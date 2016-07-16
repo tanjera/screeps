@@ -10,6 +10,8 @@ var w16s42Miner = require('w16s42.mining.op');
 
 module.exports.loop = function () {
 
+// TESTING GIT SYNC
+
     // Clear dead creeps from Memory
     for (var eachCreep in Memory.creeps) {
         if (!Game.creeps[eachCreep]) {
