@@ -24,7 +24,8 @@ var w16s43Miner = {
 	        
 	        // Carriers, try to pick up off the ground first
             if (creep.carryCapacity > 0) {
-                source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+                source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, {
+                    filter: (n) => { return n.amount > 5; } });
                 
                 if (source != null)  {
                     if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
