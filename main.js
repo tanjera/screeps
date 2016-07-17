@@ -24,7 +24,7 @@ module.exports.loop = function () {
      */
     var p2Burrower = 1;
     var p2Carrier = 2;
-    var p2Upgrader = 6;
+    var p2Upgrader = 4;
     var p2Builder = 1;
     var p2Repairer = 2;
     var p2Defender = 0;
@@ -112,6 +112,8 @@ module.exports.loop = function () {
     var lW16S42Burrower = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrower');
     var lW16S42Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42carrier');
     
+
+
     if (lW16S42Burrower.length < pW16S42Burrower) {
         var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrower'});
     }
