@@ -18,7 +18,7 @@ module.exports.loop = function () {
     }
 
 
-/* TO DO: ssh success
+/* TO DO:
 
 	Iterate rooms with Object.keys(Game.rooms)
 		then iterate the rooms to memory, update each tick
@@ -119,7 +119,7 @@ module.exports.loop = function () {
      */
     var pW16S42BurrowerW = 1;
     var pW16S42BurrowerE = 1;
-    var pW16S42Carrier = 4;
+    var pW16S42Carrier = 6;
     
     var lW16S42BurrowerW = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerW');
     var lW16S42BurrowerE = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerE');
