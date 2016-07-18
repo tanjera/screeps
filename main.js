@@ -52,10 +52,10 @@ module.exports.loop = function () {
         if (l2Carrier.length < p2Carrier && l2Miner == 0) // Possibly colony wiped? Need restart?
             var newHarvester = Game.spawns.Spawn2.createCreep([WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'w16s43miner'});
         else
-            var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE], null, {role: 'w16s43burrower'});
+            var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s43burrower'});
     }
     else if (l2Carrier.length < p2Carrier) {
-        var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s43carrier'});
+        var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s43carrier'});
     }
     else if (l2Upgrader.length < p2Upgrader) {
         var newUpgrader = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s43upgrader'});
@@ -133,7 +133,7 @@ module.exports.loop = function () {
         var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrowerE'});
     }
     else if (lW16S42Carrier.length < pW16S42Carrier) {
-        var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s42carrier'});
+        var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s42carrier'});
     }
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
