@@ -19,6 +19,18 @@ module.exports.loop = function () {
 
 
 
+/* TO DO:
+
+	Iterate rooms with Object.keys(Game.rooms)
+		then iterate the rooms to memory, update each tick
+		note hostility, controller level, # of sources
+		note explored rooms surrounding... iterate exits???
+		balance amount of creeps in the room and surrounding rooms (may need scout to scout all surrounding rooms)
+*/
+
+
+
+
     /* W16S43 
      * COLONY OPERATION (#2)
      */
@@ -106,23 +118,28 @@ module.exports.loop = function () {
      * Mining Operation 
      * (from Colony #2, W16S43)
      */
-    var pW16S42Burrower = 1;
-    var pW16S42Carrier = 2;
+    var pW16S42BurrowerW = 1;
+    var pW16S42BurrowerE = 1;
+    var pW16S42Carrier = 4;
     
-    var lW16S42Burrower = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrower');
+    var lW16S42BurrowerW = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerW');
+    var lW16S42BurrowerE = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerE');
     var lW16S42Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42carrier');
     
 
 
-    if (lW16S42Burrower.length < pW16S42Burrower) {
-        var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrower'});
+    if (lW16S42BurrowerW.length < pW16S42BurrowerW) {
+        var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrowerW'});
+    }
+    else if (lW16S42BurrowerE.length < pW16S42BurrowerE) {
+        var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrowerE'});
     }
     else if (lW16S42Carrier.length < pW16S42Carrier) {
         var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s42carrier'});
     }
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
-        if (thisCreep.memory.role == 'w16s42burrower' || thisCreep.memory.role == 'w16s42carrier') {
+        if (thisCreep.memory.role == 'w16s42burrowerW' || thisCreep.memory.role == 'w16s42burrowerE' || thisCreep.memory.role == 'w16s42carrier') {
             w16s42Miner.run(thisCreep);
         }
     }

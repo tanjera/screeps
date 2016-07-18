@@ -47,7 +47,11 @@ var w16s42Miner = {
                         }
                     }
                 } else { // Burrowers, straight to the source
-                    source = Game.getObjectById('577b93490f9d51615fa47ead');    
+                    if (creep.memory.role == 'w16s42burrowerW') {
+                        source = Game.getObjectById('577b93490f9d51615fa47ead');
+                    } else if (creep.memory.role == 'w16s42burrowerE') {
+                        source = Game.getObjectById('577b93490f9d51615fa47eaf');
+                    }
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source);
