@@ -18,6 +18,22 @@ module.exports.loop = function () {
     }
 
 
+/* Test code & ideas:
+
+	try: possible to iterate rooms with Object.keys(Game.rooms)????
+	.... console.log(Object.keys(Game.rooms));
+	.... or ... Object.keys(Game.rooms).forEach(function(n){ console.log(n); });
+
+
+	if possible to iterate rooms:
+		then iterate the rooms to memory, update each tick
+		note hostility, controller level, # of sources
+		note explored rooms surrounding... iterate exits???
+		balance amount of creeps in the room and surrounding rooms (may need scout to scout all surrounding rooms)
+
+*/
+
+
 
 /* TO DO:
 
