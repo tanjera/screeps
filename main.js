@@ -25,8 +25,19 @@ module.exports.loop = function () {
 		note hostility, controller level, # of sources
 		note explored rooms surrounding... iterate exits???
 		balance amount of creeps in the room and surrounding rooms (may need scout to scout all surrounding rooms)
-*/
 
+
+
+    // Iterate all rooms to memory
+
+    for (var n in Object.keys(Game.rooms)) {
+        if (Game.rooms[n]) {
+            Memory.rooms[n] = {
+                'Hostile_Creeps': Game.rooms[n].find(FIND_HOSTILE_CREEPS),
+                'Sources': Game.rooms[n].find(FIND_SOURCES) };
+        }
+    }
+*/     
 
 
 
@@ -119,7 +130,7 @@ module.exports.loop = function () {
      */
     var pW16S42BurrowerW = 1;
     var pW16S42BurrowerE = 1;
-    var pW16S42Carrier = 6;
+    var pW16S42Carrier = 5;
     
     var lW16S42BurrowerW = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerW');
     var lW16S42BurrowerE = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerE');
