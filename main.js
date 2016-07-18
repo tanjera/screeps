@@ -18,7 +18,7 @@ module.exports.loop = function () {
     }
 
 
-/* TO DO:
+/* TO DO: ssh success
 
 	Iterate rooms with Object.keys(Game.rooms)
 		then iterate the rooms to memory, update each tick
