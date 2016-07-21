@@ -2,7 +2,7 @@ var RoleWorker = {
 
     run: function(creep) {
 
-        var _ticksReusePath = 16;
+        var _ticksReusePath = 25;
 
         // Manage machine states!
         if (creep.memory.state == 'working' && creep.carry[RESOURCE_ENERGY] == 0) {
