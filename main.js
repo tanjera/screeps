@@ -4,6 +4,8 @@ var w18s43Worker = require('w18s43.worker');
 var w16s43Miner = require('w16s43.miner');
 var w16s43Worker = require('w16s43.worker');
 
+var MiningOp = require('mining.op');
+
 var w16s41Miner = require('w16s41.mining.op');
 var w17s42Miner = require('w17s42.mining.op');
 var w17s43Miner = require('w17s43.mining.op');
