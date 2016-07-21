@@ -2,7 +2,7 @@ var RoleMiner = {
 
     run: function(creep, rmDeliver, rmHarvest) {
 
-        var _ticksReusePath = 25;
+        var _ticksReusePath = 10;
 
         // Burrower?
         if (creep.carryCapacity == 0) {
@@ -26,12 +26,12 @@ var RoleMiner = {
                     creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
                     creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
-                        creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
+                        creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
                     }
                 }
                 else {
-                    var result = creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
-                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH || Game.map.getTerrainAt(creep.memory.exit.x, creep.memory.exit.y, creep.room.name) == 'wall') {
+                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
+                    if (result == ERR_NO_PATH) {
                         delete creep.memory.route;
                         delete creep.memory.exit;
                     }
@@ -107,12 +107,12 @@ var RoleMiner = {
                     creep.memory.route = Game.map.findRoute(creep.room, rmDeliver);
                     creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
-                        creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
+                        creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
                     }
                 }
                 else {
-                    var result = creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
-                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH || Game.map.getTerrainAt(creep.memory.exit.x, creep.memory.exit.y, creep.room.name) == 'wall') {
+                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
+                    if (result == ERR_NO_PATH) {
                         delete creep.memory.route;
                         delete creep.memory.exit;
                     }
