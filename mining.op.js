@@ -20,9 +20,13 @@ var MiningOp = {
         
 	    if(creep.memory.state == 'getenergy') {
 	        if (creep.room.name != rmHarvest) {
-    	        var route = Game.map.findRoute(creep.room, rmHarvest);
-                if (route.length > 0) {
-                    var exit = creep.pos.findClosestByRange(route[0].exit);
+    	        if (creep.memory.route == null || creep.memory.route[0].room != creep.room) {
+                    creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
+                    if (creep.memory.route.length > 0) {
+                        creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+                    }
+                }
+                else {
                     creep.moveTo(exit);
                 }
 	        }
@@ -47,7 +51,7 @@ var MiningOp = {
                 } else { // Burrowers, straight to the source
                     
                     source = Game.getObjectById(idSource);
-                    //console.log(idSource);
+                    
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source);
@@ -82,10 +86,13 @@ var MiningOp = {
 	            }
 	        }
 	        else if (creep.room.name != rmDeliver) {
-	            var route = Game.map.findRoute(creep.room, rmDeliver);
-	            
-	            if (route.length > 0) {
-                    var exit = creep.pos.findClosestByPath(route[0].exit);
+    	        if (creep.memory.route == null || creep.memory.route[0].room != creep.room) {
+                    creep.memory.route = Game.map.findRoute(creep.room, rmDeliver);
+                    if (creep.memory.route.length > 0) {
+                        creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+                    }
+                }
+                else {
                     creep.moveTo(exit);
                 }
 	        }
