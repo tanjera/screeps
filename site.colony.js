@@ -10,7 +10,7 @@ var siteColony = {
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
         
         if (lWorker.length < popWorker) {
-            spawn.createCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', room: rmColony});
+            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', room: rmColony});
         }
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
             || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS).length)) {
