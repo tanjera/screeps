@@ -56,7 +56,9 @@ var RoleWorker = {
         // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
 
             if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 5000) {
-                if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                var r = creep.upgradeController(creep.room.controller); 
+                if (r == OK) return;
+                else if (r == ERR_NOT_IN_RANGE) {
                     creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
                     return;
                 }
@@ -74,7 +76,9 @@ var RoleWorker = {
                             } 
                     }); 
             if (structure != null) {
-                if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
+                var r = creep.repair(structure); 
+                if (r == OK) return;
+                else if(r == ERR_NOT_IN_RANGE) {
                     creep.moveTo(structure, {reusePath: _ticksReusePath});
                     return;
                 }
@@ -83,7 +87,9 @@ var RoleWorker = {
             // Build construction sites
             structure = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
             if (structure != null) {
-                if(creep.build(structure) == ERR_NOT_IN_RANGE) {
+                var r = creep.build(structure);
+                if (r == OK) return;
+                else if (r == ERR_NOT_IN_RANGE) {
                     creep.moveTo(structure, {reusePath: _ticksReusePath});
                     return;
                 }
@@ -100,7 +106,9 @@ var RoleWorker = {
                                 } 
                         });
                 if (structure != null) {
-                    if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
+                    var r = creep.repair(structure);
+                    if (r == OK) return;
+                    else if (r == ERR_NOT_IN_RANGE) {
                         creep.moveTo(structure, {reusePath: _ticksReusePath});
                         return;
                     }
@@ -108,7 +116,9 @@ var RoleWorker = {
             }
 
             // Or upgrade the controller
-            if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+            var r = creep.upgradeController(creep.room.controller);
+            if (r == OK) return;
+            else if (r == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
                 return;
             }
