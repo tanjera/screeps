@@ -4,6 +4,7 @@ var w18s43Worker = require('w18s43.worker');
 var w16s43Miner = require('w16s43.miner');
 var w16s43Worker = require('w16s43.worker');
 
+var w16s41Miner = require('w16s41.mining.op');
 var w17s42Miner = require('w17s42.mining.op');
 var w17s43Miner = require('w17s43.mining.op');
 var w19s43Miner = require('w19s43.mining.op');
@@ -175,6 +176,30 @@ module.exports.loop = function () {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w17s42burrower' || thisCreep.memory.role == 'w17s42carrier') {
             w17s42Miner.run(thisCreep);
+        }
+    }
+
+    /* W16S41 
+     * Mining Operation 
+     * (from Colony #2, W16S43)
+     */
+    var pW16S41Burrower = 1;
+    var pW16S41Carrier = 2;
+    
+    var lW16S41Burrower = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s41burrower');
+    var lW16S41Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s41carrier');
+    
+
+    if (lW16S41Burrower.length < pW16S41Burrower) {
+        var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s41burrower'});
+    }
+    else if (lW16S41Carrier.length < pW16S41Carrier) {
+        var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s41carrier'});
+    }
+    for (var eachName in Game.creeps) {
+        var thisCreep = Game.creeps[eachName];
+        if (thisCreep.memory.role == 'w16s41burrower' || thisCreep.memory.role == 'w16s41carrier') {
+            w16s41Miner.run(thisCreep);
         }
     }
 
