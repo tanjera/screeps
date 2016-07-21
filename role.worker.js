@@ -1,6 +1,5 @@
 var RoleWorker = {
 
-    /** @param {Creep} creep **/
     run: function(creep) {
 
         // Manage machine states!

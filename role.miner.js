@@ -1,6 +1,6 @@
-var RoleMining = {
+var RoleMiner = {
 
-    run: function(creep, rmDeliver, rmHarvest, idSource) {
+    run: function(creep, rmDeliver, rmHarvest) {
         
         // Burrower?
         if (creep.carryCapacity == 0) {
@@ -50,7 +50,7 @@ var RoleMining = {
                             creep.moveTo(source);
                         }
                     } else {
-                        source = Game.getObjectById(idSource);
+                        source = creep.pos.findClosestByRange(FIND_SOURCES);
                         
                         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source);
@@ -58,8 +58,7 @@ var RoleMining = {
                     }
                 } else { // Burrowers, straight to the source
                     
-                    source = Game.getObjectById(idSource);
-                    
+                    source = creep.pos.findClosestByRange(FIND_SOURCES);
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source);
@@ -79,7 +78,7 @@ var RoleMining = {
                         filter: (structure) => {
                             return (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity)
                                 || (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity)
-                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 2);
+                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity);
                         }
                 });
                 // And to extensions/containers otherwise
@@ -116,4 +115,4 @@ var RoleMining = {
 	}
 };
 
-module.exports = RoleMining;
+module.exports = RoleMiner;

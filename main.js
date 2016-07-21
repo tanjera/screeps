@@ -1,3 +1,5 @@
+var siteMining = require('site.mining');
+
 var roleMiner = require('role.miner');
 var roleWorker = require('role.worker');
 var roleSoldier = require('role.soldier');
@@ -14,8 +16,9 @@ module.exports.loop = function () {
 
 
 /* TO DO:
-    finish refactoring role.worker.js
-    refactor colony & mining op code into one function 
+    refactor colonies into siteColony
+
+    scale colony and mining op body parts by room controller level...
 
     split helper functions into separate functions
         e.g. navigating rooms- move from role.miner to navigate room code??
@@ -105,52 +108,13 @@ module.exports.loop = function () {
     }
     
     
-    
-    /* W16S42 
-     * Mining Operation 
-     * (from Colony #2, W16S43)
-     */
-    var pW16S42BurrowerW = 1;
-    var pW16S42BurrowerE = 1;
-    var pW16S42Carrier = 4;
-    
-    var lW16S42BurrowerW = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerW');
-    var lW16S42BurrowerE = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42burrowerE');
-    var lW16S42Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42carrier');
-    
 
-    if (Game.rooms.W16S42 != null && Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS).length > 0) {
-        var lW16S42Defender = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42defender');
-        if (lW16S42Defender.length == 0) {
-            var newDefender = Game.spawns.Spawn2.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
-                                                            ATTACK, ATTACK, ATTACK, 
-                                                            MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42defender'});
-        }
+    // siteMining.run(spawn, rmDeliver, rmHarvest, popBurrower, popCarrier, popMiner)
 
-        for (var n = 0; n < lW16S42Defender.length; n++) {
-            if (lW16S42Defender[n].attack(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                lW16S42Defender[n].moveTo(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]);
-            }
-        }
-    }
-    if (lW16S42BurrowerW.length < pW16S42BurrowerW) {
-        var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrowerW'});
-    }
-    else if (lW16S42BurrowerE.length < pW16S42BurrowerE) {
-        var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrowerE'});
-    }
-    else if (lW16S42Carrier.length < pW16S42Carrier) {
-        var newHarvester = Game.spawns.Spawn2.createCreep([CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], null, {role: 'w16s42carrier'});
-    }
-    for (var eachName in Game.creeps) {
-        var thisCreep = Game.creeps[eachName];
-        if (thisCreep.memory.role == 'w16s42burrowerW' || thisCreep.memory.role == 'w16s42carrier') {
-            roleMiner.run(thisCreep, 'W16S43', 'W16S42', '577b93490f9d51615fa47ead');
-        }
-        else if (thisCreep.memory.role == 'w16s42burrowerE') {
-            roleMiner.run(thisCreep, 'W16S43', 'W16S42', '577b93490f9d51615fa47eaf');
-        }
-    }
+    
+    /* W16S42     * Mining Operation     * (from Colony #2, W16S43)    */
+    siteMining.run(Game.spawns.Spawn2, 'W16S43', 'W16S42', 2, 4, 0);
+
         
     /* W17S42 
      * Mining Operation 

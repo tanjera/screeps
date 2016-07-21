@@ -1,7 +1,5 @@
-
 var RoleSoldier = {
 
-    /** @param {Creep} creep **/
     run: function(creep, tgtRoom) {
 
         var targets = creep.room.find(FIND_HOSTILE_CREEPS);
