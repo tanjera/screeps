@@ -13,6 +13,9 @@ module.exports.loop = function () {
 
 
 /* TO DO:
+    bugs:
+        - miners are still being made???
+    
     scale colony and mining op body parts by room controller level...
 
     split helper functions into separate functions
