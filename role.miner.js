@@ -2,7 +2,7 @@ var RoleMiner = {
 
     run: function(creep, rmDeliver, rmHarvest) {
 
-        var _ticksReusePath = 10;
+        var _ticksReusePath = 16;
 
         // Burrower?
         if (creep.carryCapacity == 0) {

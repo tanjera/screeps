@@ -2,6 +2,8 @@ var RoleWorker = {
 
     run: function(creep) {
 
+        var _ticksReusePath = 16;
+
         // Manage machine states!
         if (creep.memory.state == 'working' && creep.carry[RESOURCE_ENERGY] == 0) {
             creep.memory.state = 'getenergy';
@@ -22,7 +24,7 @@ var RoleWorker = {
             
             if (source != null)  {
                 if (creep.pickup(source) == ERR_NOT_IN_RANGE)
-                    creep.moveTo(source);
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
             }
             
             else // Try to pull energy from storage containers...
@@ -36,14 +38,14 @@ var RoleWorker = {
                 
                 if (source != null) {
                     if (source.transfer(creep, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source);
+                        creep.moveTo(source, {reusePath: _ticksReusePath});
                     }
                 }
                 else { // But if there are none... then harvest from a source
                     
                     source = creep.pos.findClosestByPath(FIND_SOURCES);
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source);
+                        creep.moveTo(source, {reusePath: _ticksReusePath});
                     } 
                 }
             }
@@ -55,7 +57,7 @@ var RoleWorker = {
 
             if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 5000) {
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(creep.room.controller);
+                    creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
                     return;
                 }
             }
@@ -73,7 +75,7 @@ var RoleWorker = {
                     }); 
             if (structure != null) {
                 if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure);
+                    creep.moveTo(structure, {reusePath: _ticksReusePath});
                     return;
                 }
             }
@@ -82,7 +84,7 @@ var RoleWorker = {
             structure = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
             if (structure != null) {
                 if(creep.build(structure) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure);
+                    creep.moveTo(structure, {reusePath: _ticksReusePath});
                     return;
                 }
             }
@@ -99,7 +101,7 @@ var RoleWorker = {
                         });
                 if (structure != null) {
                     if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(structure);
+                        creep.moveTo(structure, {reusePath: _ticksReusePath});
                         return;
                     }
                 }
@@ -107,7 +109,7 @@ var RoleWorker = {
 
             // Or upgrade the controller
             if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller);
+                creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
                 return;
             }
 	    }
