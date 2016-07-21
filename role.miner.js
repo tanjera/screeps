@@ -1,7 +1,9 @@
 var RoleMiner = {
 
     run: function(creep, rmDeliver, rmHarvest) {
-        
+
+        var _ticksReusePath = 10;
+
         // Burrower?
         if (creep.carryCapacity == 0) {
             creep.memory.state = 'getenergy';
@@ -24,11 +26,11 @@ var RoleMiner = {
                     creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
                     creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
-                        creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
+                        creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
                     }
                 }
                 else {
-                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
+                    var result = creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
                     if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH || Game.map.getTerrainAt(creep.memory.exit.x, creep.memory.exit.y, creep.room.name) == 'wall') {
                         delete creep.memory.route;
                         delete creep.memory.exit;
@@ -52,13 +54,13 @@ var RoleMiner = {
                     
                     if (source != null)  {
                         if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(source);
+                            creep.moveTo(source, {reusePath: _ticksReusePath});
                         }
                     } else {
                         source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                         
                         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(source);
+                            creep.moveTo(source, {reusePath: _ticksReusePath});
                         }
                     }
                 } else { // Burrowers, straight to the source
@@ -66,7 +68,7 @@ var RoleMiner = {
                     source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source);
+                        creep.moveTo(source, {reusePath: _ticksReusePath});
                     }
                 }
 	        }
@@ -97,7 +99,7 @@ var RoleMiner = {
                 };
                 
                 if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
+                    creep.moveTo(target, {reusePath: _ticksReusePath});
 	            }
 	        }
 	        else if (creep.room.name != rmDeliver) {
@@ -105,11 +107,11 @@ var RoleMiner = {
                     creep.memory.route = Game.map.findRoute(creep.room, rmDeliver);
                     creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
-                        creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
+                        creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
                     }
                 }
                 else {
-                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
+                    var result = creep.moveTo(creep.memory.exit, {reusePath: _ticksReusePath});
                     if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH || Game.map.getTerrainAt(creep.memory.exit.x, creep.memory.exit.y, creep.room.name) == 'wall') {
                         delete creep.memory.route;
                         delete creep.memory.exit;
