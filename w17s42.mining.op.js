@@ -113,4 +113,4 @@ var w17s42Miner = {
 	}
 };
 
-module.exports = w16s42Miner;
+module.exports = w17s42Miner;
