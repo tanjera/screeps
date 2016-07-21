@@ -22,7 +22,8 @@ var RoleMiner = {
         
 	    if(creep.memory.state == 'getenergy') {
 	        if (creep.room.name != rmHarvest) {
-    	        if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null) {
+    	        if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name 
+                    || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name) {
                     creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
                     creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
