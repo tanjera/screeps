@@ -92,4 +92,4 @@ var MiningOp = {
 	}
 };
 
-module.exports = w16s41Miner;
+module.exports = MiningOp;
