@@ -142,9 +142,9 @@ module.exports.loop = function () {
                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42defender'});
         }
 
-        for (var n in lW16S42Defender) {
-            if (n.attack(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                n.moveTo(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]);
+        for (var n = 0; n < lW16S42Defender.length; n++) {
+            if (lW16S42Defender[n].attack(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                lW16S42Defender[n].moveTo(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]);
             }
         }
     }
@@ -186,9 +186,9 @@ module.exports.loop = function () {
                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w17s42defender'});
         }
 
-        for (var n in lW17S42Defender) {
-            if (n.attack(Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                n.moveTo(Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS)[0]);
+        for (var n = 0; n < lW17S42Defender.length; n++) {
+            if (lW17S42Defender[n].attack(Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                lW17S42Defender[n].moveTo(Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS)[0]);
             }
         }
     }
@@ -224,9 +224,9 @@ module.exports.loop = function () {
                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s41defender'});
         }
 
-        for (var n in lW16S41Defender) {
-            if (n.attack(Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                n.moveTo(Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS)[0]);
+        for (var n = 0; n < lW16S41Defender.length; n++) {
+            if (lW16S41Defender[n].attack(Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                lW16S41Defender[n].moveTo(Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS)[0]);
             }
         }
     }
@@ -347,9 +347,9 @@ module.exports.loop = function () {
                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w17s43defender'});
         }
 
-        for (var n in lW17S43Defender) {
-            if (n.attack(Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                n.moveTo(Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS)[0]);
+        for (var n = 0; n < lW17S43Defender.length; n++) {
+            if (lW17S43Defender[n].attack(Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                lW17S43Defender[n].moveTo(Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS)[0]);
             }
         }
     }
@@ -385,9 +385,9 @@ module.exports.loop = function () {
                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w19s43defender'});
         }
 
-        for (var n in lW19S43Defender) {
-            if (n.attack(Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                n.moveTo(Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS)[0]);
+        for (var n = 0; n < lW19S43Defender.length; n++) {
+            if (lW19S43Defender[n].attack(Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                lW19S43Defender[n].moveTo(Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS)[0]);
             }
         }
     }
