@@ -55,7 +55,7 @@ var RoleMiner = {
                             creep.moveTo(source);
                         }
                     } else {
-                        source = creep.pos.findClosestByRange(FIND_SOURCES);
+                        source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }}););
                         
                         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source);
@@ -63,7 +63,7 @@ var RoleMiner = {
                     }
                 } else { // Burrowers, straight to the source
                     
-                    source = creep.pos.findClosestByRange(FIND_SOURCES);
+                    source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source);
