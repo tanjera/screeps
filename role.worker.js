@@ -67,7 +67,7 @@ var RoleWorker = {
             var structure;
 
             // Repair *critical* structures
-            structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+            structure = creep.room.find(FIND_STRUCTURES, {
                             filter: function(structure) {
                                 return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 20000)
                                     || (structure.structureType == STRUCTURE_WALL && structure.hits < 20000)
@@ -75,11 +75,11 @@ var RoleWorker = {
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 3);
                             } 
                     }); 
-            if (structure != null) {
-                var r = creep.repair(structure); 
+            if (structure.length > 0) {
+                var r = creep.repair(structure[0]); 
                 if (r == OK) return;
                 else if(r == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure, {reusePath: _ticksReusePath});
+                    creep.moveTo(structure[0], {reusePath: _ticksReusePath});
                     return;
                 }
             }
