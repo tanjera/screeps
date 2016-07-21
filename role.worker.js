@@ -87,8 +87,8 @@ var RoleWorker = {
             // Find something to build
             structure = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
             if (structure != null) {
-                if(creep.build(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
+                if(creep.build(structure) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure);
                     return;
                 }
             }
