@@ -1,3 +1,5 @@
+var roleMiner = require('role.miner');
+
 var siteMining = {
 
     // Note: Miner = Burrower + Carrier
