@@ -241,7 +241,7 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w16s41burrower' || thisCreep.memory.role == 'w16s41carrier') {
-            w16s41Miner.run(thisCreep);
+            MiningOp.run(thisCreep, 'W16S43', 'W16S41', '577b93490f9d51615fa47eaa');
         }
     }
 
