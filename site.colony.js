@@ -17,10 +17,10 @@ var siteColony = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
-            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', room: rmColony});
+            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', room: rmColony});
         }
         
         
