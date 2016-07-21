@@ -61,28 +61,16 @@ var RoleWorker = {
             }
 
             var structure;
-            // Find critical structures first
+
+            // Repair *critical* structures
             structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                             filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 20000)
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 10000)
+                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 50000)
+                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 50000)
                                     || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 3)
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 3);
                             } 
-                    });
-            // Then find structures to maintain
-            if (structure == null) {
-                structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                                filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000);
-                                } 
-                        });
-            } 
-
-            // Repair first
+                    }); 
             if (structure != null) {
                 if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(structure);
@@ -90,10 +78,26 @@ var RoleWorker = {
                 }
             }
 
-            // Find something to build
+            // Build construction sites
             structure = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
             if (structure != null) {
                 if(creep.build(structure) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure);
+                    return;
+                }
+            }
+
+            // Repair *maintenance* on structures
+            structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: function(structure) {
+                                return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
+                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
+                                    || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
+                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000);
+                            } 
+                    });
+            if (structure != null) {
+                if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(structure);
                     return;
                 }
