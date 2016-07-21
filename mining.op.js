@@ -1,6 +1,6 @@
 var MiningOp = {
 
-    run: function(creep, rmDeliver, rmHarvest, srcHarvest) {
+    run: function(creep, rmDeliver, rmHarvest, idSource) {
         
         // Burrower?
         if (creep.carryCapacity == 0) {
@@ -19,14 +19,14 @@ var MiningOp = {
         }
         
 	    if(creep.memory.state == 'getenergy') {
-	        if (creep.room != rmHarvest) {
+	        if (creep.room.name != rmHarvest) {
     	        var route = Game.map.findRoute(creep.room, rmHarvest);
                 if (route.length > 0) {
                     var exit = creep.pos.findClosestByRange(route[0].exit);
                     creep.moveTo(exit);
                 }
 	        }
-	        else if (creep.room == rmHarvest) {
+	        else if (creep.room.name == rmHarvest) {
     	        var source;
     	        
     	        // Carriers, try to pick up off the ground first
@@ -38,7 +38,7 @@ var MiningOp = {
                             creep.moveTo(source);
                         }
                     } else {
-                        source = srcHarvest;
+                        source = Game.getObjectById(idSource);
                         
                         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source);
@@ -46,7 +46,8 @@ var MiningOp = {
                     }
                 } else { // Burrowers, straight to the source
                     
-                    source = srcHarvest;
+                    source = Game.getObjectById(idSource);
+                    //console.log(idSource);
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source);
@@ -56,8 +57,7 @@ var MiningOp = {
         }
         
         if (creep.memory.state == 'working') { 
-            
-            if (creep.room == rmDeliver) {
+            if (creep.room.name == rmDeliver) {
 	            var target;
                 // Deliver to Spawns and extensions as priority
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -81,10 +81,11 @@ var MiningOp = {
                     creep.moveTo(target);
 	            }
 	        }
-	        else if (creep.room != rmDeliver) {
+	        else if (creep.room.name != rmDeliver) {
 	            var route = Game.map.findRoute(creep.room, rmDeliver);
-                if (route.length > 0) {
-                    var exit = creep.pos.findClosestByRange(route[0].exit);
+	            
+	            if (route.length > 0) {
+                    var exit = creep.pos.findClosestByPath(route[0].exit);
                     creep.moveTo(exit);
                 }
 	        }
