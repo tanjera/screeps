@@ -29,7 +29,7 @@ var siteMining = {
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];
                 
-            if (creep.memory.room == rmHarvest && creep.memory.role == 'miner' || thisCreep.memory.role == 'burrower' || thisCreep.memory.role == 'carrier') {
+            if (creep.memory.room == rmHarvest && creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                 roleMiner.run(creep, rmDeliver, rmHarvest);
             }
         }
