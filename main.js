@@ -51,7 +51,7 @@ module.exports.loop = function () {
     var p2Upgrader = 4;
     var p2Builder = 1;
     var p2Repairer = 2;
-    var p2Defender = 0;
+    var p2Defender = 1;
     
     var l2Burrower  = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s43burrower');
     var l2Carrier  = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s43carrier');
@@ -139,6 +139,20 @@ module.exports.loop = function () {
     var lW16S42Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42carrier');
     
 
+    if (Game.rooms.W16S42 != null && Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS).length > 0) {
+        var lW16S42Defender = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s42defender');
+        if (lW16S42Defender.length == 0) {
+            var newDefender = Game.spawns.Spawn2.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
+                                                            ATTACK, ATTACK, ATTACK, 
+                                                            MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42defender'});
+        }
+
+        for (var n in lW16S42Defender) {
+            if (n.attack(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                n.moveTo(Game.rooms.W16S42.find(FIND_HOSTILE_CREEPS)[0]);
+            }
+        }
+    }
     if (lW16S42BurrowerW.length < pW16S42BurrowerW) {
         var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s42burrowerW'});
     }
@@ -166,6 +180,20 @@ module.exports.loop = function () {
     var lW17S42Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w17s42carrier');
     
 
+    if (Game.rooms.W17S42 != null && Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS).length > 0) {
+        var lW17S42Defender = _.filter(Game.creeps, (creep) => creep.memory.role == 'w17s42defender');
+        if (lW17S42Defender.length == 0) {
+            var newDefender = Game.spawns.Spawn2.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
+                                                            ATTACK, ATTACK, ATTACK, 
+                                                            MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w17s42defender'});
+        }
+
+        for (var n in lW17S42Defender) {
+            if (n.attack(Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                n.moveTo(Game.rooms.W17S42.find(FIND_HOSTILE_CREEPS)[0]);
+            }
+        }
+    }
     if (lW17S42Burrower.length < pW17S42Burrower) {
         var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w17s42burrower'});
     }
@@ -190,6 +218,20 @@ module.exports.loop = function () {
     var lW16S41Carrier = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s41carrier');
     
 
+    if (Game.rooms.W16S41 != null && Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS).length > 0) {
+        var lW16S41Defender = _.filter(Game.creeps, (creep) => creep.memory.role == 'w16s41defender');
+        if (lW16S41Defender.length == 0) {
+            var newDefender = Game.spawns.Spawn2.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
+                                                            ATTACK, ATTACK, ATTACK, 
+                                                            MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s41defender'});
+        }
+
+        for (var n in lW16S41Defender) {
+            if (n.attack(Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                n.moveTo(Game.rooms.W16S41.find(FIND_HOSTILE_CREEPS)[0]);
+            }
+        }
+    }
     if (lW16S41Burrower.length < pW16S41Burrower) {
         var newHarvester = Game.spawns.Spawn2.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w16s41burrower'});
     }
@@ -215,7 +257,7 @@ module.exports.loop = function () {
     var p1Upgrader = 6;
     var p1Builder = 1;
     var p1Repairer = 2;
-    var p1Defender = 0;
+    var p1Defender = 1;
     
     var l1MinerN = _.filter(Game.creeps, (creep) => creep.memory.role == 'w18s43MinerN');
     var l1MinerS = _.filter(Game.creeps, (creep) => creep.memory.role == 'w18s43MinerS');
@@ -295,6 +337,21 @@ module.exports.loop = function () {
     var pW17S43MinerW = 4;
     var pW17S43MinerE = 3;
     
+
+    if (Game.rooms.W17S43 != null && Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS).length > 0) {
+        var lW17S43Defender = _.filter(Game.creeps, (creep) => creep.memory.role == 'w17s43defender');
+        if (lW17S43Defender.length == 0) {
+            var newDefender = Game.spawns.Spawn1.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
+                                                            ATTACK, ATTACK, ATTACK, 
+                                                            MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w17s43defender'});
+        }
+
+        for (var n in lW17S43Defender) {
+            if (n.attack(Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                n.moveTo(Game.rooms.W17S43.find(FIND_HOSTILE_CREEPS)[0]);
+            }
+        }
+    }
     var lW17S43MinerW = _.filter(Game.creeps, (creep) => creep.memory.role == 'w17s43minerW');
     if (lW17S43MinerW.length < pW17S43MinerW) {
         var newHarvester = Game.spawns.Spawn1.createCreep([WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w17s43minerW'});
@@ -317,6 +374,20 @@ module.exports.loop = function () {
      */
     var pW19S43Miner = 3;
     
+    if (Game.rooms.W19S43 != null && Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS).length > 0) {
+        var lW19S43Defender = _.filter(Game.creeps, (creep) => creep.memory.role == 'w19s43defender');
+        if (lW19S43Defender.length == 0) {
+            var newDefender = Game.spawns.Spawn1.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
+                                                            ATTACK, ATTACK, ATTACK, 
+                                                            MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w19s43defender'});
+        }
+
+        for (var n in lW19S43Defender) {
+            if (n.attack(Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                n.moveTo(Game.rooms.W19S43.find(FIND_HOSTILE_CREEPS)[0]);
+            }
+        }
+    }
     var lW19S43Miner = _.filter(Game.creeps, (creep) => creep.memory.role == 'w19s43miner');
     if (lW19S43Miner.length < pW19S43Miner) {
         var newHarvester = Game.spawns.Spawn1.createCreep([WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w19s43miner'});
