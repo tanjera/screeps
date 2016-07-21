@@ -20,17 +20,23 @@ var MiningOp = {
         
 	    if(creep.memory.state == 'getenergy') {
 	        if (creep.room.name != rmHarvest) {
-    	        if (creep.memory.route == null || creep.memory.route[0].room != creep.room) {
+    	        if (creep.memory.route == null || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null) {
                     creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
                     if (creep.memory.route.length > 0) {
                         creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
                     }
                 }
                 else {
-                    creep.moveTo(exit);
+                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
+                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH) {
+                        delete creep.memory.route;
+                    }
                 }
 	        }
 	        else if (creep.room.name == rmHarvest) {
+    	        delete creep.memory.route;
+    	        delete creep.memory.exit;
+    	        
     	        var source;
     	        
     	        // Carriers, try to pick up off the ground first
@@ -62,6 +68,9 @@ var MiningOp = {
         
         if (creep.memory.state == 'working') { 
             if (creep.room.name == rmDeliver) {
+                delete creep.memory.route;
+    	        delete creep.memory.exit;
+    	        
 	            var target;
                 // Deliver to Spawns and extensions as priority
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -86,14 +95,18 @@ var MiningOp = {
 	            }
 	        }
 	        else if (creep.room.name != rmDeliver) {
-    	        if (creep.memory.route == null || creep.memory.route[0].room != creep.room) {
+    	        if (creep.memory.route == null || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null) {
+    	            
                     creep.memory.route = Game.map.findRoute(creep.room, rmDeliver);
                     if (creep.memory.route.length > 0) {
                         creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
                     }
                 }
                 else {
-                    creep.moveTo(exit);
+                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
+                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH) {
+                        delete creep.memory.route;
+                    }
                 }
 	        }
         }
