@@ -43,7 +43,7 @@ var RoleMiner = {
     	        
     	        // Carriers, try to pick up off the ground first
                 if (creep.carryCapacity > 0) {
-                    source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+                    source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount > 10; }});
                     
                     if (source != null)  {
                         if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
