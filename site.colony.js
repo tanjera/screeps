@@ -4,20 +4,25 @@ var roleSoldier = require('role.soldier');
 
 var siteColony = {
 
-    run: function(spawn, rmColony, popWorker, popSoldier) {
+    run: function(spawn, rmColony, popRepairer, popWorker, popSoldier) {
     
+        var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'repairer' && creep.memory.room == rmColony);
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
         
-        if (lWorker.length < popWorker) {
-            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', room: rmColony});
-        }
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
             || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS).length)) {
             spawn.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
                                 ATTACK, ATTACK, ATTACK, 
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'soldier', room: rmColony});
         }
+        else if (lRepairer.length < popRepairer) {
+            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', subrole: 'repairer', room: rmColony});
+        }
+        else if (lWorker.length < popWorker) {
+            spawn.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'worker', room: rmColony});
+        }
+        
         
         // Run roles!
         for (var n in Game.creeps) {

@@ -3,7 +3,7 @@ var RoleWorker = {
     run: function(creep) {
 
         // Manage machine states!
-        if (creep.memory.state == 'working' && creep.carry[RESOURCE_ENERGY] == 0 && creep.memory.role != 'w16s43defender') {
+        if (creep.memory.state == 'working' && creep.carry[RESOURCE_ENERGY] == 0) {
             creep.memory.state = 'getenergy';
         }
         else if (creep.memory.state == 'getenergy' && creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
@@ -53,7 +53,7 @@ var RoleWorker = {
 	    else if (creep.memory.state == 'working') {
         // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
 
-	        if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 5000) {
+            if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 5000) {
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(creep.room.controller);
                     return;
@@ -87,8 +87,8 @@ var RoleWorker = {
                 }
             }
 
-            // Repair *maintenance* on structures *every 3rd minute for an entire minute*
-            if (new Date().getMinutes() % 3 == 1) {
+            // Repair *maintenance* for subrole repairers
+            if (creep.memory.subrole == 'repairer') {
                 structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                                 filter: function(structure) {
                                     return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
