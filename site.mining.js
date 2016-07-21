@@ -4,12 +4,28 @@ var siteMining = {
 
     // Note: Miner = Burrower + Carrier
     run: function(spawn, rmDeliver, rmHarvest, popBurrower, popCarrier, popMiner) {
-    
+
+        // Defend the mining op!
+        if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length > 0) {
+            var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
+            if (lDefender.length == 0) {
+                spawn.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, 
+                                    ATTACK, ATTACK, 
+                                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'defender', room: rmHarvest});
+            }
+
+            for (var n = 0; n < lDefender.length; n++) {
+                if (lDefender[n].attack(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                    lDefender[n].moveTo(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]);
+                }
+            }
+        }
+
+        // Populate the mining op
         var lBurrower  = _.filter(Game.creeps, (creep) => creep.memory.role == 'burrower' && creep.memory.room == rmHarvest);
         var lCarrier  = _.filter(Game.creeps, (creep) => creep.memory.role == 'carrier' && creep.memory.room == rmHarvest);
         var lMiner  = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.memory.room == rmHarvest);
         
-
         if (lMiner.length < popMiner) {
             if (lMiner.length == 0) // Possibly colony wiped? Need restart?
                 spawn.createCreep([WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'miner', room: rmHarvest});
