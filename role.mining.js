@@ -22,13 +22,12 @@ var RoleMining = {
 	        if (creep.room.name != rmHarvest) {
     	        if (creep.memory.route == null || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null) {
                     creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
-                    if (creep.memory.route.length > 0) {
-                        creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
-                    }
+                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+                    
                 }
                 else {
                     var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
-                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH) {
+                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH || Game.map.getTerrainAt(creep.memory.exit.x, creep.memory.exit.y, creep.room.name) == 'wall') {
                         delete creep.memory.route;
                     }
                 }
@@ -104,7 +103,7 @@ var RoleMining = {
                 }
                 else {
                     var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y);
-                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH) {
+                    if (result == ERR_INVALID_TARGET || result == ERR_NO_PATH || Game.map.getTerrainAt(creep.memory.exit.x, creep.memory.exit.y, creep.room.name) == 'wall') {
                         delete creep.memory.route;
                     }
                 }
