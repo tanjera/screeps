@@ -75,7 +75,7 @@ module.exports.loop = function () {
             roleMiner.run(thisCreep, 'W16S43', 'W16S43', '577b93490f9d51615fa47eb2');
         }
         else if (thisCreep.memory.role == 'w16s43upgrader' || thisCreep.memory.role == 'w16s43builder' || thisCreep.memory.role == 'w16s43repairer') {
-            RoleWorker.run(thisCreep);
+            roleWorker.run(thisCreep);
         }
     }
     
@@ -286,7 +286,7 @@ module.exports.loop = function () {
         }
         else if (thisCreep.memory.role == 'w18s43upgrader' || thisCreep.memory.role == 'w18s43builder' 
         || thisCreep.memory.role == 'w18s43repairer' || thisCreep.memory.role == 'w18s43defender') {
-            RoleWorker.run(thisCreep);
+            roleWorker.run(thisCreep);
         }
     }
     
