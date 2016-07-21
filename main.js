@@ -109,25 +109,12 @@ module.exports.loop = function () {
     /* W18S43
      * COLONY OPERATION (#1)
      */
-    var p1MinerN = 4;
-    var p1MinerS = 2;
     var p1Upgrader = 6;
     var p1Builder = 1;
     var p1Repairer = 2;
     var p1Defender = 1;
     
-    var l1MinerN = _.filter(Game.creeps, (creep) => creep.memory.role == 'w18s43MinerN');
-    var l1MinerS = _.filter(Game.creeps, (creep) => creep.memory.role == 'w18s43MinerS');
     
-    if (l1MinerN.length < p1MinerN) {
-        if (l1MinerN.length == 0)
-            var newHarvester = Game.spawns.Spawn1.createCreep([WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'w18s43MinerN'});
-        else
-            var newHarvester = Game.spawns.Spawn1.createCreep([WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], null, {role: 'w18s43MinerN'});
-    }
-    if (l1MinerS.length < p1MinerS) {
-        var newHarvester = Game.spawns.Spawn1.createCreep([WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'w18s43MinerS'});
-    }
     var l1Upgrader = _.filter(Game.creeps, (creep) => creep.memory.role == 'w18s43upgrader');
     if (l1Upgrader.length < p1Upgrader) {
         var newUpgrader = Game.spawns.Spawn1.createCreep([WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], null, {role: 'w18s43upgrader'});
@@ -190,6 +177,7 @@ module.exports.loop = function () {
     }
     
     // siteMining.run(spawn, rmDeliver, rmHarvest, popBurrower, popCarrier, popMiner)
+    siteMining.run(Game.spawns.Spawn2, 'W18S43', 'W18S43', 2, 4, 0);    // W18S43 colony #1 mining
     siteMining.run(Game.spawns.Spawn2, 'W18S43', 'W17S43', 2, 5, 0);    // W17S43 mining operation (from Colony #1, W18S43)
     siteMining.run(Game.spawns.Spawn2, 'W18S43', 'W19S43', 1, 3, 0);    // W19S43 mining operation (from Colony #1, W18S43)
     
