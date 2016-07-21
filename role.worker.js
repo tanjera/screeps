@@ -65,8 +65,8 @@ var RoleWorker = {
             // Repair *critical* structures
             structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                             filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 50000)
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 50000)
+                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 20000)
+                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 20000)
                                     || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 3)
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 3);
                             } 
@@ -87,19 +87,21 @@ var RoleWorker = {
                 }
             }
 
-            // Repair *maintenance* on structures
-            structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
-                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
-                                    || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000);
-                            } 
-                    });
-            if (structure != null) {
-                if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure);
-                    return;
+            // Repair *maintenance* on structures *every 3rd minute for an entire minute*
+            if (new Date().getMinutes() % 3 == 1) {
+                structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                                filter: function(structure) {
+                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
+                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
+                                        || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
+                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000);
+                                } 
+                        });
+                if (structure != null) {
+                    if(creep.repair(structure) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(structure);
+                        return;
+                    }
                 }
             }
 
