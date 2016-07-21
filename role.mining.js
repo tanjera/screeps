@@ -1,4 +1,4 @@
-var MiningOp = {
+var RoleMining = {
 
     run: function(creep, rmDeliver, rmHarvest, idSource) {
         
@@ -113,4 +113,4 @@ var MiningOp = {
 	}
 };
 
-module.exports = MiningOp;
+module.exports = RoleMining;

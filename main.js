@@ -1,10 +1,8 @@
-var w18s43Miner = require('w18s43.miner');
 var w18s43Worker = require('w18s43.worker');
 
-var w16s43Miner = require('w16s43.miner');
 var w16s43Worker = require('w16s43.worker');
 
-var MiningOp = require('mining.op');
+var roleMiner = require('role.mining');
 
 
 module.exports.loop = function () {
@@ -89,7 +87,7 @@ module.exports.loop = function () {
         var thisCreep = Game.creeps[eachName];
             
         if (thisCreep.memory.role == 'w16s43miner' || thisCreep.memory.role == 'w16s43burrower' || thisCreep.memory.role == 'w16s43carrier') {
-            w16s43Miner.run(thisCreep);
+            roleMiner.run(thisCreep, 'W16S43', 'W16S43', '577b93490f9d51615fa47eb2');
         }
         else if (thisCreep.memory.role == 'w16s43upgrader' || thisCreep.memory.role == 'w16s43builder' || thisCreep.memory.role == 'w16s43repairer') {
             w16s43Worker.run(thisCreep);
@@ -162,10 +160,10 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w16s42burrowerW' || thisCreep.memory.role == 'w16s42carrier') {
-            MiningOp.run(thisCreep, 'W16S43', 'W16S42', '577b93490f9d51615fa47ead');
+            roleMiner.run(thisCreep, 'W16S43', 'W16S42', '577b93490f9d51615fa47ead');
         }
         else if (thisCreep.memory.role == 'w16s42burrowerE') {
-            MiningOp.run(thisCreep, 'W16S43', 'W16S42', '577b93490f9d51615fa47eaf');
+            roleMiner.run(thisCreep, 'W16S43', 'W16S42', '577b93490f9d51615fa47eaf');
         }
     }
         
@@ -203,7 +201,7 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w17s42burrower' || thisCreep.memory.role == 'w17s42carrier') {
-            MiningOp.run(thisCreep, 'W16S43', 'W17S42', '577b93460f9d51615fa47e5e');
+            roleMiner.run(thisCreep, 'W16S43', 'W17S42', '577b93460f9d51615fa47e5e');
         }
     }
 
@@ -241,7 +239,7 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w16s41burrower' || thisCreep.memory.role == 'w16s41carrier') {
-            MiningOp.run(thisCreep, 'W16S43', 'W16S41', '577b93490f9d51615fa47eaa');
+            roleMiner.run(thisCreep, 'W16S43', 'W16S41', '577b93490f9d51615fa47eaa');
         }
     }
 
@@ -295,8 +293,11 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         
-        if (thisCreep.memory.role == 'w18s43MinerS' || thisCreep.memory.role == 'w18s43MinerN') {
-            w18s43Miner.run(thisCreep);
+        if (thisCreep.memory.role == 'w18s43MinerN') {
+            roleMiner.run(thisCreep, 'W18S43', 'W18S43', '577b93430f9d51615fa47e1d');
+        }
+        else if (thisCreep.memory.role == 'w18s43MinerS') {
+            roleMiner.run(thisCreep, 'W18S43', 'W18S43', '577b93430f9d51615fa47e1e');
         }
         else if (thisCreep.memory.role == 'w18s43upgrader' || thisCreep.memory.role == 'w18s43builder' 
         || thisCreep.memory.role == 'w18s43repairer' || thisCreep.memory.role == 'w18s43defender') {
@@ -363,9 +364,9 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w17s43minerW') {
-            MiningOp.run(thisCreep, 'W18S43', 'W17S43', '577b93470f9d51615fa47e61');
+            roleMiner.run(thisCreep, 'W18S43', 'W17S43', '577b93470f9d51615fa47e61');
         } else if (thisCreep.memory.role == 'w17s43minerE') {
-            MiningOp.run(thisCreep, 'W18S43', 'W17S43', '577b93470f9d51615fa47e60');
+            roleMiner.run(thisCreep, 'W18S43', 'W17S43', '577b93470f9d51615fa47e60');
         }
     }
     
@@ -397,7 +398,7 @@ module.exports.loop = function () {
     for (var eachName in Game.creeps) {
         var thisCreep = Game.creeps[eachName];
         if (thisCreep.memory.role == 'w19s43miner') {
-            MiningOp.run(thisCreep, 'W18S43', 'W19S43', '577b93400f9d51615fa47de1');
+            roleMiner.run(thisCreep, 'W18S43', 'W19S43', '577b93400f9d51615fa47de1');
         }
     }
 }
