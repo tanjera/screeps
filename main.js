@@ -1,8 +1,6 @@
-var w18s43Worker = require('w18s43.worker');
-
-var w16s43Worker = require('w16s43.worker');
-
-var roleMiner = require('role.mining');
+var roleMiner = require('role.miner');
+var roleWorker = require('role.worker');
+var roleSoldier = require('role.soldier');
 
 
 module.exports.loop = function () {
@@ -16,24 +14,11 @@ module.exports.loop = function () {
 
 
 /* TO DO:
+    finish refactoring role.worker.js
+    refactor colony & mining op code into one function 
 
-	Iterate rooms with Object.keys(Game.rooms)
-		then iterate the rooms to memory, update each tick
-		note hostility, controller level, # of sources
-		note explored rooms surrounding... iterate exits???
-		balance amount of creeps in the room and surrounding rooms (may need scout to scout all surrounding rooms)
-
-
-
-    // Iterate all rooms to memory
-
-    for (var n in Object.keys(Game.rooms)) {
-        if (Game.rooms[n]) {
-            Memory.rooms[n] = {
-                'Hostile_Creeps': Game.rooms[n].find(FIND_HOSTILE_CREEPS),
-                'Sources': Game.rooms[n].find(FIND_SOURCES) };
-        }
-    }
+    split helper functions into separate functions
+        e.g. navigating rooms- move from role.miner to navigate room code??
 */     
 
 
@@ -90,7 +75,7 @@ module.exports.loop = function () {
             roleMiner.run(thisCreep, 'W16S43', 'W16S43', '577b93490f9d51615fa47eb2');
         }
         else if (thisCreep.memory.role == 'w16s43upgrader' || thisCreep.memory.role == 'w16s43builder' || thisCreep.memory.role == 'w16s43repairer') {
-            w16s43Worker.run(thisCreep);
+            RoleWorker.run(thisCreep);
         }
     }
     
@@ -301,7 +286,7 @@ module.exports.loop = function () {
         }
         else if (thisCreep.memory.role == 'w18s43upgrader' || thisCreep.memory.role == 'w18s43builder' 
         || thisCreep.memory.role == 'w18s43repairer' || thisCreep.memory.role == 'w18s43defender') {
-            w18s43Worker.run(thisCreep);
+            RoleWorker.run(thisCreep);
         }
     }
     
