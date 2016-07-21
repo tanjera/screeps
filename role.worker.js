@@ -51,9 +51,15 @@ var RoleWorker = {
 	    
 
 	    else if (creep.memory.state == 'working') {
-        // Order of functions: repair first, then build, then upgrade
+        // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
 
-	    
+	        if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 5000) {
+                if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(creep.room.controller);
+                    return;
+                }
+            }
+
             var structure;
             // Find critical structures first
             structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
