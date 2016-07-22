@@ -22,17 +22,14 @@ var RoleMiner = {
         
 	    if(creep.memory.state == 'getenergy') {
 	        if (creep.room.name != rmHarvest) {
-                if ((creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name 
-                        || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name)
-                        && creep.pos != creep.memory.exit) {
-                    creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
-                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
-                    if (creep.memory.exit) {
-                        creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
-                    }
-                }
-                else {
-                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
+                if (!creep.memory.route || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name)
+                    creep.memory.route = Game.map.findRoute(creep.room, rmHarvest); 
+                if (!creep.memory.exit || creep.memory.exit.roomName != creep.room.name)
+                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+
+                if (creep.memory.exit) {
+                    var result = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
+                    
                     if (result == ERR_NO_PATH) {
                         delete creep.memory.route;
                         delete creep.memory.exit;
@@ -105,17 +102,14 @@ var RoleMiner = {
 	            }
 	        }
 	        else if (creep.room.name != rmDeliver) {
-    	        if ((creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name 
-                        || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name)
-                        && creep.pos != creep.memory.exit) {
-                    creep.memory.route = Game.map.findRoute(creep.room, rmDeliver);
-                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
-                    if (creep.memory.exit) {
-                        creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
-                    }
-                }
-                else {
-                    var result = creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
+                if (!creep.memory.route || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name)
+                    creep.memory.route = Game.map.findRoute(creep.room, rmHarvest); 
+                if (!creep.memory.exit || creep.memory.exit.roomName != creep.room.name)
+                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+
+                if (creep.memory.exit) {
+                    var result = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
+                    
                     if (result == ERR_NO_PATH) {
                         delete creep.memory.route;
                         delete creep.memory.exit;

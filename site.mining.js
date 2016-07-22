@@ -11,12 +11,16 @@ var siteMining = {
             if (lDefender.length == 0) {
                 spawn.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, 
                                     ATTACK, ATTACK, 
-                                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'defender', room: rmHarvest});
+                                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'defender', room: rmHarvest});
             }
 
             for (var n = 0; n < lDefender.length; n++) {
-                if (lDefender[n].attack(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
-                    lDefender[n].moveTo(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]);
+                if (Game.rooms[rmHarvest] != null) {
+                    if (lDefender[n].attack(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
+                        lDefender[n].moveTo(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]);
+                    }
+                } else {
+                    // Implement moving to room without a presence 
                 }
             }
         }
