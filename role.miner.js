@@ -26,7 +26,7 @@ var RoleMiner = {
                         || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name)
                         && creep.pos != creep.memory.exit) {
                     creep.memory.route = Game.map.findRoute(creep.room, rmHarvest);
-                    creep.memory.exit = creep.pos.findClosestByPath(rt[0].exit);;
+                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
                         creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
                     }
@@ -109,7 +109,7 @@ var RoleMiner = {
                         || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name)
                         && creep.pos != creep.memory.exit) {
                     creep.memory.route = Game.map.findRoute(creep.room, rmDeliver);
-                    creep.memory.exit = creep.pos.findClosestByPath(rt[0].exit);;
+                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);;
                     if (creep.memory.exit) {
                         creep.moveTo(creep.memory.exit.x, creep.memory.exit.y, {reusePath: _ticksReusePath});
                     }
