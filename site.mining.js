@@ -5,6 +5,10 @@ var siteMining = {
     // Note: Miner = Burrower + Carrier
     run: function(spawn, rmDeliver, rmHarvest, popBurrower, popCarrier, popMiner) {
 
+        var lBurrower  = _.filter(Game.creeps, (creep) => creep.memory.role == 'burrower' && creep.memory.room == rmHarvest);
+        var lCarrier  = _.filter(Game.creeps, (creep) => creep.memory.role == 'carrier' && creep.memory.room == rmHarvest);
+        var lMiner  = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.memory.room == rmHarvest);
+
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length > 0) {
             var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
@@ -24,24 +28,7 @@ var siteMining = {
                 }
             }
         }
-
-        // Populate the mining op
-        var lBurrower  = _.filter(Game.creeps, (creep) => creep.memory.role == 'burrower' && creep.memory.room == rmHarvest);
-        var lCarrier  = _.filter(Game.creeps, (creep) => creep.memory.role == 'carrier' && creep.memory.room == rmHarvest);
-        var lMiner  = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.memory.room == rmHarvest);
-        
-        /*
-            MOVE	        50
-            WORK	        100	
-            CARRY	        50
-            ATTACK	        80
-            RANGED_ATTACK	150	
-            HEAL	        25
-            CLAIM	        600	
-            TOUGH       	10
-        */
-
-        if (lMiner.length < popMiner) {
+        else if (lMiner.length < popMiner) {
             if (lMiner.length == 0) // Possibly colony wiped? Need restart?
                 spawn.createCreep([WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'miner', room: rmHarvest});
             else {
@@ -98,10 +85,7 @@ var siteMining = {
                             MOVE, MOVE, MOVE, MOVE, MOVE];
 
                 spawn.createCreep(body, null, {role: 'miner', room: rmHarvest});
-            }
-
-
-                
+            }    
         }
         else if (lBurrower.length < popBurrower) {
             if (lCarrier.length < popCarrier && lMiner.length == 0) // Possibly colony wiped? Need restart?

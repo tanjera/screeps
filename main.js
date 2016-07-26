@@ -13,6 +13,8 @@ module.exports.loop = function () {
 
 
 /* TO DO:
+    make mining defenders based on spawn energy
+
     refactor code for moving to rooms without a presence
         ... then add it to defenders for mining ops 
     change soldiers to ranged attacks?!
