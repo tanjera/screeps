@@ -17,11 +17,6 @@ module.exports.loop = function () {
     refactor code for moving to rooms without a presence
         ... then add it to defenders for mining ops 
     change soldiers to ranged attacks?!
-    
-    ... miners are still being made???
-    
-    scale colony and mining op body parts by room controller level...
-
 */     
 
 
