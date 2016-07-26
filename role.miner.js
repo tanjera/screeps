@@ -51,7 +51,6 @@ var RoleMiner = {
                     if (source == null) { 
                         source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
                     }
-                    
                     if (source != null)  {
                         if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source, {reusePath: _ticksReusePath});
@@ -63,8 +62,7 @@ var RoleMiner = {
                         if (source != null) {
                             if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity) == ERR_NOT_IN_RANGE)
                                 creep.moveTo(source, {reusePath: _ticksReusePath});
-                        }
-                        else { // Miners can still harvest
+                        } else if (creep.getActiveBodyparts('work') > 0) { // Miners can still harvest
                             source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(source, {reusePath: _ticksReusePath});
@@ -72,14 +70,13 @@ var RoleMiner = {
                         }
                     }
                 } else { // Burrowers, straight to the source
-                    
                     source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                     
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source, {reusePath: _ticksReusePath});
                     }
                 }
-	        }
+	    }
         }
         
         if (creep.memory.state == 'working') { 
