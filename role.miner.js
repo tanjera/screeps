@@ -57,8 +57,9 @@ var RoleMiner = {
                             creep.moveTo(source, {reusePath: _ticksReusePath});
                         }
                     } else {
+                        creep.say('yay');
                         source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
-                                return (s.structure == STRUCTURE_STORAGE || s.structure == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > 0; }});
+                                return (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > 0; }});
                         
                         if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity) == ERR_NOT_IN_RANGE)
                             creep.moveTo(source, {reusePath: _ticksReusePath});
