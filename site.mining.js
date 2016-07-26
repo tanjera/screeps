@@ -150,17 +150,16 @@ var siteMining = {
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
                 else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
-                    body = [ // 1800 energy, 16x CARRY, 16x MOVE
+                    body = [ // 1400 energy, 14x CARRY, 14x MOVE
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
-                            CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
-                            CARRY, MOVE];
+                            CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
                 else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-                    body = [ // 2000 energy, 20x CARRY, 20x MOVE
+                    body = [ // 1800 energy, 18x CARRY, 18x MOVE
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
-                            CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
+                            CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
                 else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
                     body = [ // 2500 energy, 25x CARRY, 25x MOVE
                             CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
