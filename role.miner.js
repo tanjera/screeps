@@ -57,11 +57,17 @@ var RoleMiner = {
                             creep.moveTo(source, {reusePath: _ticksReusePath});
                         }
                     } else {
-                        source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
+                        source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
+                                return (s.structure == STRUCTURE_STORAGE || s.structure == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > 0; }});
+                        
+                        if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity) == ERR_NOT_IN_RANGE)
+                            creep.moveTo(source, {reusePath: _ticksReusePath});
+                        
+                        /*source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                         
                         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source, {reusePath: _ticksReusePath});
-                        }
+                        } */
                     }
                 } else { // Burrowers, straight to the source
                     

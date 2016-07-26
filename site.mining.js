@@ -13,9 +13,10 @@ var siteMining = {
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length > 0) {
             var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
             if (lDefender.length == 0) {
-                spawn.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, 
-                                    ATTACK, ATTACK, 
-                                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], null, {role: 'defender', room: rmHarvest});
+                spawn.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                                    ATTACK, ATTACK, ATTACK, 
+                                     MOVE, MOVE, MOVE], null, {role: 'defender', room: rmHarvest});
             }
 
             for (var n = 0; n < lDefender.length; n++) {
