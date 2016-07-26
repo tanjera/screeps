@@ -30,33 +30,29 @@ var siteColony = {
                         MOVE, TOUGH,   
                         MOVE, ATTACK]; 
             else if (spawn.room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
-                body = [ // 510 energy, 2x TOUGH, 3x ATTACK, 5x MOVE
+                body = [ // 380 energy, 2x TOUGH, 2x ATTACK, 4x MOVE
                         MOVE, TOUGH, MOVE, TOUGH,  
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
+                        MOVE, ATTACK, MOVE, ATTACK]; 
             else if (spawn.room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-                body = [ // 760 energy, 4x TOUGH, 4x ATTACK, 8x MOVE
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
+                body = [ // 570 energy, 3x TOUGH, 3x ATTACK, 6x MOVE
+                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,  
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
             else if (spawn.room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-                body = [ // 1270 energy, 6x TOUGH, 7x ATTACK, 13x MOVE
+                body = [ // 950 energy, 5x TOUGH, 5x ATTACK, 10x MOVE
                         MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
-                        MOVE, TOUGH, 
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
-                        MOVE, ATTACK, MOVE, ATTACK];
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
             else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
-                body = [ // 1650 energy, 8x TOUGH, 9x ATTACK, 17x MOVE
+                body = [ // 1390 energy, 8x TOUGH, 7x ATTACK, 15x MOVE
                         MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
                         MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
+                        MOVE, ATTACK, MOVE, ATTACK]; 
             else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-                body = [ // 2270 energy, 14x TOUGH, 11x ATTACK, 25x MOVE
+                body = [ // 1720 energy, 10x TOUGH, 8x ATTACK, 18x MOVE
                         MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,
                         MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,  
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
-                        MOVE, ATTACK];
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
             else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
                 body = [ // 3250 energy, 25x MOVE, 25x ATTACK
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
@@ -83,32 +79,32 @@ var siteColony = {
                         CARRY, CARRY, 
                         MOVE, MOVE]; 
             else if (spawn.room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
-                    body = [ // 550 energy, 1x WORK, 4x CARRY, 5x MOVE
+                    body = [ // 450 energy, 1x WORK, 4x CARRY, 3x MOVE
                         WORK,  
                         CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE]; 
+                        MOVE, MOVE, MOVE]; 
             else if (spawn.room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-                body = [ // 700 energy, 2x WORK, 4x CARRY, 6x MOVE
+                body = [ // 600 energy, 2x WORK, 4x CARRY, 4x MOVE
                         WORK, WORK,  
                         CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        MOVE, MOVE, MOVE, MOVE];
             else if (spawn.room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-                body = [ // 1250 energy, 5x WORK, 5x CARRY, 10x MOVE
-                        WORK, WORK, WORK, WORK, WORK, 
-                        CARRY, CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                body = [ // 1000 energy, 4x WORK, 4x CARRY, 8x MOVE
+                        WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
+                body = [ // 1500 energy, 6x WORK, 6x CARRY, 12x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE]; 
+            else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
                 body = [ // 1750 energy, 7x WORK, 7x CARRY, 14x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE]; 
-            else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-                body = [ // 2250 energy, 9x WORK, 9x CARRY, 18x MOVE
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        MOVE, MOVE, MOVE, MOVE];
             else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
                 body = [ // 3100 energy, 12x WORK, 13x CARRY, 25x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
@@ -139,32 +135,32 @@ var siteColony = {
                         CARRY, CARRY, 
                         MOVE, MOVE]; 
             else if (spawn.room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
-                    body = [ // 550 energy, 1x WORK, 4x CARRY, 5x MOVE
+                    body = [ // 450 energy, 1x WORK, 4x CARRY, 3x MOVE
                         WORK,  
                         CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE]; 
+                        MOVE, MOVE, MOVE]; 
             else if (spawn.room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-                body = [ // 700 energy, 2x WORK, 4x CARRY, 6x MOVE
+                body = [ // 600 energy, 2x WORK, 4x CARRY, 4x MOVE
                         WORK, WORK,  
                         CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        MOVE, MOVE, MOVE, MOVE];
             else if (spawn.room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-                body = [ // 1250 energy, 5x WORK, 5x CARRY, 10x MOVE
-                        WORK, WORK, WORK, WORK, WORK, 
-                        CARRY, CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                body = [ // 1000 energy, 4x WORK, 4x CARRY, 8x MOVE
+                        WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
+                body = [ // 1500 energy, 6x WORK, 6x CARRY, 12x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE]; 
+            else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
                 body = [ // 1750 energy, 7x WORK, 7x CARRY, 14x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE]; 
-            else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-                body = [ // 2250 energy, 9x WORK, 9x CARRY, 18x MOVE
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        MOVE, MOVE, MOVE, MOVE];
             else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
                 body = [ // 3100 energy, 12x WORK, 13x CARRY, 25x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
