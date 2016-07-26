@@ -13,10 +13,52 @@ var siteMining = {
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length > 0) {
             var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
             if (lDefender.length == 0) {
-                spawn.createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-                                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
-                                    ATTACK, ATTACK, ATTACK, 
-                                     MOVE, MOVE, MOVE], null, {role: 'defender', room: rmHarvest});
+                
+                var body;
+                if (spawn.room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
+                    body = [ // 190 energy, 1x TOUGH, 1x ATTACK, 2x MOVE
+                            MOVE, TOUGH,   
+                            MOVE, ATTACK]; 
+                else if (spawn.room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
+                    body = [ // 380 energy, 2x TOUGH, 2x ATTACK, 4x MOVE
+                            MOVE, TOUGH, MOVE, TOUGH,  
+                            MOVE, ATTACK, MOVE, ATTACK]; 
+                else if (spawn.room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
+                    body = [ // 570 energy, 3x TOUGH, 3x ATTACK, 6x MOVE
+                            MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,  
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
+                else if (spawn.room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
+                    body = [ // 950 energy, 5x TOUGH, 5x ATTACK, 10x MOVE
+                            MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
+                    body = [ // 1390 energy, 8x TOUGH, 7x ATTACK, 15x MOVE
+                            MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
+                            MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+                            MOVE, ATTACK, MOVE, ATTACK]; 
+                else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
+                    body = [ // 1720 energy, 10x TOUGH, 8x ATTACK, 18x MOVE
+                            MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,
+                            MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
+                    body = [ // 3250 energy, 25x MOVE, 25x ATTACK
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                else if (spawn.room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
+                    body = [ // 3250 energy, 25x MOVE, 25x ATTACK
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+                            MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                
+                spawn.createCreep(body, null, {role: 'defender', room: rmHarvest});
             }
 
             for (var n = 0; n < lDefender.length; n++) {
