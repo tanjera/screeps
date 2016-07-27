@@ -67,8 +67,8 @@ var utilColony = {
     findInRoom_RepairCritical: function(room) {
         return room.find(FIND_STRUCTURES, {
                             filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(room)))
+                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < repairWalls_Critical(getRoom_Level(room)))
+                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < repairWalls_Critical(getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 5)
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 5);
                             }});
@@ -79,8 +79,8 @@ var utilColony = {
                                 filter: function(structure) {
                                     return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
                                         || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_RAMPART && uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)))
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)));
+                                        || (structure.structureType == STRUCTURE_RAMPART && uc.repairWalls_Maintenance(getRoom_Level(creep.room)))
+                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < repairWalls_Maintenance(getRoom_Level(creep.room)));
                                 } 
                         });
     }
