@@ -1,6 +1,8 @@
 var roleWorker = require('role.worker');
 var roleSoldier = require('role.soldier');
 
+var utilCreep = require('util.creep');
+var utilColony = require('util.colony');
 
 var siteColony = {
 
@@ -11,19 +13,14 @@ var siteColony = {
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
-            || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS).length)) {
-            var uc = require('util.creep');
-            spawn.createCreep(uc.getBody_Soldier(uc.getSpawn_Level(spawn)), null, {role: 'soldier', room: rmColony});
+            || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS).length)) {            
+            spawn.createCreep(utilCreep.getBody_Soldier(utilCreep.getSpawn_Level(spawn)), null, {role: 'soldier', room: rmColony});
         }
-
         else if (lRepairer.length < popRepairer) {
-            var uc = require('util.creep');
-            spawn.createCreep(uc.getBody_Worker(uc.getSpawn_Level(spawn)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            spawn.createCreep(utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
-
         else if (lWorker.length < popWorker) {
-            var uc = require('util.creep');
-            spawn.createCreep(uc.getBody_Worker(uc.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
+            spawn.createCreep(utilCreep.getBody_Worker(utilCreepuc.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
@@ -59,8 +56,7 @@ var siteColony = {
             } 
             
             if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
-                var uc = require('util.colony');
-                var structure = uc.findByRange_RepairMaintenance(tower);
+                var structure = utilColony.findByRange_RepairMaintenance(tower);
                 if (structure) {
                     tower.repair(structure);
                     continue;
