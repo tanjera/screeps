@@ -14,7 +14,7 @@ module.exports.loop = function () {
 
     /* TO DO:
 
-        sort tower repair array to repair by hitpoints: array.sort(function(a, b) {return a.hitpoints - b.hitpoints}) 
+         sort tower repair array to repair by hitpoints: array.sort(function(a, b) {return a.hitpoints - b.hitpoints}) 
     */     
 
 
