@@ -12,15 +12,11 @@ module.exports.loop = function () {
     }
 
 
-/* TO DO:
-    make mining defenders based on spawn energy
+    /* TO DO:
+        scale repair values (wall, ramparts, etc.) by controller level (or spawn energy available, whatever)
 
-    refactor code for moving to rooms without a presence
-        ... then add it to defenders for mining ops 
-    change soldiers to ranged attacks?!
-
-    miners are still being made??
-*/     
+        add ranged soldiers?
+    */     
 
 
     // siteColony.run(spawn, rmColony, popRepairer, popWorker, popSoldier)

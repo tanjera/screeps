@@ -51,13 +51,13 @@ var siteColony = {
             else { // Repair critical structures
                 var lstructures = lTowers[i].room.find(FIND_STRUCTURES, {
                                 filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 10000)
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < 10000)
+                                    return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
+                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000)
                                         || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 5)
                                         || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 5);
                                 } 
                         });
-                if (lstructures.length > 0) {
+                if (lTowers[i].energy > 700 && lstructures.length > 0) {
                     lTowers[i].repair(lstructures[0]);
                 } 
             }

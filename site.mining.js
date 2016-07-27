@@ -49,7 +49,6 @@ var siteMining = {
             spawn.createCreep(uc.getBody_Carrier(uc.getSpawn_Level(spawn)), null, {role: 'carrier', room: rmHarvest});
         }
         
-
         // Run roles!
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];
