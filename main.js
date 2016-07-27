@@ -13,6 +13,9 @@ module.exports.loop = function () {
 
 
     /* TO DO:
+
+        only attack creeps with attack or ranged_attack
+
         add ranged soldiers?
     */     
 

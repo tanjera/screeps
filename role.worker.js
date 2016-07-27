@@ -68,14 +68,7 @@ var RoleWorker = {
 
             // Repair *critical* structures
             var uc = require('util.colony');
-            structure = creep.room.find(FIND_STRUCTURES, {
-                            filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(creep.room)))
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(creep.room)))
-                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 3)
-                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 3);
-                            } 
-                    }); 
+            structure = uc.findInRoom_RepairCritical(creep.room);
             if (structure.length > 0) {
                 var r = creep.repair(structure[0]); 
                 if (r == OK) return;
@@ -99,14 +92,7 @@ var RoleWorker = {
             // Repair *maintenance* for subrole repairers
             if (creep.memory.subrole == 'repairer') {
                 var uc = require('util.colony');
-                structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                                filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_RAMPART && uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)))
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)));
-                                } 
-                        });
+                structure = uc.findByRange_RepairMaintenance(creep);
                 if (structure != null) {
                     var r = creep.repair(structure);
                     if (r == OK) return;

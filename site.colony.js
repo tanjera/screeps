@@ -45,24 +45,25 @@ var siteColony = {
                             
         for (var i = 0; i < lTowers.length; i++) {
             var tower = lTowers[i];
+            
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-            var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
             if (hostile) { // Anyone to attack?
                 tower.attack(hostile);
-            } else if (injured) { // Anyone to heal?
+                continue;
+            } 
+            
+            var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
+            if (injured) { // Anyone to heal?
                 tower.heal(injured);
-            } else if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
+                continue;
+            } 
+            
+            if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
                 var uc = require('util.colony');
-                var lStructs = tower.room.find(FIND_STRUCTURES, {
-                                filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Maintenance(uc.getSpawn_Level(spawn)))
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getSpawn_Level(spawn)))
-                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 4)
-                                        || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 4);
-                                } 
-                        });
-                if (lStructs.length > 0) {
-                    tower.repair(lStructs[0]);
+                var structure = uc.findByRange_RepairMaintenance(tower);
+                if (structure) {
+                    tower.repair(structure);
+                    continue;
                 } 
             }
         }

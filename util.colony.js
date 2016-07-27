@@ -56,13 +56,34 @@ var utilColony = {
                     10000,
                     25000,
                     50000,
+                    75000,
                     100000,
                     150000,
-                    300000,
-                    600000,
-                    1000000 ];
+                    200000,
+                    400000 ];
         return t[level];
-		}
+		},
+
+    findInRoom_RepairCritical: function(room) {
+        return room.find(FIND_STRUCTURES, {
+                            filter: function(structure) {
+                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(room)))
+                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(room)))
+                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 5)
+                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 5);
+                            }});
+    },
+
+    findByRange_RepairMaintenance: function(creep) {
+        return creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                                filter: function(structure) {
+                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
+                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
+                                        || (structure.structureType == STRUCTURE_RAMPART && uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)))
+                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)));
+                                } 
+                        });
+    }
 };
 
 module.exports = utilColony;
