@@ -1,6 +1,6 @@
-var RoleMiner = {
+var RolesMining = {
 
-    run: function(creep, rmDeliver, rmHarvest) {
+    Mining: function(creep, rmDeliver, rmHarvest) {
 
         var _ticksReusePath = 10;
 
@@ -113,7 +113,19 @@ var RoleMiner = {
                 }
 	        }
         }
-	}
+	},
+
+    Reserve: function(creep, rmHarvest) {
+        if (creep.room.name != rmHarvest) {
+            var uc = require('util.creep');
+            uc.moveToRoom(creep, rmHarvest);
+        }
+        else if (creep.room.name == rmHarvest) {
+            if(creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
+            }
+        }
+    }
 };
 
-module.exports = RoleMiner;
+module.exports = RolesMining;

@@ -1,13 +1,15 @@
-var roleMiner = require('role.miner');
+var rolesMining = require('roles.mining');
 
 var siteMining = {
 
     // Note: Miner = Burrower + Carrier
-    run: function(spawn, rmDeliver, rmHarvest, popBurrower, popCarrier, popMiner) {
+    run: function(spawn, rmDeliver, rmHarvest, popBurrower, popCarrier, popMiner, popReserver, popMineralist) {
 
         var lBurrower  = _.filter(Game.creeps, (creep) => creep.memory.role == 'burrower' && creep.memory.room == rmHarvest);
         var lCarrier  = _.filter(Game.creeps, (creep) => creep.memory.role == 'carrier' && creep.memory.room == rmHarvest);
         var lMiner  = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.memory.room == rmHarvest);
+        var lReserver  = _.filter(Game.creeps, (creep) => creep.memory.role == 'reserver' && creep.memory.room == rmHarvest);
+        var lMineralist  = _.filter(Game.creeps, (creep) => creep.memory.role == 'mineralist' && creep.memory.room == rmHarvest);
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
@@ -49,16 +51,26 @@ var siteMining = {
             var uc = require('util.creep');
             spawn.createCreep(uc.getBody_Carrier(uc.getSpawn_Level(spawn)), null, {role: 'carrier', room: rmHarvest});
         }
-        
+        else if (lReserver.length < popReserver) {
+            var uc = require('util.creep');
+            var body = uc.getBody_Reserver(uc.getSpawn_Level(spawn));
+            if (body != null) {
+                spawn.createCreep(body, null, {role: 'reserver', room: rmHarvest});
+            }
+        }
+
         // Run roles!
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];
                 
             if (creep.memory.room == rmHarvest 
-                && (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier')
-                && (!Object.keys(Game.rooms).includes(rmHarvest)
+                    && (!Object.keys(Game.rooms).includes(rmHarvest) 
                     || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length == 0))) {
-                roleMiner.run(creep, rmDeliver, rmHarvest);
+                if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
+                    rolesMining.Mining(creep, rmDeliver, rmHarvest);
+                } else if (creep.memory.role == 'reserver') {
+                    rolesMining.Reserve(creep, rmHarvest);
+                }
             }
         }
     }
