@@ -51,7 +51,7 @@ var siteColony = {
                 tower.attack(hostile);
             } else if (injured) { // Anyone to heal?
                 tower.heal(injured);
-            } else { // Maintain structures with some energy
+            } else if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
                 var uc = require('util.colony');
                 var lStructs = tower.room.find(FIND_STRUCTURES, {
                                 filter: function(structure) {
@@ -61,7 +61,7 @@ var siteColony = {
                                         || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 4);
                                 } 
                         });
-                if (tower.energy > tower.energyCapacity / 2 && lStructs.length > 0) {
+                if (lStructs.length > 0) {
                     tower.repair(lStructs[0]);
                 } 
             }
