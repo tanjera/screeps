@@ -20,7 +20,7 @@ var siteColony = {
             spawn.createCreep(utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            spawn.createCreep(utilCreep.getBody_Worker(utilCreepuc.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
+            spawn.createCreep(utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
