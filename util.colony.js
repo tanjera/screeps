@@ -79,7 +79,7 @@ var utilColony = {
                                 filter: function(structure) {
                                     return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
                                         || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_RAMPART && utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(creep.room)))
+                                        || (structure.structureType == STRUCTURE_RAMPART && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(creep.room)))
                                         || (structure.structureType == STRUCTURE_WALL && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(creep.room)));
                                 } 
                         });

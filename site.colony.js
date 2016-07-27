@@ -13,7 +13,8 @@ var siteColony = {
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
-            || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS).length)) {            
+            || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
+                        return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
             spawn.createCreep(utilCreep.getBody_Soldier(utilCreep.getSpawn_Level(spawn)), null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
@@ -43,7 +44,8 @@ var siteColony = {
         for (var i = 0; i < lTowers.length; i++) {
             var tower = lTowers[i];
             
-            var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) { 
+                        return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }});
             if (hostile) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;

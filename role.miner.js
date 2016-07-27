@@ -79,14 +79,14 @@ var RoleMiner = {
                         filter: (structure) => {
                             return (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity)
                                 || (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity)
-                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 2);
+                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 2.5);
                         }
                 });
                 // And to extensions/containers otherwise
                 if (target == null) {
                     target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                             filter: (structure) => {
-                                return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity)
+                                return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 1.25)
                                 || (structure.structureType == STRUCTURE_CONTAINER && _.sum(structure.store) < structure.storeCapacity)
                                 || (structure.structureType == STRUCTURE_STORAGE && _.sum(structure.store) < structure.storeCapacity);
                             }
