@@ -48,13 +48,14 @@ var siteColony = {
             if (hostile) { // Anyone to attack?
                 lTowers[i].attack(hostile);
             } 
-            else { // Repair critical structures
+            else { // Maintain structures with some energy
+                var uc = require('util.colony');
                 var lstructures = lTowers[i].room.find(FIND_STRUCTURES, {
                                 filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000)
-                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 5)
-                                        || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 5);
+                                    return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Maintenance(uc.getSpawn_Level(spawn)))
+                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getSpawn_Level(spawn)))
+                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 4)
+                                        || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 4);
                                 } 
                         });
                 if (lTowers[i].energy > 700 && lstructures.length > 0) {

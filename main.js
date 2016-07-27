@@ -13,8 +13,6 @@ module.exports.loop = function () {
 
 
     /* TO DO:
-        scale repair values (wall, ramparts, etc.) by controller level (or spawn energy available, whatever)
-
         add ranged soldiers?
     */     
 

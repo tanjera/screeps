@@ -67,10 +67,11 @@ var RoleWorker = {
             var structure;
 
             // Repair *critical* structures
+            var uc = require('util.colony');
             structure = creep.room.find(FIND_STRUCTURES, {
                             filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < 20000)
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < 20000)
+                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(creep.room)))
+                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Critical(uc.getRoom_Level(creep.room)))
                                     || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 3)
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 3);
                             } 
@@ -97,12 +98,13 @@ var RoleWorker = {
 
             // Repair *maintenance* for subrole repairers
             if (creep.memory.subrole == 'repairer') {
+                var uc = require('util.colony');
                 structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                                 filter: function(structure) {
                                     return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
                                         || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 100000)
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < 100000);
+                                        || (structure.structureType == STRUCTURE_RAMPART && uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)))
+                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getRoom_Level(creep.room)));
                                 } 
                         });
                 if (structure != null) {
