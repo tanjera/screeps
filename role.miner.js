@@ -22,20 +22,8 @@ var RoleMiner = {
         
 	    if(creep.memory.state == 'getenergy') {
 	        if (creep.room.name != rmHarvest) {
-                if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name 
-                        || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name) {
-                    creep.memory.route = Game.map.findRoute(creep.room, rmHarvest); 
-                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
-                }
-
-                if (creep.memory.exit) {
-                    var result = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
-                    
-                    if (result == ERR_NO_PATH) {
-                        delete creep.memory.route;
-                        delete creep.memory.exit;
-                    }
-                }
+                var uc = require('util.creep');
+                uc.moveToRoom(creep, rmHarvest);
 	        }
 	        else if (creep.room.name == rmHarvest) {
     	        delete creep.memory.route;
@@ -62,7 +50,8 @@ var RoleMiner = {
                         if (source != null) {
                             if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity) == ERR_NOT_IN_RANGE)
                                 creep.moveTo(source, {reusePath: _ticksReusePath});
-                        } else if (creep.getActiveBodyparts('work') > 0) { // Miners can still harvest
+                        } 
+                        else if (creep.getActiveBodyparts('work') > 0) { // Miners can still harvest
                             source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(source, {reusePath: _ticksReusePath});

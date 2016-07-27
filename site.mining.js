@@ -18,12 +18,13 @@ var siteMining = {
             }
 
             for (var n = 0; n < lDefender.length; n++) {
-                if (Game.rooms[rmHarvest] != null) {
+                if (lDefender[n].room.name == rmHarvest) {
                     if (lDefender[n].attack(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]) == ERR_NOT_IN_RANGE) {
                         lDefender[n].moveTo(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS)[0]);
                     }
                 } else {
-                    // Implement moving to room without a presence 
+                    var uc = require('util.creep');
+                    uc.moveToRoom(lDefender[n], rmHarvest);
                 }
             }
         }
@@ -53,7 +54,10 @@ var siteMining = {
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];
                 
-            if (creep.memory.room == rmHarvest && (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier')) {
+            if (creep.memory.room == rmHarvest 
+                && (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier')
+                && (!Object.keys(Game.rooms).includes(rmHarvest)
+                    || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length == 0))) {
                 roleMiner.run(creep, rmDeliver, rmHarvest);
             }
         }

@@ -205,6 +205,25 @@ var utilCreep = {
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
         }
+    },
+
+    moveToRoom: function(creep, tgtRoom) {
+        var _ticksReusePath = 10;
+        
+        if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name 
+                || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name) {
+            creep.memory.route = Game.map.findRoute(creep.room, tgtRoom); 
+            creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+        }
+
+        if (creep.memory.exit) {
+            var r = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
+            
+            if (r == ERR_NO_PATH) {
+                delete creep.memory.route;
+                delete creep.memory.exit;
+            }
+        }
     }
 };
 
