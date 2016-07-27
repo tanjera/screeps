@@ -44,13 +44,16 @@ var siteColony = {
                             return s.structureType == STRUCTURE_TOWER; }});
                             
         for (var i = 0; i < lTowers.length; i++) {
-            var hostile = lTowers[i].pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            var tower = lTowers[i];
+            var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
             if (hostile) { // Anyone to attack?
-                lTowers[i].attack(hostile);
-            } 
-            else { // Maintain structures with some energy
+                tower.attack(hostile);
+            } else if (injured) { // Anyone to heal?
+                tower.heal(injured);
+            } else { // Maintain structures with some energy
                 var uc = require('util.colony');
-                var lstructures = lTowers[i].room.find(FIND_STRUCTURES, {
+                var lStructs = tower.room.find(FIND_STRUCTURES, {
                                 filter: function(structure) {
                                     return (structure.structureType == STRUCTURE_RAMPART && structure.hits < uc.repairWalls_Maintenance(uc.getSpawn_Level(spawn)))
                                         || (structure.structureType == STRUCTURE_WALL && structure.hits < uc.repairWalls_Maintenance(uc.getSpawn_Level(spawn)))
@@ -58,8 +61,8 @@ var siteColony = {
                                         || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 4);
                                 } 
                         });
-                if (lTowers[i].energy > 700 && lstructures.length > 0) {
-                    lTowers[i].repair(lstructures[0]);
+                if (tower.energy > tower.energyCapacity / 2 && lStructs.length > 0) {
+                    tower.repair(lStructs[0]);
                 } 
             }
         }
