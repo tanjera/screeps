@@ -20,7 +20,7 @@ var RoleWorker = {
             var source;
             
             // Try to pick up off the ground first, if there is a pile...
-            source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount > 100; }});
+            source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount >= creep.carryCapacity / 2; }});
             
             if (source != null)  {
                 if (creep.pickup(source) == ERR_NOT_IN_RANGE)
