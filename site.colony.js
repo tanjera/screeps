@@ -37,29 +37,27 @@ var siteColony = {
         }
         
         // Process Towers
-        var lTowers = spawn.room.find(FIND_MY_STRUCTURES, {
-                        filter: (s) => {
-                            return s.structureType == STRUCTURE_TOWER; }});
+        var lTowers = spawn.room.find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});
                             
         for (var i = 0; i < lTowers.length; i++) {
             var tower = lTowers[i];
             
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }});
-            if (hostile) { // Anyone to attack?
+            if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;
             } 
             
             var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
-            if (injured) { // Anyone to heal?
+            if (injured != null) { // Anyone to heal?
                 tower.heal(injured);
                 continue;
             } 
             
             if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
-                var structure = utilColony.findByRange_RepairMaintenance(tower);
-                if (structure) {
+                var structure = utilColony.findByNeed_RepairMaintenance(tower.room);
+                if (structure != null) {
                     tower.repair(structure);
                     continue;
                 } 

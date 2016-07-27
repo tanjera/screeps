@@ -65,15 +65,14 @@ var RoleWorker = {
             }
 
             var structure;
-
             // Repair *critical* structures
             var uc = require('util.colony');
-            structure = uc.findInRoom_RepairCritical(creep.room);
-            if (structure.length > 0) {
-                var r = creep.repair(structure[0]); 
+            var structure = uc.findByNeed_RepairCritical(creep.room);
+            if (structure != null) {
+                var r = creep.repair(structure); 
                 if (r == OK) return;
                 else if(r == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure[0], {reusePath: _ticksReusePath});
+                    creep.moveTo(structure, {reusePath: _ticksReusePath});
                     return;
                 }
             }
