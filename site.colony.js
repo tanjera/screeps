@@ -15,13 +15,13 @@ var siteColony = {
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
             || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
-            spawn.createCreep(utilCreep.getBody_Soldier(utilCreep.getSpawn_Level(spawn)), null, {role: 'soldier', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Soldier(utilCreep.getSpawn_Level(spawn)), null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
-            spawn.createCreep(utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            spawn.createCreep(utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
