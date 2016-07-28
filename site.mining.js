@@ -64,7 +64,8 @@ var siteMining = {
                 
             if (creep.memory.room == rmHarvest 
                     && (!Object.keys(Game.rooms).includes(rmHarvest) 
-                    || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS).length == 0))) {
+                    || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
+                        { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length == 0))) {
                 if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                     rolesMining.Mine(creep, rmDeliver, rmHarvest);
                 } else if (creep.memory.role == 'reserver') {
