@@ -23,7 +23,7 @@ module.exports.loop = function () {
     /* Colonies and in-colony mining operations */
     siteMining.run(Game.spawns.Spawn1, 'W18S43', 'W18S43', 1, 2, 0, 0, 0);    // W18S43 colony #1 mining
     siteMining.run(Game.spawns.Spawn2, 'W16S43', 'W16S43', 1, 1, 0, 0, 0);    // W16S43 colony #2 mining
-    siteColony.run(Game.spawns.Spawn1, 'W18S43', 1, 2, 1);     // W16S43 colony #1
+    siteColony.run(Game.spawns.Spawn1, 'W18S43', 1, 2, 0);     // W16S43 colony #1
     siteColony.run(Game.spawns.Spawn2, 'W16S43', 1, 1, 0);     // W16S43 colony #2
 
     /* All other mining operations */
