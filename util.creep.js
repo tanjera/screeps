@@ -217,12 +217,10 @@ var utilCreep = {
                         CLAIM, MOVE];
             case 5:    
             case 6:
-                return [ // 1300 energy, 2x CLAIM, 2x MOVE
-                        CLAIM, CLAIM, MOVE, MOVE];
             case 7:
             case 8:
-                return [ // 1950 energy, 3x CLAIM, 3x MOVE
-                        CLAIM, CLAIM, CLAIM, MOVE, MOVE, MOVE];
+                return [ // 1300 energy, 2x CLAIM, 2x MOVE
+                        CLAIM, CLAIM, MOVE, MOVE];
         }
     },
 
