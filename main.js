@@ -13,7 +13,7 @@ module.exports.loop = function () {
 
 
     /* TO DO:
-          mineral extracting implemented- needs debugging
+          mineral extracting implemented- needs debugging?
     */     
 
 
