@@ -23,30 +23,30 @@ var utilCreep = {
         switch (level) {
             case 1:
                 return [ // 190 energy, 1x TOUGH, 1x ATTACK, 2x MOVE
-                        MOVE, TOUGH,   
+                        TOUGH, MOVE,   
                         MOVE, ATTACK]; 
             case 2:
                 return [ // 380 energy, 2x TOUGH, 2x ATTACK, 4x MOVE
-                        MOVE, TOUGH, MOVE, TOUGH,  
+                        TOUGH, TOUGH, MOVE, MOVE,
                         MOVE, ATTACK, MOVE, ATTACK]; 
             case 3:
                 return [ // 570 energy, 3x TOUGH, 3x ATTACK, 6x MOVE
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,  
+                        TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, 
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
             case 4:
                 return [ // 950 energy, 5x TOUGH, 5x ATTACK, 10x MOVE
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, 
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
             case 5:
                 return [ // 1390 energy, 8x TOUGH, 7x ATTACK, 15x MOVE
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, 
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
                         MOVE, ATTACK, MOVE, ATTACK]; 
             case 6:
                 return [ // 1720 energy, 10x TOUGH, 8x ATTACK, 18x MOVE
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,
-                        MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH, MOVE, TOUGH,
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
             case 7:
