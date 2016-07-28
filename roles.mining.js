@@ -1,6 +1,8 @@
+var utilCreep = require('util.creep');
+
 var RolesMining = {
 
-    Mining: function(creep, rmDeliver, rmHarvest) {
+    Mine: function(creep, rmDeliver, rmHarvest) {
 
         var _ticksReusePath = 10;
 
@@ -13,7 +15,7 @@ var RolesMining = {
         else if (creep.memory.state == 'working' && creep.carry[RESOURCE_ENERGY] == 0) {
             creep.memory.state = 'getenergy';
         }
-        else if (creep.memory.state == 'getenergy' && creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+        else if (creep.memory.state == 'getenergy' && _.sum(creep.carry) == creep.carryCapacity) {
             creep.memory.state = 'working';
         }
         else if (creep.memory.state != 'getenergy' && creep.memory.state != 'working') {
@@ -22,8 +24,7 @@ var RolesMining = {
         
 	    if(creep.memory.state == 'getenergy') {
 	        if (creep.room.name != rmHarvest) {
-                var uc = require('util.creep');
-                uc.moveToRoom(creep, rmHarvest);
+                utilCreep.moveToRoom(creep, rmHarvest);
 	        }
 	        else if (creep.room.name == rmHarvest) {
     	        delete creep.memory.route;
@@ -65,7 +66,7 @@ var RolesMining = {
                         creep.moveTo(source, {reusePath: _ticksReusePath});
                     }
                 }
-	    }
+	        }
         }
         
         if (creep.memory.state == 'working') { 
@@ -98,31 +99,70 @@ var RolesMining = {
 	            }
 	        }
 	        else if (creep.room.name != rmDeliver) {
-                if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route[0].room == creep.room.name 
-                        || creep.memory.exit == null || creep.memory.exit.roomName != creep.room.name) {
-                    creep.memory.route = Game.map.findRoute(creep.room, rmDeliver); 
-                    creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
-                }
-                if (creep.memory.exit) {
-                    var result = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
-                    
-                    if (result == ERR_NO_PATH) {
-                        delete creep.memory.route;
-                        delete creep.memory.exit;
-                    }
-                }
+                utilCreep.moveToRoom(creep, rmDeliver);
 	        }
         }
 	},
 
+
+    Extract: function(creep, rmDeliver, rmHarvest) {
+        var _ticksReusePath = 10;
+
+        if (creep.memory.state == 'working' && _.sum(creep.carry) < creep.carryCapacity) {
+            creep.memory.state = 'getenergy';
+        }
+        else if (creep.memory.state == 'getenergy' && _.sum(creep.carry) == creep.carryCapacity) {
+            creep.memory.state = 'working';
+        }
+        else if (creep.memory.state != 'getenergy' && creep.memory.state != 'working') {
+            creep.memory.state = 'working';
+        }
+        
+        if(creep.memory.state == 'getenergy') {
+            if (creep.room.name != rmHarvest) {
+                utilCreep.moveToRoom(creep, rmHarvest);
+            }
+            else if (creep.room.name == rmHarvest) {
+                delete creep.memory.route;
+                delete creep.memory.exit;
+
+                var source = creep.pos.findClosestByRange(FIND_MINERALS);
+                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                }
+            }
+        }        
+        
+        if (creep.memory.state == 'working') { 
+            if (creep.room.name == rmDeliver) {
+                delete creep.memory.route;
+    	        delete creep.memory.exit;
+    	        
+	            var target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (structure) => {
+                                return (structure.structureType == STRUCTURE_STORAGE && _.sum(structure.store) < structure.storeCapacity); }});
+                
+                for(var resourceType in creep.carry) {
+                    if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target, {reusePath: _ticksReusePath});
+                        return;
+                    }
+	            }
+	        }
+	        else if (creep.room.name != rmDeliver) {
+                utilCreep.moveToRoom(creep, rmDeliver);
+	        }
+        }
+	},
+
+
     Reserve: function(creep, rmHarvest) {
         if (creep.room.name != rmHarvest) {
-            var uc = require('util.creep');
-            uc.moveToRoom(creep, rmHarvest);
+            utilCreep.moveToRoom(creep, rmHarvest);
         }
         else if (creep.room.name == rmHarvest) {
             if(creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
+                creep.moveTo(creep.room.controller);
             }
         }
     }
