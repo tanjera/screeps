@@ -1,5 +1,15 @@
 var utilColony = {
 
+	Spawn: function(rmName, cBody, cName, cArgs) {
+		for (var i = 0; i < Game.spawns.length; i++) {
+			if (Game.spawns[i].room.name == rmName) {
+				if (Game.spawns[i].createCreep(cBody, cName, cArgs) != ERR_BUSY) {
+					return;
+				}
+			}
+		}
+	}
+
     getSpawn_Level: function(spawn) {
         if (spawn.room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
             return 1;
