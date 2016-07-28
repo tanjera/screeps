@@ -6,22 +6,22 @@ var utilColony = require('util.colony');
 
 var siteColony = {
 
-    run: function(spawn, rmColony, popRepairer, popWorker, popSoldier) {
+    run: function(rmColony, popRepairer, popWorker, popSoldier) {
     
         var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'repairer' && creep.memory.room == rmColony);
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
-            || (lSoldier.length < spawn.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
+            || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
-            utilColony.Spawn(rmColony, utilCreep.getBody_Soldier(utilCreep.getSpawn_Level(spawn)), null, {role: 'soldier', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Soldier(utilColony.getRoom_Level(rmColony)), null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
-            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilColony.getRoom_Level(rmColony)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilCreep.getSpawn_Level(spawn)), null, {role: 'worker', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilColony.getRoom_Level(rmColony)), null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
