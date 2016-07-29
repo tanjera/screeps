@@ -40,7 +40,8 @@ var siteMining = {
         else if (lCarrier.length < popCarrier) {
             utilColony.Spawn(rmColony, 2, utilCreep.getBody_Carrier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'carrier', room: rmHarvest});
         }
-        else if (lReserver.length < popReserver) {
+        else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
+                && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 1000)) {
             var body = utilCreep.getBody_Reserver(utilColony.getRoom_Level(Game.rooms[rmColony]));
             if (body != null) {
                 utilColony.Spawn(rmColony, 2, body, null, {role: 'reserver', room: rmHarvest});
