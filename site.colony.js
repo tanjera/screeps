@@ -43,7 +43,8 @@ var siteColony = {
             var tower = lTowers[i];
             
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }});
+                        return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0
+                                || c.owner.username == 'Invader'; }});
             if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;

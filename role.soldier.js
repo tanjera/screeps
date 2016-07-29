@@ -2,14 +2,15 @@ var utilCreep = require('util.creep');
 
 var RoleSoldier = {
 
-    run: function(creep, tgtRoom) {
+    run: function(creep) {
 
-        if (creep.room.name != tgtRoom) {
-            utilCreep.moveToRoom(lDefender[n], rmHarvest);
+        if (creep.memory.room != null || creep.room.name != creep.memory.room) {
+            utilCreep.moveToRoom(creep, creep.memory.room);
         }
-        else if (creep.room.name == tgtRoom) {
+        else {
             var targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                            return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }});
+                            return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0
+                                    || c.owner.username == 'Invader'; }});
             
             if (targets.length > 0) {
                 if(creep.attack(targets[0]) == ERR_NOT_IN_RANGE) {
