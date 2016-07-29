@@ -19,36 +19,37 @@ var RoleWorker = {
 	    if(creep.memory.state == 'getenergy') {
             var source;
             
-            // Try to pick up off the ground first, if there is a pile...
-            source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount >= creep.carryCapacity / 2; }});
-            
-            if (source != null)  {
-                if (creep.pickup(source) == ERR_NOT_IN_RANGE)
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-            }
-            
-            else // Try to pull energy from storage containers...
-            {
-                source = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                                return (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 0)
-                                        || (structure.structureType == STRUCTURE_STORAGE && structure.store[RESOURCE_ENERGY] > 0);
-                            }
-                    });
+            // Try to pick up off the ground first, if there aren't any carriers around
+            if (creep.room.find(FIND_MY_CREEPS, { filter: function(c) 
+                    { return c.memory.role == 'carrier' && c.memory.room == creep.room.name && c.memory.state == 'getenergy'; }}).length == 0) {
                 
-                if (source != null) {
-                    if (source.transfer(creep, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source, {reusePath: _ticksReusePath});
-                    }
-                }
-                else { // But if there are none... then harvest from a source
-                    
-                    source = creep.pos.findClosestByPath(FIND_SOURCES);
-                    if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source, {reusePath: _ticksReusePath});
-                    } 
+                source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount >= creep.carryCapacity / 2; }});
+                if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {                
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                    return;
                 }
             }
+            
+            // Try to pull energy from storage containers...
+            source = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 0)
+                                    || (structure.structureType == STRUCTURE_STORAGE && structure.store[RESOURCE_ENERGY] > 0);
+                        }});
+            
+            if (source != null) {
+                if (source.transfer(creep, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                    return;
+                }
+            }
+            
+            // But if there are none... then harvest from a source
+            source = creep.pos.findClosestByPath(FIND_SOURCES);
+            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source, {reusePath: _ticksReusePath});
+                return;
+            } 
 	    }
 	    
 

@@ -49,7 +49,7 @@ var RolesMining = {
                         source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
                                 return (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > creep.carryCapacity; }});
                         if (source != null) {
-                            if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity) == ERR_NOT_IN_RANGE)
+                            if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity - _.sum(creep.carry)) == ERR_NOT_IN_RANGE)
                                 creep.moveTo(source, {reusePath: _ticksReusePath});
                         } 
                         else if (creep.getActiveBodyparts('work') > 0) { // Miners can still harvest
@@ -94,8 +94,11 @@ var RolesMining = {
                     })
                 };
                 
-                if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {reusePath: _ticksReusePath});
+                for (var resourceType in creep.carry) {
+                    if(creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target, {reusePath: _ticksReusePath});
+                        return;
+                    }
 	            }
 	        }
 	        else if (creep.room.name != rmDeliver) {
@@ -142,7 +145,7 @@ var RolesMining = {
                             filter: (structure) => {
                                 return (structure.structureType == STRUCTURE_STORAGE && _.sum(structure.store) < structure.storeCapacity); }});
                 
-                for(var resourceType in creep.carry) {
+                for (var resourceType in creep.carry) {
                     if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target, {reusePath: _ticksReusePath});
                         return;
