@@ -4,7 +4,7 @@ var utilColony = {
         //rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		
         var lSpawn = Object.keys(Game.spawns).sort(function(a, b) { 
-            return Game.map.getRoomLinearDistance(Game.spawns[a].room.name, rmName) - Game.map.getRoomLinearDistance(Game.spawns[b].room.name, rmName)}) 
+            return Game.map.getRoomLinearDistance(Game.spawns[a].room.name, rmName) - Game.map.getRoomLinearDistance(Game.spawns[b].room.name, rmName)});
 
         for (var i = 0; i < lSpawn.length; i++) {
 			if (Game.map.getRoomLinearDistance(Game.spawns[lSpawn[i]].room.name, rmName) <= rmDistance
