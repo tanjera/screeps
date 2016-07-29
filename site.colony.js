@@ -15,13 +15,13 @@ var siteColony = {
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
-            utilColony.Spawn(rmColony, utilCreep.getBody_Soldier(utilColony.getRoom_Level(rmColony)), null, {role: 'soldier', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Soldier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
-            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilColony.getRoom_Level(rmColony)), null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilColony.getRoom_Level(rmColony)), null, {role: 'worker', room: rmColony});
+            utilColony.Spawn(rmColony, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
@@ -37,7 +37,7 @@ var siteColony = {
         }
         
         // Process Towers
-        var lTowers = spawn.room.find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});
+        var lTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});
                             
         for (var i = 0; i < lTowers.length; i++) {
             var tower = lTowers[i];
