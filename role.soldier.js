@@ -4,7 +4,7 @@ var RoleSoldier = {
 
     run: function(creep) {
 
-        if (creep.memory.room != null || creep.room.name != creep.memory.room) {
+        if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             utilCreep.moveToRoom(creep, creep.memory.room);
         }
         else {
