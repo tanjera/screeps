@@ -51,7 +51,7 @@ var RoleWorker = {
                 }
                 
                 // But if there are none... then harvest from a source
-                source = creep.pos.findClosestByPath(FIND_SOURCES);
+                source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
                 if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
@@ -62,7 +62,7 @@ var RoleWorker = {
             else if (creep.memory.state == 'working') {
             // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
 
-                if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 5000) {
+                if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 4000) {
                     var r = creep.upgradeController(creep.room.controller); 
                     if (r == OK) return;
                     else if (r == ERR_NOT_IN_RANGE) {

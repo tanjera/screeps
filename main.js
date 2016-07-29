@@ -13,12 +13,6 @@ module.exports.loop = function () {
 
 
     /* TO DO:
-        start spawning new creeps to replace ones with little time left 
-            listWorker -= listWorker(filter {with < 200 ticks})
-            (pitfall: make sure it doesn't trigger 3 spawns to spawn the same replacement!!!)
-
-        for distant spawning: maybe sort spawns for availability and attempt closest spawn first????
-            otherwise everything will spawn from main colony???
     */     
 
 
