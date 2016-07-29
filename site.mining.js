@@ -9,11 +9,11 @@ var siteMining = {
     // Note: Miner = Burrower + Carrier
     run: function(rmColony, rmHarvest, popBurrower, popCarrier, popMiner, popReserver, popExtractor) {
 
-        var lBurrower  = _.filter(Game.creeps, (creep) => creep.memory.role == 'burrower' && creep.memory.room == rmHarvest);
-        var lCarrier  = _.filter(Game.creeps, (creep) => creep.memory.role == 'carrier' && creep.memory.room == rmHarvest);
-        var lMiner  = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.memory.room == rmHarvest);
-        var lReserver  = _.filter(Game.creeps, (creep) => creep.memory.role == 'reserver' && creep.memory.room == rmHarvest);
-        var lExtractor  = _.filter(Game.creeps, (creep) => creep.memory.role == 'extractor' && creep.memory.room == rmHarvest);
+        var lBurrower  = _.filter(Game.creeps, (c) => c.memory.role == 'burrower' && c.memory.room == rmHarvest && c.ticksToLive != undefined && c.ticksToLive > 160);
+        var lCarrier  = _.filter(Game.creeps, (c) => c.memory.role == 'carrier' && c.memory.room == rmHarvest && c.ticksToLive != undefined && c.ticksToLive > 160);
+        var lMiner  = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.memory.room == rmHarvest && c.ticksToLive != undefined && c.ticksToLive > 160);
+        var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest);
+        var lExtractor  = _.filter(Game.creeps, (c) => c.memory.role == 'extractor' && c.memory.room == rmHarvest);
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 

@@ -31,7 +31,7 @@ module.exports.loop = function () {
     siteMining.run('W19S42', 'W19S42', 1, 1, 0, 0, 0);    // W19S42 colony #2 mining
     siteColony.run('W18S43', 1, 2, 0);     // W16S43 colony #1
     siteColony.run('W16S43', 1, 2, 0);     // W16S43 colony #2
-    siteColony.run('W19S42', 0, 1, 0);     // W19S42 colony #3
+    siteColony.run('W19S42', 0, 2, 0);     // W19S42 colony #3
 
     /* All other mining operations */
     siteMining.run('W18S43', 'W17S43', 1, 2, 0, 1, 0);    // W17S43 mining operation (from Colony #1, W18S43)
