@@ -75,14 +75,21 @@ var RolesMining = {
     	        delete creep.memory.exit;
     	        
 	            var target;
+                // If under attack, feed the towers first
+                if (creep.room.find(FIND_HOSTILE_CREEPS, 
+                        { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
+                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                            filter: (structure) => {
+                            return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity); }});
+                }
                 // Deliver to Spawns and extensions as priority
+                if (target == null) {
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                         filter: (structure) => {
                             return (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity)
                                 || (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity)
-                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 2.5);
-                        }
-                });
+                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 2.5); }});
+                }
                 // And to extensions/containers otherwise
                 if (target == null) {
                     target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -90,9 +97,8 @@ var RolesMining = {
                                 return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 1.25)
                                 || (structure.structureType == STRUCTURE_CONTAINER && _.sum(structure.store) < structure.storeCapacity)
                                 || (structure.structureType == STRUCTURE_STORAGE && _.sum(structure.store) < structure.storeCapacity);
-                            }
-                    })
-                };
+                            }});
+                }
                 
                 for (var resourceType in creep.carry) {
                     if(creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
