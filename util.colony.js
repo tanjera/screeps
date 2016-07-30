@@ -1,19 +1,19 @@
 var utilColony = {
 
-	Spawn: function(rmName, rmDistance, cBody, cName, cArgs) {
-        //rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
-		
-        var lSpawn = Object.keys(Game.spawns).sort(function(a, b) { 
-            return Game.map.getRoomLinearDistance(Game.spawns[a].room.name, rmName) - Game.map.getRoomLinearDistance(Game.spawns[b].room.name, rmName)});
+	requestSpawn: function(rmName, rmDistance, lvlPriority, cBody, cName, cArgs) {
+        /*  lvlPriority is an integer rating priority, e.g.:
+                0: Defense (active, imminent danger)
+                1: Mining operations (critical)
+                2: Mining operations (regular)
+                3: Colony operation (critical)
+                4: Colony operation (regular)
+                5: ... ? scouting? passive defense?
+                
+            rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
+		*/
 
-        for (var i = 0; i < lSpawn.length; i++) {
-			if (Game.map.getRoomLinearDistance(Game.spawns[lSpawn[i]].room.name, rmName) <= rmDistance
-                        && Game.spawns[lSpawn[i]].room.controller.level >= Game.rooms[rmName].controller.level) {
-				if (Game.spawns[lSpawn[i]].createCreep(cBody, cName, cArgs) != ERR_BUSY) {
-					return;
-				}
-			}
-		}
+        var i = Object.keys(Memory['hive']['spawn_requests']).length;
+        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, body: cBody, name: cName, args: cArgs};
 	},
 
     getSpawn_Level: function(spawn) {

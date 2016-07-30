@@ -20,35 +20,35 @@ var siteMining = {
                         { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
             var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
             if (lDefender.length == 0) {
-                utilColony.Spawn(rmColony, 0, utilCreep.getBody_Soldier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'defender', room: rmHarvest});
+                utilColony.requestSpawn(rmColony, 0, 0, utilCreep.getBody_Soldier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'defender', room: rmHarvest});
             }
         }
         else if (lMiner.length < popMiner) {
             if (lMiner.length == 0) // Possibly colony wiped? Need restart?
-                utilColony.Spawn(rmColony, 0, [WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'miner', room: rmHarvest});
+                utilColony.requestSpawn(rmColony, 0, 1, [WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'miner', room: rmHarvest});
             else {
-                utilColony.Spawn(rmColony, 2, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'miner', room: rmHarvest});
+                utilColony.requestSpawn(rmColony, 2, 1, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'miner', room: rmHarvest});
             }    
         }
         else if (lBurrower.length < popBurrower) {
             if (lCarrier.length == 0 && popCarrier > 0 && lMiner.length == 0) // Possibly colony wiped? Need restart?
-                utilColony.Spawn(rmColony, 0, [WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'miner', room: rmHarvest});
+                utilColony.requestSpawn(rmColony, 0, 1, [WORK, CARRY, CARRY, MOVE, MOVE], null, {role: 'miner', room: rmHarvest});
             else {
-                utilColony.Spawn(rmColony, 2, utilCreep.getBody_Burrower(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'burrower', room: rmHarvest});
+                utilColony.requestSpawn(rmColony, 2, 1, utilCreep.getBody_Burrower(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'burrower', room: rmHarvest});
             }
         }
         else if (lCarrier.length < popCarrier) {
-            utilColony.Spawn(rmColony, 2, utilCreep.getBody_Carrier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'carrier', room: rmHarvest});
+            utilColony.requestSpawn(rmColony, 2, 1, utilCreep.getBody_Carrier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'carrier', room: rmHarvest});
         }
         else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
                 && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 1000)) {
             var body = utilCreep.getBody_Reserver(utilColony.getRoom_Level(Game.rooms[rmColony]));
             if (body != null) {
-                utilColony.Spawn(rmColony, 2, body, null, {role: 'reserver', room: rmHarvest});
+                utilColony.requestSpawn(rmColony, 2, 1, body, null, {role: 'reserver', room: rmHarvest});
             }
         }
         else if (lExtractor.length < popExtractor) {
-            utilColony.Spawn(rmColony, 2, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'extractor', room: rmHarvest});    
+            utilColony.requestSpawn(rmColony, 2, 2, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'extractor', room: rmHarvest});    
         }
 
         // Run roles!

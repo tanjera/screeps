@@ -12,16 +12,16 @@ var siteColony = {
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
-        if (lSoldier.length < popSoldier // If there's a hostile creep in the room... spawn a defender!
+        if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
-            utilColony.Spawn(rmColony, 0, utilCreep.getBody_Soldier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'soldier', room: rmColony});
+            utilColony.requestSpawn(rmColony, 0, 0, utilCreep.getBody_Soldier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
-            utilColony.Spawn(rmColony, 2, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilColony.requestSpawn(rmColony, 2, 4, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            utilColony.Spawn(rmColony, 2, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', room: rmColony});
+            utilColony.requestSpawn(rmColony, 2, 3, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
@@ -51,7 +51,7 @@ var siteColony = {
             } 
             
             var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
-            if (injured != null) { // Anyone to heal?
+            if (injured != null && tower.energy > tower.energyCapacity / 4) { // Anyone to heal?
                 tower.heal(injured);
                 continue;
             } 
