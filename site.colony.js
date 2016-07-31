@@ -58,13 +58,13 @@ var siteColony = {
             } 
             
             var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
-            if (injured != null && tower.energy > tower.energyCapacity / 4) { // Anyone to heal?
+            if (injured != null && tower.energy > tower.energyCapacity / 2) { // Anyone to heal?
                 tower.heal(injured);
                 continue;
             } 
             
             if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
-                var structure = utilColony.findByNeed_RepairMaintenance(tower.room);
+                var structure = utilColony.findByNeed_RepairCritical(tower.room);
                 if (structure != null) {
                     tower.repair(structure);
                     continue;
