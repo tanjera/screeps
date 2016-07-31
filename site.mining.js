@@ -22,7 +22,7 @@ var siteMining = {
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
+                        {filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
             var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
             if (lDefender.length == 0) {
                 utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'defender', room: rmHarvest});
@@ -49,7 +49,8 @@ var siteMining = {
                 && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 1000)) {
             utilHive.requestSpawn(rmColony, 2, 1, 'reserver', null, {role: 'reserver', room: rmHarvest});            
         }
-        else if (lExtractor.length < popExtractor) {
+        else if (lExtractor.length < popExtractor && Object.keys(Game.rooms).includes(rmHarvest)
+                    && Game['rooms'][rmHarvest].find(FIND_MINERALS, {filter: function(m) { return m.mineralAmount > 0; }}).length > 0) {
             utilHive.requestSpawn(rmColony, 2, 2, 'worker', null, {role: 'extractor', room: rmHarvest});    
         }
 
