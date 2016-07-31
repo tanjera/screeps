@@ -14,9 +14,7 @@ module.exports.loop = function () {
 
 
     /* TO DO:
-        make spawn priority list- all requests to spawn modify the list in memory
-            at the end of main.js, sort list by priority and run all spawn calls  
-
+        Add ranged attack to soldiers??
     */     
 
     

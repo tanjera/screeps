@@ -58,18 +58,22 @@ var siteMining = {
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];
                 
-            if (creep.memory.room == rmHarvest 
-                    && (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
-                    || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length == 0))) {
-                if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
-                    rolesMining.Mine(creep, rmColony, rmHarvest);
-                } else if (creep.memory.role == 'reserver') {
-                    rolesMining.Reserve(creep, rmHarvest);
-                } else if (creep.memory.role == 'extractor') {
-                    rolesMining.Extract(creep, rmColony, rmHarvest);
-                } else if (creep.memory.role == 'defender') {
+            if (creep.memory.room != null && creep.memory.room == rmColony) {
+                if (creep.memory.role == 'defender') {
                     roleSoldier.run(creep);
+                }
+
+                if (creep.memory.room == rmHarvest      // If the room is safe to run mining operations... run roles. 
+                        && (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
+                        || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
+                            { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length == 0))) {
+                    if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
+                        rolesMining.Mine(creep, rmColony, rmHarvest);
+                    } else if (creep.memory.role == 'reserver') {
+                        rolesMining.Reserve(creep, rmHarvest);
+                    } else if (creep.memory.role == 'extractor') {
+                        rolesMining.Extract(creep, rmColony, rmHarvest);
+                    } 
                 }
             }
         }

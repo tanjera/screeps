@@ -32,12 +32,14 @@ var siteColony = {
         // Run roles!
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];
-                
-            if (creep.memory.role == 'worker') {
-                roleWorker.run(creep);
-            }
-            else if (creep.memory.role == 'soldier') {
-                roleSoldier.run(creep);
+            
+            if (creep.memory.room != null && creep.memory.room == rmColony) {
+                if (creep.memory.role == 'worker') {
+                    roleWorker.run(creep);
+                }
+                else if (creep.memory.role == 'soldier') {
+                    roleSoldier.run(creep);
+                }
             }
         }
         
