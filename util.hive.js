@@ -1,36 +1,94 @@
 var utilHive = {
 
-
-    resetSpawnRequests: function() {   // Reset the memory for spawn requests
+    prepareHiveMemory: function() {
         if (Memory['hive'] == null) {
             Memory['hive'] = {};
         }
 
-        Memory['hive']['spawn_requests'] = {};   
+        Memory['hive']['population_balance'] = {};  // Reset data for population balancing
+        Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   
     },
 
 
+    populationTally: function(rmName, popTarget, popActual) {
+        // Tallies the target population for a colony, to be used for spawn load balancing
+        if (Memory['hive']['population_balance'][rmName] == null) {
+            Memory['hive']['population_balance'][rmName] = {target: popTarget, actual: popActual, total: null};
+        } else {
+            Memory['hive']['population_balance'][rmName]['target'] += popTarget;
+            Memory['hive']['population_balance'][rmName]['actual'] += popActual; 
+        }
+    },
+
+
+    requestSpawn: function(rmName, rmDistance, lvlPriority, cBody, cName, cArgs) {
+        /*  lvlPriority is an integer rating priority, e.g.:
+                0: Defense (active, imminent danger)
+                1: Mining operations (critical)
+                2: Mining operations (regular)
+                3: Colony operation (critical)
+                4: Colony operation (regular)
+                5: ... ? scouting? passive defense?
+                
+            rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
+		*/
+
+        var i = Object.keys(Memory['hive']['spawn_requests']).length;
+        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, body: cBody, name: cName, args: cArgs};
+	},
+
+
     processSpawnRequests: function() {
+
+        // Determine percentage each colony meets its target population
+        for (var n in Object.keys(Memory['hive']['population_balance'])) {
+            Memory['hive']['population_balance'][n]['total'] = Memory['hive']['population_balance'][n]['actual'] / Memory['hive']['population_balance'][n]['target'];
+        }
+
         var listRequests = Object.keys(Memory['hive']['spawn_requests']).sort(function(a, b) { 
             return Memory['hive']['spawn_requests'][a].priority - Memory['hive']['spawn_requests'][b].priority; } );
-		
         var listSpawns = Object.keys(Game['spawns']).filter(function(a) { return Game['spawns'][a].spawning == null; });
+        var utilCreep = require('util.creep');
 
         for (var r = 0; r < listRequests.length; r++) {
             for (var s = 0; s < listSpawns.length; s++) {
-                if (listSpawns[s] != null && listRequests[r] != null
-                        && Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, listRequests[r].room) <= listRequests[r].distance) {
+                if (listSpawns[s] != null && listRequests[r] != null) {
                     
-                    var result = Game['spawns'][listSpawns[s]].createCreep(listRequests[r].body, listRequests[r].name, listRequests[r].args);
-
-                    if (_.isString(result)) {
-                        listSpawns[s] = null;
-                        listRequests[r] = null;
+                    var request = Memory['hive']['spawn_requests'][listRequests[r]];
+                    
+                    if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {
+                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total']) * utilHive.getRoom_Level(request.room));
+                        var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
+    
+                        if (_.isString(result)) {
+                            listSpawns[s] = null;
+                            listRequests[r] = null;
+                        }
                     }
                 }
             }
         }
-	}
+	},
+
+
+    getRoom_Level: function(room) {
+        if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
+            return 1;
+        else if (room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
+            return 2;
+        else if (room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
+            return 3;
+        else if (room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
+            return 4;
+        else if (room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
+            return 5;
+        else if (room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
+            return 6;
+        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
+            return 7;
+        else if (room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
+            return 8;
+		},
 };
 
 module.exports = utilHive;

@@ -1,23 +1,14 @@
 var utilCreep = {
 
-    getSpawn_Level: function(spawn) {
-        if (spawn.room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
-            return 1;
-        else if (spawn.room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
-            return 2;
-        else if (spawn.room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-            return 3;
-        else if (spawn.room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-            return 4;
-        else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
-            return 5;
-        else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-            return 6;
-        else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
-            return 7;
-        else if (spawn.room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
-            return 8;
-		},
+    getBody: function(type, level) {
+        switch (type) {
+            case 'soldier': return getBody_Soldier(level);
+            case 'worker': return getBody_Worker(level);
+            case 'burrower': return getBody_Burrower(level);
+            case 'carrier': return getBody_Carrier(level);
+            case 'reserver': return getBody_Reserver(level);
+        }
+    },
 
     getBody_Soldier: function(level) {
         switch (level) {

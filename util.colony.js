@@ -1,59 +1,5 @@
 var utilColony = {
 
-	requestSpawn: function(rmName, rmDistance, lvlPriority, cBody, cName, cArgs) {
-        /*  lvlPriority is an integer rating priority, e.g.:
-                0: Defense (active, imminent danger)
-                1: Mining operations (critical)
-                2: Mining operations (regular)
-                3: Colony operation (critical)
-                4: Colony operation (regular)
-                5: ... ? scouting? passive defense?
-                
-            rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
-		*/
-
-        var i = Object.keys(Memory['hive']['spawn_requests']).length;
-        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, body: cBody, name: cName, args: cArgs};
-	},
-
-    getSpawn_Level: function(spawn) {
-        if (spawn.room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
-            return 1;
-        else if (spawn.room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
-            return 2;
-        else if (spawn.room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-            return 3;
-        else if (spawn.room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-            return 4;
-        else if (spawn.room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
-            return 5;
-        else if (spawn.room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-            return 6;
-        else if (spawn.room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
-            return 7;
-        else if (spawn.room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
-            return 8;
-		},
-
-    getRoom_Level: function(room) {
-        if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
-            return 1;
-        else if (room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
-            return 2;
-        else if (room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-            return 3;
-        else if (room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-            return 4;
-        else if (room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
-            return 5;
-        else if (room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-            return 6;
-        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
-            return 7;
-        else if (room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
-            return 8;
-		},
-
     repairWalls_Critical: function(level) {
         var t = [0, 
                     1000,

@@ -21,7 +21,7 @@ module.exports.loop = function () {
 
     
     /* Prepare hive functions/memory for this tick */
-    utilHive.resetSpawnRequests();
+    utilHive.prepareHiveMemory();
 
     /* Colonies and in-colony mining operations */
     siteColony.run('W18S43', 1, 2, 0);     // W16S43 colony #1

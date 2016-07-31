@@ -3,6 +3,7 @@ var roleSoldier = require('role.soldier');
 
 var utilCreep = require('util.creep');
 var utilColony = require('util.colony');
+var utilHive = require('util.hive');
 
 var siteColony = {
 
@@ -12,16 +13,20 @@ var siteColony = {
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
+        var popTarget = popRepairer + popWorker + popSoldier;
+        var popActual = lRepairer.length + lWorker.length + lSoldier.length;
+        utilHive.populationTally(rmColony, popTarget, popActual);
+
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
-            utilColony.requestSpawn(rmColony, 0, 0, utilCreep.getBody_Soldier(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'soldier', room: rmColony});
+            utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
-            utilColony.requestSpawn(rmColony, 2, 4, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 4, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
         }
         else if (lWorker.length < popWorker) {
-            utilColony.requestSpawn(rmColony, 2, 3, utilCreep.getBody_Worker(utilColony.getRoom_Level(Game.rooms[rmColony])), null, {role: 'worker', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 3, 'worker', null, {role: 'worker', room: rmColony});
         }
         
         // Run roles!
