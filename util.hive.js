@@ -41,7 +41,8 @@ var utilHive = {
     processSpawnRequests: function() {
 
         // Determine percentage each colony meets its target population
-        for (var n in Object.keys(Memory['hive']['population_balance'])) {
+        for (var i = 0; i < Object.keys(Memory['hive']['population_balance']).length; i++) {
+            var n = Object.keys(Memory['hive']['population_balance'])[i];
             Memory['hive']['population_balance'][n]['total'] = Memory['hive']['population_balance'][n]['actual'] / Memory['hive']['population_balance'][n]['target'];
         }
 
@@ -57,9 +58,9 @@ var utilHive = {
                     var request = Memory['hive']['spawn_requests'][listRequests[r]];
                     
                     if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {
-                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total']) * utilHive.getRoom_Level(request.room));
+                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * utilHive.getRoom_Level(request.room)));
                         var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
-    
+
                         if (_.isString(result)) {
                             listSpawns[s] = null;
                             listRequests[r] = null;
@@ -71,22 +72,22 @@ var utilHive = {
 	},
 
 
-    getRoom_Level: function(room) {
-        if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
+    getRoom_Level: function(rmName) {
+        if (Game['rooms'][rmName].energyCapacityAvailable < 550)           // lvl 1, 300 energy
             return 1;
-        else if (room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable < 800)      // lvl 2, 550 energy
             return 2;
-        else if (room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable < 1300)     // lvl 3, 800 energy
             return 3;
-        else if (room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
             return 4;
-        else if (room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
             return 5;
-        else if (room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
             return 6;
-        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
             return 7;
-        else if (room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
+        else if (Game['rooms'][rmName].energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
             return 8;
 		},
 };

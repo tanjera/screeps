@@ -1,5 +1,24 @@
 var utilColony = {
 
+    getRoom_Level: function(room) {
+        if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
+            return 1;
+        else if (room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
+            return 2;
+        else if (room.energyCapacityAvailable < 1300)     // lvl 3, 800 energy
+            return 3;
+        else if (room.energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
+            return 4;
+        else if (room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
+            return 5;
+        else if (room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
+            return 6;
+        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
+            return 7;
+        else if (room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
+            return 8;
+		},
+        
     repairWalls_Critical: function(level) {
         var t = [0, 
                     1000,

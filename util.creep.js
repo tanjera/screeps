@@ -2,11 +2,11 @@ var utilCreep = {
 
     getBody: function(type, level) {
         switch (type) {
-            case 'soldier': return getBody_Soldier(level);
-            case 'worker': return getBody_Worker(level);
-            case 'burrower': return getBody_Burrower(level);
-            case 'carrier': return getBody_Carrier(level);
-            case 'reserver': return getBody_Reserver(level);
+            case 'soldier': return utilCreep.getBody_Soldier(level);
+            case 'worker': return utilCreep.getBody_Worker(level);
+            case 'burrower': return utilCreep.getBody_Burrower(level);
+            case 'carrier': return utilCreep.getBody_Carrier(level);
+            case 'reserver': return utilCreep.getBody_Reserver(level);
         }
     },
 
