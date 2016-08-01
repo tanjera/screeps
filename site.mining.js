@@ -46,7 +46,7 @@ var siteMining = {
             utilHive.requestSpawn(rmColony, 2, 1, 'carrier', null, {role: 'carrier', room: rmHarvest});
         }
         else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
-                && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 1000)) {
+                && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
             utilHive.requestSpawn(rmColony, 2, 1, 'reserver', null, {role: 'reserver', room: rmHarvest});            
         }
         else if (lExtractor.length < popExtractor && Object.keys(Game.rooms).includes(rmHarvest)

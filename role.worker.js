@@ -14,7 +14,7 @@ var RoleWorker = {
             if (creep.memory.state == 'working' && creep.carry[RESOURCE_ENERGY] == 0) {
                 creep.memory.state = 'getenergy';
             }
-            else if (creep.memory.state == 'getenergy' && creep.carry[RESOURCE_ENERGY] == creep.carryCapacity) {
+            else if (creep.memory.state == 'getenergy' && _.sum(creep.carry) == creep.carryCapacity) {
                 creep.memory.state = 'working';
             }
             else if (creep.memory.state != 'getenergy' && creep.memory.state != 'working') {
@@ -25,7 +25,7 @@ var RoleWorker = {
             if(creep.memory.state == 'getenergy') {
                 // Priority #1: get dropped energy
                 var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
-                    return s.amount >= creep.carryCapacity / 2}});
+                    return s.amount >= creep.carryCapacity / 2 && s.mineralType == RESOURCE_ENERGY}});
                 if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;

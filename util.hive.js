@@ -84,8 +84,10 @@ var utilHive = {
         for (var s = 0; s < listSpawns.length; s++) {
             var spawn = Game['spawns'][listSpawns[s]];
             var creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
-            if (creeps.length > 0) {
-                spawn.renewCreep(creeps[0]);
+            for (var c = 0; c < creeps.length; c++) {
+                if (spawn.renewCreep(creeps[c]) == OK) {
+                    c = creeps.length;  // Break the inner for loop
+                }
             }
         }
     },
