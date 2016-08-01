@@ -24,7 +24,7 @@ var RoleWorker = {
             // Out of energy? Find more...
             if(creep.memory.state == 'getenergy') {
                 // Priority #1: get dropped energy
-                var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { return s.amount > creep.carryCapacity / 5 }});
+                var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { return s.amount >= creep.carryCapacity}});
                 if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
