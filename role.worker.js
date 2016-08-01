@@ -24,18 +24,18 @@ var RoleWorker = {
             // Out of energy? Find more...
             if(creep.memory.state == 'getenergy') {
                 // Priority #1: get dropped energy
-                var sources = creep.room.find(FIND_DROPPED_ENERGY).sort(function(a, b) { return b - a; });
-                if (sources.length > 0 && creep.pickup(sources[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { return s.amount > creep.carryCapacity / 5 }});
+                if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 }
 
                 // Priority #2: get energy from receiving containers and links
-                var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
+                var source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
                     return (s.structureType == STRUCTURE_LINK && s.energy > 0)
                         || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
-                if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                if (source != null && creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } 
 
