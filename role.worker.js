@@ -23,45 +23,42 @@ var RoleWorker = {
 
             // Out of energy? Find more...
             if(creep.memory.state == 'getenergy') {
-                var source;
-                
-                // Try to pick up off the ground first, if there aren't any carriers around
-                if (creep.room.find(FIND_MY_CREEPS, { filter: function(c) 
-                        { return c.memory.role == 'carrier' && c.memory.room == creep.room.name && c.memory.state == 'getenergy'; }}).length == 0) {
-                    
-                    source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount >= creep.carryCapacity / 2; }});
-                    if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {                
-                        creep.moveTo(source, {reusePath: _ticksReusePath});
-                        return;
-                    }
+                // Priority #1: get dropped energy
+                var sources = creep.room.find(FIND_DROPPED_ENERGY).sort(function(a, b) { return b - a; });
+                if (sources.length > 0 && creep.pickup(sources[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                    return;
                 }
-                
-                // Try to pull energy from storage containers...
-                source = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                                return (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 0)
-                                        || (structure.structureType == STRUCTURE_STORAGE && structure.store[RESOURCE_ENERGY] > 0);
-                            }});
-                
-                if (source != null) {
-                    if (source.transfer(creep, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source, {reusePath: _ticksReusePath});
-                        return;
-                    }
-                }
-                
-                // But if there are none... then harvest from a source
-                source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
-                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
+
+                // Priority #2: get energy from receiving containers and links
+                var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
+                    return (s.structureType == STRUCTURE_LINK && s.energy > 0)
+                        || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
+                if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(sources[0], {reusePath: _ticksReusePath});
                     return;
                 } 
+
+                // Priority #3: get energy from storage
+                var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
+                    return s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0; }});
+                if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                    return;
+                } 
+
+                // Priority #4: if able to, mine.
+                if (creep.getActiveBodyparts('work') > 0) {
+                    var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
+                    if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(source, {reusePath: _ticksReusePath});
+                        return;
+                    } 
+                }
             }
             
-
-            else if (creep.memory.state == 'working') {
+            if (creep.memory.state == 'working') {
             // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
-
                 if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 4000) {
                     var r = creep.upgradeController(creep.room.controller); 
                     if (r == OK) return;

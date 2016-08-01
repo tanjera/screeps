@@ -76,7 +76,7 @@ var siteColony = {
         var listLinks = Game['rooms'][rmColony].find(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
         var listSpawns = Game['rooms'][rmColony].find(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; }});
         if (listLinks.length > 1 && listSpawns.length > 0) {
-            var linkTo = listSpawns.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
+            var linkTo = listSpawns[0].pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
 
             if (linkTo != null) {
                 for (var i = 0; i < listLinks.length; i++) {

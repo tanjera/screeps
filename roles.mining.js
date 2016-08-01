@@ -40,8 +40,9 @@ var RolesMining = {
 
                     // Priority #2: get energy from receiving containers and links
                     var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
-                        return (s.structureType == STRUCTURE_LINK || s.structureType == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > 0; }});
-                    if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY, creep.carryCapacity - _.sum(creep.carry)) == ERR_NOT_IN_RANGE) {
+                        return (s.structureType == STRUCTURE_LINK && s.energy > 0)
+                            || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
+                    if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(sources[0], {reusePath: _ticksReusePath});
                         return;
                     } 
@@ -49,7 +50,7 @@ var RolesMining = {
                     // Priority #3: get energy from storage
                     var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
                         return s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0; }});
-                    if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY, creep.carryCapacity - _.sum(creep.carry)) == ERR_NOT_IN_RANGE) {
+                    if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(sources[0], {reusePath: _ticksReusePath});
                         return;
                     } 
@@ -59,6 +60,7 @@ var RolesMining = {
                         var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
                         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source, {reusePath: _ticksReusePath});
+                            return;
                         } 
                     }
                 } else { 
@@ -66,6 +68,7 @@ var RolesMining = {
                     var source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source, {reusePath: _ticksReusePath});
+                        return;
                     }
                 }
 	        }
@@ -166,6 +169,7 @@ var RolesMining = {
                 var source = creep.pos.findClosestByRange(FIND_MINERALS);
                 if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
+                    return;
                 }
             }
         }        
@@ -188,6 +192,7 @@ var RolesMining = {
 	        }
 	        else if (creep.room.name != rmDeliver) {
                 utilCreep.moveToRoom(creep, rmDeliver);
+                return;
 	        }
         }
 	},
@@ -196,10 +201,12 @@ var RolesMining = {
     Reserve: function(creep, rmHarvest) {
         if (creep.room.name != rmHarvest) {
             utilCreep.moveToRoom(creep, rmHarvest);
+            return;
         }
         else if (creep.room.name == rmHarvest) {
             if(creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller);
+                return;
             }
         }
     }
