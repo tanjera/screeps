@@ -5,22 +5,15 @@ var utilHive = require('util.hive');
 
 module.exports.loop = function () {
 
-    // Clear dead creeps from Memory
-    for (var n in Memory.creeps) {
-        if (!Game.creeps[n]) {
-            delete Memory.creeps[n];
-        }
-    }
-
-
     /* TO DO:
         Add ranged attack to soldiers??
 
-
+        Spawns can idly renew nearby creeps
     */     
 
     
     /* Prepare hive functions/memory for this tick */
+    utilHive.clearDeadMemory();
     utilHive.prepareHiveMemory();
 
     /* Colonies and in-colony mining operations */

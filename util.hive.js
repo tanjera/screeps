@@ -1,5 +1,14 @@
 var utilHive = {
 
+    clearDeadMemory: function() {
+        // Clear dead creeps from Memory
+        for (var n in Memory.creeps) {
+            if (!Game.creeps[n]) {
+                delete Memory.creeps[n];
+            }
+        }
+    },
+
     prepareHiveMemory: function() {
         if (Memory['hive'] == null) {
             Memory['hive'] = {};

@@ -30,38 +30,40 @@ var RolesMining = {
     	        delete creep.memory.route;
     	        delete creep.memory.exit;
     	        
-    	        var source;
-    	        
-    	        // Carriers, try to pick up off the ground first
-                if (creep.carryCapacity > 0) {
-                    
-                    // Try to pick up larger piles first... then pick up anything
-                    source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: (s) => { return s.amount >= creep.carryCapacity / 10; }});
-                    if (source == null) { 
-                        source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+    	        if (creep.carryCapacity > 0) {  // Carriers and miners, priority is to move energy throughout the room                    
+                    // Priority #1: get dropped energy
+                    var sources = creep.room.find(FIND_DROPPED_ENERGY).sort(function(a, b) { return b - a; });
+                    if (sources.length > 0 && creep.pickup(sources[0]) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                        return;
                     }
-                    if (source != null)  {
-                        if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
+
+                    // Priority #2: get energy from receiving containers and links
+                    var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
+                        return (s.structureType == STRUCTURE_LINK || s.structureType == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > 0; }});
+                    if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY, creep.carryCapacity - _.sum(creep.carry)) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                        return;
+                    } 
+
+                    // Priority #3: get energy from storage
+                    var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
+                        return s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0; }});
+                    if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY, creep.carryCapacity - _.sum(creep.carry)) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(sources[0], {reusePath: _ticksReusePath});
+                        return;
+                    } 
+
+                    // Priority #4: if able to, mine.
+                    if (creep.getActiveBodyparts('work') > 0) {
+                        var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
+                        if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(source, {reusePath: _ticksReusePath});
-                        }
-                    } else {
-                        // Attempt to carry energy from a container/storage
-                        source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
-                                return (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] > creep.carryCapacity; }});
-                        if (source != null) {
-                            if(creep.withdraw(source, RESOURCE_ENERGY, creep.carryCapacity - _.sum(creep.carry)) == ERR_NOT_IN_RANGE)
-                                creep.moveTo(source, {reusePath: _ticksReusePath});
                         } 
-                        else if (creep.getActiveBodyparts('work') > 0) { // Miners can still harvest
-                            source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
-                            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo(source, {reusePath: _ticksReusePath});
-                            } 
-                        }
                     }
-                } else { // Burrowers, straight to the source
-                    source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
-                    
+                } else { 
+                    // Burrowers, straight to the source
+                    var source = creep.pos.findClosestByPath(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(source, {reusePath: _ticksReusePath});
                     }
@@ -75,40 +77,66 @@ var RolesMining = {
     	        delete creep.memory.exit;
     	        
 	            var target;
-                // If under attack, feed the towers first
-                if (creep.room.find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
-                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                            return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity); }});
-                }
-                // Deliver to Spawns and extensions as priority
-                if (target == null) {
-                target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (structure) => {
-                            return (structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity)
-                                || (structure.structureType == STRUCTURE_EXTENSION && structure.energy < structure.energyCapacity)
-                                || (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 2.5); }});
-                }
-                // And to extensions/containers otherwise
-                if (target == null) {
-                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                                return (structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity / 1.25)
-                                || (structure.structureType == STRUCTURE_CONTAINER && _.sum(structure.store) < structure.storeCapacity)
-                                || (structure.structureType == STRUCTURE_STORAGE && _.sum(structure.store) < structure.storeCapacity);
-                            }});
-                }
-                
-                for (var resourceType in creep.carry) {
-                    if(creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target, {reusePath: _ticksReusePath});
-                        return;
+
+                if (rmDeliver == rmHarvest) {  // Carriers that *are* working within the colony room
+                    // Priority #1: if under attack, feed the towers
+                    if (creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
+                                return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
+                                return (s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity); }});
                     }
-	            }
-	        }
-	        else if (creep.room.name != rmDeliver) {
+                    // Priority #2: feed spawns and extensions
+                    if (target == null) {
+                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity)
+                                    || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
+                    }
+                    // Priority #3: feed towers and storage
+                    if (target == null) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                    return (s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity)
+                                    || (s.structureType == STRUCTURE_STORAGE && _.sum(s.store) < s.storeCapacity); }});
+                    }
+                    // Priority #4: fill containers
+                    if (target == null) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                    return (s.structureType == STRUCTURE_CONTAINER && s.energy < s.energyCapacity); }});
+                    }
+                }
+                else if (rmDeliver != rmHarvest) {   // Carriers *not* working within the colony room
+                    // Priority #1: fill links
+                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                    return (s.structureType == STRUCTURE_LINK && s.energy < s.energyCapacity); }});
+                    // Priority #2: fill delivery containers
+                    if (target == null) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                    return (s.structureType == STRUCTURE_CONTAINER && s.energy < s.energyCapacity); }});
+                    }
+                    // Priority #3: feed spawns and extensions
+                    if (target == null) {
+                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity)
+                                    || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
+                    }
+                    // Priority #4: feed towers and storage
+                    if (target == null) {
+                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                                    return (s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity)
+                                    || (s.structureType == STRUCTURE_STORAGE && _.sum(s.store) < s.storeCapacity); }});
+                    }
+                }
+
+                if (target != null) {
+                    for (var resourceType in creep.carry) {
+                        if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(target, {reusePath: _ticksReusePath});
+                            return;
+                        }
+                    }
+                }
+	        } else if (creep.room.name != rmDeliver) {
                 utilCreep.moveToRoom(creep, rmDeliver);
+                return;
 	        }
         }
 	},
@@ -148,8 +176,8 @@ var RolesMining = {
     	        delete creep.memory.exit;
     	        
 	            var target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                                return (structure.structureType == STRUCTURE_STORAGE && _.sum(structure.store) < structure.storeCapacity); }});
+                            filter: function (s) {
+                                return (s.structureType == STRUCTURE_STORAGE && _.sum(s.store) < s.storeCapacity); }});
                 
                 for (var resourceType in creep.carry) {
                     if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {

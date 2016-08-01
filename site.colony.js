@@ -44,10 +44,10 @@ var siteColony = {
         }
         
         // Process Towers
-        var lTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});
+        var listTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});
                             
-        for (var i = 0; i < lTowers.length; i++) {
-            var tower = lTowers[i];
+        for (var i = 0; i < listTowers.length; i++) {
+            var tower = listTowers[i];
             
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0
@@ -69,6 +69,21 @@ var siteColony = {
                     tower.repair(structure);
                     continue;
                 } 
+            }
+        }
+
+        // Move energy from distant links to closer links
+        var listLinks = Game['rooms'][rmColony].find(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
+        var listSpawns = Game['rooms'][rmColony].find(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; }});
+        if (listLinks.length > 1 && listSpawns.length > 0) {
+            var linkTo = listSpawns.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
+
+            if (linkTo != null) {
+                for (var i = 0; i < listLinks.length; i++) {
+                    if (listLinks[i] != linkTo) {
+                        listLinks[i].transferEnergy(linkTo);
+                    }
+                }
             }
         }
     }
