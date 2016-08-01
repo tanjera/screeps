@@ -32,7 +32,7 @@ var RoleWorker = {
                 }
                 
                 // Priority #2: get energy from storage or containers
-                var sources = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
+                var source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
                     return (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
                         || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
                 if (source != null && creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {

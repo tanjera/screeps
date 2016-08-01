@@ -7,8 +7,6 @@ module.exports.loop = function () {
 
     /* TO DO:
         Add ranged attack to soldiers??
-
-        Spawns can idly renew nearby creeps
     */     
 
     
@@ -34,4 +32,5 @@ module.exports.loop = function () {
     
     /* Run end-tick hive functions */
     utilHive.processSpawnRequests();
+    utilHive.processSpawnRenewing();
 }

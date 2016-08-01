@@ -48,7 +48,6 @@ var utilHive = {
 
 
     processSpawnRequests: function() {
-
         // Determine percentage each colony meets its target population
         for (var i = 0; i < Object.keys(Memory['hive']['population_balance']).length; i++) {
             var n = Object.keys(Memory['hive']['population_balance'])[i];
@@ -79,6 +78,17 @@ var utilHive = {
             }
         }
 	},
+
+    processSpawnRenewing: function() {
+        var listSpawns = Object.keys(Game['spawns']).filter(function(a) { return Game['spawns'][a].spawning == null; });
+        for (var s = 0; s < listSpawns.length; s++) {
+            var spawn = Game['spawns'][listSpawns[s]];
+            var creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
+            if (creeps.length > 0) {
+                spawn.renewCreep(creeps[0]);
+            }
+        }
+    },
 
 
     getRoom_Level: function(rmName) {
