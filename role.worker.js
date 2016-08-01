@@ -24,29 +24,23 @@ var RoleWorker = {
             // Out of energy? Find more...
             if(creep.memory.state == 'getenergy') {
                 // Priority #1: get dropped energy
-                var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { return s.amount >= creep.carryCapacity}});
+                var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
+                    return s.amount >= creep.carryCapacity / 2}});
                 if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 }
-
-                // Priority #2: get energy from receiving containers
-                var source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
-                    return s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0; }});
+                
+                // Priority #2: get energy from storage or containers
+                var sources = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
+                    return (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
+                        || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
                 if (source != null && creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } 
 
-                // Priority #3: get energy from storage
-                var sources = creep.room.find(FIND_STRUCTURES, { filter: function (s) { 
-                    return s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0; }});
-                if (sources.length > 0 && creep.withdraw(sources[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0], {reusePath: _ticksReusePath});
-                    return;
-                } 
-
-                // Priority #4: if able to, mine.
+                // Priority #3: if able to, mine.
                 if (creep.getActiveBodyparts('work') > 0) {
                     var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
