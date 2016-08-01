@@ -107,21 +107,18 @@ var RolesMining = {
                     }
                 }
                 else if (rmDeliver != rmHarvest) {   // Carriers *not* working within the colony room
-                    // Priority #1: fill links
+                    // Priority #1: fill links and delivery containers 
                     target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
-                                    return (s.structureType == STRUCTURE_LINK && s.energy < s.energyCapacity); }});
-                    // Priority #2: fill delivery containers
-                    if (target == null) {
-                        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
-                                    return (s.structureType == STRUCTURE_CONTAINER && s.energy < s.energyCapacity); }});
-                    }
-                    // Priority #3: feed spawns and extensions
+                                    return (s.structureType == STRUCTURE_LINK && s.energy < s.energyCapacity)
+                                        || (s.structureType == STRUCTURE_CONTAINER && s.energy < s.energyCapacity); }});
+                     
+                    // Priority #2: feed spawns and extensions
                     if (target == null) {
                     target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
                                 return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity)
                                     || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
                     }
-                    // Priority #4: feed towers and storage
+                    // Priority #3: feed towers and storage
                     if (target == null) {
                         target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
                                     return (s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity)
