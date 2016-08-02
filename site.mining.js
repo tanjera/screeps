@@ -1,5 +1,5 @@
 var rolesMining = require('roles.mining');
-var roleSoldier = require('role.soldier');
+var rolesCombat = require('roles.combat');
 
 var utilCreep = require('util.creep');
 var utilColony = require('util.colony');
@@ -23,9 +23,9 @@ var siteMining = {
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         {filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
-            var lDefender = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender' && creep.memory.room == rmHarvest);
-            if (lDefender.length == 0) {
-                utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'defender', room: rmHarvest});
+            var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
+            if (lSoldier.length == 0) {
+                utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmHarvest});
             }
         }
         else if (lMiner.length < popMiner) {
@@ -59,8 +59,8 @@ var siteMining = {
             var creep = Game.creeps[n];
                 
             if (creep.memory.room != null && creep.memory.room == rmHarvest) {
-                if (creep.memory.role == 'defender') {
-                    roleSoldier.run(creep);
+                if (creep.memory.role == 'soldier') {
+                    rolesCombat.Soldier(creep);
                 }
 
                     // If the room is safe to run mining operations... run roles. 

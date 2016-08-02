@@ -56,7 +56,93 @@ var utilCreep = {
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
         }
     },
+
+    getBody_Archer: function(level) {
+        switch (level) {
+            case 1:
+                return [ // 260 energy, 1x TOUGH, 1x RANGED_ATTACK, 2x MOVE
+                        TOUGH, 
+                        MOVE, MOVE, 
+                        RANGED_ATTACK]; 
+            case 2:
+                return [ // 460 energy, 1x TOUGH, 2x RANGED_ATTACK, 3x MOVE
+                        TOUGH, 
+                        MOVE, MOVE, MOVE, 
+                        RANGED_ATTACK, RANGED_ATTACK]; 
+            case 3:
+                return [ // 720 energy, 2x TOUGH, 3x RANGED_ATTACK, 5x MOVE
+                        TOUGH, TOUGH, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK]; 
+            case 4:
+                return [ // 1120 energy, 2x TOUGH, 5x RANGED_ATTACK, 7x MOVE
+                        TOUGH, TOUGH, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+            case 5:
+                return [ // 1580 energy, 2x TOUGH, 5x RANGED_ATTACK, 7x MOVE
+                        TOUGH, TOUGH, TOUGH,  
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK]; 
+            case 6:
+                return [ // 2020 energy, 7x TOUGH, 8x RANGED_ATTACK, 15x MOVE
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE,
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+            case 7:
+                return [ // 4000 energy, 20x RANGED_ATTACK, 20x MOVE                                                 
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, 
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, 
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, 
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+            case 8:
+                return [ // 5000 energy, 25x RANGED_ATTACK, 25x MOVE
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, 
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, 
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,  
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+        }
+    },
     
+    getBody_Healer: function(level) {
+        switch (level) {
+            case 1:
+            case 2:
+                return [ // 300 energy, 1x HEAL, 1x MOVE
+                        MOVE, HEAL];  
+            case 3:
+                return [ // 600 energy, 2x HEAL, 2x MOVE
+                        MOVE, MOVE, 
+                        HEAL, HEAL]; 
+            case 4:
+                return [ // 1200 energy, 4x HEAL, 4x MOVE
+                        MOVE, MOVE, MOVE, MOVE,
+                        HEAL, HEAL, HEAL, HEAL]; 
+            case 5:
+                return [ // 1500 energy, 5x HEAL, 5x MOVE
+                        MOVE, MOVE, MOVE, MOVE, MOVE,
+                        HEAL, HEAL, HEAL, HEAL, HEAL]; 
+            case 6:
+                return [ // 2100 energy, 7x HEAL, 7x MOVE
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL]; 
+            case 7:
+                return [ // 4500 energy, 15x HEAL, 15x MOVE
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE,
+                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
+                        HEAL, HEAL, HEAL, HEAL, HEAL]; 
+            case 8:
+                return [ // 6000 energy, 20x HEAL, 20x MOVE
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
+                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL]; 
+        }
+    },
+
     getBody_Worker: function(level) {
         switch (level) {
             case 1:
@@ -213,6 +299,24 @@ var utilCreep = {
                 return [ // 1300 energy, 2x CLAIM, 2x MOVE
                         CLAIM, CLAIM, MOVE, MOVE];
         }
+    },
+
+    moveFrom: function(creep, target) {
+        var tgtDir = creep.pos.getDirectionTo(target);
+        var moveDir;
+        
+        switch (tgtDir) {
+            case TOP:           moveDir = BOTTOM;
+            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;
+            case RIGHT:         moveDir = LEFT;
+            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;
+            case BOTTOM:        moveDir = TOP;
+            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;
+            case LEFT:          moveDir = RIGHT;
+            case TOP_LEFT:      moveDir = BOTTOM_RIGHT;
+        }
+
+        return creep.move(moveDir);
     },
 
     moveToRoom: function(creep, tgtRoom) {

@@ -1,5 +1,5 @@
-var roleWorker = require('role.worker');
-var roleSoldier = require('role.soldier');
+var rolesWork = require('roles.work');
+var rolesCombat = require('roles.combat');
 
 var utilCreep = require('util.creep');
 var utilColony = require('util.colony');
@@ -35,10 +35,10 @@ var siteColony = {
             
             if (creep.memory.room != null && creep.memory.room == rmColony) {
                 if (creep.memory.role == 'worker') {
-                    roleWorker.run(creep);
+                    rolesWork.Worker(creep);
                 }
                 else if (creep.memory.role == 'soldier') {
-                    roleSoldier.run(creep);
+                    rolesCombat.Soldier(creep);
                 }
             }
         }

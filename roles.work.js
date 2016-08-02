@@ -1,8 +1,8 @@
 var utilCreep = require('util.creep');
 
-var RoleWorker = {
+var RolesWork = {
 
-    run: function(creep) {
+    Worker: function(creep) {
 
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             utilCreep.moveToRoom(creep, creep.memory.room);
@@ -111,4 +111,4 @@ var RoleWorker = {
     }
 };
 
-module.exports = RoleWorker;
+module.exports = RolesWork;
