@@ -30,6 +30,8 @@ module.exports.loop = function () {
     siteMining.run('W16S43', 'W16S42', 1, 3, 0, 1, 0);    // W16S42 mining operation (from Colony #2, W16S43)
     siteMining.run('W16S43', 'W16S41', 1, 2, 0, 1, 0);    // W16S41 mining operation (from Colony #2, W16S43)
     
+    siteMining.run('W19S42', 'W18S42', 1, 2, 0, 1, 0);    // W16S41 mining operation (from Colony #2, W16S43)
+    
     /* Run end-tick hive functions */
     utilHive.processSpawnRequests();
     utilHive.processSpawnRenewing();
