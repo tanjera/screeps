@@ -306,14 +306,14 @@ var utilCreep = {
         var moveDir;
         
         switch (tgtDir) {
-            case TOP:           moveDir = BOTTOM;
-            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;
-            case RIGHT:         moveDir = LEFT;
-            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;
-            case BOTTOM:        moveDir = TOP;
-            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;
-            case LEFT:          moveDir = RIGHT;
-            case TOP_LEFT:      moveDir = BOTTOM_RIGHT;
+            case TOP:           moveDir = BOTTOM;       break;
+            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;  break;
+            case RIGHT:         moveDir = LEFT;         break;
+            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;     break;
+            case BOTTOM:        moveDir = TOP;          break;
+            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;    break;
+            case LEFT:          moveDir = RIGHT;        break;
+            case TOP_LEFT:      moveDir = BOTTOM_RIGHT; break;
         }
 
         return creep.move(moveDir);
