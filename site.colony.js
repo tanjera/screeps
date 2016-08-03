@@ -7,8 +7,13 @@ var utilHive = require('util.hive');
 
 var siteColony = {
 
-    run: function(rmColony, popRepairer, popWorker, popSoldier) {
+    run: function(rmColony, popRepairer, popWorker, popSoldier, listLinks) {
     
+        if (Memory['hive']['rooms'][rmColony] == null) {
+            Memory['hive']['rooms'][rmColony] = {};
+        }
+         
+
         var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'repairer' && creep.memory.room == rmColony);
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
@@ -19,7 +24,7 @@ var siteColony = {
 
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length)) {            
+                        return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
             utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmColony});
         }
         else if (lRepairer.length < popRepairer) {
@@ -49,21 +54,20 @@ var siteColony = {
         for (var i = 0; i < listTowers.length; i++) {
             var tower = listTowers[i];
             
-            var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0
-                                || c.owner.username == 'Invader'; }});
+            var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
+                        return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }});
             if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;
             } 
             
             var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
-            if (injured != null && tower.energy > tower.energyCapacity / 2) { // Anyone to heal?
+            if (injured != null && tower.energy > tower.energyCapacity * 0.5) { // Anyone to heal?
                 tower.heal(injured);
                 continue;
             } 
             
-            if (tower.energy > tower.energyCapacity / 2) { // Maintain structures with extra energy
+            if (tower.energy > tower.energyCapacity * 0.5) { // Maintain structures with extra energy
                 var structure = utilColony.findByNeed_RepairCritical(tower.room);
                 if (structure != null) {
                     tower.repair(structure);
@@ -72,17 +76,16 @@ var siteColony = {
             }
         }
 
-        // Move energy from distant links to closer links
-        var listLinks = Game['rooms'][rmColony].find(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
-        var listSpawns = Game['rooms'][rmColony].find(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; }});
-        if (listLinks.length > 1 && listSpawns.length > 0) {
-            var linkTo = listSpawns[0].pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; }});
+        // Process links via listLinks parameter (an array of [id: '', role: 'send/receive'])
+        if (listLinks != null) {
+            Memory['hive']['rooms'][rmColony]['links'] = listLinks;
 
-            if (linkTo != null) {
-                for (var i = 0; i < listLinks.length; i++) {
-                    if (listLinks[i] != linkTo) {
-                        listLinks[i].transferEnergy(linkTo);
-                    }
+            var linksSend = _.filter(listLinks, (obj) => { return obj.id && obj['role'] == 'send'; });
+            var linksReceive = _.filter(listLinks, (obj) => { return obj.id && obj['role'] == 'receive'; });
+
+            for (var r = 0; r < linksReceive.length; r++) {
+                for (var s = 0; s < linksSend.length; s++) {
+                    Game.getObjectById(linksSend[s]['id']).transferEnergy(Game.getObjectById(linksReceive[r]['id']));
                 }
             }
         }

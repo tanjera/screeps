@@ -30,8 +30,23 @@ var RolesWork = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 }
+
+                // Priority #2: get energy from receiving links
+                if (Memory['hive']['rooms'][creep.room.name]['links'] != null) {
+                    var links = _.filter(Memory['hive']['rooms'][creep.room.name]['links'], (obj) => { 
+                        return obj.id && obj['role'] == 'receive'; });
+                        
+                    for (var l = 0; l < links.length; l++) {
+                        var source = Game.getObjectById(links[l]['id']);
+                        if (source != null && source.energy > 0
+                                && creep.pos.getRangeTo(source) < 8 && creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(source, {reusePath: _ticksReusePath});
+                            return;
+                        } 
+                    }
+                }
                 
-                // Priority #2: get energy from storage or containers
+                // Priority #3: get energy from storage or containers
                 var source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
                     return (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
                         || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
@@ -40,7 +55,7 @@ var RolesWork = {
                     return;
                 } 
 
-                // Priority #3: if able to, mine.
+                // Priority #4: if able to, mine.
                 if (creep.getActiveBodyparts('work') > 0) {
                     var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
                     if(creep.harvest(source) == ERR_NOT_IN_RANGE) {

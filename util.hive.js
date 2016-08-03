@@ -10,9 +10,23 @@ var utilHive = {
     },
 
     prepareHiveMemory: function() {
-        if (Memory['hive'] == null) {
-            Memory['hive'] = {};
+        if (Memory['hive'] == null) { 
+            Memory['hive'] = {}; 
         }
+        if (Memory['hive']['rooms'] == null) { 
+            Memory['hive']['rooms'] = {}; 
+        }
+
+        // Populate empty room memories
+        for (var k = 0; k < Object.keys(Game['rooms']).length; k++) {
+            var r = Object.keys(Game['rooms'])[k];
+            if (Memory['hive']['rooms'][r] == null) {
+                Memory['hive']['rooms'][r] = {};
+            }
+        }
+
+        // Set allies
+        Memory['hive']['allies'] = { Pantek59: null };
 
         Memory['hive']['population_balance'] = {};  // Reset data for population balancing
         Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   

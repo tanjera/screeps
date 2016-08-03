@@ -50,8 +50,8 @@ var utilColony = {
                             filter: function(structure) {
                                 return (structure.structureType == STRUCTURE_RAMPART && structure.hits < utilColony.repairWalls_Critical(utilColony.getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_WALL && structure.hits < utilColony.repairWalls_Critical(utilColony.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 5)
-                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 5);
+                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.2)
+                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.2);
                             }}).sort(function(a, b) {return a.hits - b.hits});
         return (list.length > 0) ? list[0] : null;
     },
@@ -61,8 +61,8 @@ var utilColony = {
                             filter: function(structure) {
                                 return (structure.structureType == STRUCTURE_RAMPART && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_WALL && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 5)
-                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 5);
+                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.8)
+                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.8);
                             }}).sort(function(a, b) {return a.hits - b.hits});
         return (list.length > 0) ? list[0] : null;
     },
@@ -70,8 +70,8 @@ var utilColony = {
     findByRange_RepairMaintenance: function(creep) {
         return creep.pos.findClosestByRange(FIND_STRUCTURES, {
                                 filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2)
-                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax / 2)
+                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.8)
+                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.8)
                                         || (structure.structureType == STRUCTURE_RAMPART && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(creep.room)))
                                         || (structure.structureType == STRUCTURE_WALL && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(creep.room)));
                                 } 

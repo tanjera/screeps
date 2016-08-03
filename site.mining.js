@@ -22,7 +22,7 @@ var siteMining = {
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
+                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length > 0) {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length == 0) {
                 utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmHarvest});
@@ -47,7 +47,7 @@ var siteMining = {
         }
         else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
                 && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
-            utilHive.requestSpawn(rmColony, 2, 1, 'reserver', null, {role: 'reserver', room: rmHarvest});            
+            utilHive.requestSpawn(rmColony, 0, 1, 'reserver', null, {role: 'reserver', room: rmHarvest});            
         }
         else if (lExtractor.length < popExtractor && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game['rooms'][rmHarvest].find(FIND_MINERALS, {filter: function(m) { return m.mineralAmount > 0; }}).length > 0) {
@@ -66,7 +66,7 @@ var siteMining = {
                     // If the room is safe to run mining operations... run roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length == 0)) {
+                        { filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                         rolesMining.Mine(creep, rmColony, rmHarvest);
                     } else if (creep.memory.role == 'reserver') {
