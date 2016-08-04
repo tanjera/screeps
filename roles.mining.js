@@ -92,8 +92,10 @@ var RolesMining = {
                                 || (s.structureType == STRUCTURE_CONTAINER && _.sum(s.store) < s.storeCapacity); }});
 	            }
                 // Priority #1: keep towers fed... and if under attack, top them off!
-                target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+                if (target == null) {
+                    target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
                         return s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity * 0.4; }});
+                }
                 if (creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                             return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
                     target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
