@@ -26,7 +26,9 @@ var utilHive = {
         }
 
         // Set allies
-        Memory['hive']['allies'] = { Pantek59: null };
+        Memory['hive']['allies'] = {    Pantek59: null,
+                                        Atavus: null,
+                                        BlackLotus: null };
 
         Memory['hive']['population_balance'] = {};  // Reset data for population balancing
         Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   

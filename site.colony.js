@@ -7,32 +7,34 @@ var utilHive = require('util.hive');
 
 var siteColony = {
 
-    run: function(rmColony, popRepairer, popWorker, popSoldier, listLinks) {
+    run: function(rmColony, popWorker, popRepairer, popUpgrader, popSoldier, listLinks) {
     
         if (Memory['hive']['rooms'][rmColony] == null) {
             Memory['hive']['rooms'][rmColony] = {};
         }
          
 
-        var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'repairer' && creep.memory.room == rmColony);
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
+        var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'repairer' && creep.memory.room == rmColony);
+        var lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'upgrader' && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
-        var popTarget = popRepairer + popWorker + popSoldier;
-        var popActual = lRepairer.length + lWorker.length + lSoldier.length;
+        var popTarget = popWorker + popRepairer + popUpgrader + popSoldier;
+        var popActual = lWorker.length + lRepairer.length + lUpgrader.length + lSoldier.length;
         utilHive.populationTally(rmColony, popTarget, popActual);
 
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
             utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmColony});
-        }
-        else if (lRepairer.length < popRepairer) {
-            utilHive.requestSpawn(rmColony, 2, 4, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
-        }
-        else if (lWorker.length < popWorker) {
+        } else if (lWorker.length < popWorker) {
             utilHive.requestSpawn(rmColony, 2, 3, 'worker', null, {role: 'worker', room: rmColony});
+        } else if (lRepairer.length < popRepairer) {
+            utilHive.requestSpawn(rmColony, 2, 4, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
+        } else if (lUpgrader.length < popUpgrader) {
+            utilHive.requestSpawn(rmColony, 2, 4, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
         }
+        
         
         // Run roles!
         for (var n in Game.creeps) {

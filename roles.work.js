@@ -24,8 +24,9 @@ var RolesWork = {
             // Out of energy? Find more...
             if(creep.memory.state == 'getenergy') {
                 // Priority #1: get dropped energy
+                
                 var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
-                    return s.amount >= creep.carryCapacity / 2 && s.mineralType == RESOURCE_ENERGY}});
+                    return s.amount >= creep.carryCapacity / 2 && s.resourceType == RESOURCE_ENERGY; }});
                 if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
@@ -67,7 +68,8 @@ var RolesWork = {
             
             if (creep.memory.state == 'working') {
             // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
-                if (creep.room.controller != null && creep.room.controller.ticksToDowngrade < 4000) {
+                if (creep.memory.subrole == 'upgrader'
+                    || creep.room.controller != null && creep.room.controller.ticksToDowngrade < 3500) {
                     var r = creep.upgradeController(creep.room.controller); 
                     if (r == OK) return;
                     else if (r == ERR_NOT_IN_RANGE) {
@@ -90,7 +92,7 @@ var RolesWork = {
                 }
 
                 // Build construction sites
-                structure = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+                structure = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                 if (structure != null) {
                     var r = creep.build(structure);
                     if (r == OK) return;
