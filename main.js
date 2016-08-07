@@ -6,6 +6,8 @@ var utilHive = require('util.hive');
 module.exports.loop = function () {
 
     /* TO DO:
+        ADD 2nd LINK #3
+        
         add logic for:
             - don't renew boosted creeps
             - fix link loop, add conditions (don't send to already ~full links!)
@@ -53,7 +55,8 @@ module.exports.loop = function () {
     siteColony.run('W16S43', 4, 1, 0, 0);      // W16S43 colony #2
     siteColony.run('W19S42', 5, 1, 0, 0,       // W19S42 colony #3
             [{id: '57a23067cf975f59293d8a28', role: 'send'},
-             {id: '57a23201113c59e97f7e364e', role: 'receive'}]);    
+             {id: '57a23201113c59e97f7e364e', role: 'receive'},
+             {id: '57a6a9d62d673fac4f21a62a', role: 'receive'}]);    
     siteColony.run('W15S41', 4, 1, 1, 0);      // W15S41 colony #4
     siteMining.run('W18S43', 'W18S43', 1, 2, 0, 0, 0);    // W18S43 colony #1 mining
     siteMining.run('W16S43', 'W16S43', 1, 2, 0, 0, 1);    // W16S43 colony #2 mining

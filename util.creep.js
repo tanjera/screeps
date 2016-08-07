@@ -151,10 +151,10 @@ var utilCreep = {
                     CARRY, CARRY, 
                     MOVE, MOVE]; 
             case 2:
-                return [ // 550 energy, 1x WORK, 4x CARRY, 5x MOVE
+                return [ // 450 energy, 1x WORK, 4x CARRY, 5x MOVE
                         WORK,  
-                        CARRY, CARRY, CARRY, CARRY, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE]; 
+                        CARRY, CARRY, CARRY,  
+                        MOVE, MOVE, MOVE, MOVE]; 
             case 3:
                 return [ // 700 energy, 2x WORK, 4x CARRY, 6x MOVE
                         WORK, WORK,  
