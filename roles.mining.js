@@ -99,12 +99,12 @@ var RolesMining = {
                 if (creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                             return c.getActiveBodyparts('attack') > 0 || c.getActiveBodyparts('ranged_attack') > 0; }}).length > 0) {
                     target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (s) => { 
-                            return (s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity); }});
+                            return s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity * 0.9; }});
                 }
                 // Priority #2: feed extensions and spawns (that aren't burning energy on renewing...)
                 if (target == null) {
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
-                            return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.8)
+                            return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
                 }
                 // Priority #3: feed links sending to upgraders
@@ -203,11 +203,11 @@ var RolesMining = {
 
 
     Reserve: function(creep, rmHarvest) {
-        if (creep.room.name != rmHarvest) {
-            utilCreep.moveToRoom(creep, rmHarvest);
+        if (creep.memory.room != null && creep.room.name != creep.memory.room) {
+            utilCreep.moveToRoom(creep, creep.memory.room);
             return;
         }
-        else if (creep.room.name == rmHarvest) {
+        else {
             if ((creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE 
                     ? creep.moveTo(creep.room.controller) 
                     : creep.reserveController(creep.room.controller)) == OK) {

@@ -1,4 +1,5 @@
 var rolesMining = require('roles.mining');
+var rolesWork = require('roles.work');
 var rolesCombat = require('roles.combat');
 
 var utilCreep = require('util.creep');
@@ -8,16 +9,17 @@ var utilHive = require('util.hive');
 var siteMining = {
 
     // Note: Miner = Burrower + Carrier
-    run: function(rmColony, rmHarvest, popBurrower, popCarrier, popMiner, popReserver, popExtractor) {
+    run: function(rmColony, rmHarvest, popBurrower, popCarrier, popMiner, popWorker, popReserver, popExtractor) {
 
         var lBurrower  = _.filter(Game.creeps, (c) => c.memory.role == 'burrower' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         var lCarrier  = _.filter(Game.creeps, (c) => c.memory.role == 'carrier' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         var lMiner  = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        var lWorker  = _.filter(Game.creeps, (c) => c.memory.role == 'worker' && c.memory.room == rmHarvest);
         var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest);
         var lExtractor  = _.filter(Game.creeps, (c) => c.memory.role == 'extractor' && c.memory.room == rmHarvest);
 
-        var popTarget = popBurrower + popCarrier + popMiner + popReserver + popExtractor;
-        var popActual = lBurrower.length + lCarrier.length + lMiner.length + lReserver.length + lExtractor.length;
+        var popTarget = popBurrower + popCarrier + popMiner + popWorker + popReserver + popExtractor;
+        var popActual = lBurrower.length + lCarrier.length + lMiner.length + lWorker.length + lReserver.length + lExtractor.length;
         utilHive.populationTally(rmColony, popTarget, popActual);
 
         // Defend the mining op!
@@ -45,6 +47,9 @@ var siteMining = {
         else if (lCarrier.length < popCarrier) {
             utilHive.requestSpawn(rmColony, 2, 1, 'carrier', null, {role: 'carrier', room: rmHarvest});
         }
+        else if (lWorker.length < popWorker) {
+            utilHive.requestSpawn(rmColony, 2, 1, 'worker', null, {role: 'worker', room: rmHarvest});
+        }
         else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
                 && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
             utilHive.requestSpawn(rmColony, 0, 1, 'reserver', null, {role: 'reserver', room: rmHarvest});            
@@ -63,14 +68,16 @@ var siteMining = {
                     rolesCombat.Soldier(creep);
                 }
 
-                    // If the room is safe to run mining operations... run roles. 
+                // If the room is safe to run mining operations... run roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         { filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                         rolesMining.Mine(creep, rmColony, rmHarvest);
+                    } else if (creep.memory.role == 'worker') {
+                        roleWork.Worker(creep);
                     } else if (creep.memory.role == 'reserver') {
-                        rolesMining.Reserve(creep, rmHarvest);
+                        rolesMining.Reserve(creep);
                     } else if (creep.memory.role == 'extractor') {
                         rolesMining.Extract(creep, rmColony, rmHarvest);
                     } 

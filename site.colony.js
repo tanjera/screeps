@@ -87,7 +87,11 @@ var siteColony = {
 
             for (var r = 0; r < linksReceive.length; r++) {
                 for (var s = 0; s < linksSend.length; s++) {
-                    Game.getObjectById(linksSend[s]['id']).transferEnergy(Game.getObjectById(linksReceive[r]['id']));
+                    var lSend = Game.getObjectById(linksSend[s]['id']);
+                    var lReceive = Game.getObjectById(linksReceive[r]['id']);
+                    if (lSend.energy > lSend.energyCapacity * 0.25 && lReceive.energy < lReceive.energyCapacity * 0.9) {
+                        lSend.transferEnergy(lReceive);
+                    }
                 }
             }
         }
