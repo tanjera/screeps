@@ -7,17 +7,14 @@ module.exports.loop = function () {
 
     /* TO DO:
 
-        worker -> multirole (work, attack) for mining
-        is miner -> link functioning entirely?
+        task system: implemented for workers
+        ** needs to be implemented for get_energy and for mining **
 
-        task system...
-
-        add logic for:
-            - don't renew boosted creeps
+        - is miner -> link functioning entirely?
+        - don't renew boosted creeps
             
     */     
 
-  
   
     
     // siteColony.run (rmColony, popWorker, popRepairer, popUpgrader, popSoldier, listLinks)
