@@ -23,11 +23,11 @@ var siteMining = {
         utilHive.populationTally(rmColony, popTarget, popActual);
 
         // Defend the mining op!
-        var hostiles = Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }});
-        if (Object.keys(Game.rooms).includes(rmHarvest) && hostiles.length > 0) {
+        if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
+                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length > 0) {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
-            if (lSoldier.length + lMultirole.length < hostiles.length) {
+            if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
+                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
                 utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmHarvest});
             }
         }

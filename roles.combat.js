@@ -53,7 +53,8 @@ var RolesCombat = {
                 return c.hits < c.hitsMax; }});
             
             if (wounded != null && creep.heal(wounded) == ERR_NOT_IN_RANGE) {                
-                creep.moveTo(wounded);            
+                creep.rangedHeal(wounded);
+                creep.moveTo(wounded);
             }
         }
     }
