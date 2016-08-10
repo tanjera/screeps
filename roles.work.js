@@ -69,7 +69,7 @@ var RolesWork = {
             if (creep.memory.state == 'working') {
             // Order of functions: upgrade critical downgrade timer, repair, build, then upgrade extra
                 if (creep.memory.subrole == 'upgrader'
-                    || creep.room.controller != null && creep.room.controller.ticksToDowngrade < 3500) {
+                    || creep.room.controller != null && creep.room.controller.level > 0 && creep.room.controller.ticksToDowngrade < 3500) {
                     var r = creep.upgradeController(creep.room.controller); 
                     if (r == OK) return;
                     else if (r == ERR_NOT_IN_RANGE) {
@@ -117,11 +117,13 @@ var RolesWork = {
                 }
 
                 // Or upgrade the controller
-                var r = creep.upgradeController(creep.room.controller);
-                if (r == OK) return;
-                else if (r == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
-                    return;
+                if (creep.room.controller != null && creep.room.controller.level > 0) {
+                    var r = creep.upgradeController(creep.room.controller);
+                    if (r == OK) return;
+                    else if (r == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(creep.room.controller, {reusePath: _ticksReusePath});
+                        return;
+                    }
                 }
             }
         }

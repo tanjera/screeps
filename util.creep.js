@@ -3,6 +3,9 @@ var utilCreep = {
     getBody: function(type, level) {
         switch (type) {
             case 'soldier': return utilCreep.getBody_Soldier(level);
+            case 'archer': return utilCreep.getBody_Archer(level);
+            case 'healer': return utilCreep.getBody_Healer(level);
+            case 'multirole': return utilCreep.getBody_Multirole(level); 
             case 'worker': return utilCreep.getBody_Worker(level);
             case 'burrower': return utilCreep.getBody_Burrower(level);
             case 'carrier': return utilCreep.getBody_Carrier(level);
@@ -140,6 +143,62 @@ var utilCreep = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL]; 
+        }
+    },
+
+    getBody_Multirole: function(level) {
+        switch (level) {
+            case 1:
+                return [ // 280 energy, 1x WORK, 1x CARRY, 1x MOVE, 1x ATTACK
+                        WORK, CARRY,   
+                        MOVE, 
+                        ATTACK]; 
+            case 2:
+                return [ // 430 energy, 1x WORK, 2x CARRY, 3x MOVE, 1x ATTACK 
+                        WORK, CARRY, CARRY,   
+                        MOVE, MOVE, MOVE, 
+                        ATTACK]; 
+            case 3:
+                return [ // 730 energy, 2x WORK, 3x CARRY, 6x MOVE, 1x ATTACK 
+                        WORK, WORK, CARRY, CARRY, CARRY,    
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        ATTACK]; 
+            case 4:
+                return [ // 1110 energy, 3x WORK, 5x CARRY, 8x MOVE, 2x ATTACK 
+                        WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, CARRY,    
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        ATTACK, ATTACK];
+            case 5:
+                return [ // 1620 energy, 4x WORK, 6x CARRY, 12x MOVE, 4x ATTACK 
+                        WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,    
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, 
+                        ATTACK, ATTACK, ATTACK, ATTACK]; 
+            case 6:
+                return [ // 2020 energy, 6x WORK, 8x CARRY, 14x MOVE, 4x ATTACK 
+                        WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,    
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE,  
+                        ATTACK, ATTACK, ATTACK, ATTACK];
+            case 7:
+                return [ // 3100 energy, 6x WORK, 10x CARRY, 24x MOVE, 10x ATTACK 
+                        WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,    
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE,
+                        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
+            case 8:
+                return [ // 3100 energy, 6x WORK, 10x CARRY, 24x MOVE, 10x ATTACK 
+                        WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,    
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE,
+                        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
         }
     },
 
