@@ -3,19 +3,23 @@ var uCr = require('util.creep');
 var RolesWork = {
 
     Worker: function(creep) {
-
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             uCr.moveToRoom(creep, creep.memory.room);
         }
         else {
             switch (creep.memory.state) {
                 default:
-                    creep.memory.state = 'need_energy';
+                    creep.memory.state = 'energy_needed';
                     break;
 
-                case 'need_energy':
+                case 'energy_needed':
+                    RolesWork.Worker_FindEnergy(creep);
+                    break;
+
+                case 'energy_fetch':
                     if (_.sum(creep.carry) == creep.carryCapacity) {
                         creep.memory.state = 'task_needed';
+                        delete creep.memory.task;
                         break;
                     }     
                     
@@ -28,7 +32,7 @@ var RolesWork = {
 
                 case 'task_working':
                     if (creep.carry[RESOURCE_ENERGY] == 0) {
-                        creep.memory.state = 'need_energy';
+                        creep.memory.state = 'energy_needed';
                         delete creep.memory.task;
                         break;
                     }
@@ -40,15 +44,17 @@ var RolesWork = {
         }
     },
 
-
-    Worker_GetEnergy: function(creep) {
-        var _ticksReusePath = 10;
-
+    
+    Worker_FindEnergy: function(creep) {
         // Priority #1: get dropped energy
         var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
-            return s.amount >= creep.carryCapacity / 2 && s.resourceType == RESOURCE_ENERGY; }});
-        if (source != null && creep.pickup(source) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source, {reusePath: _ticksReusePath});
+            return s.amount >= creep.carryCapacity * 0.5 && s.resourceType == RESOURCE_ENERGY; }});
+        if (source != null) {
+            creep.memory.task = {
+                type: 'pickup',
+                id: source.id,
+                timer: 10 };
+            creep.memory.state = 'energy_fetch';
             return;
         }
 
@@ -59,9 +65,12 @@ var RolesWork = {
                 
             for (var l = 0; l < links.length; l++) {
                 var source = Game.getObjectById(links[l]['id']);
-                if (source != null && source.energy > 0
-                        && creep.pos.getRangeTo(source) < 8 && creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                if (source != null && source.energy > 0 && creep.pos.getRangeTo(source) < 8) {
+                    creep.memory.task = {
+                        type: 'withdraw',
+                        id: source.id,
+                        timer: 5 };
+                    creep.memory.state = 'energy_fetch';
                     return;
                 } 
             }
@@ -71,24 +80,89 @@ var RolesWork = {
         var source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
             return (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
                 || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
-        if (source != null && creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(source, {reusePath: _ticksReusePath});
+        if (source != null) {
+            creep.memory.task = {
+                type: 'withdraw',
+                id: source.id,
+                timer: 5 };
+            creep.memory.state = 'energy_fetch';
             return;
         } 
 
         // Priority #4: if able to, mine.
         if (creep.getActiveBodyparts('work') > 0) {
             var source = creep.pos.findClosestByRange(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
-            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source, {reusePath: _ticksReusePath});
+            if (source != null) {
+                creep.memory.task = {
+                    type: 'mine',
+                    id: source.id,
+                    timer: 5 };
+                creep.memory.state = 'energy_fetch';
                 return;
             }
         } 
+
+    },
+
+
+    Worker_GetEnergy: function(creep) {
+        var _ticksReusePath = 8;
+
+        if (creep.memory.task == null) {
+            delete creep.memory.task;
+            creep.memory.state == 'energy_needed';
+        } 
+        else if (creep.memory.task['timer'] != null) {
+            // Process the task timer
+            creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
+            if (creep.memory.task['timer'] <= 0) {
+                RolesWork.Worker_FindEnergy(creep);
+            }
+        }
+
+        var source = Game.getObjectById(creep.memory.task['id']);
+        switch (creep.memory.task['type']) {
+            case 'pickup':
+                var result = creep.pickup(source); 
+                if (result == OK && source != null && source.amount > creep.carryCapacity * 0.3) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    RolesWork.Worker_FindEnergy(creep);
+                    return;
+                }
+
+            case 'withdraw':
+                var result = creep.withdraw(source, 'energy'); 
+                if (result == OK) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    RolesWork.Worker_FindEnergy(creep);
+                    return;
+                }
+
+            default:
+            case 'mine':
+                var result = creep.harvest(source); 
+                if (result == OK && source.energy > 0) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    RolesWork.Worker_FindEnergy(creep);
+                    return;
+                }
+        }
     },
 
 
     Worker_AssignTask: function(creep) {
-        
         var structure;
         var uCo = require('util.colony');
 
@@ -147,52 +221,61 @@ var RolesWork = {
 
 
     Worker_RunTask: function(creep) {
-        var _ticksReusePath = 10;
+        var _ticksReusePath = 8;
 
         if (creep.memory.task == null) {
             delete creep.memory.task;
             creep.memory.state == 'task_needed';
+            return;
         } 
         else if (creep.memory.task['timer'] != null) {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
-                creep.memory.state = 'task_needed';
+                RolesWork.Worker_AssignTask(creep);
             }
         }
 
-        if (creep.memory.task['type'] == 'upgrade') {
-            var controller = Game.getObjectById(creep.memory.task['id']);
-            var result = creep.upgradeController(controller); 
-            if (result == OK) return;
-            else if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(controller, {reusePath: _ticksReusePath});
-                return;
-            } else {
-                creep.memory.state = 'task_needed';
-            }
-        }
-        else if (creep.memory.task['type'] == 'repair') {
-            var structure = Game.getObjectById(creep.memory.task['id']);
-            var result = creep.repair(structure); 
-            if (result == OK && structure.hits != structure.hitsMax) return;
-            else if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(structure, {reusePath: _ticksReusePath});
-                return;
-            } else {
-                creep.memory.state = 'task_needed';
-            }
-        }
-        else if (creep.memory.task['type'] == 'build') {
-            var structure = Game.getObjectById(creep.memory.task['id']);
-            var result = creep.build(structure);
-            if (result == OK) return;
-            else if (result == ERR_NOT_IN_RANGE) {
-                creep.moveTo(structure, {reusePath: _ticksReusePath});
-                return;
-            } else {
-                creep.memory.state = 'task_needed';
-            }
+        switch (creep.memory.task['type']) {
+            default:
+            case 'upgrade':
+                var controller = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.upgradeController(controller); 
+                if (result == OK) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(controller, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    RolesWork.Worker_AssignTask(creep);
+                    return;
+                }
+
+            case 'repair':
+                var structure = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.repair(structure); 
+                if (result == OK && structure.hits != structure.hitsMax) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    RolesWork.Worker_AssignTask(creep);
+                    return;
+                }
+            
+            case 'build':
+                var structure = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.build(structure);
+                if (result == OK) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    RolesWork.Worker_AssignTask(creep);
+                    return;
+                }
         }
     }
 };

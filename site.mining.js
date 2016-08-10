@@ -70,7 +70,7 @@ var siteMining = {
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         { filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
-                        rolesMining.Mine(creep, rmColony, rmHarvest);
+                        rolesMining.Mining(creep, rmColony, rmHarvest);
                     } else if (creep.memory.role == 'multirole') {
                         rolesWork.Worker(creep);
                     } else if (creep.memory.role == 'reserver') {
