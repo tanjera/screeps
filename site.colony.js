@@ -7,7 +7,7 @@ var utilHive = require('util.hive');
 
 var siteColony = {
 
-    run: function(rmColony, popWorker, popRepairer, popUpgrader, popSoldier, listLinks) {
+    run: function(rmColony, lvlMultiplier, popWorker, popRepairer, popUpgrader, popSoldier, listLinks) {
     
         if (Memory['hive']['rooms'][rmColony] == null) {
             Memory['hive']['rooms'][rmColony] = {};
@@ -28,11 +28,11 @@ var siteColony = {
                         return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
             utilHive.requestSpawn(rmColony, 0, 0, 1, 'soldier', null, {role: 'soldier', room: rmColony});
         } else if (lWorker.length < popWorker) {
-            utilHive.requestSpawn(rmColony, 2, 3, 1, 'worker', null, {role: 'worker', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 3, lvlMultiplier, 'worker', null, {role: 'worker', room: rmColony});
         } else if (lRepairer.length < popRepairer) {
-            utilHive.requestSpawn(rmColony, 2, 4, 1, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 4, lvlMultiplier, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
         } else if (lUpgrader.length < popUpgrader) {
-            utilHive.requestSpawn(rmColony, 2, 4, 1, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 4, lvlMultiplier, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
         }
         
         

@@ -28,7 +28,8 @@ var utilHive = {
         // Set allies
         Memory['hive']['allies'] = {    Pantek59: null,
                                         Atavus: null,
-                                        BlackLotus: null };
+                                        BlackLotus: null,
+                                        shedletsky: null };
 
         Memory['hive']['population_balance'] = {};  // Reset data for population balancing
         Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   
@@ -46,7 +47,7 @@ var utilHive = {
     },
 
 
-    requestSpawn: function(rmName, rmDistance, lvlPriority, multLevel, cBody, cName, cArgs) {
+    requestSpawn: function(rmName, rmDistance, lvlPriority, lvlMultiplier, cBody, cName, cArgs) {
         /*  lvlPriority is an integer rating priority, e.g.:
                 0: Defense (active, imminent danger)
                 1: Mining operations (critical)
@@ -55,12 +56,12 @@ var utilHive = {
                 4: Colony operation (regular)
                 5: ... ? scouting? passive defense?
                 
-            multLevel is a multiplier for what level to set the body at
+            lvlMultiplier is a multiplier for what level to set the body at
             rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
 
         var i = Object.keys(Memory['hive']['spawn_requests']).length;
-        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, body: cBody, name: cName, args: cArgs};
+        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, multiplier: lvlMultiplier, body: cBody, name: cName, args: cArgs};
 	},
 
 
@@ -83,7 +84,7 @@ var utilHive = {
                     var request = Memory['hive']['spawn_requests'][listRequests[r]];
                     
                     if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {
-                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * multLevel * utilHive.getRoom_Level(request.room)));
+                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * request.multiplier * utilHive.getRoom_Level(request.room)));
                         var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
 
                         if (_.isString(result)) {
