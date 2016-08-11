@@ -14,6 +14,7 @@ var RolesWork = {
 
                 case 'energy_needed':
                     RolesWork.Worker_FindEnergy(creep);
+                    RolesWork.Worker_GetEnergy(creep);
                     break;
 
                 case 'energy_fetch':
@@ -28,6 +29,7 @@ var RolesWork = {
 
                 case 'task_needed':
                     RolesWork.Worker_AssignTask(creep);
+                    RolesWork.Worker_RunTask(creep);
                     break;
 
                 case 'task_working':
@@ -109,8 +111,8 @@ var RolesWork = {
         var _ticksReusePath = 8;
 
         if (creep.memory.task == null) {
-            delete creep.memory.task;
             creep.memory.state == 'energy_needed';
+            return;
         } 
         else if (creep.memory.task['timer'] != null) {
             // Process the task timer
@@ -224,7 +226,6 @@ var RolesWork = {
         var _ticksReusePath = 8;
 
         if (creep.memory.task == null) {
-            delete creep.memory.task;
             creep.memory.state == 'task_needed';
             return;
         } 

@@ -10,6 +10,7 @@ var RolesMining = {
 
             case 'energy_needed':
                 RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
+                RolesMining.Mining_GetEnergy(creep, rmDeliver, rmHarvest);
                 break;
 
             case 'energy_fetch':
@@ -24,6 +25,7 @@ var RolesMining = {
 
             case 'delivery_needed':
                 RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
+                RolesMining.Mining_RunDelivery(creep, rmDeliver, rmHarvest);
                 break;
 
             case 'delivery_working':
@@ -81,7 +83,7 @@ var RolesMining = {
                     creep.memory.task = {
                         type: 'mine',
                         id: source.id,
-                        timer: 15 };
+                        timer: 10 };
                     creep.memory.state = 'energy_fetch';
                     return;
                 } 
@@ -98,7 +100,7 @@ var RolesMining = {
                 creep.memory.task = {
                     type: 'mine',
                     id: source.id,
-                    timer: 15 };
+                    timer: 10 };
                 creep.memory.state = 'energy_fetch';
                 return;                    
             }
@@ -111,7 +113,6 @@ var RolesMining = {
         var _ticksReusePath = 8;
 
         if (creep.memory.task == null) {
-            delete creep.memory.task;
             creep.memory.state == 'energy_needed';
             return;
         } 
@@ -190,7 +191,7 @@ var RolesMining = {
         }
         // Priority #2: feed extensions and spawns (that aren't burning energy on renewing...)
         if (target == null) {
-        target = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) {
+        target = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: function (s) {
                     return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                         || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
         }
@@ -216,7 +217,7 @@ var RolesMining = {
         creep.memory.task = {
             type: 'deposit',
             id: target.id,
-            timer: 3 };
+            timer: 2 };
         creep.memory.state = 'delivery_working';
         return;   
 
@@ -230,6 +231,7 @@ var RolesMining = {
         if (creep.memory.task == null) {
             delete creep.memory.task;
             creep.memory.state == 'task_needed';
+            return;
         } 
         else if (creep.memory.task['timer'] != null) {
             // Process the task timer
@@ -240,18 +242,19 @@ var RolesMining = {
         }
 
         var target = Game.getObjectById(creep.memory.task['id']);
-        if (!creep.pos.isNearTo(target)) {
-            creep.moveTo(target, {reusePath: _ticksReusePath});
-            return;
-        }
-        
         // Cycle through feeding spawns and extensions a bit faster...
         if ((target.structureType == STRUCTURE_SPAWN || target.structureType == STRUCTURE_EXTENSION)
                 && target.energy == target.energyCapacity) {
             RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
         }
+        
+        // Move to the deposit
+        if (!creep.pos.isNearTo(target)) {
+            creep.moveTo(target, {reusePath: _ticksReusePath});
+            return;
+        }
 
-        // Deliver... (starting with minerals)
+        // Cycle through all resources and deposit, starting with minerals
         for (var r = Object.keys(creep.carry).length; r > 0; r--) {
             var resourceType = Object.keys(creep.carry)[r - 1];
             if (resourceType != RESOURCE_ENERGY && creep.carry[resourceType] < 50) {

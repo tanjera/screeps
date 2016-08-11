@@ -46,7 +46,7 @@ var utilHive = {
     },
 
 
-    requestSpawn: function(rmName, rmDistance, lvlPriority, cBody, cName, cArgs) {
+    requestSpawn: function(rmName, rmDistance, lvlPriority, multLevel, cBody, cName, cArgs) {
         /*  lvlPriority is an integer rating priority, e.g.:
                 0: Defense (active, imminent danger)
                 1: Mining operations (critical)
@@ -55,6 +55,7 @@ var utilHive = {
                 4: Colony operation (regular)
                 5: ... ? scouting? passive defense?
                 
+            multLevel is a multiplier for what level to set the body at
             rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
 
@@ -82,7 +83,7 @@ var utilHive = {
                     var request = Memory['hive']['spawn_requests'][listRequests[r]];
                     
                     if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {
-                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * utilHive.getRoom_Level(request.room)));
+                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * multLevel * utilHive.getRoom_Level(request.room)));
                         var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
 
                         if (_.isString(result)) {

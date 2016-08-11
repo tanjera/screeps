@@ -26,13 +26,13 @@ var siteColony = {
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
-            utilHive.requestSpawn(rmColony, 0, 0, 'soldier', null, {role: 'soldier', room: rmColony});
+            utilHive.requestSpawn(rmColony, 0, 0, 1, 'soldier', null, {role: 'soldier', room: rmColony});
         } else if (lWorker.length < popWorker) {
-            utilHive.requestSpawn(rmColony, 2, 3, 'worker', null, {role: 'worker', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 3, 1, 'worker', null, {role: 'worker', room: rmColony});
         } else if (lRepairer.length < popRepairer) {
-            utilHive.requestSpawn(rmColony, 2, 4, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 4, 1, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
         } else if (lUpgrader.length < popUpgrader) {
-            utilHive.requestSpawn(rmColony, 2, 4, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
+            utilHive.requestSpawn(rmColony, 2, 4, 1, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
         }
         
         
