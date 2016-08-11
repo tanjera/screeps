@@ -25,7 +25,7 @@ module.exports.loop = function () {
              {id: '57a24a31e620955e29e63e27', role: 'send'},
              {id: '57a24f9cacbffcb869dc9d21', role: 'receive'},
              {id: '57a25c61958cffd536325056', role: 'receive'}]);
-    siteColony.run('W16S43', 0.8, 2, 1, 0, 0);      // W16S43 colony #2
+    siteColony.run('W16S43', 0.8, 1, 1, 0, 0);      // W16S43 colony #2
     siteColony.run('W19S42', 1.0, 4, 1, 0, 0,       // W19S42 colony #3
             [{id: '57a23067cf975f59293d8a28', role: 'send'},
              {id: '57a23201113c59e97f7e364e', role: 'receive'},
@@ -33,7 +33,7 @@ module.exports.loop = function () {
     siteColony.run('W15S41', 1.0, 5, 2, 2, 0);      // W15S41 colony #4
 
     siteMining.run('W18S43', 'W18S43', 1.0, 1, 2, 0, 0, 0, 0);    // W18S43 colony #1 mining
-    siteMining.run('W16S43', 'W16S43', 1.0, 1, 1, 0, 0, 0, 0);    // W16S43 colony #2 mining
+    siteMining.run('W16S43', 'W16S43', 0.8, 1, 1, 0, 0, 0, 0);    // W16S43 colony #2 mining
     siteMining.run('W19S42', 'W19S42', 1.0, 1, 2, 0, 0, 0, 0);    // W19S42 colony #3 mining
     siteMining.run('W15S41', 'W15S41', 1.0, 1, 2, 0, 0, 0, 0);    // W15S41 colony #4 mining
     

@@ -104,6 +104,12 @@ var RolesWork = {
             }
         } 
 
+        // If there is no energy to get... at least do something!
+        if (creep.memory.task == null) {
+            delete creep.memory.task;
+            creep.memory.state = 'task_needed';
+            return;
+        }
     },
 
 
@@ -118,7 +124,9 @@ var RolesWork = {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
+                delete creep.memory.task;
                 RolesWork.Worker_FindEnergy(creep);
+                return;
             }
         }
 
@@ -132,6 +140,7 @@ var RolesWork = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } else {
+                    delete creep.memory.task;
                     RolesWork.Worker_FindEnergy(creep);
                     return;
                 }
@@ -144,6 +153,7 @@ var RolesWork = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } else {
+                    delete creep.memory.task;
                     RolesWork.Worker_FindEnergy(creep);
                     return;
                 }
@@ -157,6 +167,7 @@ var RolesWork = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } else {
+                    delete creep.memory.task;
                     RolesWork.Worker_FindEnergy(creep);
                     return;
                 }
@@ -233,7 +244,9 @@ var RolesWork = {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
+                delete creep.memory.task;
                 RolesWork.Worker_AssignTask(creep);
+                return;
             }
         }
 

@@ -106,6 +106,12 @@ var RolesMining = {
             }
         }
     
+        // If there is no energy to get... at least do something!
+        if (creep.memory.task == null) {
+            delete creep.memory.task;
+            creep.memory.state = 'delivery_needed';
+            return;
+        }
     },
 
 
@@ -120,7 +126,9 @@ var RolesMining = {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
+                delete creep.memory.task;
                 RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
+                return;
             }
         }
 
@@ -134,6 +142,7 @@ var RolesMining = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } else {
+                    delete creep.memory.task;
                     RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                     return;
                 }
@@ -146,6 +155,7 @@ var RolesMining = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } else {
+                    delete creep.memory.task;
                     RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                     return;
                 }
@@ -159,6 +169,7 @@ var RolesMining = {
                     creep.moveTo(source, {reusePath: _ticksReusePath});
                     return;
                 } else {
+                    delete creep.memory.task;
                     RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                     return;
                 }
@@ -237,7 +248,9 @@ var RolesMining = {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
+                delete creep.memory.task;
                 RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
+                return;
             }
         }
 
@@ -247,24 +260,22 @@ var RolesMining = {
                 && target.energy == target.energyCapacity) {
             RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
         }
-        
-        // Move to the deposit
-        if (!creep.pos.isNearTo(target)) {
-            creep.moveTo(target, {reusePath: _ticksReusePath});
-            return;
-        }
 
         // Cycle through all resources and deposit, starting with minerals
         for (var r = Object.keys(creep.carry).length; r > 0; r--) {
             var resourceType = Object.keys(creep.carry)[r - 1];
-            if (resourceType != RESOURCE_ENERGY && creep.carry[resourceType] < 50) {
-                continue;   // Don't drop off small stacks of boosting minerals!!
-            }
-            if (target != null 
-                && (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE 
-                    ? creep.moveTo(target, {reusePath: _ticksReusePath}) 
-                    : creep.transfer(target, resourceType)) == OK) {
-                return;
+            if (target != null) {
+                var result = creep.transfer(target, resourceType)
+                if (result == OK) {
+                    return;
+                } else if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target, {reusePath: _ticksReusePath});
+                    return;
+                } else {
+                    delete creep.memory.task;
+                    RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
+                    return;
+                }
             }
         }
 	},
