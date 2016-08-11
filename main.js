@@ -30,7 +30,9 @@ module.exports.loop = function () {
             [{id: '57a23067cf975f59293d8a28', role: 'send'},
              {id: '57a23201113c59e97f7e364e', role: 'receive'},
              {id: '57a6a9d62d673fac4f21a62a', role: 'receive'}]);    
-    siteColony.run('W15S41', 1.0, 5, 2, 2, 0);      // W15S41 colony #4
+    siteColony.run('W15S41', 1.0, 5, 2, 2, 0,       // W15S41 colony #4
+            [{id: '57abd1d35c977d2d5fec0d0f', role: 'send'},            
+             {id: '57abe33f4a8b4b5a2f1a2b85', role: 'receive'}]);
 
     siteMining.run('W18S43', 'W18S43', 1.0, 1, 2, 0, 0, 0, 0);    // W18S43 colony #1 mining
     siteMining.run('W16S43', 'W16S43', 0.8, 1, 1, 0, 0, 0, 0);    // W16S43 colony #2 mining
