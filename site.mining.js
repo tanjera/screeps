@@ -2,8 +2,6 @@ var rolesMining = require('roles.mining');
 var rolesWork = require('roles.work');
 var rolesCombat = require('roles.combat');
 
-var utilCreep = require('util.creep');
-var utilColony = require('util.colony');
 var utilHive = require('util.hive');
 
 var siteMining = {

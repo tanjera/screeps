@@ -1,26 +1,30 @@
-var siteMining = require('site.mining');
 var siteColony = require('site.colony');
+var siteMining = require('site.mining');
+var siteReserve = require('site.reserve');
 
 var utilHive = require('util.hive');
 
 module.exports.loop = function () {
 
     /* TO DO:
+        * add range to worker picking energy from ground (within 15 squares?)
+        * add to utilCreep to try moveTo first, then moveTo(RoomPosition(25, 25, ''))
+
         - is miner -> link functioning entirely?
         - don't renew boosted creeps
     */     
 
-  
     
     // siteColony.run rmColony, lvlMultiplier, popWorker, popRepairer, popUpgrader, popSoldier, listLinks)
     // siteMining.run (rmColony, rmHarvest, lvlMultiplier, popBurrower, popCarrier, popMiner, popMultirole, popReserver, popExtractor)
+    // siteReserve.run (rmColony, rmHarvest, lvlMultiplier, popReserver)
 
     /* Prepare hive functions/memory for this tick */
     utilHive.clearDeadMemory();
     utilHive.prepareHiveMemory();
 
     /* Colonies and in-colony mining operations */
-    siteColony.run('W18S43', 0.8, 1, 1, 0, 0,       // W16S43 colony #1
+    siteColony.run('W18S43', 0.8, 2, 1, 0, 0,       // W16S43 colony #1
             [{id: '57a2465268244ab107a96d5e', role: 'send'},
              {id: '57a24a31e620955e29e63e27', role: 'send'},
              {id: '57a24f9cacbffcb869dc9d21', role: 'receive'},
@@ -50,9 +54,13 @@ module.exports.loop = function () {
     
     siteMining.run('W19S42', 'W18S42', 1.0, 1, 3, 0, 1, 1, 0);    // W18S42 mining operation (from Colony #3, W19S42)
     
-    siteMining.run('W15S41', 'W15S42', 1.0, 1, 3, 0, 1, 1, 0);    // W15S42 mining operation (from Colony #4, W15S41)
+    siteMining.run('W15S41', 'W15S42', 1.0, 1, 4, 0, 1, 1, 0);    // W15S42 mining operation (from Colony #4, W15S41)
+    siteMining.run('W15S41', 'W14S42', 1.0, 1, 4, 0, 1, 1, 0);    // W15S42 mining operation (from Colony #4, W15S41)
     siteMining.run('W15S41', 'W16S41', 1.0, 1, 2, 0, 1, 1, 0);    // W16S41 mining operation (from Colony #4, W15S41)
     
+    /* Reserve rooms for Atavus in W15S35 quad */
+    siteReserve.run('W15S41', 'W13S38', 1.0, 1);
+    siteReserve.run('W15S41', 'W13S39', 1.0, 1);
     
     /* Run end-tick hive functions */
     utilHive.processSpawnRequests();

@@ -1,7 +1,6 @@
 var rolesWork = require('roles.work');
 var rolesCombat = require('roles.combat');
 
-var utilCreep = require('util.creep');
 var utilColony = require('util.colony');
 var utilHive = require('util.hive');
 
@@ -13,7 +12,6 @@ var siteColony = {
             Memory['hive']['rooms'][rmColony] = {};
         }
          
-
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
         var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'repairer' && creep.memory.room == rmColony);
         var lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'upgrader' && creep.memory.room == rmColony);
@@ -50,9 +48,9 @@ var siteColony = {
             }
         }
         
+
         // Process Towers
-        var listTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});
-                            
+        var listTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});                            
         for (var i = 0; i < listTowers.length; i++) {
             var tower = listTowers[i];
             
@@ -77,6 +75,7 @@ var siteColony = {
                 } 
             }
         }
+
 
         // Process links via listLinks parameter (an array of [id: '', role: 'send/receive'])
         if (listLinks != null) {

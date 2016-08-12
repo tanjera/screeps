@@ -40,18 +40,7 @@ var RolesWork = {
             return;
         }
 
-        // Priority #1: get dropped energy
-        var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
-            return s.amount >= creep.carryCapacity * 0.3 && s.resourceType == RESOURCE_ENERGY; }});
-        if (source != null) {
-            creep.memory.task = {
-                type: 'pickup',
-                id: source.id,
-                timer: 10 };
-            return;
-        }
-
-        // Priority #2: get energy from receiving links
+        // Priority #1: get energy from nearby receiving links
         if (Memory['hive']['rooms'][creep.room.name]['links'] != null) {
             var links = _.filter(Memory['hive']['rooms'][creep.room.name]['links'], (obj) => { 
                 return obj.id && obj['role'] == 'receive'; });
@@ -67,7 +56,18 @@ var RolesWork = {
                 } 
             }
         }
-        
+
+        // Priority #2: get dropped energy
+        var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
+            return s.amount >= creep.carryCapacity * 0.3 && s.resourceType == RESOURCE_ENERGY; }});
+        if (source != null) {
+            creep.memory.task = {
+                type: 'pickup',
+                id: source.id,
+                timer: 10 };
+            return;
+        }
+
         // Priority #3: get energy from storage or containers
         var source = creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: function (s) { 
             return (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
