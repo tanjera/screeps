@@ -6,57 +6,48 @@ var RolesWork = {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             uCr.moveToRoom(creep, creep.memory.room);
         }
-        else {
-            switch (creep.memory.state) {
-                default:
-                    creep.memory.state = 'energy_needed';
-                    break;
-
-                case 'energy_needed':
-                    RolesWork.Worker_FindEnergy(creep);
-                    RolesWork.Worker_GetEnergy(creep);
-                    break;
-
-                case 'energy_fetch':
-                    if (_.sum(creep.carry) == creep.carryCapacity) {
-                        creep.memory.state = 'task_needed';
-                        delete creep.memory.task;
-                        break;
-                    }     
-                    
-                    RolesWork.Worker_GetEnergy(creep);
-                    break;
-
-                case 'task_needed':
-                    RolesWork.Worker_AssignTask(creep);
-                    RolesWork.Worker_RunTask(creep);
-                    break;
-
-                case 'task_working':
-                    if (creep.carry[RESOURCE_ENERGY] == 0) {
-                        creep.memory.state = 'energy_needed';
-                        delete creep.memory.task;
-                        break;
-                    }
-                    
-                    RolesWork.Worker_RunTask(creep);
-                    break;
-
+        else if (creep.memory.state == 'refueling') {
+            if (_.sum(creep.carry) == creep.carryCapacity) {
+                creep.memory.state = 'working';
+                delete creep.memory.task;
+                return;
             }
-        }
+            
+            RolesWork.Worker_FindEnergy(creep);
+            RolesWork.Worker_GetEnergy(creep);
+            return;
+
+        } else if (creep.memory.state == 'working') {            
+            if (creep.carry[RESOURCE_ENERGY] == 0) {
+                    creep.memory.state = 'refueling';
+                    delete creep.memory.task;
+                    return;
+                }
+            
+            RolesWork.Worker_AssignTask(creep);
+            RolesWork.Worker_RunTask(creep);
+            return;
+
+        } else {
+            creep.memory.state = 'refueling';
+            return;
+        }                        
     },
 
     
     Worker_FindEnergy: function(creep) {
+        if (creep.memory.task != null) {
+            return;
+        }
+
         // Priority #1: get dropped energy
         var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY, { filter: function (s) { 
-            return s.amount >= creep.carryCapacity * 0.5 && s.resourceType == RESOURCE_ENERGY; }});
+            return s.amount >= creep.carryCapacity * 0.3 && s.resourceType == RESOURCE_ENERGY; }});
         if (source != null) {
             creep.memory.task = {
                 type: 'pickup',
                 id: source.id,
                 timer: 10 };
-            creep.memory.state = 'energy_fetch';
             return;
         }
 
@@ -72,7 +63,6 @@ var RolesWork = {
                         type: 'withdraw',
                         id: source.id,
                         timer: 5 };
-                    creep.memory.state = 'energy_fetch';
                     return;
                 } 
             }
@@ -87,7 +77,6 @@ var RolesWork = {
                 type: 'withdraw',
                 id: source.id,
                 timer: 5 };
-            creep.memory.state = 'energy_fetch';
             return;
         } 
 
@@ -99,15 +88,13 @@ var RolesWork = {
                     type: 'mine',
                     id: source.id,
                     timer: 5 };
-                creep.memory.state = 'energy_fetch';
                 return;
             }
         } 
 
         // If there is no energy to get... at least do something!
         if (creep.memory.task == null) {
-            delete creep.memory.task;
-            creep.memory.state = 'task_needed';
+            creep.memory.state = 'working';
             return;
         }
     },
@@ -117,7 +104,6 @@ var RolesWork = {
         var _ticksReusePath = 8;
 
         if (creep.memory.task == null) {
-            creep.memory.state == 'energy_needed';
             return;
         } 
         else if (creep.memory.task['timer'] != null) {
@@ -125,7 +111,6 @@ var RolesWork = {
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
                 delete creep.memory.task;
-                RolesWork.Worker_FindEnergy(creep);
                 return;
             }
         }
@@ -133,49 +118,42 @@ var RolesWork = {
         var source = Game.getObjectById(creep.memory.task['id']);
         switch (creep.memory.task['type']) {
             case 'pickup':
-                var result = creep.pickup(source); 
-                if (result == OK && source != null && source.amount > creep.carryCapacity * 0.3) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-                    return;
-                } else {
+                if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(source, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, source.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
                     delete creep.memory.task;
-                    RolesWork.Worker_FindEnergy(creep);
                     return;
                 }
 
             case 'withdraw':
-                var result = creep.withdraw(source, 'energy'); 
-                if (result == OK) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-                    return;
-                } else {
+                if (creep.withdraw(source, 'energy') == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(source, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, source.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
                     delete creep.memory.task;
-                    RolesWork.Worker_FindEnergy(creep);
                     return;
                 }
 
             default:
             case 'mine':
                 var result = creep.harvest(source); 
-                if (result == OK && source.energy > 0) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-                    return;
-                } else {
+                if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
+                    return creep.moveTo(source, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, source.room.name)) : 1;
+                } else if (result != OK) {
                     delete creep.memory.task;
-                    RolesWork.Worker_FindEnergy(creep);
                     return;
-                }
+                } else { return; }
         }
     },
 
 
     Worker_AssignTask: function(creep) {
+        if (creep.memory.task != null) {
+            return;
+        }
+
         var structure;
         var uCo = require('util.colony');
 
@@ -186,7 +164,6 @@ var RolesWork = {
                 type: 'upgrade',
                 id: creep.room.controller.id,
                 timer: 20 };
-            creep.memory.state = 'task_working';
             return;
         }
         // Priority #2: Repair critical structures
@@ -196,7 +173,6 @@ var RolesWork = {
                 type: 'repair',
                 id: structure.id,
                 timer: 20 };
-            creep.memory.state = 'task_working';
             return;
         }
         // Priority #3: Build
@@ -206,7 +182,6 @@ var RolesWork = {
                 type: 'build',
                 id: structure.id,
                 timer: 30 };
-            creep.memory.state = 'task_working';
             return;
         }
         // Priority #4: Maintain (repair) structures
@@ -217,7 +192,6 @@ var RolesWork = {
                     type: 'repair',
                     id: structure.id,
                     timer: 30 };
-                creep.memory.state = 'task_working';
                 return;
             }
         }
@@ -227,7 +201,6 @@ var RolesWork = {
                 type: 'upgrade',
                 id: creep.room.controller.id,
                 timer: 60 };
-            creep.memory.state = 'task_working';
             return;
         }
     },
@@ -237,7 +210,6 @@ var RolesWork = {
         var _ticksReusePath = 8;
 
         if (creep.memory.task == null) {
-            creep.memory.state == 'task_needed';
             return;
         } 
         else if (creep.memory.task['timer'] != null) {
@@ -245,7 +217,6 @@ var RolesWork = {
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
                 delete creep.memory.task;
-                RolesWork.Worker_AssignTask(creep);
                 return;
             }
         }
@@ -255,41 +226,35 @@ var RolesWork = {
             case 'upgrade':
                 var controller = Game.getObjectById(creep.memory.task['id']);
                 var result = creep.upgradeController(controller); 
-                if (result == OK) {
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(controller, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, controller.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
                     return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(controller, {reusePath: _ticksReusePath});
-                    return;
-                } else {
-                    RolesWork.Worker_AssignTask(creep);
-                    return;
-                }
+                } else { return; }
 
             case 'repair':
                 var structure = Game.getObjectById(creep.memory.task['id']);
                 var result = creep.repair(structure); 
-                if (result == OK && structure.hits != structure.hitsMax) {
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                } else if (result != OK || structure.hits == structure.hitsMax) {
+                    delete creep.memory.task;
                     return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure, {reusePath: _ticksReusePath});
-                    return;
-                } else {
-                    RolesWork.Worker_AssignTask(creep);
-                    return;
-                }
+                } else { return; }
             
             case 'build':
                 var structure = Game.getObjectById(creep.memory.task['id']);
                 var result = creep.build(structure);
-                if (result == OK) {
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
                     return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(structure, {reusePath: _ticksReusePath});
-                    return;
-                } else {
-                    RolesWork.Worker_AssignTask(creep);
-                    return;
-                }
+                } else { return; }
         }
     }
 };

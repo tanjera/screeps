@@ -3,47 +3,41 @@ var uCr = require('util.creep');
 var RolesMining = {
 
     Mining: function(creep, rmDeliver, rmHarvest) {
-        switch (creep.memory.state) {
-            default:
-                creep.memory.state = 'energy_needed';
-                break;
-
-            case 'energy_needed':
-                RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
-                RolesMining.Mining_GetEnergy(creep, rmDeliver, rmHarvest);
-                break;
-
-            case 'energy_fetch':
+        if (creep.memory.state == 'refueling') {
                 if (_.sum(creep.carry) == creep.carryCapacity && creep.carryCapacity > 0) {
-                    creep.memory.state = 'delivery_needed';
+                    creep.memory.state = 'delivering';
                     delete creep.memory.task;
-                    break;
+                    return;
                 }
                 
+                RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);                
                 RolesMining.Mining_GetEnergy(creep, rmDeliver, rmHarvest);
-                break;
+                return;
 
-            case 'delivery_needed':
-                RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
-                RolesMining.Mining_RunDelivery(creep, rmDeliver, rmHarvest);
-                break;
-
-            case 'delivery_working':
+        } else if (creep.memory.state == 'delivering') {            
                 if (creep.carryCapacity == 0
                     || (creep.carry[RESOURCE_ENERGY] == 0 && _.sum(creep.carry) < creep.carryCapacity)) {
-                    creep.memory.state = 'energy_needed';
+                    creep.memory.state = 'refueling';
                     delete creep.memory.task;
-                    break;
+                    return;
                 }
-                
+
+                RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);                
                 RolesMining.Mining_RunDelivery(creep, rmDeliver, rmHarvest);
-                break;
+                return;
+
+        } else {
+            creep.memory.state = 'refueling';
+            return;
         }
     },
 
 
     Mining_FindEnergy: function(creep, rmDeliver, rmHarvest) {
-        
+        if (creep.memory.task != null) {
+            return;
+        }
+
         if (creep.room.name != rmHarvest) {
             uCr.moveToRoom(creep, rmHarvest);
             return;
@@ -53,12 +47,10 @@ var RolesMining = {
             // Priority #1: get dropped energy
             var source = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
             if (source != null) {    
-                
                 creep.memory.task = {
                     type: 'pickup',
                     id: source.id,
                     timer: 5 };
-                creep.memory.state = 'energy_fetch';
                 return;                        
             }
 
@@ -72,7 +64,6 @@ var RolesMining = {
                     type: 'withdraw',
                     id: sources[0].id,
                     timer: 5 };
-                creep.memory.state = 'energy_fetch';
                 return;
             } 
         
@@ -84,7 +75,6 @@ var RolesMining = {
                         type: 'mine',
                         id: source.id,
                         timer: 10 };
-                    creep.memory.state = 'energy_fetch';
                     return;
                 } 
             }
@@ -101,15 +91,13 @@ var RolesMining = {
                     type: 'mine',
                     id: source.id,
                     timer: 10 };
-                creep.memory.state = 'energy_fetch';
                 return;                    
             }
         }
     
         // If there is no energy to get... at least do something!
         if (creep.memory.task == null) {
-            delete creep.memory.task;
-            creep.memory.state = 'delivery_needed';
+            creep.memory.state = 'delivering';
             return;
         }
     },
@@ -118,8 +106,7 @@ var RolesMining = {
     Mining_GetEnergy: function(creep, rmDeliver, rmHarvest) {
         var _ticksReusePath = 8;
 
-        if (creep.memory.task == null) {
-            creep.memory.state == 'energy_needed';
+        if (creep.memory.task == null) {            
             return;
         } 
         else if (creep.memory.task['timer'] != null) {
@@ -127,7 +114,6 @@ var RolesMining = {
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
                 delete creep.memory.task;
-                RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                 return;
             }
         }
@@ -135,53 +121,46 @@ var RolesMining = {
         var source = Game.getObjectById(creep.memory.task['id']);
         switch (creep.memory.task['type']) {
             case 'pickup':
-                var result = creep.pickup(source); 
-                if (result == OK && source != null && source.amount > creep.carryCapacity * 0.1) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-                    return;
-                } else {
+                if (creep.pickup(source) == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(source, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, source.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
                     delete creep.memory.task;
-                    RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                     return;
                 }
 
-            case 'withdraw':
-                var result = creep.withdraw(source, 'energy'); 
-                if (result == OK) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-                    return;
-                } else {
+            case 'withdraw':                 
+                if (creep.withdraw(source, 'energy') == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(source, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, source.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
                     delete creep.memory.task;
-                    RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                     return;
                 }
 
             default:
             case 'mine':
                 var result = creep.harvest(source); 
-                if (result == OK) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
-                    creep.moveTo(source, {reusePath: _ticksReusePath});
-                    return;
-                } else {
+                if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
+                    return creep.moveTo(source, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, source.room.name)) : 1;
+                } else if (result != OK) {
                     delete creep.memory.task;
-                    RolesMining.Mining_FindEnergy(creep, rmDeliver, rmHarvest);
                     return;
-                }
+                } else { return; }
         }
     },
         
 
     Mining_AssignDelivery: function(creep, rmDeliver, rmHarvest) {
+        if (creep.memory.task != null) {
+            return;
+        }
+        
         if (creep.room.name != rmDeliver) {
             uCr.moveToRoom(creep, rmDeliver);
             return;
-        }      
+        }
 
         var target;
         // Somehow picked up a stack of minerals?? Deliver to storage.
@@ -224,56 +203,50 @@ var RolesMining = {
                         || (s.structureType == STRUCTURE_CONTAINER && _.sum(s.store) < s.storeCapacity); }});
         }
         // And set the delivery task!
-
         creep.memory.task = {
             type: 'deposit',
             id: target.id,
-            timer: 2 };
-        creep.memory.state = 'delivery_working';
+            timer: 10 };
         return;   
-
-
     },
 
 
     Mining_RunDelivery: function(creep, rmDeliver, rmHarvest) {
-        var _ticksReusePath = 8;
+        var target;
+        var _ticksReusePath = 5;
 
-        if (creep.memory.task == null) {
-            delete creep.memory.task;
-            creep.memory.state == 'task_needed';
-            return;
-        } 
-        else if (creep.memory.task['timer'] != null) {
+        if (creep.memory.task != null && creep.memory.task['timer'] != null) {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
-                delete creep.memory.task;
-                RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
+                delete creep.memory.task;                  
                 return;
             }
         }
 
-        var target = Game.getObjectById(creep.memory.task['id']);
-        // Cycle through feeding spawns and extensions a bit faster...
-        if ((target.structureType == STRUCTURE_SPAWN || target.structureType == STRUCTURE_EXTENSION)
-                && target.energy == target.energyCapacity) {
-            RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
+        if (creep.memory.task != null) {
+            // Make sure the target hasn't filled up...
+            target = Game.getObjectById(creep.memory.task['id']);
+            if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
+                    || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
+                    || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
+                    || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
+                    || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
+                    || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
+                RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
+            }
         }
 
-        // Cycle through all resources and deposit, starting with minerals
-        for (var r = Object.keys(creep.carry).length; r > 0; r--) {
-            var resourceType = Object.keys(creep.carry)[r - 1];
-            if (target != null) {
-                var result = creep.transfer(target, resourceType)
-                if (result == OK) {
-                    return;
-                } else if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {reusePath: _ticksReusePath});
-                    return;
+        if (creep.memory.task != null) {
+            // Cycle through all resources and deposit, starting with minerals
+            target = Game.getObjectById(creep.memory.task['id']);
+            for (var r = Object.keys(creep.carry).length; r > 0; r--) {
+                var resourceType = Object.keys(creep.carry)[r - 1];
+                if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(target, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, target.room.name)) : 1;
                 } else {
                     delete creep.memory.task;
-                    RolesMining.Mining_AssignDelivery(creep, rmDeliver, rmHarvest);
                     return;
                 }
             }
