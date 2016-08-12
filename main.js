@@ -59,8 +59,7 @@ module.exports.loop = function () {
     siteMining.run('W15S41', 'W16S41', 1.0, 1, 2, 0, 1, 1, 0);    // W16S41 mining operation (from Colony #4, W15S41)
     
     /* Reserve rooms for Atavus in W15S35 quad */
-    siteReserve.run('W15S41', 'W13S38', 1.0, 1);
-    siteReserve.run('W15S41', 'W13S39', 1.0, 1);
+    siteReserve.run('W15S41', 'W15S39', 1.0, 1);
     
     /* Run end-tick hive functions */
     utilHive.processSpawnRequests();

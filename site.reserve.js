@@ -6,7 +6,7 @@ var siteReserve = {
 
     run: function(rmColony, rmHarvest, lvlMultiplier, popReserver) {
 
-        var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest);
+        var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 80));
         
         var popTarget = popReserver;
         var popActual = lReserver.length;
