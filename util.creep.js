@@ -464,6 +464,30 @@ var utilCreep = {
                     return;
                 } else { return; }
 
+            case 'deposit':
+                // Make sure the target hasn't filled up...
+                var target = Game.getObjectById(creep.memory.task['id']);
+                if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
+                        || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
+                    var uTask = require('util.tasks');
+                    uTask.assignTask(creep, false);
+                }
+                // Cycle through all resources and deposit, starting with minerals                
+                for (var r = Object.keys(creep.carry).length; r > 0; r--) {
+                    var resourceType = Object.keys(creep.carry)[r - 1];
+                    if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                        return creep.moveTo(target, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                            ? creep.moveTo(new RoomPosition(25, 25, target.room.name)) : 1;
+                    } else {
+                        delete creep.memory.task;
+                        return;
+                    }
+                }
+
         }
     },
 

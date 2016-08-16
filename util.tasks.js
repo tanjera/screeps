@@ -69,7 +69,7 @@ var utilTasks = {
                     pos: structures[i].pos,
                     timer: 20,
                     creep: 2,
-                    priority: 4
+                    priority: 6
                 });
         }
         
@@ -78,8 +78,8 @@ var utilTasks = {
             utilTasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'build',
-                    id: structure.id,
-                    pos: structure.pos,
+                    id: structures[i].id,
+                    pos: structures[i].pos,
                     timer: 30,
                     creep: 3,
                     priority: 3
@@ -137,11 +137,12 @@ var utilTasks = {
         var storages = room.find(FIND_STRUCTURES, { filter: function (s) { 
             return (s.structureType == STRUCTURE_STORAGE)
                 || (s.structureType == STRUCTURE_CONTAINER); }});
-        for (var i = 0; i < storages.length; i++) {
+        for (var i = 0; i < storages.length; i++) {            
             if (storages[i].store[RESOURCE_ENERGY] > 0) {
                 utilTasks.addTask(rmName, 
                     {   type: 'energy',
                         subtype: 'withdraw',
+                        structure: storages[i].structureType,
                         resource: 'energy',
                         id: storages[i].id,
                         pos: storages[i].pos,
@@ -154,12 +155,23 @@ var utilTasks = {
                 utilTasks.addTask(rmName, 
                     {   type: 'carry',
                         subtype: 'deposit',
+                        structure: storages[i].structureType,
                         resource: 'energy',
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 5,
                         creeps: 8
-                    });    
+                    });
+                utilTasks.addTask(rmName, 
+                    {   type: 'carry',
+                        subtype: 'deposit',
+                        structure: storages[i].structureType,
+                        resource: 'mineral',
+                        id: storages[i].id,
+                        pos: storages[i].pos,
+                        timer: 5,
+                        creeps: 8
+                    });     
             }
         } 
 
@@ -181,7 +193,7 @@ var utilTasks = {
                      });
                 } else if (links[l]['role'] == 'receive' && link != null && link.energy > 0) {
                     utilTasks.addTask(rmName, 
-                    {   type: 'carry',
+                    {   type: 'energy',
                         subtype: 'withdraw',
                         structure: 'link',
                         resource: 'energy',
@@ -243,43 +255,196 @@ var utilTasks = {
         }
 
         switch (creep.memory.role) {
-            default: return;
+            default: 
+                return;
+
+            case 'multirole':
             case 'worker': 
-                assignTask_Worker(creep, isRefueling);
+                utilTasks.assignTask_Work(creep, isRefueling);
+                return;
+
+            case 'miner':
+            case 'burrower':
+            case 'carrier':                
+                utilTasks.assignTask_Mine(creep, isRefueling);
+                return;
+
+            case 'extractor':
+                utilTasks.assignTask_Extract(creep, isRefueling);
                 return;
         }
     },
 
-    assignTask_Worker: function(creep, isRefueling) {
+    assignTask_Work: function(creep, isRefueling) {
         var tasks;
 
-        if (isRefueling) {
-            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'energy'; }), 'priority');
+        if (isRefueling) {            
+            tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'energy'; }), 
+                    function(t) { return creep.pos.getRangeTo(t.pos); }), 
+                    'priority');
             if (tasks.length > 0) {
-                creep.memory.task = tasks[0];
-            } else {
-                // TO DO: assign a mining task    
+                utilTasks.giveTask(creep, tasks[0]);
+                return;
             }
+            
+            if (creep.memory.role == 'multirole') {
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.subtype == 'pickup' && t.resource == 'energy'; }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); });
+                if (tasks.length > 0) {
+                    utilTasks.giveTask(creep, tasks[0]);
+                    return;
+                }
 
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); });
+                if (tasks.length > 0) {
+                    utilTasks.giveTask(creep, tasks[0]);
+                    return;
+                }
+            }
         } else {
-            var tasks;
             if (creep.memory.subrole == 'repairer') {
-                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work' && t.subtype == 'repair'; }), 'priority');
+                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.type == 'work' && t.subtype == 'repair'; }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); }), 
+                        'priority');
             }
             else if (creep.memory.subrole == 'upgrader') {
                 tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work' && t.subtype == 'upgrade'; }), 'priority');
             }
             
             if (tasks == null) {
-                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work'; }), 'priority');
+                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.type == 'work'; }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); }), 
+                        'priority');
             }
 
             if (tasks.length > 0) {
-                creep.memory.task = tasks[0];
+                utilTasks.giveTask(creep, tasks[0]);        
+                return;
             }
         }
     },
 
+    assignTask_Mine: function(creep, isRefueling) {
+        var tasks;
+
+        if (isRefueling) {
+            if (creep.room.name != creep.memory.room) {
+                var uCreep = require('util.creep');
+                uCreep.moveToRoom(creep, creep.memory.room);
+                return;
+            } 
+
+            if (creep.memory.role == 'burrower') {
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); });
+                if (tasks.length > 0) {
+                    utilTasks.giveTask(creep, tasks[0]);
+                    return;
+                } else {    // All sources are empty? Move to the one renewing next!
+                    var sources = creep.room.find(FIND_SOURCES).sort(function(a, b) { return a.ticksToRegeneration - b.ticksToRegeneration; });
+                        source = sources.length > 0 ? sources[0] : null;                
+                    if (source != null) {
+                        creep.memory.task = {
+                            type: 'mine',
+                            id: source.id,
+                            timer: 10 };
+                        return;                    
+                    }
+                }
+            }
+            else if (creep.memory.role == 'miner' || creep.memory.role == 'carrier') {
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return (t.subtype == 'pickup' && t.resource == 'energy') || (t.type == 'energy' && t.structure != 'link'); }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); });
+                if (tasks.length > 0) {
+                    utilTasks.giveTask(creep, tasks[0]);
+                    return;
+                }
+
+                if (creep.getActiveBodyparts('work') > 0) {
+                    tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
+                        function(t) { return creep.pos.getRangeTo(t.pos); });
+                    if (tasks.length > 0) {
+                        utilTasks.giveTask(creep, tasks[0]);
+                        return;
+                    }
+                }
+
+                // If there is no energy to get... at least do something!
+                if (creep.memory.task == null) {
+                    creep.memory.state = 'delivering';
+                    return;
+                }
+            }
+        } else {
+            if (creep.room.name != creep.memory.colony) {
+                var uCreep = require('util.creep');
+                uCreep.moveToRoom(creep, creep.memory.colony);
+                return;
+            }
+
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'carry' && t.resource == 'energy'; }), 
+                    function(t) { return creep.pos.getRangeTo(t.pos); });
+            if (tasks.length > 0) {
+                utilTasks.giveTask(creep, tasks[0]);
+                return;
+            }
+        }
+    },
+
+    assignTask_Extract: function(creep, isRefueling) {
+        var tasks;
+
+        if (isRefueling) {
+            if (creep.room.name != creep.memory.room) {
+                var uCreep = require('util.creep');
+                uCreep.moveToRoom(creep, creep.memory.room);
+                return;
+            } 
+
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                function (t) { return t.type == 'mine' && t.resource == 'mineral'; }), 
+                function(t) { return creep.pos.getRangeTo(t.pos); });
+            if (tasks.length > 0) {
+                utilTasks.giveTask(creep, tasks[0]);
+                return;
+            }            
+
+        } else {
+            if (creep.room.name != creep.memory.colony) {
+                var uCreep = require('util.creep');
+                uCreep.moveToRoom(creep, creep.memory.colony);
+                return;
+            }
+
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'carry' && t.resource == 'mineral'; }), 
+                    function(t) { return creep.pos.getRangeTo(t.pos); });
+            if (tasks.length > 0) {
+                utilTasks.giveTask(creep, tasks[0]);
+                return;
+            }
+        }
+    },
+
+    giveTask (creep, task) {
+        creep.memory.task = task;
+        if (Memory['hive']['rooms'][creep.room.name]['tasks']['creeps'] != null) {
+            Memory['hive']['rooms'][creep.room.name]['tasks']['creeps'] -= 1;
+            if (Memory['hive']['rooms'][creep.room.name]['tasks']['creeps'] <= 0) {
+                _.remove(Memory['hive']['rooms'][creep.room.name]['tasks'], function(t) { return t == task; });
+            }
+        }
+    }
 }
 
 module.exports = utilTasks;

@@ -31,31 +31,31 @@ var siteMining = {
         }
         else if (lMiner.length < popMiner) {
             if (lMiner.length == 0) // Possibly colony wiped? Need restart?
-                utilHive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
             else {
-                utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'worker', null, {role: 'miner', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
             }    
         }
         else if (lBurrower.length < popBurrower) {
             if (lCarrier.length == 0 && popCarrier > 0 && lMiner.length == 0) // Possibly colony wiped? Need restart?
-                utilHive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
             else {
-                utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'burrower', null, {role: 'burrower', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'burrower', null, {role: 'burrower', room: rmHarvest, colony: rmColony});
             }
         }
         else if (lCarrier.length < popCarrier) {
-            utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'carrier', null, {role: 'carrier', room: rmHarvest});
+            utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'carrier', null, {role: 'carrier', room: rmHarvest, colony: rmColony});
         }
         else if (lMultirole.length < popMultirole) {
-            utilHive.requestSpawn(rmColony, 2, 2, tgtLevel, 'multirole', null, {role: 'multirole', room: rmHarvest});
+            utilHive.requestSpawn(rmColony, 2, 2, tgtLevel, 'multirole', null, {role: 'multirole', room: rmHarvest, colony: rmColony});
         }
         else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
                 && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
-            utilHive.requestSpawn(rmColony, 0, 2, tgtLevel, 'reserver', null, {role: 'reserver', room: rmHarvest});            
+            utilHive.requestSpawn(rmColony, 0, 2, tgtLevel, 'reserver', null, {role: 'reserver', room: rmHarvest, colony: rmColony});            
         }
         else if (lExtractor.length < popExtractor && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game['rooms'][rmHarvest].find(FIND_MINERALS, {filter: function(m) { return m.mineralAmount > 0; }}).length > 0) {
-            utilHive.requestSpawn(rmColony, 2, 2, tgtLevel, 'worker', null, {role: 'extractor', room: rmHarvest});    
+            utilHive.requestSpawn(rmColony, 2, 2, tgtLevel, 'worker', null, {role: 'extractor', room: rmHarvest, colony: rmColony});    
         }
 
         // Run roles!

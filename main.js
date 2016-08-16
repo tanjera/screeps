@@ -11,12 +11,10 @@ module.exports.loop = function () {
         * don't renew boosted creeps
 
         * task system:
-            - add combat tasks!
-            - add dismantle tasks...
-            - cycle through all creeps, remove tasks from task list if already taken
-            - remove the task from the room's task list once it's taken!!
-            - implement only getting tasks close by (e.g. energy from links within 8 units)
-            - implement getting tasks from task list!
+            - add dismantle and combat tasks
+            - cycle through all creeps, remove tasks from task list if already taken (immediately after compiling list!)            
+            - utilCreep: add resource types to things like 'withdraw'
+            - refactor 'reserver' to task system??
     */     
 
     
