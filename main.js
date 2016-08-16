@@ -13,6 +13,9 @@ module.exports.loop = function () {
         * task system:
             - add combat tasks!
             - add dismantle tasks...
+            - cycle through all creeps, remove tasks from task list if already taken
+            - remove the task from the room's task list once it's taken!!
+            - implement only getting tasks close by (e.g. energy from links within 8 units)
             - implement getting tasks from task list!
     */     
 

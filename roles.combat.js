@@ -1,10 +1,10 @@
-var utilCreep = require('util.creep');
+var uCreep = require('util.creep');
 
 var RolesCombat = {
 
     Soldier: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            utilCreep.moveToRoom(creep, creep.memory.room);
+            uCreep.moveToRoom(creep, creep.memory.room);
         }
         else {
             var targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
@@ -21,7 +21,7 @@ var RolesCombat = {
 
     Archer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            utilCreep.moveToRoom(creep, creep.memory.room);
+            uCreep.moveToRoom(creep, creep.memory.room);
         }
         else {
             var allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
@@ -37,7 +37,7 @@ var RolesCombat = {
             } else if (nearTargets.length > 0) {
                 creep.rangedAttack(nearTargets[0]);
                 if (creep.pos.getRangeTo(nearTargets[0]) < 2) {
-                    utilCreep.moveFrom(creep, nearTargets[0]);
+                    uCreep.moveFrom(creep, nearTargets[0]);
                 }
             }
         }
@@ -46,7 +46,7 @@ var RolesCombat = {
 
     Healer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            utilCreep.moveToRoom(creep, creep.memory.room);
+            uCreep.moveToRoom(creep, creep.memory.room);
         }
         else {
             var wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { 

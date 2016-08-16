@@ -1,4 +1,4 @@
-var uCr = require('util.creep');
+var uCreep = require('util.creep');
 
 var RolesMining = {
 
@@ -39,7 +39,7 @@ var RolesMining = {
         }
 
         if (creep.room.name != rmHarvest) {
-            uCr.moveToRoom(creep, rmHarvest);
+            uCreep.moveToRoom(creep, rmHarvest);
             return;
         } 
         
@@ -158,7 +158,7 @@ var RolesMining = {
         }
         
         if (creep.room.name != rmDeliver) {
-            uCr.moveToRoom(creep, rmDeliver);
+            uCreep.moveToRoom(creep, rmDeliver);
             return;
         }
 
@@ -279,7 +279,7 @@ var RolesMining = {
         var _ticksReusePath = 10;
         
         if (creep.room.name != rmHarvest) {
-            uCr.moveToRoom(creep, rmHarvest);
+            uCreep.moveToRoom(creep, rmHarvest);
         }
         else if (creep.room.name == rmHarvest) {
             delete creep.memory.route;
@@ -316,7 +316,7 @@ var RolesMining = {
             }
         }
         else if (creep.room.name != rmDeliver) {
-            uCr.moveToRoom(creep, rmDeliver);
+            uCreep.moveToRoom(creep, rmDeliver);
             return;
         }
 	},
@@ -324,7 +324,7 @@ var RolesMining = {
 
     Reserve: function(creep, rmHarvest) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCr.moveToRoom(creep, creep.memory.room);
+            uCreep.moveToRoom(creep, creep.memory.room);
             return;
         }
         else {

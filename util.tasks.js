@@ -31,7 +31,8 @@ var utilTasks = {
                         id: room.controller.id,
                         pos: room.controller.pos,
                         timer: 20,
-                        creeps: 15 
+                        creeps: 15,
+                        priority: 1
                     });
             } else {
                 utilTasks.addTask(rmName, 
@@ -40,7 +41,8 @@ var utilTasks = {
                         id: room.controller.id,
                         pos: room.controller.pos,
                         timer: 20,
-                        creeps: 15
+                        creeps: 15,
+                        priority: 5
                     });
             }
         }
@@ -53,7 +55,8 @@ var utilTasks = {
                     id: structures[i].id,
                     pos: structures[i].pos,
                     timer: 20,
-                    creep: 2
+                    creep: 2,
+                    priority: 2
                 });                
         }
         
@@ -65,7 +68,8 @@ var utilTasks = {
                     id: structures[i].id,
                     pos: structures[i].pos,
                     timer: 20,
-                    creep: 2
+                    creep: 2,
+                    priority: 4
                 });
         }
         
@@ -77,7 +81,8 @@ var utilTasks = {
                     id: structure.id,
                     pos: structure.pos,
                     timer: 30,
-                    creep: 3
+                    creep: 3,
+                    priority: 3
                 });            
         }
 
@@ -216,7 +221,7 @@ var utilTasks = {
             }
         }
 
-        var structures = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function (s) {
+        var structures = room.find(FIND_MY_STRUCTURES, { filter: function (s) {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
         for (var i = 0; i < structures.length; i++) {            
@@ -230,7 +235,51 @@ var utilTasks = {
                     priority: 2 
                 });
         }
-    }
+    },
+
+    assignTask: function(creep, isRefueling) {
+        if (creep.memory.task != null) {
+            return;
+        }
+
+        switch (creep.memory.role) {
+            default: return;
+            case 'worker': 
+                assignTask_Worker(creep, isRefueling);
+                return;
+        }
+    },
+
+    assignTask_Worker: function(creep, isRefueling) {
+        var tasks;
+
+        if (isRefueling) {
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'energy'; }), 'priority');
+            if (tasks.length > 0) {
+                creep.memory.task = tasks[0];
+            } else {
+                // TO DO: assign a mining task    
+            }
+
+        } else {
+            var tasks;
+            if (creep.memory.subrole == 'repairer') {
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work' && t.subtype == 'repair'; }), 'priority');
+            }
+            else if (creep.memory.subrole == 'upgrader') {
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work' && t.subtype == 'upgrade'; }), 'priority');
+            }
+            
+            if (tasks == null) {
+                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work'; }), 'priority');
+            }
+
+            if (tasks.length > 0) {
+                creep.memory.task = tasks[0];
+            }
+        }
+    },
+
 }
 
 module.exports = utilTasks;

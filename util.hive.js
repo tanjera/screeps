@@ -1,5 +1,3 @@
-var utilTasks = require('util.tasks');
-
 var utilHive = {
 
     clearDeadMemory: function() {
@@ -11,7 +9,7 @@ var utilHive = {
         }
     },
 
-    initHiveMemory: function() {
+    initMemory: function() {
         if (Memory['hive'] == null) { 
             Memory['hive'] = {}; 
         }
@@ -40,12 +38,18 @@ var utilHive = {
         Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   
     },
 
-
     initTasks: function() {
+        var utilTasks = require('util.tasks');
+        
+        var startCpu = Game.cpu.getUsed();        
         // Only compiles tasks for rooms with access!!
         for (var k = 0; k < Object.keys(Game['rooms']).length; k++) {
-            utilTasks.compileTasks(Object.keys(Game['rooms'])[k]);
-        }
+            var r = Object.keys(Game['rooms'])[k];
+            Memory['hive']['rooms'][r]['tasks'] = {};
+            utilTasks.compileTasks(r);
+        }        
+        var elapsed = Game.cpu.getUsed() - startCpu;
+        //console.log(elapsed + ' CPU on utilTasks.compileTasks(r)');
     },
 
 
@@ -97,7 +101,7 @@ var utilHive = {
                     var request = Memory['hive']['spawn_requests'][listRequests[r]];
                     
                     if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {
-                        var level = request.level > utilHive.getRoom_Level(request.room) ? utilHive.getRoom_Level(request.room) : request.level; 
+                        var level = _.clamp(request.level, 1, utilHive.getRoom_Level(request.room));                         
                         var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * level));
                         var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
 

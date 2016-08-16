@@ -380,6 +380,93 @@ var utilCreep = {
         return creep.move(moveDir);
     },
 
+    runTaskTimer: function(creep) {
+        if (creep.memory.task == null) {
+            return false;
+        } 
+        else if (creep.memory.task['timer'] != null) {
+            // Process the task timer
+            creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
+            if (creep.memory.task['timer'] <= 0) {
+                delete creep.memory.task;
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    runTask: function(creep) {
+        var _ticksReusePath = 8;
+        
+        switch (creep.memory.task['subtype']) {
+            case 'pickup':
+                var obj = Game.getObjectById(creep.memory.task['id']);
+                if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
+                    delete creep.memory.task;
+                    return;
+                }
+
+            case 'withdraw':
+                var obj = Game.getObjectById(creep.memory.task['id']);
+                if (creep.withdraw(obj, 'energy') == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
+                    delete creep.memory.task;
+                    return;
+                }
+
+            case 'harvest':
+                var obj = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.harvest(obj); 
+                if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
+                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+
+            case 'upgrade':
+                var controller = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.upgradeController(controller); 
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(controller, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, controller.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+
+            case 'repair':
+                var structure = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.repair(structure); 
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                } else if (result != OK || structure.hits == structure.hitsMax) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+            
+            case 'build':
+                var structure = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.build(structure);
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+
+        }
+    },
+
     moveToRoom: function(creep, tgtRoom) {
         var _ticksReusePath = 10;
         
