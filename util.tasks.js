@@ -1,104 +1,112 @@
 var utilTasks = {
 
-    CreateRoomMemory: function (rmName) {
-        if (Memory['hive']['rooms'][rmName] == null) {
-            Memory['hive']['rooms'][rmName] = {};
-        }
-
-        if (Memory['hive']['rooms'][rmName]['tasks'] == null) {
-            Memory['hive']['rooms'][rmName]['tasks'] = {};
-        }
-    },
-
-    List_AddTask: function (rmName, task) {
+    addTask: function (rmName, incTask) {
         /* Task format:
-            type:       pickup | withdraw | deposit | harvest | upgrade | repair | dismantle | attack | heal
-            subtype:    link | storage
-            priority:   1-20... need to make a list...
+            type:       combat | work | mine | carry | energy
+            subtype:    pickup | withdraw | deposit | harvest | upgrade | repair | dismantle | attack | defend | heal            
+            priority:   on a scale of 1-10; only competes with tasks of same type
+            structure:  link | storage
             resource:   energy | mineral
             id:         target gameobject id
+            pos:        room position
             timer:      run for x ticks
             goal:       e.g. hp goal for repairing, amount to deposit, etc.
             creeps:     maximum # of creeps to run this task
          */
+
+        var index = Object.keys(Memory['hive']['rooms'][rmName]['tasks']).length;
+        Memory['hive']['rooms'][rmName]['tasks'][index] = incTask;
     },
 
-    CompileTasks: function (rmName) {
-        utilTasks.CreateRoomMemory(rmName);
-        utilTasks.CompileTasks_Energy(rmName);
-        utilTasks.CompileTasks_Colony(rmName);
+    compileTasks: function (rmName) {
+        var uCo = require('util.colony');
+        var room = Game.rooms[rmName];
 
-        //TO-DO: Factor in worker tasks (build, repair, upgrade)  
-
-        // Then sort based on priority...
-    },
-
-
-    CompileTasks_Colony: function (rmName) {
-        if (Memory['hive']['rooms'][rmName]['links'] != null) {
-            var links = Memory['hive']['rooms'][rmName]['links'];
-            for (var l = 0; l < links.length; l++) {
-                var link = Game.getObjectById(links[l]['id']);
-                if (links[l]['role'] == 'send' && link != null && link.energy < link.energyCapacity * 0.9) {
-                    utilTasks.List_AddTask(rmName, 
-                    {   type: 'deposit',
-                        subtype: 'link',
-                        resource: 'energy',
-                        id: links[l]['id'],
-                        timer: 5,
-                        creeps: 1
-                     });
-                    return;
-                } else if (links[l]['role'] == 'receive' && link != null && link.energy > 0) {
-                    utilTasks.List_AddTask(rmName, 
-                    {   type: 'withdraw',
-                        subtype: 'link',
-                        resource: 'energy',
-                        id: links[l]['id'],
-                        timer: 5,
-                        creeps: 1 
+        /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
+        if (room.controller != null && room.controller.level > 0) {
+            if (room.controller.ticksToDowngrade < 3500) {
+                utilTasks.addTask(rmName, 
+                    {   type: 'work',
+                        subtype: 'upgrade',
+                        id: room.controller.id,
+                        pos: room.controller.pos,
+                        timer: 20,
+                        creeps: 15 
                     });
-                }
+            } else {
+                utilTasks.addTask(rmName, 
+                    {   type: 'work',
+                        subtype: 'upgrade',
+                        id: room.controller.id,
+                        pos: room.controller.pos,
+                        timer: 20,
+                        creeps: 15
+                    });
             }
         }
-    },
-
-
-    CompileTasks_Energy: function (rmName) {
-        var room = Game.rooms[rmName];
         
-        var piles = room.find(FIND_DROPPED_ENERGY);
-        for (var i = 0; i < piles.length; i++) {
-            utilTasks.List_AddTask(rmName, 
-                {   type: 'pickup',
-                    resource: piles[i].resourceType == 'energy' ? 'energy' : 'mineral',
-                    id: piles[i].id,
-                    timer: 5, 
-                    creeps: 1
+        var structures = uCo.findByNeed_RepairCritical(room);
+        for (var i = 0; i < structures.length; i++) {
+            utilTasks.addTask(rmName, 
+                {   type: 'work',
+                    subtype: 'repair',
+                    id: structures[i].id,
+                    pos: structures[i].pos,
+                    timer: 20,
+                    creep: 2
+                });                
+        }
+        
+        var structures = uCo.findByNeed_RepairMaintenance(room);
+        for (var i = 0; i < structures.length; i++) {
+            utilTasks.addTask(rmName, 
+                {   type: 'work',
+                    subtype: 'repair',
+                    id: structures[i].id,
+                    pos: structures[i].pos,
+                    timer: 20,
+                    creep: 2
                 });
         }
+        
+        structures = room.find(FIND_CONSTRUCTION_SITES);
+        for (var i = 0; i < structures.length; i++) {
+            utilTasks.addTask(rmName, 
+                {   type: 'work',
+                    subtype: 'build',
+                    id: structure.id,
+                    pos: structure.pos,
+                    timer: 30,
+                    creep: 3
+                });            
+        }
 
-        var storages = room.find(FIND_STRUCTURES, { filter: function (s) { 
-            return (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 0)
-                || (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0); }});
-        for (var i = 0; i < storages.length; i++) {
-            utilTasks.List_AddTask(rmName, 
-                {   type: 'withdraw',
-                    resource: 'energy',
-                    id: storages[i].id,
-                    timer: 5,
-                    goal: storages[i].store['energy']
+        /* Carrier-based tasks & energy supply for workers) */
+        var piles = room.find(FIND_DROPPED_ENERGY);
+        for (var i = 0; i < piles.length; i++) {
+            utilTasks.addTask(rmName, 
+                {   type: 'carry',
+                    subtype: 'pickup',
+                    resource: piles[i].resourceType == 'energy' ? 'energy' : 'mineral',
+                    id: piles[i].id,
+                    pos: piles[i].pos,
+                    timer: 5, 
+                    creeps: 1,
+                    priority: piles[i].resourceType == 'energy' ? 2 : 1,
                 });
-        } 
+        }
 
         var sources = room.find(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
         for (var i = 0; i < sources.length; i++) {
-            utilTasks.List_AddTask(rmName, 
-                {   type: 'harvest',
+            utilTasks.addTask(rmName, 
+                {   type: 'mine',
+                    subtype: 'harvest',
                     resource: 'energy',
                     id: sources[i].id,
+                    pos: sources[i].pos,
                     timer: 5,
-                    goal: sources[i].energy
+                    creeps: 2,
+                    priority: 1
                 });
         }
 
@@ -107,15 +115,120 @@ var utilTasks = {
             var look = minerals[i].pos.look();
             for (var l = 0; l < look.length; l++) {
                 if (look[l].structure != null && look[l].structure.structureType == 'extractor') {
-                    utilTasks.List_AddTask(rmName, 
-                        {   type: 'harvest',
+                    utilTasks.addTask(rmName, 
+                        {   type: 'mine',
+                            subtype: 'harvest',
                             resource: 'mineral',
                             id: minerals[i].id,
+                            pos: minerals[i].pos,
                             timer: 5,
-                            goal: minerals[i].mineralAmount
+                            creeps: 2,
+                            priority: 2
                         }); 
                 }
             }
+        }
+
+        var storages = room.find(FIND_STRUCTURES, { filter: function (s) { 
+            return (s.structureType == STRUCTURE_STORAGE)
+                || (s.structureType == STRUCTURE_CONTAINER); }});
+        for (var i = 0; i < storages.length; i++) {
+            if (storages[i].store[RESOURCE_ENERGY] > 0) {
+                utilTasks.addTask(rmName, 
+                    {   type: 'energy',
+                        subtype: 'withdraw',
+                        resource: 'energy',
+                        id: storages[i].id,
+                        pos: storages[i].pos,
+                        timer: 5,
+                        creeps: 8,
+                        priority: 3
+                    });
+            }
+            if (_.sum(storages[i].store) < storages[i].storeCapacity) {
+                utilTasks.addTask(rmName, 
+                    {   type: 'carry',
+                        subtype: 'deposit',
+                        resource: 'energy',
+                        id: storages[i].id,
+                        pos: storages[i].pos,
+                        timer: 5,
+                        creeps: 8
+                    });    
+            }
+        } 
+
+        if (Memory['hive']['rooms'][rmName]['links'] != null) {
+            var links = Memory['hive']['rooms'][rmName]['links'];
+            for (var l = 0; l < links.length; l++) {
+                var link = Game.getObjectById(links[l]['id']);
+                if (links[l]['role'] == 'send' && link != null && link.energy < link.energyCapacity * 0.9) {
+                    utilTasks.addTask(rmName, 
+                    {   type: 'carry',
+                        subtype: 'deposit',
+                        structure: 'link',
+                        resource: 'energy',
+                        id: links[l]['id'],
+                        pos: link.pos,
+                        timer: 5,
+                        creeps: 2,
+                        priority: 3
+                     });
+                } else if (links[l]['role'] == 'receive' && link != null && link.energy > 0) {
+                    utilTasks.addTask(rmName, 
+                    {   type: 'carry',
+                        subtype: 'withdraw',
+                        structure: 'link',
+                        resource: 'energy',
+                        id: links[l]['id'],
+                        pos: link.pos,
+                        timer: 5,
+                        creeps: 2,
+                        priority: 1
+                    });
+                }
+            }
+        }
+
+        var towers = room.find(FIND_MY_STRUCTURES, { filter: function (s) {
+            return s.structureType == STRUCTURE_TOWER; }});
+        for (var i = 0; i < towers.length; i++) {
+            if (towers[i].energy < towers[i].energyCapacity * 0.4) {
+                utilTasks.addTask(rmName, 
+                {   type: 'carry',
+                    subtype: 'deposit',
+                    id: towers[i].id,
+                    pos: towers[i].pos,
+                    timer: 10,
+                    creeps: 1,
+                    priority: 1 
+                });
+            } else {
+                utilTasks.addTask(rmName, 
+                {   type: 'carry',
+                    subtype: 'deposit',
+                    id: towers[i].id,
+                    pos: towers[i].pos,
+                    timer: 10,
+                    creeps: 1,
+                    priority: 5
+                });
+            }
+        }
+
+        var structures = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, { filter: function (s) {
+            return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
+                || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
+        for (var i = 0; i < structures.length; i++) {            
+                utilTasks.addTask(rmName, 
+                {   type: 'carry',
+                    subtype: 'deposit',
+                    id: structures[i].id,
+                    pos: structures[i].pos,
+                    timer: 10,
+                    creeps: 1,
+                    priority: 2 
+                });
         }
     }
 }

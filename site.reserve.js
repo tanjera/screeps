@@ -4,7 +4,7 @@ var utilHive = require('util.hive');
 
 var siteReserve = {
 
-    run: function(rmColony, rmHarvest, lvlMultiplier, popReserver) {
+    run: function(rmColony, rmHarvest, tgtLevel, popReserver) {
 
         var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 80));
         
@@ -14,7 +14,7 @@ var siteReserve = {
 
         // Defend the mining op!
         if (lReserver.length < popReserver) {
-            utilHive.requestSpawn(rmColony, 0, 2, lvlMultiplier, 'reserver', null, {role: 'reserver', room: rmHarvest});            
+            utilHive.requestSpawn(rmColony, 0, 2, tgtLevel, 'reserver', null, {role: 'reserver', room: rmHarvest});            
         }
 
         // Run roles!

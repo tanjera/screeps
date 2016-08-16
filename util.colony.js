@@ -46,25 +46,23 @@ var utilColony = {
 		},
 
     findByNeed_RepairCritical: function(room) {
-        var list = room.find(FIND_STRUCTURES, {
+        return room.find(FIND_STRUCTURES, {
                             filter: function(structure) {
                                 return (structure.structureType == STRUCTURE_RAMPART && structure.hits < utilColony.repairWalls_Critical(utilColony.getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_WALL && structure.hits < utilColony.repairWalls_Critical(utilColony.getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.2)
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.2);
-                            }}).sort(function(a, b) {return a.hits - b.hits});
-        return (list.length > 0) ? list[0] : null;
+                            }}).sort(function(a, b) {return a.hits - b.hits});    
     },
     
     findByNeed_RepairMaintenance: function(room) {
-        var list = room.find(FIND_STRUCTURES, {
+        return room.find(FIND_STRUCTURES, {
                             filter: function(structure) {
                                 return (structure.structureType == STRUCTURE_RAMPART && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_WALL && structure.hits < utilColony.repairWalls_Maintenance(utilColony.getRoom_Level(room)))
                                     || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.8)
                                     || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.8);
-                            }}).sort(function(a, b) {return a.hits - b.hits});
-        return (list.length > 0) ? list[0] : null;
+                            }}).sort(function(a, b) {return a.hits - b.hits});        
     },
 
     findByRange_RepairMaintenance: function(creep) {
