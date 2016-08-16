@@ -7,7 +7,7 @@ var utilHive = require('util.hive');
 var siteMining = {
 
     // Note: Miner = Burrower + Carrier
-    run: function(rmColony, rmHarvest, lvlMultiplier, popBurrower, popCarrier, popMiner, popMultirole, popReserver, popExtractor) {
+    run: function(rmColony, rmHarvest, tgtLevel, popBurrower, popCarrier, popMiner, popMultirole, popReserver, popExtractor) {
 
         var lBurrower  = _.filter(Game.creeps, (c) => c.memory.role == 'burrower' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         var lCarrier  = _.filter(Game.creeps, (c) => c.memory.role == 'carrier' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
@@ -33,29 +33,29 @@ var siteMining = {
             if (lMiner.length == 0) // Possibly colony wiped? Need restart?
                 utilHive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest});
             else {
-                utilHive.requestSpawn(rmColony, 2, 1, lvlMultiplier, 'worker', null, {role: 'miner', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'worker', null, {role: 'miner', room: rmHarvest});
             }    
         }
         else if (lBurrower.length < popBurrower) {
             if (lCarrier.length == 0 && popCarrier > 0 && lMiner.length == 0) // Possibly colony wiped? Need restart?
                 utilHive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest});
             else {
-                utilHive.requestSpawn(rmColony, 2, 1, lvlMultiplier, 'burrower', null, {role: 'burrower', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'burrower', null, {role: 'burrower', room: rmHarvest});
             }
         }
         else if (lCarrier.length < popCarrier) {
-            utilHive.requestSpawn(rmColony, 2, 1, lvlMultiplier, 'carrier', null, {role: 'carrier', room: rmHarvest});
+            utilHive.requestSpawn(rmColony, 2, 1, tgtLevel, 'carrier', null, {role: 'carrier', room: rmHarvest});
         }
         else if (lMultirole.length < popMultirole) {
-            utilHive.requestSpawn(rmColony, 2, 2, lvlMultiplier, 'multirole', null, {role: 'multirole', room: rmHarvest});
+            utilHive.requestSpawn(rmColony, 2, 2, tgtLevel, 'multirole', null, {role: 'multirole', room: rmHarvest});
         }
         else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null 
                 && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
-            utilHive.requestSpawn(rmColony, 0, 2, lvlMultiplier, 'reserver', null, {role: 'reserver', room: rmHarvest});            
+            utilHive.requestSpawn(rmColony, 0, 2, tgtLevel, 'reserver', null, {role: 'reserver', room: rmHarvest});            
         }
         else if (lExtractor.length < popExtractor && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game['rooms'][rmHarvest].find(FIND_MINERALS, {filter: function(m) { return m.mineralAmount > 0; }}).length > 0) {
-            utilHive.requestSpawn(rmColony, 2, 2, lvlMultiplier, 'worker', null, {role: 'extractor', room: rmHarvest});    
+            utilHive.requestSpawn(rmColony, 2, 2, tgtLevel, 'worker', null, {role: 'extractor', room: rmHarvest});    
         }
 
         // Run roles!

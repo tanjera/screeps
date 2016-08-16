@@ -1,3 +1,5 @@
+var utilTasks = require('util.tasks');
+
 var utilHive = {
 
     clearDeadMemory: function() {
@@ -9,7 +11,7 @@ var utilHive = {
         }
     },
 
-    prepareHiveMemory: function() {
+    initHiveMemory: function() {
         if (Memory['hive'] == null) { 
             Memory['hive'] = {}; 
         }
@@ -22,6 +24,9 @@ var utilHive = {
             var r = Object.keys(Game['rooms'])[k];
             if (Memory['hive']['rooms'][r] == null) {
                 Memory['hive']['rooms'][r] = {};
+            }
+            if (Memory['hive']['rooms'][r]['tasks'] == null) {
+                Memory['hive']['rooms'][r]['tasks'] = {};
             }
         }
 
@@ -36,6 +41,14 @@ var utilHive = {
     },
 
 
+    initTasks: function() {
+        // Only compiles tasks for rooms with access!!
+        for (var k = 0; k < Object.keys(Game['rooms']).length; k++) {
+            utilTasks.compileTasks(Object.keys(Game['rooms'])[k]);
+        }
+    },
+
+
     populationTally: function(rmName, popTarget, popActual) {
         // Tallies the target population for a colony, to be used for spawn load balancing
         if (Memory['hive']['population_balance'][rmName] == null) {
@@ -47,7 +60,7 @@ var utilHive = {
     },
 
 
-    requestSpawn: function(rmName, rmDistance, lvlPriority, lvlMultiplier, cBody, cName, cArgs) {
+    requestSpawn: function(rmName, rmDistance, lvlPriority, tgtLevel, cBody, cName, cArgs) {
         /*  lvlPriority is an integer rating priority, e.g.:
                 0: Defense (active, imminent danger)
                 1: Mining operations (critical)
@@ -56,12 +69,12 @@ var utilHive = {
                 4: Colony operation (regular)
                 5: ... ? scouting? passive defense?
                 
-            lvlMultiplier is a multiplier for what level to set the body at
+            tgtLevel is the target level of the creep's body (per util.creep)
             rmDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
 
         var i = Object.keys(Memory['hive']['spawn_requests']).length;
-        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, multiplier: lvlMultiplier, body: cBody, name: cName, args: cArgs};
+        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: rmDistance, priority: lvlPriority, level: tgtLevel, body: cBody, name: cName, args: cArgs};
 	},
 
 
@@ -84,7 +97,8 @@ var utilHive = {
                     var request = Memory['hive']['spawn_requests'][listRequests[r]];
                     
                     if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {
-                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * request.multiplier * utilHive.getRoom_Level(request.room)));
+                        var level = request.level > utilHive.getRoom_Level(request.room) ? utilHive.getRoom_Level(request.room) : request.level; 
+                        var body = utilCreep.getBody(request.body, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * level));
                         var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
 
                         if (_.isString(result)) {
