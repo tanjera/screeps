@@ -1,5 +1,5 @@
 var uCreep = require('util.creep');
-var uTask = require('util.tasks');
+var Tasks = require('tasks');
 
 var Roles = {
     Worker: function(creep) {
@@ -13,7 +13,7 @@ var Roles = {
                 return;
             }
             
-            uTask.assignTask(creep, true);        
+            Tasks.assignTask(creep, true);        
             if (uCreep.runTaskTimer(creep)) {
                 uCreep.runTask(creep);
             }
@@ -26,7 +26,7 @@ var Roles = {
                     return;
                 }
             
-            uTask.assignTask(creep, false);
+            Tasks.assignTask(creep, false);
             if (uCreep.runTaskTimer(creep)) {
                 uCreep.runTask(creep);
             }
@@ -45,7 +45,7 @@ var Roles = {
                 return;
             }
             
-            uTask.assignTask(creep, true);        
+            Tasks.assignTask(creep, true);        
             if (uCreep.runTaskTimer(creep)) {
                 uCreep.runTask(creep);
             }
@@ -59,7 +59,7 @@ var Roles = {
                 return;
             }
 
-            uTask.assignTask(creep, false);
+            Tasks.assignTask(creep, false);
             if (uCreep.runTaskTimer(creep)) {
                 uCreep.runTask(creep);
             }
@@ -78,7 +78,7 @@ var Roles = {
                     creep.memory.state = 'deliver';
                 }
 
-                uTask.assignTask(creep, true);
+                Tasks.assignTask(creep, true);
                 if (uCreep.runTaskTimer(creep)) {
                     uCreep.runTask(creep);
                 }
@@ -89,7 +89,7 @@ var Roles = {
                     creep.memory.state = 'get_minerals';
                 }
 
-                uTask.assignTask(creep, false);
+                Tasks.assignTask(creep, false);
                 if (uCreep.runTaskTimer(creep)) {
                     uCreep.runTask(creep);
                 }

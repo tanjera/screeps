@@ -24,11 +24,11 @@ var Sites = {
                         return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
             Hive.requestSpawn(rmColony, 0, 0, tgtLevel, 'soldier', null, {role: 'soldier', room: rmColony});
         } else if (lWorker.length < popWorker) {
-            Hive.requestSpawn(rmColony, 2, 3, tgtLevel, 'worker', null, {role: 'worker', room: rmColony});
+            Hive.requestSpawn(rmColony, 3, 3, tgtLevel, 'worker', null, {role: 'worker', room: rmColony});
         } else if (lRepairer.length < popRepairer) {
-            Hive.requestSpawn(rmColony, 2, 4, tgtLevel, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
+            Hive.requestSpawn(rmColony, 3, 4, tgtLevel, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
         } else if (lUpgrader.length < popUpgrader) {
-            Hive.requestSpawn(rmColony, 2, 4, tgtLevel, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
+            Hive.requestSpawn(rmColony, 3, 4, tgtLevel, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
         }
         
         

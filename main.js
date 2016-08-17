@@ -4,8 +4,6 @@ var Hive = require('hive');
 module.exports.loop = function () {
 
     /* TO DO:
-        * don't renew boosted creeps
-
         * task system:
             - add dismantle and combat tasks            
             - utilCreep: add resource types to things like 'withdraw'
@@ -38,7 +36,7 @@ module.exports.loop = function () {
             [{id: '57abd1d35c977d2d5fec0d0f', role: 'send'},            
              {id: '57abe33f4a8b4b5a2f1a2b85', role: 'receive'},
              {id: '57af99d528986c413c0a8f4c', role: 'receive'}]);
-    Sites.Colony('W15S43', 6, 5, 1, 1, 0);      // W15S43 colony #4
+    Sites.Colony('W15S43', 6, 3, 1, 1, 0);      // W15S43 colony #4
 
     Sites.Mining('W18S43', 'W18S43', 6, 1, 2, 0, 0, 0, 0);    // W18S43 colony #1 mining
     Sites.Mining('W19S42', 'W19S42', 6, 1, 2, 0, 0, 0, 0);    // W19S42 colony #2 mining

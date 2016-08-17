@@ -179,6 +179,15 @@ var utilCreep = {
         return creep.move(moveDir); 
     },
 
+    isBoosted: function(creep) {
+        for (var b in creep.body) {
+            if (creep.body[b].boost) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     getBody: function(type, level) {
         switch (type) {
             case 'soldier': return utilCreep.getBody_Soldier(level);

@@ -115,13 +115,16 @@ var Hive = {
 	},
 
     processSpawnRenewing: function() {
+        var uCreep = require('util.creep');
         var listSpawns = Object.keys(Game['spawns']).filter(function(a) { return Game['spawns'][a].spawning == null; });
         for (var s = 0; s < listSpawns.length; s++) {
             var spawn = Game['spawns'][listSpawns[s]];
             var creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
             for (var c = 0; c < creeps.length; c++) {
-                if (spawn.renewCreep(creeps[c]) == OK) {
-                    c = creeps.length;  // Break the inner for loop
+                if (!uCreep.isBoosted(creeps[c])) {
+                    if (spawn.renewCreep(creeps[c]) == OK) {
+                        c = creeps.length;  // Break the inner for loop
+                    }
                 }
             }
         }
