@@ -7,7 +7,7 @@ var utilHive = require('util.hive');
 var siteMining = {
 
     // Note: Miner = Burrower + Carrier
-    run: function(rmColony, rmHarvest, tgtLevel, popBurrower, popCarrier, popMiner, popMultirole, popReserver, popExtractor) {
+    run: function(rmColony, rmHarvest, tgtLevel, popBurrower, popCarrier, popMiner, popMultirole, popReserver, popExtractor, listRoute) {
 
         var lBurrower  = _.filter(Game.creeps, (c) => c.memory.role == 'burrower' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         var lCarrier  = _.filter(Game.creeps, (c) => c.memory.role == 'carrier' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
@@ -26,7 +26,7 @@ var siteMining = {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
-                utilHive.requestSpawn(rmColony, 0, 0, 1, 'soldier', null, {role: 'soldier', room: rmHarvest});
+                utilHive.requestSpawn(rmColony, 0, 0, tgtLevel, 'soldier', null, {role: 'soldier', room: rmHarvest});
             }
         }
         else if (lMiner.length < popMiner) {
@@ -63,24 +63,25 @@ var siteMining = {
             var creep = Game.creeps[n];
                 
             if (creep.memory.room != null && creep.memory.room == rmHarvest) {
+                creep.memory.listRoute = listRoute;
                 // If the room is safe to run mining operations... run roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         { filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
-                        rolesMining.Mining(creep, rmColony, rmHarvest);
+                        rolesMining.Mining(creep, rmColony, rmHarvest, listRoute);
                     } else if (creep.memory.role == 'multirole') {
-                        rolesWork.Worker(creep);
+                        rolesWork.Worker(creep, listRoute);
                     } else if (creep.memory.role == 'reserver') {
-                        rolesMining.Reserve(creep);
+                        rolesMining.Reserve(creep, listRoute);
                     } else if (creep.memory.role == 'extractor') {
-                        rolesMining.Extract(creep, rmColony, rmHarvest);
+                        rolesMining.Extract(creep, rmColony, rmHarvest, listRoute);
                     } 
                 }
             } else {
                 // If it's not safe... attack!
                 if (creep.memory.role == 'soldier' || creep.memory.role == 'multirole') {
-                    rolesCombat.Soldier(creep);
+                    rolesCombat.Soldier(creep, listRoute);
                 }
             }
         }

@@ -10,8 +10,7 @@ var utilCreep = {
             case 'burrower': return utilCreep.getBody_Burrower(level);
             case 'carrier': return utilCreep.getBody_Carrier(level);
             case 'reserver': return utilCreep.getBody_Reserver(level);
-        }
-    },
+        }},
 
     getBody_Soldier: function(level) {
         switch (level) {
@@ -57,8 +56,7 @@ var utilCreep = {
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
-        }
-    },
+        }},
 
     getBody_Archer: function(level) {
         switch (level) {
@@ -106,8 +104,7 @@ var utilCreep = {
                         MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
                         MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,  
                         MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
-        }
-    },
+        }},
     
     getBody_Healer: function(level) {
         switch (level) {
@@ -143,8 +140,7 @@ var utilCreep = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL]; 
-        }
-    },
+        }},
 
     getBody_Multirole: function(level) {
         switch (level) {
@@ -199,8 +195,7 @@ var utilCreep = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE,
                         ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
-        }
-    },
+        }},
 
     getBody_Worker: function(level) {
         switch (level) {
@@ -210,10 +205,10 @@ var utilCreep = {
                         CARRY, CARRY, 
                         MOVE, MOVE]; 
             case 2:
-                return [ // 450 energy, 1x WORK, 4x CARRY, 5x MOVE
-                        WORK,  
-                        CARRY, CARRY, CARRY,  
-                        MOVE, MOVE, MOVE, MOVE]; 
+                return [ // 450 energy, 2x WORK, 2x CARRY, 3x MOVE
+                        WORK, WORK,
+                        CARRY, CARRY,  
+                        MOVE, MOVE, MOVE]; 
             case 3:
                 return [ // 700 energy, 3x WORK, 4x CARRY, 4x MOVE
                         WORK, WORK, WORK,
@@ -250,11 +245,10 @@ var utilCreep = {
                         CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-        }
-    },
+        }},
     
     getBody_Burrower: function(level) {
-				switch (level) {
+        switch (level) {
             case 1:
                 return [ // 300 energy, 2x WORK, 2x MOVE
                         WORK, MOVE, WORK, MOVE]; 
@@ -293,8 +287,7 @@ var utilCreep = {
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-        }
-    },
+        }},
     
     getBody_Carrier: function(level) {
         switch (level) {
@@ -341,8 +334,7 @@ var utilCreep = {
                         CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-        }
-    },
+        }},
 
     getBody_Reserver: function(level) {
         switch (level) {
@@ -361,25 +353,7 @@ var utilCreep = {
                         CLAIM, CLAIM, MOVE, MOVE];
         }
     },
-
-    moveFrom: function(creep, target) {
-        var tgtDir = creep.pos.getDirectionTo(target);
-        var moveDir;
-        
-        switch (tgtDir) {
-            case TOP:           moveDir = BOTTOM;       break;
-            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;  break;
-            case RIGHT:         moveDir = LEFT;         break;
-            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;     break;
-            case BOTTOM:        moveDir = TOP;          break;
-            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;    break;
-            case LEFT:          moveDir = RIGHT;        break;
-            case TOP_LEFT:      moveDir = BOTTOM_RIGHT; break;
-        }
-
-        return creep.move(moveDir);
-    },
-
+    
     runTaskTimer: function(creep) {
         if (creep.memory.task == null) {
             return false;
@@ -393,11 +367,10 @@ var utilCreep = {
             }
         }
 
-        return true;
-    },
+        return true; },
 
     runTask: function(creep) {
-        var _ticksReusePath = 8;
+        var _ticksReusePath = 5;
         
         switch (creep.memory.task['subtype']) {
             case 'pickup':
@@ -491,12 +464,28 @@ var utilCreep = {
         }
     },
 
-    moveToRoom: function(creep, tgtRoom) {
+    moveToRoom: function(creep, tgtRoom, forwardRoute) {
         var _ticksReusePath = 10;
         
         if (creep.room.name == tgtRoom) {
             console.log('Error: trying to move creep ' + creep.name + ' to its own room... check logic!!!');
             return;
+        } 
+
+        if (creep.memory.listRoute != null) {
+            if (forwardRoute == true) {
+                for (var i = 1; i < creep.memory.listRoute.length; i++) {
+                    if (creep.room.name == creep.memory.listRoute[i - 1]) {
+                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]));
+                    }
+                }
+            } else if (forwardRoute == false) {
+                for (var i = listRoute.length - 1; i >= 0; i--) {
+                    if (creep.room.name == listRoute[i + 1]) {
+                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]));
+                    }
+                }
+            }
         } 
         
         if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route == ERR_NO_PATH 
@@ -520,8 +509,24 @@ var utilCreep = {
                 delete creep.memory.route;
                 delete creep.memory.exit;
             }
+        }},
+
+    moveFrom: function(creep, target) {
+        var tgtDir = creep.pos.getDirectionTo(target);
+        var moveDir;
+        
+        switch (tgtDir) {
+            case TOP:           moveDir = BOTTOM;       break;
+            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;  break;
+            case RIGHT:         moveDir = LEFT;         break;
+            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;     break;
+            case BOTTOM:        moveDir = TOP;          break;
+            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;    break;
+            case LEFT:          moveDir = RIGHT;        break;
+            case TOP_LEFT:      moveDir = BOTTOM_RIGHT; break;
         }
-    }
+
+        return creep.move(moveDir); },
 };
 
 module.exports = utilCreep;

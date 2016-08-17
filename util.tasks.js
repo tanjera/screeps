@@ -216,6 +216,7 @@ var utilTasks = {
                     subtype: 'deposit',
                     id: towers[i].id,
                     pos: towers[i].pos,
+                    structure: towers[i].structureType,
                     timer: 10,
                     creeps: 1,
                     priority: 1 
@@ -226,6 +227,7 @@ var utilTasks = {
                     subtype: 'deposit',
                     id: towers[i].id,
                     pos: towers[i].pos,
+                    structure: towers[i].structureType,
                     timer: 10,
                     creeps: 1,
                     priority: 5
@@ -240,8 +242,10 @@ var utilTasks = {
                 utilTasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'deposit',
+                    resource: 'energy',
                     id: structures[i].id,
                     pos: structures[i].pos,
+                    structure: structures[i].structureType,
                     timer: 10,
                     creeps: 1,
                     priority: 2 
@@ -336,7 +340,7 @@ var utilTasks = {
         if (isRefueling) {
             if (creep.room.name != creep.memory.room) {
                 var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.room);
+                uCreep.moveToRoom(creep, creep.memory.room, isRefueling);
                 return;
             } 
 
@@ -360,9 +364,10 @@ var utilTasks = {
                 }
             }
             else if (creep.memory.role == 'miner' || creep.memory.role == 'carrier') {
-                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return (t.subtype == 'pickup' && t.resource == 'energy') || (t.type == 'energy' && t.structure != 'link'); }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos); });
+                        function(t) { return creep.pos.getRangeTo(t.pos); }),
+                        'priority');
                 if (tasks.length > 0) {
                     utilTasks.giveTask(creep, tasks[0]);
                     return;
@@ -387,13 +392,14 @@ var utilTasks = {
         } else {
             if (creep.room.name != creep.memory.colony) {
                 var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.colony);
+                uCreep.moveToRoom(creep, creep.memory.colony, isRefueling);
                 return;
             }
 
-            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
-                    function (t) { return t.type == 'carry' && t.resource == 'energy'; }), 
-                    function(t) { return creep.pos.getRangeTo(t.pos); });
+            tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'carry' && t.subtype == 'deposit' && t.resource == 'energy'; }), 
+                    function(t) { return creep.pos.getRangeTo(t.pos); }),
+                    'priority');
             if (tasks.length > 0) {
                 utilTasks.giveTask(creep, tasks[0]);
                 return;
@@ -407,7 +413,7 @@ var utilTasks = {
         if (isRefueling) {
             if (creep.room.name != creep.memory.room) {
                 var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.room);
+                uCreep.moveToRoom(creep, creep.memory.room, isRefueling);
                 return;
             } 
 
@@ -422,7 +428,7 @@ var utilTasks = {
         } else {
             if (creep.room.name != creep.memory.colony) {
                 var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.colony);
+                uCreep.moveToRoom(creep, creep.memory.colony, isRefueling);
                 return;
             }
 

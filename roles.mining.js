@@ -3,7 +3,7 @@ var uTask = require('util.tasks');
 
 var RolesMining = {
 
-    Mining: function(creep, rmDeliver, rmHarvest) {
+    Mining: function(creep) {
         if (creep.memory.state == 'refueling') {
             if (_.sum(creep.carry) == creep.carryCapacity && creep.carryCapacity > 0) {
                 creep.memory.state = 'delivering';
@@ -37,7 +37,7 @@ var RolesMining = {
         }
     },
 
-    Extract: function(creep, rmDeliver, rmHarvest) {
+    Extract: function(creep) {
         switch (creep.memory.state) {
             default:
             case 'get_minerals':
@@ -64,9 +64,9 @@ var RolesMining = {
         }
     },
 
-    Reserve: function(creep, rmHarvest) {
+    Reserve: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCreep.moveToRoom(creep, creep.memory.room);
+            uCreep.moveToRoom(creep, creep.memory.room, true);
             return;
         }
         else {
