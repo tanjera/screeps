@@ -1,5 +1,180 @@
 var utilCreep = {
 
+    runTaskTimer: function(creep) {
+        if (creep.memory.task == null) {
+            return false;
+        } 
+        else if (creep.memory.task['timer'] != null) {
+            // Process the task timer
+            creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
+            if (creep.memory.task['timer'] <= 0) {
+                delete creep.memory.task;
+                return false;
+            }
+        }
+
+        return true; },
+
+    runTask: function(creep) {
+        var _ticksReusePath = 5;
+        
+        switch (creep.memory.task['subtype']) {
+            case 'pickup':
+                var obj = Game.getObjectById(creep.memory.task['id']);
+                if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
+                    delete creep.memory.task;
+                    return;
+                }
+
+            case 'withdraw':
+                var obj = Game.getObjectById(creep.memory.task['id']);
+                if (creep.withdraw(obj, 'energy') == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else {    // Action takes one tick... task complete... delete task...
+                    delete creep.memory.task;
+                    return;
+                }
+
+            case 'harvest':
+                var obj = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.harvest(obj); 
+                if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
+                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+
+            case 'upgrade':
+                var controller = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.upgradeController(controller); 
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(controller, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, controller.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+
+            case 'repair':
+                var structure = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.repair(structure); 
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                } else if (result != OK || structure.hits == structure.hitsMax) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+            
+            case 'build':
+                var structure = Game.getObjectById(creep.memory.task['id']);
+                var result = creep.build(structure);
+                if (result == ERR_NOT_IN_RANGE) {
+                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                } else if (result != OK) {
+                    delete creep.memory.task;
+                    return;
+                } else { return; }
+
+            case 'deposit':
+                // Make sure the target hasn't filled up...
+                var target = Game.getObjectById(creep.memory.task['id']);
+                if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
+                        || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
+                        || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
+                    var Task = require('tasks');
+                    Task.assignTask(creep, false);
+                }
+                // Cycle through all resources and deposit, starting with minerals                
+                for (var r = Object.keys(creep.carry).length; r > 0; r--) {
+                    var resourceType = Object.keys(creep.carry)[r - 1];
+                    if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                        return creep.moveTo(target, {reusePath: _ticksReusePath}) == ERR_NO_PATH
+                            ? creep.moveTo(new RoomPosition(25, 25, target.room.name)) : 1;
+                    } else {
+                        delete creep.memory.task;
+                        return;
+                    }
+                }
+
+        }
+    },
+
+    moveToRoom: function(creep, tgtRoom, forwardRoute) {
+        var _ticksReusePath = 10;
+        
+        if (creep.room.name == tgtRoom) {
+            console.log('Error: trying to move creep ' + creep.name + ' to its own room... check logic!!!');
+            return;
+        } 
+
+        if (creep.memory.listRoute != null) {
+            if (forwardRoute == true) {
+                for (var i = 1; i < creep.memory.listRoute.length; i++) {
+                    if (creep.room.name == creep.memory.listRoute[i - 1]) {
+                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: _ticksReusePath});
+                    }
+                }
+            } else if (forwardRoute == false) {
+                for (var i = listRoute.length - 1; i >= 0; i--) {
+                    if (creep.room.name == listRoute[i + 1]) {
+                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: _ticksReusePath});
+                    }
+                }
+            }
+        } 
+        
+        if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route == ERR_NO_PATH 
+                || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null
+                || creep.memory.exit.roomName != creep.room.name) {
+            
+            creep.memory.route = Game.map.findRoute(creep.room, tgtRoom);
+            
+            if (creep.memory.route == ERR_NO_PATH) {
+                delete creep.memory.route;
+                return;
+            }
+            
+            creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
+        }
+
+        if (creep.memory.exit) {
+            var r = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
+            
+            if (r == ERR_NO_PATH) {
+                delete creep.memory.route;
+                delete creep.memory.exit;
+            }
+        }},
+
+    moveFrom: function(creep, target) {
+        var tgtDir = creep.pos.getDirectionTo(target);
+        var moveDir;
+        
+        switch (tgtDir) {
+            case TOP:           moveDir = BOTTOM;       break;
+            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;  break;
+            case RIGHT:         moveDir = LEFT;         break;
+            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;     break;
+            case BOTTOM:        moveDir = TOP;          break;
+            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;    break;
+            case LEFT:          moveDir = RIGHT;        break;
+            case TOP_LEFT:      moveDir = BOTTOM_RIGHT; break;
+        }
+
+        return creep.move(moveDir); 
+    },
+
     getBody: function(type, level) {
         switch (type) {
             case 'soldier': return utilCreep.getBody_Soldier(level);
@@ -353,180 +528,7 @@ var utilCreep = {
                         CLAIM, CLAIM, MOVE, MOVE];
         }
     },
-    
-    runTaskTimer: function(creep) {
-        if (creep.memory.task == null) {
-            return false;
-        } 
-        else if (creep.memory.task['timer'] != null) {
-            // Process the task timer
-            creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
-            if (creep.memory.task['timer'] <= 0) {
-                delete creep.memory.task;
-                return false;
-            }
-        }
 
-        return true; },
-
-    runTask: function(creep) {
-        var _ticksReusePath = 5;
-        
-        switch (creep.memory.task['subtype']) {
-            case 'pickup':
-                var obj = Game.getObjectById(creep.memory.task['id']);
-                if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
-                } else {    // Action takes one tick... task complete... delete task...
-                    delete creep.memory.task;
-                    return;
-                }
-
-            case 'withdraw':
-                var obj = Game.getObjectById(creep.memory.task['id']);
-                if (creep.withdraw(obj, 'energy') == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
-                } else {    // Action takes one tick... task complete... delete task...
-                    delete creep.memory.task;
-                    return;
-                }
-
-            case 'harvest':
-                var obj = Game.getObjectById(creep.memory.task['id']);
-                var result = creep.harvest(obj); 
-                if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
-                    return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
-                } else if (result != OK) {
-                    delete creep.memory.task;
-                    return;
-                } else { return; }
-
-            case 'upgrade':
-                var controller = Game.getObjectById(creep.memory.task['id']);
-                var result = creep.upgradeController(controller); 
-                if (result == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(controller, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, controller.room.name)) : 1;
-                } else if (result != OK) {
-                    delete creep.memory.task;
-                    return;
-                } else { return; }
-
-            case 'repair':
-                var structure = Game.getObjectById(creep.memory.task['id']);
-                var result = creep.repair(structure); 
-                if (result == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
-                } else if (result != OK || structure.hits == structure.hitsMax) {
-                    delete creep.memory.task;
-                    return;
-                } else { return; }
-            
-            case 'build':
-                var structure = Game.getObjectById(creep.memory.task['id']);
-                var result = creep.build(structure);
-                if (result == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(structure, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
-                } else if (result != OK) {
-                    delete creep.memory.task;
-                    return;
-                } else { return; }
-
-            case 'deposit':
-                // Make sure the target hasn't filled up...
-                var target = Game.getObjectById(creep.memory.task['id']);
-                if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
-                        || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
-                    var uTask = require('util.tasks');
-                    uTask.assignTask(creep, false);
-                }
-                // Cycle through all resources and deposit, starting with minerals                
-                for (var r = Object.keys(creep.carry).length; r > 0; r--) {
-                    var resourceType = Object.keys(creep.carry)[r - 1];
-                    if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-                        return creep.moveTo(target, {reusePath: _ticksReusePath}) == ERR_NO_PATH
-                            ? creep.moveTo(new RoomPosition(25, 25, target.room.name)) : 1;
-                    } else {
-                        delete creep.memory.task;
-                        return;
-                    }
-                }
-
-        }
-    },
-
-    moveToRoom: function(creep, tgtRoom, forwardRoute) {
-        var _ticksReusePath = 10;
-        
-        if (creep.room.name == tgtRoom) {
-            console.log('Error: trying to move creep ' + creep.name + ' to its own room... check logic!!!');
-            return;
-        } 
-
-        if (creep.memory.listRoute != null) {
-            if (forwardRoute == true) {
-                for (var i = 1; i < creep.memory.listRoute.length; i++) {
-                    if (creep.room.name == creep.memory.listRoute[i - 1]) {
-                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]));
-                    }
-                }
-            } else if (forwardRoute == false) {
-                for (var i = listRoute.length - 1; i >= 0; i--) {
-                    if (creep.room.name == listRoute[i + 1]) {
-                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]));
-                    }
-                }
-            }
-        } 
-        
-        if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route == ERR_NO_PATH 
-                || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null
-                || creep.memory.exit.roomName != creep.room.name) {
-            
-            creep.memory.route = Game.map.findRoute(creep.room, tgtRoom);
-            
-            if (creep.memory.route == ERR_NO_PATH) {
-                delete creep.memory.route;
-                return;
-            }
-            
-            creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
-        }
-
-        if (creep.memory.exit) {
-            var r = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _ticksReusePath});
-            
-            if (r == ERR_NO_PATH) {
-                delete creep.memory.route;
-                delete creep.memory.exit;
-            }
-        }},
-
-    moveFrom: function(creep, target) {
-        var tgtDir = creep.pos.getDirectionTo(target);
-        var moveDir;
-        
-        switch (tgtDir) {
-            case TOP:           moveDir = BOTTOM;       break;
-            case TOP_RIGHT:     moveDir = BOTTOM_LEFT;  break;
-            case RIGHT:         moveDir = LEFT;         break;
-            case BOTTOM_RIGHT:  moveDir = TOP_LEFT;     break;
-            case BOTTOM:        moveDir = TOP;          break;
-            case BOTTOM_LEFT:   moveDir = TOP_RIGHT;    break;
-            case LEFT:          moveDir = RIGHT;        break;
-            case TOP_LEFT:      moveDir = BOTTOM_RIGHT; break;
-        }
-
-        return creep.move(moveDir); },
 };
 
 module.exports = utilCreep;

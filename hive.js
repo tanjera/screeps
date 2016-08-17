@@ -1,4 +1,4 @@
-var utilHive = {
+var Hive = {
 
     clearDeadMemory: function() {
         // Clear dead creeps from Memory
@@ -149,4 +149,4 @@ var utilHive = {
 		},
 };
 
-module.exports = utilHive;
+module.exports = Hive;

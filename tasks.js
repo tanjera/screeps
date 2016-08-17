@@ -1,4 +1,4 @@
-var utilTasks = {
+var Tasks = {
 
     addTask: function (rmName, incTask) {
         /* Task format:
@@ -16,7 +16,7 @@ var utilTasks = {
 
         var index = Object.keys(Memory['hive']['rooms'][rmName]['tasks']).length;
         Memory['hive']['rooms'][rmName]['tasks'][index] = incTask;
-    },
+        },
 
     compileTasks: function (rmName) {
         var uCo = require('util.colony');
@@ -48,7 +48,7 @@ var utilTasks = {
         }
         
         var structures = uCo.findByNeed_RepairCritical(room);
-        for (var i = 0; i < structures.length; i++) {
+        for (var i in structures) {
             utilTasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'repair',
@@ -61,7 +61,7 @@ var utilTasks = {
         }
         
         var structures = uCo.findByNeed_RepairMaintenance(room);
-        for (var i = 0; i < structures.length; i++) {
+        for (var i in structures) {
             utilTasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'repair',
@@ -74,7 +74,7 @@ var utilTasks = {
         }
         
         structures = room.find(FIND_CONSTRUCTION_SITES);
-        for (var i = 0; i < structures.length; i++) {
+        for (var i in structures) {
             utilTasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'build',
@@ -88,7 +88,7 @@ var utilTasks = {
 
         /* Carrier-based tasks & energy supply for workers) */
         var piles = room.find(FIND_DROPPED_ENERGY);
-        for (var i = 0; i < piles.length; i++) {
+        for (var i in piles) {
             utilTasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'pickup',
@@ -102,7 +102,7 @@ var utilTasks = {
         }
 
         var sources = room.find(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
-        for (var i = 0; i < sources.length; i++) {
+        for (var i in sources) {
             utilTasks.addTask(rmName, 
                 {   type: 'mine',
                     subtype: 'harvest',
@@ -116,7 +116,7 @@ var utilTasks = {
         }
 
         var minerals = room.find(FIND_MINERALS, { filter: function (m) { return m.mineralAmount > 0; }});
-        for (var i = 0; i < minerals.length; i++) {
+        for (var i in minerals) {
             var look = minerals[i].pos.look();
             for (var l = 0; l < look.length; l++) {
                 if (look[l].structure != null && look[l].structure.structureType == 'extractor') {
@@ -137,7 +137,7 @@ var utilTasks = {
         var storages = room.find(FIND_STRUCTURES, { filter: function (s) { 
             return (s.structureType == STRUCTURE_STORAGE)
                 || (s.structureType == STRUCTURE_CONTAINER); }});
-        for (var i = 0; i < storages.length; i++) {            
+        for (var i in storages) {            
             if (storages[i].store[RESOURCE_ENERGY] > 0) {
                 utilTasks.addTask(rmName, 
                     {   type: 'energy',
@@ -177,7 +177,7 @@ var utilTasks = {
 
         if (Memory['hive']['rooms'][rmName]['links'] != null) {
             var links = Memory['hive']['rooms'][rmName]['links'];
-            for (var l = 0; l < links.length; l++) {
+            for (var l in links) {
                 var link = Game.getObjectById(links[l]['id']);
                 if (links[l]['role'] == 'send' && link != null && link.energy < link.energyCapacity * 0.9) {
                     utilTasks.addTask(rmName, 
@@ -209,7 +209,7 @@ var utilTasks = {
 
         var towers = room.find(FIND_MY_STRUCTURES, { filter: function (s) {
             return s.structureType == STRUCTURE_TOWER; }});
-        for (var i = 0; i < towers.length; i++) {
+        for (var i in towers) {
             if (towers[i].energy < towers[i].energyCapacity * 0.4) {
                 utilTasks.addTask(rmName, 
                 {   type: 'carry',
@@ -238,7 +238,7 @@ var utilTasks = {
         var structures = room.find(FIND_MY_STRUCTURES, { filter: function (s) {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
-        for (var i = 0; i < structures.length; i++) {            
+        for (var i in structures) {            
                 utilTasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'deposit',
@@ -251,7 +251,25 @@ var utilTasks = {
                     priority: 2 
                 });
         }
-    },
+
+        /* Cycle through all creeps in the room- remove the task if it's already taken */
+            for (var t in Memory['hive']['rooms'][rmName]['tasks']) {
+                var task = Memory['hive']['rooms'][rmName]['tasks'][t];
+                for (var c in Game.creeps) {
+                    var creep = Game.creeps[c];
+
+                    if (creep.room.name == rmName && creep.memory.task != null
+                            && creep.memory.task.type == task.type && creep.memory.task.subtype == task.subtype
+                            && creep.memory.task.id == task.id && creep.memory.task.structure == task.structure
+                            && creep.memory.task.resource == task.resource) {
+                        task.creeps -= 1;                        
+                    }
+                    if (task.creeps <= 0) {
+                        delete Memory['hive']['rooms'][rmName]['tasks'][t];
+                    }
+                }
+            }        
+        },
 
     assignTask: function(creep, isRefueling) {
         if (creep.memory.task != null) {
@@ -277,7 +295,7 @@ var utilTasks = {
                 utilTasks.assignTask_Extract(creep, isRefueling);
                 return;
         }
-    },
+        },
 
     assignTask_Work: function(creep, isRefueling) {
         var tasks;
@@ -332,7 +350,7 @@ var utilTasks = {
                 return;
             }
         }
-    },
+        },
 
     assignTask_Mine: function(creep, isRefueling) {
         var tasks;
@@ -405,7 +423,7 @@ var utilTasks = {
                 return;
             }
         }
-    },
+        },
 
     assignTask_Extract: function(creep, isRefueling) {
         var tasks;
@@ -440,7 +458,7 @@ var utilTasks = {
                 return;
             }
         }
-    },
+        },
 
     giveTask (creep, task) {
         creep.memory.task = task;
@@ -450,7 +468,7 @@ var utilTasks = {
                 _.remove(Memory['hive']['rooms'][creep.room.name]['tasks'], function(t) { return t == task; });
             }
         }
-    }
+        }
 }
 
-module.exports = utilTasks;
+module.exports = Tasks;
