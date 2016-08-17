@@ -4,14 +4,10 @@ var Hive = require('hive');
 module.exports.loop = function () {
 
     /* TO DO:
-        * debug:
-            - pathfinding via listRoute (try forwards and backwards!!)
-
         * don't renew boosted creeps
 
         * task system:
-            - add dismantle and combat tasks
-            - cycle through all creeps, remove tasks from task list if already taken (immediately after compiling list!)            
+            - add dismantle and combat tasks            
             - utilCreep: add resource types to things like 'withdraw'
             - refactor 'reserver' to task system??
     */     
@@ -56,14 +52,15 @@ module.exports.loop = function () {
     
     Sites.Mining('W19S42', 'W18S42', 6, 1, 3, 0, 1, 1, 0);    // W18S42 mining operation (from Colony #2, W19S42)
     
-    Sites.Mining('W15S41', 'W15S42', 4, 1, 2, 0, 1, 1, 0);    // W15S42 mining operation (from Colony #3, W15S41)
+    Sites.Mining('W15S41', 'W15S42', 3, 1, 2, 0, 1, 1, 0);    // W15S42 mining operation (from Colony #3, W15S41)
     Sites.Mining('W15S41', 'W14S42', 5, 1, 2, 0, 1, 1, 0);    // W15S42 mining operation (from Colony #3, W15S41)
-    Sites.Mining('W15S41', 'W16S41', 4, 1, 2, 0, 1, 1, 0);    // W16S41 mining operation (from Colony #3, W15S41)
-    
+    Sites.Mining('W15S41', 'W16S41', 3, 1, 2, 0, 1, 1, 0);    // W16S41 mining operation (from Colony #3, W15S41)
+    Sites.Mining('W15S43', 'W16S42', 3, 1, 2, 0, 1, 1, 0,     // W16S42 mining operation (from Colony #4, W15S43)
+            ['W15S41', 'W16S41', 'W16S42']);
+
     Sites.Mining('W15S43', 'W16S43', 6, 1, 2, 0, 1, 1, 0);    // W14S43 mining operation (from Colony #4, W15S43)
     Sites.Mining('W15S43', 'W14S43', 6, 1, 2, 0, 1, 1, 0);    // W15S43 mining operation (from Colony #4, W15S43)
-    Sites.Mining('W15S43', 'W16S42', 5, 1, 2, 0, 1, 1, 0);    // W16S42 mining operation (from Colony #4, W15S43)
-    
+
     /* Reserve rooms for Atavus in W15S35 quad */
     Sites.Reservation('W15S41', 'W15S39', 6, 1);
     Sites.Reservation('W15S41', 'W13S39', 6, 1,

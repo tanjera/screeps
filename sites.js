@@ -144,8 +144,7 @@ var Sites = {
 
         // Run roles!
         for (var n in Game.creeps) {
-            var creep = Game.creeps[n];
-                
+            var creep = Game.creeps[n];                
             if (creep.memory.room != null && creep.memory.room == rmHarvest) {
                 creep.memory.listRoute = listRoute;
                 // If the room is safe to run mining operations... run roles. 
@@ -165,7 +164,7 @@ var Sites = {
             } else {
                 // If it's not safe... attack!
                 if (creep.memory.role == 'soldier' || creep.memory.role == 'multirole') {
-                    rolesCombat.Soldier(creep, listRoute);
+                    Roles.Soldier(creep, listRoute);
                 }
             }
         } },
@@ -188,7 +187,7 @@ var Sites = {
             if (creep.memory.room != null && creep.memory.room == rmHarvest) {
                 creep.memory.listRoute = listRoute;
                 if (creep.memory.role == 'reserver') {
-                    rolesMining.Reserve(creep);
+                    Roles.Reserver(creep);
                 }
             }            
         } }

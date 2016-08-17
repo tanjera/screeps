@@ -8,6 +8,8 @@ var utilCreep = {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
+                var Task = require('tasks');
+                Task.returnTask(creep, creep.memory.task);
                 delete creep.memory.task;
                 return false;
             }
@@ -123,12 +125,14 @@ var utilCreep = {
                 for (var i = 1; i < creep.memory.listRoute.length; i++) {
                     if (creep.room.name == creep.memory.listRoute[i - 1]) {
                         creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: _ticksReusePath});
+                        return;
                     }
                 }
-            } else if (forwardRoute == false) {
-                for (var i = listRoute.length - 1; i >= 0; i--) {
-                    if (creep.room.name == listRoute[i + 1]) {
+            } else if (forwardRoute == false) { 
+                for (var i = creep.memory.listRoute.length - 2; i >= 0; i--) {
+                    if (creep.room.name == creep.memory.listRoute[i + 1]) {
                         creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: _ticksReusePath});
+                        return;
                     }
                 }
             }
