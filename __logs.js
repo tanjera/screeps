@@ -1,4 +1,4 @@
-var utilLogs = {
+var __Logs = {
 
     Resources: function() {
 
@@ -40,4 +40,4 @@ var utilLogs = {
     }
 }
 
-module.exports = utilLogs;
+module.exports = __Logs;

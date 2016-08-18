@@ -1,4 +1,4 @@
-var Tasks = {
+var _Tasks = {
 
     addTask: function (rmName, incTask) {
         /* Task format:
@@ -19,7 +19,7 @@ var Tasks = {
         },
 
     compileTasks: function (rmName) {
-        var uCo = require('util.colony');
+        var __Colony = require('__colony');
         var room = Game.rooms[rmName];
 
         /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
@@ -47,7 +47,7 @@ var Tasks = {
             }
         }
         
-        var structures = uCo.findByNeed_RepairCritical(room);
+        var structures = __Colony.findByNeed_RepairCritical(room);
         for (var i in structures) {
             Tasks.addTask(rmName, 
                 {   type: 'work',
@@ -60,7 +60,7 @@ var Tasks = {
                 });                
         }
         
-        var structures = uCo.findByNeed_RepairMaintenance(room);
+        var structures = __Colony.findByNeed_RepairMaintenance(room);
         for (var i in structures) {
             Tasks.addTask(rmName, 
                 {   type: 'work',
@@ -360,8 +360,8 @@ var Tasks = {
 
         if (isRefueling) {
             if (creep.room.name != creep.memory.room) {
-                var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.room, isRefueling);
+                var __Creep = require('__creep');
+                __Creep.moveToRoom(creep, creep.memory.room, isRefueling);
                 return;
             } 
 
@@ -412,8 +412,8 @@ var Tasks = {
             }
         } else {
             if (creep.room.name != creep.memory.colony) {
-                var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.colony, isRefueling);
+                var __Creep = require('__creep');
+                __Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
                 return;
             }
 
@@ -433,8 +433,8 @@ var Tasks = {
 
         if (isRefueling) {
             if (creep.room.name != creep.memory.room) {
-                var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.room, isRefueling);
+                var __Creep = require('__creep');
+                __Creep.moveToRoom(creep, creep.memory.room, isRefueling);
                 return;
             } 
 
@@ -448,8 +448,8 @@ var Tasks = {
 
         } else {
             if (creep.room.name != creep.memory.colony) {
-                var uCreep = require('util.creep');
-                uCreep.moveToRoom(creep, creep.memory.colony, isRefueling);
+                var __Creep = require('__creep');
+                __Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
                 return;
             }
 
@@ -479,4 +479,4 @@ var Tasks = {
     }
 }
 
-module.exports = Tasks;
+module.exports = _Tasks;

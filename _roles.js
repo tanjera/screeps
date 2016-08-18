@@ -1,10 +1,10 @@
-var uCreep = require('util.creep');
-var Tasks = require('tasks');
+var __Creep = require('__creep');
+var _Tasks = require('_tasks');
 
-var Roles = {
+var _Roles = {
     Worker: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCreep.moveToRoom(creep, creep.memory.room);
+            __Creep.moveToRoom(creep, creep.memory.room);
         }
         else if (creep.memory.state == 'refueling') {
             if (_.sum(creep.carry) == creep.carryCapacity) {
@@ -13,9 +13,9 @@ var Roles = {
                 return;
             }
             
-            Tasks.assignTask(creep, true);        
-            if (uCreep.runTaskTimer(creep)) {
-                uCreep.runTask(creep);
+            _Tasks.assignTask(creep, true);        
+            if (__Creep.runTaskTimer(creep)) {
+                __Creep.runTask(creep);
             }
             return;
 
@@ -26,9 +26,9 @@ var Roles = {
                     return;
                 }
             
-            Tasks.assignTask(creep, false);
-            if (uCreep.runTaskTimer(creep)) {
-                uCreep.runTask(creep);
+            _Tasks.assignTask(creep, false);
+            if (__Creep.runTaskTimer(creep)) {
+                __Creep.runTask(creep);
             }
             return;
 
@@ -45,9 +45,9 @@ var Roles = {
                 return;
             }
             
-            Tasks.assignTask(creep, true);        
-            if (uCreep.runTaskTimer(creep)) {
-                uCreep.runTask(creep);
+            _Tasks.assignTask(creep, true);        
+            if (__Creep.runTaskTimer(creep)) {
+                __Creep.runTask(creep);
             }
             return;
 
@@ -59,9 +59,9 @@ var Roles = {
                 return;
             }
 
-            Tasks.assignTask(creep, false);
-            if (uCreep.runTaskTimer(creep)) {
-                uCreep.runTask(creep);
+            _Tasks.assignTask(creep, false);
+            if (__Creep.runTaskTimer(creep)) {
+                __Creep.runTask(creep);
             }
             return;
 
@@ -78,9 +78,9 @@ var Roles = {
                     creep.memory.state = 'deliver';
                 }
 
-                Tasks.assignTask(creep, true);
-                if (uCreep.runTaskTimer(creep)) {
-                    uCreep.runTask(creep);
+                _Tasks.assignTask(creep, true);
+                if (__Creep.runTaskTimer(creep)) {
+                    __Creep.runTask(creep);
                 }
             return;
 
@@ -89,16 +89,16 @@ var Roles = {
                     creep.memory.state = 'get_minerals';
                 }
 
-                Tasks.assignTask(creep, false);
-                if (uCreep.runTaskTimer(creep)) {
-                    uCreep.runTask(creep);
+                _Tasks.assignTask(creep, false);
+                if (__Creep.runTaskTimer(creep)) {
+                    __Creep.runTask(creep);
                 }
             return;
         } },
 
     Reserver: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCreep.moveToRoom(creep, creep.memory.room, true);
+            __Creep.moveToRoom(creep, creep.memory.room, true);
             return;
         }
         else {
@@ -111,7 +111,7 @@ var Roles = {
 
     Soldier: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCreep.moveToRoom(creep, creep.memory.room);
+            __Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             var targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
@@ -126,7 +126,7 @@ var Roles = {
 
     Archer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCreep.moveToRoom(creep, creep.memory.room);
+            __Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             var allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
@@ -142,14 +142,14 @@ var Roles = {
             } else if (nearTargets.length > 0) {
                 creep.rangedAttack(nearTargets[0]);
                 if (creep.pos.getRangeTo(nearTargets[0]) < 2) {
-                    uCreep.moveFrom(creep, nearTargets[0]);
+                    __Creep.moveFrom(creep, nearTargets[0]);
                 }
             }
         } },
 
     Healer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            uCreep.moveToRoom(creep, creep.memory.room);
+            __Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             var wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { 
@@ -162,4 +162,4 @@ var Roles = {
         } }
 };
 
-module.exports = Roles;
+module.exports = _Roles;

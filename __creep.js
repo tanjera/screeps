@@ -1,4 +1,4 @@
-var utilCreep = {
+var __Creep = {
 
     runTaskTimer: function(creep) {
         if (creep.memory.task == null) {
@@ -190,14 +190,14 @@ var utilCreep = {
 
     getBody: function(type, level) {
         switch (type) {
-            case 'soldier': return utilCreep.getBody_Soldier(level);
-            case 'archer': return utilCreep.getBody_Archer(level);
-            case 'healer': return utilCreep.getBody_Healer(level);
-            case 'multirole': return utilCreep.getBody_Multirole(level); 
-            case 'worker': return utilCreep.getBody_Worker(level);
-            case 'burrower': return utilCreep.getBody_Burrower(level);
-            case 'carrier': return utilCreep.getBody_Carrier(level);
-            case 'reserver': return utilCreep.getBody_Reserver(level);
+            case 'soldier': return __Creep.getBody_Soldier(level);
+            case 'archer': return __Creep.getBody_Archer(level);
+            case 'healer': return __Creep.getBody_Healer(level);
+            case 'multirole': return __Creep.getBody_Multirole(level); 
+            case 'worker': return __Creep.getBody_Worker(level);
+            case 'burrower': return __Creep.getBody_Burrower(level);
+            case 'carrier': return __Creep.getBody_Carrier(level);
+            case 'reserver': return __Creep.getBody_Reserver(level);
         }},
 
     getBody_Soldier: function(level) {
@@ -544,4 +544,4 @@ var utilCreep = {
 
 };
 
-module.exports = utilCreep;
+module.exports = __Creep;
