@@ -25,7 +25,7 @@ var _Tasks = {
         /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
         if (room.controller != null && room.controller.level > 0) {
             if (room.controller.ticksToDowngrade < 3500) {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                     {   type: 'work',
                         subtype: 'upgrade',
                         id: room.controller.id,
@@ -35,7 +35,7 @@ var _Tasks = {
                         priority: 1
                     });
             } else {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                     {   type: 'work',
                         subtype: 'upgrade',
                         id: room.controller.id,
@@ -49,7 +49,7 @@ var _Tasks = {
         
         var structures = __Colony.findByNeed_RepairCritical(room);
         for (var i in structures) {
-            Tasks.addTask(rmName, 
+            _Tasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'repair',
                     id: structures[i].id,
@@ -62,7 +62,7 @@ var _Tasks = {
         
         var structures = __Colony.findByNeed_RepairMaintenance(room);
         for (var i in structures) {
-            Tasks.addTask(rmName, 
+            _Tasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'repair',
                     id: structures[i].id,
@@ -75,7 +75,7 @@ var _Tasks = {
         
         structures = room.find(FIND_CONSTRUCTION_SITES);
         for (var i in structures) {
-            Tasks.addTask(rmName, 
+            _Tasks.addTask(rmName, 
                 {   type: 'work',
                     subtype: 'build',
                     id: structures[i].id,
@@ -89,7 +89,7 @@ var _Tasks = {
         /* Carrier-based tasks & energy supply for workers) */
         var piles = room.find(FIND_DROPPED_ENERGY);
         for (var i in piles) {
-            Tasks.addTask(rmName, 
+            _Tasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'pickup',
                     resource: piles[i].resourceType == 'energy' ? 'energy' : 'mineral',
@@ -103,7 +103,7 @@ var _Tasks = {
 
         var sources = room.find(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
         for (var i in sources) {
-            Tasks.addTask(rmName, 
+            _Tasks.addTask(rmName, 
                 {   type: 'mine',
                     subtype: 'harvest',
                     resource: 'energy',
@@ -120,7 +120,7 @@ var _Tasks = {
             var look = minerals[i].pos.look();
             for (var l = 0; l < look.length; l++) {
                 if (look[l].structure != null && look[l].structure.structureType == 'extractor') {
-                    Tasks.addTask(rmName, 
+                    _Tasks.addTask(rmName, 
                         {   type: 'mine',
                             subtype: 'harvest',
                             resource: 'mineral',
@@ -139,7 +139,7 @@ var _Tasks = {
                 || (s.structureType == STRUCTURE_CONTAINER); }});
         for (var i in storages) {            
             if (storages[i].store[RESOURCE_ENERGY] > 0) {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                     {   type: 'energy',
                         subtype: 'withdraw',
                         structure: storages[i].structureType,
@@ -152,7 +152,7 @@ var _Tasks = {
                     });
             }
             if (_.sum(storages[i].store) < storages[i].storeCapacity) {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                     {   type: 'carry',
                         subtype: 'deposit',
                         structure: storages[i].structureType,
@@ -162,7 +162,7 @@ var _Tasks = {
                         timer: 20,
                         creeps: 8
                     });
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                     {   type: 'carry',
                         subtype: 'deposit',
                         structure: storages[i].structureType,
@@ -180,7 +180,7 @@ var _Tasks = {
             for (var l in links) {
                 var link = Game.getObjectById(links[l]['id']);
                 if (links[l]['role'] == 'send' && link != null && link.energy < link.energyCapacity * 0.9) {
-                    Tasks.addTask(rmName, 
+                    _Tasks.addTask(rmName, 
                     {   type: 'carry',
                         subtype: 'deposit',
                         structure: 'link',
@@ -192,7 +192,7 @@ var _Tasks = {
                         priority: 3
                      });
                 } else if (links[l]['role'] == 'receive' && link != null && link.energy > 0) {
-                    Tasks.addTask(rmName, 
+                    _Tasks.addTask(rmName, 
                     {   type: 'energy',
                         subtype: 'withdraw',
                         structure: 'link',
@@ -211,7 +211,7 @@ var _Tasks = {
             return s.structureType == STRUCTURE_TOWER; }});
         for (var i in towers) {
             if (towers[i].energy < towers[i].energyCapacity * 0.4) {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'deposit',                    
                     resource: 'energy',
@@ -223,7 +223,7 @@ var _Tasks = {
                     priority: 1 
                 });
             } else if (towers[i].energy < towers[i].energyCapacity) {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'deposit',
                     resource: 'energy',
@@ -241,7 +241,7 @@ var _Tasks = {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
         for (var i in structures) {
-                Tasks.addTask(rmName, 
+                _Tasks.addTask(rmName, 
                 {   type: 'carry',
                     subtype: 'deposit',
                     resource: 'energy',
@@ -285,17 +285,17 @@ var _Tasks = {
 
             case 'multirole':
             case 'worker': 
-                Tasks.assignTask_Work(creep, isRefueling);
+                _Tasks.assignTask_Work(creep, isRefueling);
                 return;
 
             case 'miner':
             case 'burrower':
             case 'carrier':                
-                Tasks.assignTask_Mine(creep, isRefueling);
+                _Tasks.assignTask_Mine(creep, isRefueling);
                 return;
 
             case 'extractor':
-                Tasks.assignTask_Extract(creep, isRefueling);
+                _Tasks.assignTask_Extract(creep, isRefueling);
                 return;
         }
         },
@@ -309,7 +309,7 @@ var _Tasks = {
                     function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
                     'priority');
             if (tasks.length > 0) {
-                Tasks.giveTask(creep, tasks[0]);
+                _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
             
@@ -318,7 +318,7 @@ var _Tasks = {
                         function (t) { return t.subtype == 'pickup' && t.resource == 'energy'; }), 
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                 if (tasks.length > 0) {
-                    Tasks.giveTask(creep, tasks[0]);
+                    _Tasks.giveTask(creep, tasks[0]);
                     return;
                 }
 
@@ -326,7 +326,7 @@ var _Tasks = {
                         function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                 if (tasks.length > 0) {
-                    Tasks.giveTask(creep, tasks[0]);
+                    _Tasks.giveTask(creep, tasks[0]);
                     return;
                 }
             }
@@ -349,7 +349,7 @@ var _Tasks = {
             }
 
             if (tasks.length > 0) {
-                Tasks.giveTask(creep, tasks[0]);        
+                _Tasks.giveTask(creep, tasks[0]);        
                 return;
             }
         }
@@ -370,7 +370,7 @@ var _Tasks = {
                         function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                 if (tasks.length > 0) {
-                    Tasks.giveTask(creep, tasks[0]);
+                    _Tasks.giveTask(creep, tasks[0]);
                     return;
                 } else {    // All sources are empty? Move to the one renewing next!
                     var sources = creep.room.find(FIND_SOURCES).sort(function(a, b) { return a.ticksToRegeneration - b.ticksToRegeneration; });
@@ -390,7 +390,7 @@ var _Tasks = {
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         'priority');
                 if (tasks.length > 0) {
-                    Tasks.giveTask(creep, tasks[0]);
+                    _Tasks.giveTask(creep, tasks[0]);
                     return;
                 }
 
@@ -399,7 +399,7 @@ var _Tasks = {
                         function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                     if (tasks.length > 0) {
-                        Tasks.giveTask(creep, tasks[0]);
+                        _Tasks.giveTask(creep, tasks[0]);
                         return;
                     }
                 }
@@ -422,7 +422,7 @@ var _Tasks = {
                     function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     'priority');
             if (tasks.length > 0) {
-                Tasks.giveTask(creep, tasks[0]);
+                _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
         }
@@ -442,7 +442,7 @@ var _Tasks = {
                 function (t) { return t.type == 'mine' && t.resource == 'mineral'; }), 
                 function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
-                Tasks.giveTask(creep, tasks[0]);
+                _Tasks.giveTask(creep, tasks[0]);
                 return;
             }            
 
@@ -457,7 +457,7 @@ var _Tasks = {
                     function (t) { return t.type == 'carry' && t.resource == 'mineral'; }), 
                     function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
-                Tasks.giveTask(creep, tasks[0]);
+                _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
         }
@@ -475,7 +475,7 @@ var _Tasks = {
 
     returnTask (creep, task) {
         task.creeps = 1;
-        Tasks.addTask(creep.room.name, task);
+        _Tasks.addTask(creep.room.name, task);
     }
 }
 

@@ -5,8 +5,8 @@ var _Hive = require('_hive');
 var _Sites = {
     Colony: function(rmColony, spawnDistance, tgtLevel, popWorker, popRepairer, popUpgrader, popSoldier, listLinks) {
     
-        if (Memory['_Hive']['rooms'][rmColony] == null) {
-            Memory['_Hive']['rooms'][rmColony] = {};
+        if (Memory['hive']['rooms'][rmColony] == null) {
+            Memory['hive']['rooms'][rmColony] = {};
         }
          
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
@@ -20,7 +20,7 @@ var _Sites = {
 
         if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return Object.keys(Memory['_Hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
+                        return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
             _Hive.requestSpawn(rmColony, 0, 0, tgtLevel, 'soldier', null, {role: 'soldier', room: rmColony});
         } else if (lWorker.length < popWorker) {
             _Hive.requestSpawn(rmColony, spawnDistance, 3, tgtLevel, 'worker', null, {role: 'worker', room: rmColony});
@@ -50,7 +50,7 @@ var _Sites = {
             var tower = listTowers[t];
             
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
-                        return Object.keys(Memory['_Hive']['allies']).indexOf(c.owner.username) < 0; }});
+                        return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }});
             if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;
@@ -73,7 +73,7 @@ var _Sites = {
 
         // Process links via listLinks parameter (an array of [id: '', role: 'send/receive'])
         if (listLinks != null) {
-            Memory['_Hive']['rooms'][rmColony]['links'] = listLinks;
+            Memory['hive']['rooms'][rmColony]['links'] = listLinks;
 
             var linksSend = _.filter(listLinks, (obj) => { return obj.id && obj['role'] == 'send'; });
             var linksReceive = _.filter(listLinks, (obj) => { return obj.id && obj['role'] == 'receive'; });
@@ -105,10 +105,10 @@ var _Sites = {
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return Object.keys(Memory['_Hive']['allies']).indexOf(c.owner.username) < 0; }}).length > 0) {
+                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length > 0) {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return Object.keys(Memory['_Hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
+                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
                 _Hive.requestSpawn(rmColony, 0, 0, tgtLevel, 'soldier', null, {role: 'soldier', room: rmHarvest});
             }
         }
@@ -149,7 +149,7 @@ var _Sites = {
                 // If the room is safe to run mining operations... run _Roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return Object.keys(Memory['_Hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
+                        { filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                         _Roles.Mining(creep, rmColony, rmHarvest, listRoute);
                     } else if (creep.memory.role == 'multirole') {

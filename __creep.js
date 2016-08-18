@@ -8,8 +8,8 @@ var __Creep = {
             // Process the task timer
             creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
             if (creep.memory.task['timer'] <= 0) {
-                var Task = require('tasks');
-                Task.returnTask(creep, creep.memory.task);
+                var _Tasks = require('_tasks');
+                _Tasks.returnTask(creep, creep.memory.task);
                 delete creep.memory.task;
                 return false;
             }
@@ -94,8 +94,8 @@ var __Creep = {
                         || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
                         || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
-                    var Task = require('tasks');
-                    Task.assignTask(creep, false);
+                    var _Tasks = require('_tasks');
+                    _Tasks.assignTask(creep, false);
                 }
                 // Cycle through all resources and deposit, starting with minerals                
                 for (var r = Object.keys(creep.carry).length; r > 0; r--) {
