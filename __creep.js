@@ -197,6 +197,7 @@ var __Creep = {
             case 'worker': return __Creep.getBody_Worker(level);
             case 'burrower': return __Creep.getBody_Burrower(level);
             case 'carrier': return __Creep.getBody_Carrier(level);
+            case 'carrier_at': return __Creep.getBody_Carrier_AT(level);
             case 'reserver': return __Creep.getBody_Reserver(level);
         }},
 
@@ -507,13 +508,6 @@ var __Creep = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE];
             case 7:
-                return [ // 2500 energy, 33x CARRY, 17x MOVE
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                        CARRY, CARRY, CARRY,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 8:
                 return [ // 2500 energy, 33x CARRY, 17x MOVE
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -522,6 +516,45 @@ var __Creep = {
                         CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        }},
+
+    getBody_Carrier_AT: function(level) {
+        switch (level) {
+            case 1:
+            		return [ // 300 energy, 3x CARRY, 3x MOVE
+                        CARRY, MOVE, CARRY, MOVE, CARRY, MOVE]; 
+            case 2:
+                return [ // 400 energy, 4x CARRY, 4x MOVE
+                        CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE]; 
+            case 3:
+                return [ // 600 energy, 6x CARRY, 6x MOVE
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,  
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 4:
+                return [ // 1000 energy, 10x CARRY, 10x MOVE
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,                        
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 5:
+                return [ // 1400 energy, 14x CARRY, 14x MOVE
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE];
+            case 6:
+                return [ // 1800 energy, 18x CARRY, 18 MOVE
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 7:                
+            case 8:
+                return [ // 2500 energy, 25x CARRY, 25x MOVE
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        CARRY, CARRY, CARRY, CARRY, CARRY,                         
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE];
         }},
 
     getBody_Reserver: function(level) {

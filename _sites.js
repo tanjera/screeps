@@ -3,8 +3,7 @@ var _Roles = require('_roles');
 var _Hive = require('_hive');
 
 var _Sites = {
-    Colony: function(rmColony, spawnDistance, tgtLevel, popWorker, popRepairer, popUpgrader, popSoldier, listLinks) {
-    
+    Colony: function(rmColony, spawnDistance, listPopulation, listLinks) {
         if (Memory['hive']['rooms'][rmColony] == null) {
             Memory['hive']['rooms'][rmColony] = {};
         }
@@ -14,22 +13,29 @@ var _Sites = {
         var lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == 'upgrader' && creep.memory.room == rmColony);
         var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmColony);
 
-        var popTarget = popWorker + popRepairer + popUpgrader + popSoldier;
+        var popTarget = 
+            (listPopulation['worker'] == null ? 0 : listPopulation['worker']['amount'])
+            + (listPopulation['repairer'] == null ? 0 : listPopulation['repairer']['amount'])
+            + (listPopulation['upgrader'] == null ? 0 : listPopulation['upgrader']['amount'])
+            + (listPopulation['soldier'] == null ? 0 : listPopulation['soldier']['amount']);        
         var popActual = lWorker.length + lRepairer.length + lUpgrader.length + lSoldier.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
-        if (lSoldier.length < popSoldier // If there's a hostile creep in the room... requestSpawn a defender!
+        if ((listPopulation['soldier'] != null && lSoldier.length < listPopulation['soldier']['amount']) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
-            _Hive.requestSpawn(rmColony, 0, 0, tgtLevel, 'soldier', null, {role: 'soldier', room: rmColony});
-        } else if (lWorker.length < popWorker) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 3, tgtLevel, 'worker', null, {role: 'worker', room: rmColony});
-        } else if (lRepairer.length < popRepairer) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 4, tgtLevel, 'worker', null, {role: 'worker', subrole: 'repairer', room: rmColony});
-        } else if (lUpgrader.length < popUpgrader) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 4, tgtLevel, 'worker', null, {role: 'worker', subrole: 'upgrader', room: rmColony});
-        }
-        
+            _Hive.requestSpawn(rmColony, 0, 0, listPopulation['soldier']['level'], 'soldier', 
+                null, {role: 'soldier', room: rmColony});
+        } else if (listPopulation['worker'] != null && lWorker.length < listPopulation['worker']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 3, listPopulation['worker']['level'], 'worker', 
+                null, {role: 'worker', room: rmColony});
+        } else if (listPopulation['repairer'] != null && lRepairer.length < listPopulation['repairer']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation['repairer']['level'], 'worker', 
+                null, {role: 'worker', subrole: 'repairer', room: rmColony});
+        } else if (listPopulation['upgrader'] != null && lUpgrader.length < listPopulation['upgrader']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation['upgrader']['level'], 'worker', 
+                null, {role: 'worker', subrole: 'upgrader', room: rmColony});
+        }        
         
         // Run _Roles!
         for (var n in Game.creeps) {
@@ -90,7 +96,7 @@ var _Sites = {
         } },
 
 
-    Mining: function(rmColony, rmHarvest, spawnDistance, tgtLevel, popBurrower, popCarrier, popMiner, popMultirole, popReserver, popExtractor, listRoute) {
+    Mining: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
 
         var lBurrower  = _.filter(Game.creeps, (c) => c.memory.role == 'burrower' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         var lCarrier  = _.filter(Game.creeps, (c) => c.memory.role == 'carrier' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
@@ -99,7 +105,13 @@ var _Sites = {
         var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest);
         var lExtractor  = _.filter(Game.creeps, (c) => c.memory.role == 'extractor' && c.memory.room == rmHarvest);
 
-        var popTarget = popBurrower + popCarrier + popMiner + popMultirole + popReserver + popExtractor;
+        var popTarget =(
+            listPopulation['burrower'] == null ? 0 : listPopulation['burrower']['amount'])
+            + (listPopulation['carrier'] == null ? 0 : listPopulation['carrier']['amount'])
+            + (listPopulation['miner'] == null ? 0 : listPopulation['miner']['amount'])
+            + (listPopulation['multirole'] == null ? 0 : listPopulation['multirole']['amount']
+            + (listPopulation['reserver'] == null ? 0 : listPopulation['reserver']['amount'])
+            + (listPopulation['extractor'] == null ? 0 : listPopulation['extractor']['amount']));         
         var popActual = lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
@@ -109,36 +121,49 @@ var _Sites = {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
-                _Hive.requestSpawn(rmColony, 0, 0, tgtLevel, 'soldier', null, {role: 'soldier', room: rmHarvest});
+                _Hive.requestSpawn(rmColony, 0, 0, 8, 'soldier', null, {role: 'soldier', room: rmHarvest});
             }
         }
-        else if (lMiner.length < popMiner) {
+        else if (listPopulation['miner'] != null && lMiner.length < listPopulation['miner']['amount']) {
             if (lMiner.length == 0) // Possibly colony wiped? Need restart?
                 _Hive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
             else {
-                _Hive.requestSpawn(rmColony, spawnDistance, 1, tgtLevel, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
+                _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['miner']['level'], 'worker', 
+                    null, {role: 'miner', room: rmHarvest, colony: rmColony});
             }    
         }
-        else if (lBurrower.length < popBurrower) {
+        else if (listPopulation['burrower'] != null && lBurrower.length < listPopulation['burrower']['amount']) {
             if (lCarrier.length == 0 && popCarrier > 0 && lMiner.length == 0) // Possibly colony wiped? Need restart?
                 _Hive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
             else {
-                _Hive.requestSpawn(rmColony, spawnDistance, 1, tgtLevel, 'burrower', null, {role: 'burrower', room: rmHarvest, colony: rmColony});
+                _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['burrower']['level'], 'burrower', 
+                    null, {role: 'burrower', room: rmHarvest, colony: rmColony});
             }
         }
-        else if (lCarrier.length < popCarrier) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 1, tgtLevel, 'carrier', null, {role: 'carrier', room: rmHarvest, colony: rmColony});
+        else if (listPopulation['carrier'] != null && lCarrier.length < listPopulation['carrier']['amount']) {
+            if (listPopulation['carrier']['body'] == null) {
+                _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['carrier']['level'], 'carrier', 
+                    null, {role: 'carrier', room: rmHarvest, colony: rmColony});
+            } else if (listPopulation['carrier']['body'] == 'all-terrain') {
+                _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['carrier']['level'], 'carrier_at', 
+                    null, {role: 'carrier', room: rmHarvest, colony: rmColony});
+            }
         }
-        else if (lMultirole.length < popMultirole) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 2, tgtLevel, 'multirole', null, {role: 'multirole', room: rmHarvest, colony: rmColony});
+        else if (listPopulation['multirole'] != null && lMultirole.length < listPopulation['multirole']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation['multirole']['level'], 'multirole', 
+                null, {role: 'multirole', room: rmHarvest, colony: rmColony});
         }
-        else if (lReserver.length < popReserver && Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
-                && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
-            _Hive.requestSpawn(rmColony, 0, 2, tgtLevel, 'reserver', null, {role: 'reserver', room: rmHarvest, colony: rmColony});            
+        else if (listPopulation['reserver'] != null && lReserver.length < listPopulation['reserver']['amount'] 
+                    && Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
+                    && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
+            _Hive.requestSpawn(rmColony, 0, 2, listPopulation['reserver']['level'], 'reserver', 
+                null, {role: 'reserver', room: rmHarvest, colony: rmColony});            
         }
-        else if (lExtractor.length < popExtractor && Object.keys(Game.rooms).includes(rmHarvest)
+        else if (listPopulation['extractor'] != null && lExtractor.length < listPopulation['extractor']['amount'] 
+                    && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game['rooms'][rmHarvest].find(FIND_MINERALS, {filter: function(m) { return m.mineralAmount > 0; }}).length > 0) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 2, tgtLevel, 'worker', null, {role: 'extractor', room: rmHarvest, colony: rmColony});    
+            _Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation['extractor']['level'], 'worker', 
+                null, {role: 'extractor', room: rmHarvest, colony: rmColony});    
         }
 
         // Run _Roles!
@@ -169,16 +194,17 @@ var _Sites = {
         } },
 
 
-    Reservation: function(rmColony, rmHarvest, spawnDistance, tgtLevel, popReserver, listRoute) {
+    Reservation: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
 
         var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 80));
         
-        var popTarget = popReserver;
+        var popTarget = (listPopulation['reserver'] == null ? 0 : listPopulation['reserver']['amount']);
         var popActual = lReserver.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
-        if (lReserver.length < popReserver) {
-            _Hive.requestSpawn(rmColony, spawnDistance, 1, tgtLevel, 'reserver', null, {role: 'reserver', room: rmHarvest});            
+        if (listPopulation['reserver'] != null && lReserver.length < listPopulation['reserver']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['reserver']['level'], 'reserver', 
+                null, {role: 'reserver', room: rmHarvest});            
         }
 
         for (var n in Game.creeps) {
