@@ -127,7 +127,7 @@ module.exports.loop = function () {
               reserver:  {level: 6, amount: 1} } );
     _Sites.Mining('W15S43', 'W15S45', 0,
             { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 4},
+              carrier:   {level: 6, amount: 4, body: 'all-terrain'},
               multirole: {level: 6, amount: 1} } );
     
 
