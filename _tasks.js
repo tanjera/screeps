@@ -18,6 +18,28 @@ var _Tasks = {
         Memory['hive']['rooms'][rmName]['tasks'][index] = incTask;
         },
 
+    giveTask: function(creep, task) {
+        for (var t in Memory['hive']['rooms'][creep.room.name]['tasks']) {
+            if (Memory['hive']['rooms'][creep.room.name]['tasks'][t] == task) {
+                creep.memory.task = Memory['hive']['rooms'][creep.room.name]['tasks'][t];
+                
+                if (Memory['hive']['rooms'][creep.room.name]['tasks'][t]['creeps'] != null) {
+                    Memory['hive']['rooms'][creep.room.name]['tasks'][t]['creeps'] -= 1;
+                    if (Memory['hive']['rooms'][creep.room.name]['tasks'][t]['creeps'] == 0) {
+                        delete Memory['hive']['rooms'][creep.room.name]['tasks'][t];
+                    }
+                }
+                
+                return;
+            }
+        }
+        },
+
+    returnTask: function(creep, task) {
+        task.creeps = 1;
+        _Tasks.addTask(creep.room.name, task);
+        },
+
     compileTasks: function (rmName) {
         var __Colony = require('__colony');
         var room = Game.rooms[rmName];
@@ -55,7 +77,7 @@ var _Tasks = {
                     id: structures[i].id,
                     pos: structures[i].pos,
                     timer: 20,
-                    creep: 2,
+                    creeps: 2,
                     priority: 2
                 });                
         }
@@ -68,7 +90,7 @@ var _Tasks = {
                     id: structures[i].id,
                     pos: structures[i].pos,
                     timer: 20,
-                    creep: 2,
+                    creeps: 2,
                     priority: 6
                 });
         }
@@ -81,7 +103,7 @@ var _Tasks = {
                     id: structures[i].id,
                     pos: structures[i].pos,
                     timer: 30,
-                    creep: 3,
+                    creeps: 3,
                     priority: 3
                 });            
         }
@@ -160,7 +182,8 @@ var _Tasks = {
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 20,
-                        creeps: 8
+                        creeps: 8,
+                        priority: 9
                     });
                 _Tasks.addTask(rmName, 
                     {   type: 'carry',
@@ -170,7 +193,8 @@ var _Tasks = {
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 20,
-                        creeps: 8
+                        creeps: 8,
+                        priority: 9
                     });     
             }
         } 
@@ -312,24 +336,22 @@ var _Tasks = {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
-            
-            if (creep.memory.role == 'multirole') {
-                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
-                        function (t) { return t.subtype == 'pickup' && t.resource == 'energy'; }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
-                if (tasks.length > 0) {
-                    _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                }
-
-                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
-                        function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
-                if (tasks.length > 0) {
-                    _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                }
+                        
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.subtype == 'pickup' && t.resource == 'energy'; }), 
+                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+            if (tasks.length > 0) {
+                _Tasks.giveTask(creep, tasks[0]);
+                return;
             }
+
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
+                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+            if (tasks.length > 0) {
+                _Tasks.giveTask(creep, tasks[0]);
+                return;
+            }        
         } else {
             if (creep.memory.subrole == 'repairer') {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
@@ -341,14 +363,14 @@ var _Tasks = {
                 tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], function (t) { return t.type == 'work' && t.subtype == 'upgrade'; }), 'priority');
             }
             
-            if (tasks == null) {
+            if (tasks == null || tasks.length == 0) {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return t.type == 'work'; }), 
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         'priority');
             }
 
-            if (tasks.length > 0) {
+            if (tasks != null && tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);        
                 return;
             }
@@ -462,21 +484,6 @@ var _Tasks = {
             }
         }
         },
-
-    giveTask (creep, task) {
-        creep.memory.task = task;
-        if (Memory['hive']['rooms'][creep.room.name]['tasks']['creeps'] != null) {
-            Memory['hive']['rooms'][creep.room.name]['tasks']['creeps'] -= 1;
-            if (Memory['hive']['rooms'][creep.room.name]['tasks']['creeps'] <= 0) {
-                _.remove(Memory['hive']['rooms'][creep.room.name]['tasks'], function(t) { return t == task; });
-            }
-        }
-        },
-
-    returnTask (creep, task) {
-        task.creeps = 1;
-        _Tasks.addTask(creep.room.name, task);
-    }
 }
 
 module.exports = _Tasks;

@@ -463,12 +463,12 @@ var __Creep = {
                         WORK, WORK, WORK, WORK,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]; 
             case 7:
-                return [ // 3750 energy, 28x WORK, 19x MOVE
+                return [ // 2700 energy, 21x WORK, 12x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        MOVE, MOVE];
             case 8:
                 return [ // 4000 energy, 30x WORK, 20x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,

@@ -17,18 +17,18 @@ module.exports.loop = function () {
     _Hive.initTasks();
 
 
-    /* Colony #1, W16S43 */
+    /* Colony #1, W18S43 */
     _Sites.Colony('W18S43', 3,                      
             { worker:   {level: 6, amount: 1},
               repairer: {level: 6, amount: 1},
-              upgrader: {level: 6, amount: 1} },
+              upgrader: {level: 7, amount: 2} },
             [{id: '57a2465268244ab107a96d5e', role: 'send'},
              {id: '57a24a31e620955e29e63e27', role: 'send'},
              {id: '57a24f9cacbffcb869dc9d21', role: 'receive'},
              {id: '57a25c61958cffd536325056', role: 'receive'}]);
     _Sites.Mining('W18S43', 'W18S43', 2,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 2},              
+            { burrower:  {level: 7, amount: 1},
+              carrier:   {level: 7, amount: 2},              
               extractor: {level: 6, amount: 1} } );
 
     /* Colony #2, W19S42 */
@@ -59,18 +59,18 @@ module.exports.loop = function () {
 
     /* Colony #4, W15S43 */
     _Sites.Colony('W15S43', 3,
-            { worker:   {level: 4, amount: 6},
+            { worker:   {level: 4, amount: 4},
               repairer: {level: 4, amount: 1},
               upgrader: {level: 4, amount: 1} } );      
     _Sites.Mining('W15S43', 'W15S43', 2,
             { burrower:  {level: 4, amount: 1},
-              carrier:   {level: 4, amount: 1} } );
+              carrier:   {level: 4, amount: 2} } );
 
 
     /* Remote mining operations for Colony #1, W18S43 */
     _Sites.Mining('W18S43', 'W17S43', 2,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 3},
+            { burrower:  {level: 7, amount: 1},
+              carrier:   {level: 7, amount: 3},
               multirole: {level: 6, amount: 1},
               reserver:  {level: 6, amount: 1} } );
     _Sites.Mining('W18S43', 'W19S43', 2,
@@ -86,8 +86,8 @@ module.exports.loop = function () {
     
     /* Remote mining operations for Colony #2, W19S42 */
     _Sites.Mining('W19S42', 'W18S42', 2,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 3},
+            { burrower:  {level: 7, amount: 1},
+              carrier:   {level: 7, amount: 3},
               multirole: {level: 6, amount: 1},
               reserver:  {level: 6, amount: 1} } );
     
@@ -103,10 +103,7 @@ module.exports.loop = function () {
               multirole: {level: 5, amount: 1},
               reserver:  {level: 5, amount: 1} } );
     _Sites.Mining('W15S41', 'W16S41', 2,
-            { burrower:  {level: 3, amount: 1},
-              carrier:   {level: 3, amount: 2},
-              multirole: {level: 3, amount: 1},
-              reserver:  {level: 3, amount: 1} } );
+            { multirole: {level: 3, amount: 1} } );
     _Sites.Mining('W15S41', 'W16S42', 3,
             { burrower:  {level: 5, amount: 1},
               carrier:   {level: 5, amount: 3},
@@ -116,20 +113,15 @@ module.exports.loop = function () {
     
     /* Remote mining operations for Colony #4, W15S43 */
     _Sites.Mining('W15S43', 'W16S43', 3,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 2},
-              multirole: {level: 6, amount: 1},
-              reserver:  {level: 6, amount: 1} } );
-    _Sites.Mining('W15S43', 'W14S43', 2,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 2},
-              multirole: {level: 6, amount: 1},
-              reserver:  {level: 6, amount: 1} } );
+            { burrower:  {level: 4, amount: 1},
+              carrier:   {level: 4, amount: 2},
+              multirole: {level: 4, amount: 1},
+              reserver:  {level: 4, amount: 1} } );
     _Sites.Mining('W15S43', 'W15S45', 0,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 4, body: 'all-terrain'},
+            { burrower:  {level: 6, amount: 2},
+              carrier:   {level: 6, amount: 8, body: 'all-terrain'},
               multirole: {level: 6, amount: 1} } );
-    
+
 
     /* Run end-tick _Hive functions */
     _Hive.processSpawnRequests();

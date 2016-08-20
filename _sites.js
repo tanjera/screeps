@@ -24,7 +24,7 @@ var _Sites = {
         if ((listPopulation['soldier'] != null && lSoldier.length < listPopulation['soldier']['amount']) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
-            _Hive.requestSpawn(rmColony, 0, 0, listPopulation['soldier']['level'], 'soldier', 
+            _Hive.requestSpawn(rmColony, 0, 0, (listPopulation['soldier'] == null ? 8 : listPopulation['soldier']['level']), 'soldier', 
                 null, {role: 'soldier', room: rmColony});
         } else if (listPopulation['worker'] != null && lWorker.length < listPopulation['worker']['amount']) {
             _Hive.requestSpawn(rmColony, spawnDistance, 3, listPopulation['worker']['level'], 'worker', 
@@ -125,17 +125,17 @@ var _Sites = {
             }
         }
         else if (listPopulation['miner'] != null && lMiner.length < listPopulation['miner']['amount']) {
-            if (lMiner.length == 0) // Possibly colony wiped? Need restart?
+            if (lMiner.length == 0) { // Possibly colony wiped? Need restart?
                 _Hive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
-            else {
+            } else {
                 _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['miner']['level'], 'worker', 
                     null, {role: 'miner', room: rmHarvest, colony: rmColony});
             }    
         }
         else if (listPopulation['burrower'] != null && lBurrower.length < listPopulation['burrower']['amount']) {
-            if (lCarrier.length == 0 && popCarrier > 0 && lMiner.length == 0) // Possibly colony wiped? Need restart?
+            if (lCarrier.length == 0 && listPopulation['carrier'] != null && lMiner.length == 0) {// Possibly colony wiped? Need restart?
                 _Hive.requestSpawn(rmColony, 0, 1, 1, 'worker', null, {role: 'miner', room: rmHarvest, colony: rmColony});
-            else {
+            } else {
                 _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['burrower']['level'], 'burrower', 
                     null, {role: 'burrower', room: rmHarvest, colony: rmColony});
             }
