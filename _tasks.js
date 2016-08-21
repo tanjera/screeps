@@ -299,7 +299,7 @@ var _Tasks = {
         },
 
     assignTask: function(creep, isRefueling) {
-        if (creep.memory.task != null) {
+        if (creep.memory.task != null && Object.keys(creep.memory.task).length > 0) {            
             return;
         }
 
@@ -393,17 +393,7 @@ var _Tasks = {
                         function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                 if (tasks.length > 0) {
                     _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                } else {    // All sources are empty? Move to the one renewing next!
-                    var sources = creep.room.find(FIND_SOURCES).sort(function(a, b) { return a.ticksToRegeneration - b.ticksToRegeneration; });
-                        source = sources.length > 0 ? sources[0] : null;                
-                    if (source != null) {
-                        creep.memory.task = {
-                            type: 'mine',
-                            id: source.id,
-                            timer: 10 };
-                        return;                    
-                    }
+                    return;                
                 }
             }
             else if (creep.memory.role == 'miner' || creep.memory.role == 'carrier') {

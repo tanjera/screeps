@@ -196,6 +196,7 @@ var __Creep = {
             case 'multirole': return __Creep.getBody_Multirole(level); 
             case 'worker': return __Creep.getBody_Worker(level);
             case 'burrower': return __Creep.getBody_Burrower(level);
+            case 'courier':
             case 'carrier': return __Creep.getBody_Carrier(level);
             case 'carrier_at': return __Creep.getBody_Carrier_AT(level);
             case 'reserver': return __Creep.getBody_Reserver(level);
@@ -203,6 +204,7 @@ var __Creep = {
 
     getBody_Soldier: function(level) {
         switch (level) {
+            default:
             case 1:
                 return [ // 190 energy, 1x TOUGH, 1x ATTACK, 2x MOVE
                         TOUGH, MOVE,   
@@ -249,6 +251,7 @@ var __Creep = {
 
     getBody_Archer: function(level) {
         switch (level) {
+            default:
             case 1:
                 return [ // 260 energy, 1x TOUGH, 1x RANGED_ATTACK, 2x MOVE
                         TOUGH, 
@@ -297,6 +300,7 @@ var __Creep = {
     
     getBody_Healer: function(level) {
         switch (level) {
+            default:
             case 1:
             case 2:
                 return [ // 300 energy, 1x HEAL, 1x MOVE
@@ -333,6 +337,7 @@ var __Creep = {
 
     getBody_Multirole: function(level) {
         switch (level) {
+            default:
             case 1:
                 return [ // 280 energy, 1x WORK, 1x CARRY, 1x MOVE, 1x ATTACK
                         WORK, CARRY,   
@@ -388,6 +393,7 @@ var __Creep = {
 
     getBody_Worker: function(level) {
         switch (level) {
+            default:
             case 1:
                 return [ // 300 energy, 1x WORK, 2x CARRY, 2x MOVE
                         WORK,  
@@ -438,6 +444,7 @@ var __Creep = {
     
     getBody_Burrower: function(level) {
         switch (level) {
+            default:
             case 1:
                 return [ // 300 energy, 2x WORK, 2x MOVE
                         WORK, MOVE, WORK, MOVE]; 
@@ -520,6 +527,7 @@ var __Creep = {
 
     getBody_Carrier_AT: function(level) {
         switch (level) {
+            default:
             case 1:
             		return [ // 300 energy, 3x CARRY, 3x MOVE
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE]; 
@@ -559,6 +567,7 @@ var __Creep = {
 
     getBody_Reserver: function(level) {
         switch (level) {
+            default:
             case 1:
             case 2:
                 return null; 

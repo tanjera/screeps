@@ -99,7 +99,8 @@ var _Hive = {
                     var request = Memory['hive']['spawn_requests'][listRequests[r]];                    
                     if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {                        
                         var body = __Creep.getBody(request.body, 
-                            Math.max(1, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] * Math.min(request.level, _Hive.getRoom_Level(request.room)))));
+                            Math.max(1, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] 
+                                * Math.min(request.level, _Hive.getRoom_Level(Game['spawns'][listSpawns[s]].room.name)))));
                         var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
 
                         if (_.isString(result)) {
