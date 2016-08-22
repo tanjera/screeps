@@ -14,25 +14,34 @@ var _Tasks = {
             creeps:     maximum # of creeps to run this task
          */
 
-        var index = Object.keys(Memory['hive']['rooms'][rmName]['tasks']).length;
+        var index = incTask['type'] + '-' + incTask['subtype'] + '-' 
+                + 'xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+
         Memory['hive']['rooms'][rmName]['tasks'][index] = incTask;
         },
 
     giveTask: function(creep, task) {
+        // Iterate the room's task list to see if the room's task needs updating
         for (var t in Memory['hive']['rooms'][creep.room.name]['tasks']) {
             if (Memory['hive']['rooms'][creep.room.name]['tasks'][t] == task) {
-                creep.memory.task = Memory['hive']['rooms'][creep.room.name]['tasks'][t];
+                creep.memory.task = Memory['hive']['rooms'][creep.room.name]['tasks'][t];                
                 
                 if (Memory['hive']['rooms'][creep.room.name]['tasks'][t]['creeps'] != null) {
                     Memory['hive']['rooms'][creep.room.name]['tasks'][t]['creeps'] -= 1;
                     if (Memory['hive']['rooms'][creep.room.name]['tasks'][t]['creeps'] == 0) {
                         delete Memory['hive']['rooms'][creep.room.name]['tasks'][t];
                     }
-                }
-                
+                }                
                 return;
             }
         }
+
+        // Task not found in the room task list? Possibly individualized task...
+        creep.memory.task = task;
+        return;
         },
 
     returnTask: function(creep, task) {
@@ -125,37 +134,41 @@ var _Tasks = {
 
     assignTask_Industry: function(creep, isRefueling) {
         var tasks;
+    
+        if (isRefueling) {
+            tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return (t.type == 'industry' && t.subtype == 'withdraw'); }), 
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    'priority');
+            if (tasks.length > 0) {
+                _Tasks.giveTask(creep, tasks[0]);
+                return;
+            } else {    // If no tasks, then wait                
+                _Tasks.giveTask(creep, {type: 'wait', subtype: 'wait', timer: 10});
+                return;
+            }
+        } else {
+            var resources = _.sortBy(Object.keys(creep.carry), function (c) { return -creep.carry[c]; });
+            resources = Object.keys(resources).length > 0 ? resources[0] : 'energy';                
+            tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'industry' && t.subtype == 'deposit' && t.resource == resources; }), 
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    'priority');            
+            if (tasks.length > 0) {    
+                _Tasks.giveTask(creep, tasks[0]);
+                return;
+            }
 
-        if (creep.memory.role == 'courier') {            
-            if (isRefueling) {
-                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
-                        function (t) { return (t.type == 'industry' && t.subtype == 'withdraw'); }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
-                        'priority');
-                if (tasks.length > 0) {
-                    _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                }
+            // If stuck without a task... drop off minerals in storage... or wait...
+            tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                    function (t) { return t.type == 'carry' && t.resource == 'mineral'; }), 
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+            if (tasks.length > 0) {
+                _Tasks.giveTask(creep, tasks[0]);
+                return;
             } else {
-                var resources = _.sortBy(Object.keys(creep.carry), function (c) { return -creep.carry[c]; });
-                resources = Object.keys(resources).length > 0 ? resources[0] : 'energy';                
-                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
-                        function (t) { return t.type == 'industry' && t.subtype == 'deposit' && t.resource == resources; }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
-                        'priority');
-                if (tasks.length > 0) {
-                    _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                }
-
-                // If stuck without a task... drop off minerals in storage
-                tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
-                        function (t) { return t.type == 'carry' && t.resource == 'mineral'; }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
-                if (tasks.length > 0) {
-                    _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                }        
+                _Tasks.giveTask(creep, {type: 'wait', subtype: 'wait', timer: 10});
+                return;
             }
         }
         },
@@ -497,20 +510,22 @@ var _Tasks = {
         }
 
         /* Cycle through all creeps in the room- remove the task if it's already taken */
-            for (var t = Object.keys(Memory['hive']['rooms'][rmName]['tasks']).length - 1; t >= 0 ; t--) {
+            for (var t in Memory['hive']['rooms'][rmName]['tasks']) {
                 var task = Memory['hive']['rooms'][rmName]['tasks'][t];
-                for (var c in Game.creeps) {
-                    if (Game.creeps[c].room.name == rmName) {
-                        var creep = Game.creeps[c];
-                        if (creep.memory.task != null
-                                && creep.memory.task.type == task.type && creep.memory.task.subtype == task.subtype
-                                && creep.memory.task.id == task.id && creep.memory.task.structure == task.structure
-                                && creep.memory.task.resource == task.resource) {
-                            task.creeps -= 1;
+                if (task['creeps'] != null) {
+                    for (var c in Game.creeps) {
+                        if (Game.creeps[c].room.name == rmName) {
+                            var creep = Game.creeps[c];
+                            if (creep.memory.task != null
+                                    && creep.memory.task.type == task.type && creep.memory.task.subtype == task.subtype
+                                    && creep.memory.task.id == task.id && creep.memory.task.structure == task.structure
+                                    && creep.memory.task.resource == task.resource) {
+                                task['creeps'] -= 1;
+                            }
                         }
-                        if (task.creeps <= 0) {
-                            delete Memory['hive']['rooms'][rmName]['tasks'][t];
-                        }
+                    }
+                    if (task['creeps'] <= 0) {
+                        delete Memory['hive']['rooms'][rmName]['tasks'][t];
                     }
                 }
             }  

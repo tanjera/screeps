@@ -75,7 +75,7 @@ var _Roles = {
             __Creep.moveToRoom(creep, creep.memory.room);
         }
         else if (creep.memory.state == 'loading') {
-            if (_.sum(creep.carry) == creep.carryCapacity) {
+            if (_.sum(creep.carry) > 0) {
                 creep.memory.state = 'delivering';
                 delete creep.memory.task;
                 return;
@@ -150,7 +150,7 @@ var _Roles = {
         }
         else {
             var targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }});
+                return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }});
             
             if (targets.length > 0) {
                 if(creep.attack(targets[0]) == ERR_NOT_IN_RANGE) {
@@ -165,7 +165,7 @@ var _Roles = {
         }
         else {
             var allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                    return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }});
+                    return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }});
             var nearTargets = creep.pos.findInRange(allTargets, 3);
             
             if (nearTargets.length == 0) {

@@ -15,7 +15,7 @@ module.exports.loop = function () {
             - add dismantle and combat tasks            
             - utilCreep: add resource types to things like 'withdraw'
             - refactor 'reserver' to task system??
-    */     
+    */      
 
 
     /* Prepare _Hive functions/memory for this tick */
@@ -39,12 +39,12 @@ module.exports.loop = function () {
     _Sites.Industry('W18S43', 2,
             { courier:   {level: 5, amount: 1} },
             { UL:   {action: 'reaction', labs: ['579f9f2549708a4306732b3e', '57a0539e25bdfd7a71d9a527', '57a02f90b712db3b1f1c399c'] } },
-            { U1:   {subtype: 'withdraw', resource: 'U', id: '5784906f1336e9037d76403c', target: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 2 },
-              L1:   {subtype: 'withdraw', resource: 'L', id: '5784906f1336e9037d76403c', target: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
-              U2:   {subtype: 'deposit', resource: 'U', id: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 2 },
-              L2:   {subtype: 'deposit', resource: 'L', id: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
-              UL1:  {subtype: 'withdraw', resource: 'UL', id: '579f9f2549708a4306732b3e', timer: 10, creeps: 8, priority: 1 },
-              UL2:  {subtype: 'deposit', resource: 'L', id: '5784906f1336e9037d76403c', timer: 10, creeps: 8, priority: 1 } } );
+            { U1:   {type: 'industry', subtype: 'withdraw', resource: 'U', id: '5784906f1336e9037d76403c', target: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 2 },
+              L1:   {type: 'industry', subtype: 'withdraw', resource: 'L', id: '5784906f1336e9037d76403c', target: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
+              U2:   {type: 'industry', subtype: 'deposit', resource: 'U', id: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 2 },
+              L2:   {type: 'industry', subtype: 'deposit', resource: 'L', id: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
+              UL1:  {type: 'industry', subtype: 'withdraw', resource: 'UL', id: '579f9f2549708a4306732b3e', timer: 10, creeps: 8, priority: 1 },
+              UL2:  {type: 'industry', subtype: 'deposit', resource: 'UL', id: '5784906f1336e9037d76403c', timer: 10, creeps: 8, priority: 1 } } );
 
     /* Colony #2, W19S42 */
     _Sites.Colony('W19S42', 3,
@@ -83,12 +83,12 @@ module.exports.loop = function () {
               
     /* Colony #5, W13S41 */
     _Sites.Colony('W13S41', 3,
-            { worker:   {level: 3, amount: 4},
+            { worker:   {level: 3, amount: 6},
               repairer: {level: 3, amount: 1},
               upgrader: {level: 3, amount: 1} } );      
     _Sites.Mining('W13S41', 'W13S41', 3,
-            { burrower:  {level: 3, amount: 1},
-              carrier:   {level: 3, amount: 2} } );
+            { burrower:  {level: 3, amount: 2},
+              carrier:   {level: 3, amount: 3} } );
 
 
     /* Remote mining operations for Colony #1, W18S43 */
@@ -147,6 +147,12 @@ module.exports.loop = function () {
             { burrower:  {level: 5, amount: 2},
               carrier:   {level: 5, amount: 9, body: 'all-terrain'},
               multirole: {level: 5, amount: 1} } );
+
+    /* Remote mining operations for Colony #5, W13S41 */
+    _Sites.Mining('W13S41', 'W12S41', 2,
+            { burrower:  {level: 3, amount: 1},
+              carrier:   {level: 3, amount: 2},
+              multirole: {level: 3, amount: 1} } );
 
     /* Run end-tick _Hive functions */
     _Hive.processSpawnRequests();

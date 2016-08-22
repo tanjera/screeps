@@ -1,5 +1,37 @@
 var _Hive = {
 
+    isPulse: function() {
+        if (Game.cpu.bucket > 9000) {
+            return Game.time % 5 == 0;
+        } else if (Game.cpu.bucket > 7000) {
+            return Game.time % 8 == 0;
+        } else if (Game.cpu.bucket > 5000) {
+            return Game.time % 10 == 0;
+        } else if (Game.cpu.bucket > 3000) {
+            return Game.time % 15 == 0;
+        } else if (Game.cpu.bucket > 1000) {
+            return Game.time % 20 == 0;
+        } else if (Game.cpu.bucket <= 1000) {
+            return Game.time % 30 == 0;
+        }
+    },
+
+    moveReusePath: function() {
+        if (Game.cpu.bucket > 9000) {
+            return 5;
+        } else if (Game.cpu.bucket > 7000) {
+            return 8;
+        } else if (Game.cpu.bucket > 5000) {
+            return 10;
+        } else if (Game.cpu.bucket > 3000) {
+            return 15;
+        } else if (Game.cpu.bucket > 1000) {
+            return 20;
+        } else if (Game.cpu.bucket <= 1000) {
+            return 30;
+        }
+    },
+
     clearDeadMemory: function() {
         // Clear dead creeps from Memory
         for (var n in Memory.creeps) {
@@ -29,18 +61,15 @@ var _Hive = {
         }
 
         // Set allies
-        Memory['hive']['allies'] = {    Pantek59: null,
-                                        Atavus: null,
-                                        BlackLotus: null,
-                                        shedletsky: null };
+        Memory['hive']['allies'] = {    Pantek59: '',
+                                        Atavus: '',
+                                        BlackLotus: '',
+                                        Moria: '',
+                                        shedletsky: '' };
 
         Memory['hive']['population_balance'] = {};  // Reset data for population balancing
         Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   
-    },
-
-    isPulse: function() {
-        return Game.time % 5 == 0;
-    },
+    },    
 
     initTasks: function() {
         var _Tasks = require('_tasks');

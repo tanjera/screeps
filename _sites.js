@@ -23,7 +23,7 @@ var _Sites = {
 
         if ((listPopulation['soldier'] != null && lSoldier.length < listPopulation['soldier']['amount']) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length)) {            
+                        return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length)) {            
             _Hive.requestSpawn(rmColony, 0, 0, (listPopulation['soldier'] == null ? 8 : listPopulation['soldier']['level']), 'soldier', 
                 null, {role: 'soldier', room: rmColony});
         } else if (listPopulation['worker'] != null && lWorker.length < listPopulation['worker']['amount']) {
@@ -56,7 +56,7 @@ var _Sites = {
             var tower = listTowers[t];
             
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
-                        return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }});
+                        return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }});
             if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;
@@ -117,10 +117,10 @@ var _Sites = {
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length > 0) {
+                        {filter: function(c) { return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length > 0) {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
+                        {filter: function(c) { return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length) {
                 _Hive.requestSpawn(rmColony, 0, 0, 8, 'soldier', null, {role: 'soldier', room: rmHarvest, colony: rmColony});
             }
         }
@@ -175,7 +175,7 @@ var _Sites = {
                 // If the room is safe to run mining operations... run _Roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length == 0)) {
+                        { filter: function(c) { return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                         _Roles.Mining(creep, rmColony, rmHarvest, listRoute);
                     } else if (creep.memory.role == 'multirole') {
@@ -213,7 +213,7 @@ var _Sites = {
                     break;
 
                 case 'reaction':
-                    
+                    if (Object.keys(listLabs[l]['labs']).length != 3) break;
                     var labMain = Game.getObjectById(listLabs[l]['labs'][0]);
                     var labSupply1 = Game.getObjectById(listLabs[l]['labs'][1]);
                     var labSupply2 = Game.getObjectById(listLabs[l]['labs'][2]);  
@@ -227,35 +227,34 @@ var _Sites = {
              }
         }
 
-        if (_Hive.isPulse) {
-            for (var t in listTasks) {
-                var _Tasks = require('_tasks');
-                listTasks[t]['type'] = 'industry';
-                var obj = Game.getObjectById(listTasks[t]['id']);
-                listTasks[t]['pos'] = obj.pos;
+        if (_Hive.isPulse()) {
+            var _Tasks = require('_tasks');
+
+            for (var t in listTasks) {                
+                var task = listTasks[t];
+                var obj = Game.getObjectById(task['id']);
+                task['pos'] = obj.pos;
                 
-                if (listTasks[t]['subtype'] == 'withdraw') {
-                    var target = Game.getObjectById(listTasks[t]['target']);
+                if (task['subtype'] == 'withdraw') {
+                    var target = Game.getObjectById(task['target']);
                     if ((obj.structureType == STRUCTURE_STORAGE || obj.structureType == STRUCTURE_CONTAINER) 
-                            && Object.keys(obj.store).includes(listTasks[t]['resource'])) {
-                        if (target != null && target.structureType == STRUCTURE_LAB) {
-                            if (target.mineralAmount < target.mineralCapacity * 0.8) {
-                                _Tasks.addTask(rmColony, listTasks[t]);
-                            }
-                        } else {
-                            _Tasks.addTask(rmColony, listTasks[t]);
+                            && Object.keys(obj.store).includes(task['resource'])) {
+                        if (target == null) {
+                            _Tasks.addTask(rmColony, task);
+                        } else if (target.structureType == STRUCTURE_LAB && target.mineralAmount < target.mineralCapacity * 0.75) {
+                            _Tasks.addTask(rmColony, task);
                         }
-                    } else {
-                        _Tasks.addTask(rmColony, listTasks[t]);
-                    }
-                } else if (listTasks[t]['subtype'] == 'deposit') {
+                    } else if (obj.structureType == STRUCTURE_LAB && obj.mineralAmount > obj.mineralCapacity * 0.75) {
+                            _Tasks.addTask(rmColony, task);
+                    }                        
+                } else if (task['subtype'] == 'deposit') {
                     if (obj.structureType == STRUCTURE_LAB) {
                         if (obj.mineralAmount < obj.mineralCapacity 
-                                && (obj.mineralType == listTasks[t]['resource'] || obj.mineralType == null)) {
-                            _Tasks.addTask(rmColony, listTasks[t]);
+                                && (obj.mineralType == task['resource'] || obj.mineralType == null)) {
+                            _Tasks.addTask(rmColony, task);
                         }                        
                     } else {
-                        _Tasks.addTask(rmColony, listTasks[t]);
+                        _Tasks.addTask(rmColony, task);
                     }
                 }
             }
