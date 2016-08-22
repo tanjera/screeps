@@ -70,6 +70,41 @@ var _Roles = {
             return;
         } },
 
+    Courier: function(creep) {
+        if (creep.memory.room != null && creep.room.name != creep.memory.room) {
+            __Creep.moveToRoom(creep, creep.memory.room);
+        }
+        else if (creep.memory.state == 'loading') {
+            if (_.sum(creep.carry) == creep.carryCapacity) {
+                creep.memory.state = 'delivering';
+                delete creep.memory.task;
+                return;
+            }
+            
+            _Tasks.assignTask(creep, true);        
+            if (__Creep.runTaskTimer(creep)) {
+                __Creep.runTask(creep);
+            }
+            return;
+
+        } else if (creep.memory.state == 'delivering') {            
+            if (_.sum(creep.carry) == 0) {
+                    creep.memory.state = 'loading';
+                    delete creep.memory.task;
+                    return;
+                }
+            
+            _Tasks.assignTask(creep, false);
+            if (__Creep.runTaskTimer(creep)) {
+                __Creep.runTask(creep);
+            }
+            return;
+
+        } else {
+            creep.memory.state = 'loading';
+            return;
+        } },
+
     Extracter: function(creep) {
         switch (creep.memory.state) {
             default:

@@ -121,7 +121,7 @@ var _Sites = {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         {filter: function(c) { return Object.keys(Memory['hive']['allies']).indexOf(c.owner.username) < 0; }}).length) {
-                _Hive.requestSpawn(rmColony, 0, 0, 8, 'soldier', null, {role: 'soldier', room: rmHarvest});
+                _Hive.requestSpawn(rmColony, 0, 0, 8, 'soldier', null, {role: 'soldier', room: rmHarvest, colony: rmColony});
             }
         }
         else if (listPopulation['miner'] != null && lMiner.length < listPopulation['miner']['amount']) {
@@ -169,7 +169,8 @@ var _Sites = {
         // Run _Roles!
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];                
-            if (creep.memory.room != null && creep.memory.room == rmHarvest) {
+            if (creep.memory.room != null && creep.memory.colony != null 
+                    && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
                 creep.memory.listRoute = listRoute;
                 // If the room is safe to run mining operations... run _Roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
@@ -194,25 +195,98 @@ var _Sites = {
         } },
 
 
-    Reservation: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
+    Industry: function(rmColony, spawnDistance, listPopulation, listLabs, listTasks) {
+        var lCourier  = _.filter(Game.creeps, (c) => c.memory.role == 'courier' && c.memory.room == rmColony && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
+        var popTarget = (listPopulation['courier'] == null ? 0 : listPopulation['courier']['amount']);
+        var popActual = lCourier.length;
+        _Hive.populationTally(rmColony, popTarget, popActual);
+
+        if (listPopulation['courier'] != null && lCourier.length < listPopulation['courier']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation['courier']['level'], 'courier', 
+                null, {role: 'courier', room: rmColony});            
+        }
+
+        for (var l in listLabs) {
+             switch (listLabs[l]['action']) {
+                default:
+                    return;
+
+                case 'reaction':
+                    var labMain = Game.getObjectById(listLabs[l]['main']);
+                    var labSupply1 = Game.getObjectById(listLabs[l]['supply1']);
+                    var labSupply2 = Game.getObjectById(listLabs[l]['supply2']);  
+                    if (labMain && labSupply1 && labSupply2) {
+                        labMain.runReaction(labSupply1, labSupply2);
+                    }
+                    return;
+
+                case 'boost':
+                    return;
+             }
+        }
+
+        for (var t in listTasks) {
+            var _Tasks = require('_tasks');
+            listTasks[t]['type'] = 'industry';
+            listTasks[t]['pos'] = Game.getObjectById(listTasks[t]['id']).pos;
+            _Tasks.addTask(rmColony, listTasks[t]);
+        }
+
+        for (var n in Game.creeps) {
+            var creep = Game.creeps[n];
+            if (creep.memory.room != null && creep.memory.room == rmColony) {                
+                if (creep.memory.role == 'courier') {
+                    _Roles.Courier(creep);
+                }
+            }
+        }
+        },
+
+
+    Reservation: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
         var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == 'reserver' && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 80));
-        
+
         var popTarget = (listPopulation['reserver'] == null ? 0 : listPopulation['reserver']['amount']);
         var popActual = lReserver.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation['reserver'] != null && lReserver.length < listPopulation['reserver']['amount']) {
             _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['reserver']['level'], 'reserver', 
-                null, {role: 'reserver', room: rmHarvest});            
+                null, {role: 'reserver', room: rmHarvest, colony: rmColony});
         }
 
         for (var n in Game.creeps) {
-            var creep = Game.creeps[n];                
-            if (creep.memory.room != null && creep.memory.room == rmHarvest) {
+            var creep = Game.creeps[n];
+            if (creep.memory.room != null && creep.memory.colony != null 
+                    && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
                 creep.memory.listRoute = listRoute;
                 if (creep.memory.role == 'reserver') {
                     _Roles.Reserver(creep);
+                }
+            }            
+        } },
+
+
+    Occupation: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
+        var lSoldier  = _.filter(Game.creeps, (c) => c.memory.role == 'soldier' && c.memory.room == rmOccupy && (c.ticksToLive == undefined || c.ticksToLive > 80));
+        
+        var popTarget = (listPopulation['soldier'] == null ? 0 : listPopulation['soldier']['amount']);
+        var popActual = lSoldier.length;
+        _Hive.populationTally(rmColony, popTarget, popActual);
+
+        if (listPopulation['soldier'] != null && lSoldier.length < listPopulation['soldier']['amount']) {
+            _Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation['soldier']['level'], 'soldier', 
+                null, {role: 'soldier', room: rmOccupy, colony: rmColony});            
+        }
+
+        for (var n in Game.creeps) {
+            var creep = Game.creeps[n];
+            if (creep.memory.room != null && creep.memory.colony != null 
+                    && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
+                creep.memory.listRoute = listRoute;
+                if (creep.memory.role == 'soldier') {
+                    _Roles.Soldier(creep);
                 }
             }            
         } }

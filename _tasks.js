@@ -299,7 +299,7 @@ var _Tasks = {
         },
 
     assignTask: function(creep, isRefueling) {
-        if (creep.memory.task != null) {
+        if (creep.memory.task != null && Object.keys(creep.memory.task).length > 0) {            
             return;
         }
 
@@ -312,9 +312,13 @@ var _Tasks = {
                 _Tasks.assignTask_Work(creep, isRefueling);
                 return;
 
+            case 'courier':
+                _Tasks.assignTask_Industry(creep, isRefueling);
+                return;
+
             case 'miner':
             case 'burrower':
-            case 'carrier':                
+            case 'carrier':
                 _Tasks.assignTask_Mine(creep, isRefueling);
                 return;
 
@@ -330,7 +334,7 @@ var _Tasks = {
         if (isRefueling) {            
             tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                     function (t) { return t.type == 'energy'; }), 
-                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
                     'priority');
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
@@ -339,7 +343,7 @@ var _Tasks = {
                         
             tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                     function (t) { return t.subtype == 'pickup' && t.resource == 'energy'; }), 
-                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
@@ -347,7 +351,7 @@ var _Tasks = {
 
             tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                     function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
-                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
@@ -356,7 +360,7 @@ var _Tasks = {
             if (creep.memory.subrole == 'repairer') {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return t.type == 'work' && t.subtype == 'repair'; }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         'priority');
             }
             else if (creep.memory.subrole == 'upgrader') {
@@ -366,13 +370,41 @@ var _Tasks = {
             if (tasks == null || tasks.length == 0) {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return t.type == 'work'; }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         'priority');
             }
 
             if (tasks != null && tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);        
                 return;
+            }
+        }
+        },
+
+    assignTask_Industry: function(creep, isRefueling) {
+        var tasks;
+
+        if (creep.memory.role == 'courier') {            
+            if (isRefueling) {
+                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return (t.type == 'industry' && t.subtype == 'withdraw'); }), 
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        'priority');
+                if (tasks.length > 0) {
+                    _Tasks.giveTask(creep, tasks[0]);
+                    return;
+                }
+            } else {
+                var resources = _.sortBy(Object.keys(creep.carry), function (c) { return -creep.carry[c]; });
+                resources = Object.keys(resources).length > 0 ? resources[0] : 'energy';                
+                tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
+                        function (t) { return t.type == 'industry' && t.subtype == 'deposit' && t.resource == resources; }), 
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        'priority');
+                if (tasks.length > 0) {
+                    _Tasks.giveTask(creep, tasks[0]);
+                    return;
+                }            
             }
         }
         },
@@ -390,26 +422,16 @@ var _Tasks = {
             if (creep.memory.role == 'burrower') {
                 tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                 if (tasks.length > 0) {
                     _Tasks.giveTask(creep, tasks[0]);
-                    return;
-                } else {    // All sources are empty? Move to the one renewing next!
-                    var sources = creep.room.find(FIND_SOURCES).sort(function(a, b) { return a.ticksToRegeneration - b.ticksToRegeneration; });
-                        source = sources.length > 0 ? sources[0] : null;                
-                    if (source != null) {
-                        creep.memory.task = {
-                            type: 'mine',
-                            id: source.id,
-                            timer: 10 };
-                        return;                    
-                    }
+                    return;                
                 }
             }
             else if (creep.memory.role == 'miner' || creep.memory.role == 'carrier') {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return (t.subtype == 'pickup' && t.resource == 'energy') || (t.type == 'energy' && t.structure != 'link'); }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         'priority');
                 if (tasks.length > 0) {
                     _Tasks.giveTask(creep, tasks[0]);
@@ -419,7 +441,7 @@ var _Tasks = {
                 if (creep.getActiveBodyparts('work') > 0) {
                     tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                         function (t) { return t.type == 'mine' && t.resource == 'energy'; }), 
-                        function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                     if (tasks.length > 0) {
                         _Tasks.giveTask(creep, tasks[0]);
                         return;
@@ -441,7 +463,7 @@ var _Tasks = {
 
             tasks = _.sortBy(_.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                     function (t) { return t.type == 'carry' && t.subtype == 'deposit' && t.resource == 'energy'; }), 
-                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     'priority');
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
@@ -462,7 +484,7 @@ var _Tasks = {
 
             tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                 function (t) { return t.type == 'mine' && t.resource == 'mineral'; }), 
-                function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
@@ -477,7 +499,7 @@ var _Tasks = {
 
             tasks = _.sortBy(_.filter(Memory['hive']['rooms'][creep.room.name]['tasks'], 
                     function (t) { return t.type == 'carry' && t.resource == 'mineral'; }), 
-                    function(t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
