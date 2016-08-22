@@ -195,7 +195,7 @@ var _Sites = {
         } },
 
 
-    Industry: function(rmColony, spawnDistance, listPopulation, listTasks) {
+    Industry: function(rmColony, spawnDistance, listPopulation, listLabs, listTasks) {
         var lCourier  = _.filter(Game.creeps, (c) => c.memory.role == 'courier' && c.memory.room == rmColony && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
         var popTarget = (listPopulation['courier'] == null ? 0 : listPopulation['courier']['amount']);
@@ -207,8 +207,31 @@ var _Sites = {
                 null, {role: 'courier', room: rmColony});            
         }
 
-        // TO DO: Implement listTasks!!! implement tasks as type 'industry' and subtype as 'courier', 'reaction', or 'boost'
-            // then courier tasks go to the courier, and reaction tasks go to the labs
+        for (var l in listLabs) {
+             switch (listLabs[l]['action']) {
+                default:
+                    return;
+
+                case 'reaction':
+                    var labMain = Game.getObjectById(listLabs[l]['main']);
+                    var labSupply1 = Game.getObjectById(listLabs[l]['supply1']);
+                    var labSupply2 = Game.getObjectById(listLabs[l]['supply2']);  
+                    if (labMain && labSupply1 && labSupply2) {
+                        labMain.runReaction(labSupply1, labSupply2);
+                    }
+                    return;
+
+                case 'boost':
+                    return;
+             }
+        }
+
+        for (var t in listTasks) {
+            var _Tasks = require('_tasks');
+            listTasks[t]['type'] = 'industry';
+            listTasks[t]['pos'] = Game.getObjectById(listTasks[t]['id']).pos;
+            _Tasks.addTask(rmColony, listTasks[t]);
+        }
 
         for (var n in Game.creeps) {
             var creep = Game.creeps[n];

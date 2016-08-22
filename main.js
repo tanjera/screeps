@@ -5,9 +5,7 @@ module.exports.loop = function () {
 
     /* TO DO:
         * industry:
-                - finish implementing task system for industry
-                        ... both in Sites.Industry, and in _Tasks!
-                - create for loop, cycle through labs, assign tasks/reactions
+            - add boosting
 
         * task system:
             - add dismantle and combat tasks            
@@ -33,8 +31,7 @@ module.exports.loop = function () {
              {id: '57a25c61958cffd536325056', role: 'receive'}]);
     _Sites.Mining('W18S43', 'W18S43', 2,
             { burrower:  {level: 7, amount: 1},
-              carrier:   {level: 7, amount: 2},              
-              extractor: {level: 6, amount: 1} } );
+              carrier:   {level: 7, amount: 2} } );
 
     /* Colony #2, W19S42 */
     _Sites.Colony('W19S42', 3,
@@ -64,7 +61,7 @@ module.exports.loop = function () {
 
     /* Colony #4, W15S43 */
     _Sites.Colony('W15S43', 3,
-            { worker:   {level: 5, amount: 4},
+            { worker:   {level: 5, amount: 3},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 5, amount: 1} } );      
     _Sites.Mining('W15S43', 'W15S43', 2,
@@ -135,7 +132,7 @@ module.exports.loop = function () {
               reserver:  {level: 5, amount: 1} } );
     _Sites.Mining('W15S43', 'W15S45', 0,
             { burrower:  {level: 5, amount: 2},
-              carrier:   {level: 5, amount: 8, body: 'all-terrain'},
+              carrier:   {level: 5, amount: 9, body: 'all-terrain'},
               multirole: {level: 5, amount: 1} } );
 
     /* Run end-tick _Hive functions */
