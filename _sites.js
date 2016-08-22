@@ -210,27 +210,55 @@ var _Sites = {
         for (var l in listLabs) {
              switch (listLabs[l]['action']) {
                 default:
-                    return;
+                    break;
 
                 case 'reaction':
-                    var labMain = Game.getObjectById(listLabs[l]['main']);
-                    var labSupply1 = Game.getObjectById(listLabs[l]['supply1']);
-                    var labSupply2 = Game.getObjectById(listLabs[l]['supply2']);  
-                    if (labMain && labSupply1 && labSupply2) {
+                    
+                    var labMain = Game.getObjectById(listLabs[l]['labs'][0]);
+                    var labSupply1 = Game.getObjectById(listLabs[l]['labs'][1]);
+                    var labSupply2 = Game.getObjectById(listLabs[l]['labs'][2]);  
+                    if (labMain != null && labSupply1 != null && labSupply2 != null) {
                         labMain.runReaction(labSupply1, labSupply2);
                     }
-                    return;
+                    break;
 
                 case 'boost':
-                    return;
+                    break;
              }
         }
 
-        for (var t in listTasks) {
-            var _Tasks = require('_tasks');
-            listTasks[t]['type'] = 'industry';
-            listTasks[t]['pos'] = Game.getObjectById(listTasks[t]['id']).pos;
-            _Tasks.addTask(rmColony, listTasks[t]);
+        if (_Hive.isPulse) {
+            for (var t in listTasks) {
+                var _Tasks = require('_tasks');
+                listTasks[t]['type'] = 'industry';
+                var obj = Game.getObjectById(listTasks[t]['id']);
+                listTasks[t]['pos'] = obj.pos;
+                
+                if (listTasks[t]['subtype'] == 'withdraw') {
+                    var target = Game.getObjectById(listTasks[t]['target']);
+                    if ((obj.structureType == STRUCTURE_STORAGE || obj.structureType == STRUCTURE_CONTAINER) 
+                            && Object.keys(obj.store).includes(listTasks[t]['resource'])) {
+                        if (target != null && target.structureType == STRUCTURE_LAB) {
+                            if (target.mineralAmount < target.mineralCapacity * 0.8) {
+                                _Tasks.addTask(rmColony, listTasks[t]);
+                            }
+                        } else {
+                            _Tasks.addTask(rmColony, listTasks[t]);
+                        }
+                    } else {
+                        _Tasks.addTask(rmColony, listTasks[t]);
+                    }
+                } else if (listTasks[t]['subtype'] == 'deposit') {
+                    if (obj.structureType == STRUCTURE_LAB) {
+                        if (obj.mineralAmount < obj.mineralCapacity 
+                                && (obj.mineralType == listTasks[t]['resource'] || obj.mineralType == null)) {
+                            _Tasks.addTask(rmColony, listTasks[t]);
+                        }                        
+                    } else {
+                        _Tasks.addTask(rmColony, listTasks[t]);
+                    }
+                }
+            }
         }
 
         for (var n in Game.creeps) {

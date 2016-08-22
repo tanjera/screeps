@@ -33,7 +33,7 @@ var __Creep = {
 
             case 'withdraw':
                 var obj = Game.getObjectById(creep.memory.task['id']);
-                if (creep.withdraw(obj, 'energy') == ERR_NOT_IN_RANGE) {
+                if (creep.withdraw(obj, creep.memory.task['resource']) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _ticksReusePath}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
                 } else {    // Action takes one tick... task complete... delete task...

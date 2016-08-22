@@ -4,7 +4,11 @@ var _Hive = require('_hive');
 module.exports.loop = function () {
 
     /* TO DO:
+        * add wait task!!!! 
+
         * industry:
+            - courier efficiency is mediocre... optimize?
+            - error checking that all function arguments are present (e.g. listLabs['labs'] length)
             - add boosting
 
         * task system:
@@ -32,6 +36,15 @@ module.exports.loop = function () {
     _Sites.Mining('W18S43', 'W18S43', 2,
             { burrower:  {level: 7, amount: 1},
               carrier:   {level: 7, amount: 2} } );
+    _Sites.Industry('W18S43', 2,
+            { courier:   {level: 5, amount: 1} },
+            { UL:   {action: 'reaction', labs: ['579f9f2549708a4306732b3e', '57a0539e25bdfd7a71d9a527', '57a02f90b712db3b1f1c399c'] } },
+            { U1:   {subtype: 'withdraw', resource: 'U', id: '5784906f1336e9037d76403c', target: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 2 },
+              L1:   {subtype: 'withdraw', resource: 'L', id: '5784906f1336e9037d76403c', target: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
+              U2:   {subtype: 'deposit', resource: 'U', id: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 2 },
+              L2:   {subtype: 'deposit', resource: 'L', id: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
+              UL1:  {subtype: 'withdraw', resource: 'UL', id: '579f9f2549708a4306732b3e', timer: 10, creeps: 8, priority: 1 },
+              UL2:  {subtype: 'deposit', resource: 'L', id: '5784906f1336e9037d76403c', timer: 10, creeps: 8, priority: 1 } } );
 
     /* Colony #2, W19S42 */
     _Sites.Colony('W19S42', 3,

@@ -38,10 +38,14 @@ var _Hive = {
         Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   
     },
 
+    isPulse: function() {
+        return Game.time % 5 == 0;
+    },
+
     initTasks: function() {
         var _Tasks = require('_tasks');
         var startCpu = Game.cpu.getUsed();        
-        if (Game.time % 5 == 0) {            
+        if (_Hive.isPulse()) {            
             for (var r in Game['rooms']) {            
                 Memory['hive']['rooms'][r]['tasks'] = {};
                 _Tasks.compileTasks(r);
