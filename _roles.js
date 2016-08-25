@@ -137,11 +137,20 @@ var _Roles = {
             return;
         }
         else {
-            if ((creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE 
-                    ? creep.moveTo(creep.room.controller) 
-                    : creep.reserveController(creep.room.controller)) == OK) {
+            var result = creep.reserveController(creep.room.controller); 
+            if (result == ERR_NOT_IN_RANGE) {
+                creep.moveTo(creep.room.controller)
                 return;
-            }
+            } else if (result == OK) {
+                if (Game.time % 4 == 0) {  // Don't park next to a source (and possibly block it!)
+                    var sources = creep.pos.findInRange(FIND_SOURCES, 1);
+                    if (sources != null && sources.length > 0) {
+                        var __creep = require('__creep');
+                        __creep.moveFrom(creep, sources[0]);
+                    }
+                }
+                return;
+            }                
         } },
 
     Soldier: function(creep) {

@@ -2,8 +2,8 @@ var _Tasks = {
 
     addTask: function (rmName, incTask) {
         /* Task format:
-            type:       combat | work | mine | carry | energy
-            subtype:    pickup | withdraw | deposit | harvest | upgrade | repair | dismantle | attack | defend | heal            
+            type:       combat | work | mine | carry | energy | industry | wait
+            subtype:    pickup | withdraw | deposit | harvest | upgrade | repair | dismantle | attack | defend | heal | wait            
             priority:   on a scale of 1-10; only competes with tasks of same type
             structure:  link | storage
             resource:   energy | mineral
@@ -211,11 +211,16 @@ var _Tasks = {
                         return;
                     }
                 }
-
-                // If there is no energy to get... at least do something!
+                
                 if (creep.memory.task == null) {
-                    creep.memory.state = 'delivering';
-                    return;
+                    // If there is no energy to get... deliver or wait.
+                    if (_.sum(creep.carry) > creep.carryCapacity * 0.8) {
+                        creep.memory.state = 'delivering';
+                        return;
+                    } else {
+                        _Tasks.giveTask(creep, {type: 'wait', subtype: 'wait', timer: 5});
+                        return;
+                    }
                 }
             }
         } else {
@@ -349,8 +354,8 @@ var _Tasks = {
                     id: piles[i].id,
                     pos: piles[i].pos,
                     timer: 10, 
-                    creeps: 1,
-                    priority: piles[i].resourceType == 'energy' ? 2 : 1,
+                    creeps: Math.ceil(piles[i].amount / 1000),
+                    priority: 1
                 });
         }
 
@@ -456,7 +461,7 @@ var _Tasks = {
                         pos: link.pos,
                         timer: 5,
                         creeps: 2,
-                        priority: 1
+                        priority: 3
                     });
                 }
             }

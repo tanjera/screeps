@@ -4,15 +4,15 @@ var _Hive = {
         if (Game.cpu.bucket > 9000) {
             return Game.time % 5 == 0;
         } else if (Game.cpu.bucket > 7000) {
-            return Game.time % 8 == 0;
-        } else if (Game.cpu.bucket > 5000) {
             return Game.time % 10 == 0;
-        } else if (Game.cpu.bucket > 3000) {
+        } else if (Game.cpu.bucket > 5000) {
             return Game.time % 15 == 0;
-        } else if (Game.cpu.bucket > 1000) {
+        } else if (Game.cpu.bucket > 3000) {
             return Game.time % 20 == 0;
-        } else if (Game.cpu.bucket <= 1000) {
+        } else if (Game.cpu.bucket > 1000) {
             return Game.time % 30 == 0;
+        } else if (Game.cpu.bucket <= 1000) {
+            return Game.time % 45 == 0;
         }
     },
 
@@ -20,15 +20,15 @@ var _Hive = {
         if (Game.cpu.bucket > 9000) {
             return 5;
         } else if (Game.cpu.bucket > 7000) {
-            return 8;
-        } else if (Game.cpu.bucket > 5000) {
             return 10;
-        } else if (Game.cpu.bucket > 3000) {
+        } else if (Game.cpu.bucket > 5000) {
             return 15;
-        } else if (Game.cpu.bucket > 1000) {
+        } else if (Game.cpu.bucket > 3000) {
             return 20;
-        } else if (Game.cpu.bucket <= 1000) {
+        } else if (Game.cpu.bucket > 1000) {
             return 30;
+        } else if (Game.cpu.bucket <= 1000) {
+            return 45;
         }
     },
 

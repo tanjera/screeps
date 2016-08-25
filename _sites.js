@@ -232,7 +232,12 @@ var _Sites = {
 
             for (var t in listTasks) {                
                 var task = listTasks[t];
+                
                 var obj = Game.getObjectById(task['id']);
+                if (obj == null) {
+                    continue;
+                }
+
                 task['pos'] = obj.pos;
                 
                 if (task['subtype'] == 'withdraw') {
@@ -245,11 +250,13 @@ var _Sites = {
                             _Tasks.addTask(rmColony, task);
                         }
                     } else if (obj.structureType == STRUCTURE_LAB && obj.mineralAmount > obj.mineralCapacity * 0.75) {
-                            _Tasks.addTask(rmColony, task);
-                    }                        
+                        _Tasks.addTask(rmColony, task);
+                    } else if (obj.structureType == STRUCTURE_TERMINAL && Object.keys(obj.store).includes(task['resource'])) {
+                        _Tasks.addTask(rmColony, task);
+                    }
                 } else if (task['subtype'] == 'deposit') {
                     if (obj.structureType == STRUCTURE_LAB) {
-                        if (obj.mineralAmount < obj.mineralCapacity 
+                        if (obj.mineralAmount < obj.mineralCapacity * 0.75
                                 && (obj.mineralType == task['resource'] || obj.mineralType == null)) {
                             _Tasks.addTask(rmColony, task);
                         }                        

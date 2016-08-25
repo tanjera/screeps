@@ -154,12 +154,12 @@ var __Creep = {
         }
 
         if (creep.memory.exit) {
-            var r = creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _Hive.moveReusePath()});
+            creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: _Hive.moveReusePath()});
             
-            if (r == ERR_NO_PATH) {
+            /* if (r == ERR_NO_PATH) {
                 delete creep.memory.route;
                 delete creep.memory.exit;
-            }
+            } */
         }},
 
     moveFrom: function(creep, target) {
