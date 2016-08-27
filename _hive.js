@@ -81,7 +81,20 @@ var _Hive = {
 			- sweep Memory['_request] for any requests
 			- switch per request type (task injection, log request, terminal send order, etc.)
 			- run switch
-		*/
+		*/		
+		
+		if (Memory['_request'] != null) {
+			switch (Memory['request']) {
+				default:
+					return;
+					
+				case 'log_resources':
+					var __Logs = require('__logs');
+					__Logs.Resources();
+					return;
+					
+			}
+		}
 	},
 	
 	runEconomy: function() {
@@ -96,6 +109,47 @@ var _Hive = {
 			- add a _Sites.Industry for the room to process. *OR* do a _Sites.Commerce that uses a creep of type
 				'courier' (overlaps tasks but not functionality with _Sites.Industry)
 		*/
+		
+		var _Tasks = require('_tasks');
+		if (Memory['_terminals'] == null) Memory['_terminals'] = {};
+		
+        if (_Hive.isPulse()) {
+			var listRooms = Object.keys(Game['rooms']).filter(function(a)
+				{ return Game['rooms'][a].terminal != null && Game['rooms'][a].terminal.my == true; });
+				
+			for (var r in listRooms) {
+				if (Memory['_terminals'][r] == null) {
+					Memory['_terminals'][r] = 
+						{ requests: { energy: 25000 } };
+				}
+				
+				for (var req in Memory['_terminals'][r]['requests']) {
+					var terminal = Game['rooms'][r].terminal;
+					if (Object.keys(terminal.store).includes(req) 
+							&& terminal.store[req] >= Memory['_terminals'][r]['requests'][req])
+						continue;					
+						
+					var storage = Game['rooms'][r].storage;
+					if (storage != null && Object.keys(storage.store).includes(req) 
+							&& storage.store[req] > Memory['_terminals'][r]['requests'][req]) {
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'withdraw', 
+								resource: req, id: storage.id, 
+								timer: 10, creeps: 8, priority: 3 
+							});
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'deposit', 
+								resource: req,
+								id: Game['rooms'][r].terminal.id,
+								timer: 10, creeps: 8, priority: 3 
+							});
+
+					/* CYCLE through other terminals & their storages... send excess to this terminal */
+					}
+				}	
+			}
+			
+		}		
 	}
 	
     populationTally: function(rmName, popTarget, popActual) {
@@ -144,12 +198,16 @@ var _Hive = {
 					var spawn = Game['spawns'][listSpawns[s]];
                     var request = Memory['_spawn_requests'][listRequests[r]];
                     if (Game.map.getRoomLinearDistance(spawn.room.name, request.room) <= request.distance) {
-                        var body = __Creep.getBody(request.body, 
-                            Math.max(1, Math.ceil(Memory['_population_balance'][request.room]['total'] 
-                                * Math.min(request.level, _Hive.getRoom_Level(spawn.room.name)))));
+                        var level = Math.max(1, Math.ceil(Memory['_population_balance'][request.room]['total'] 
+                                * Math.min(request.level, _Hive.getRoom_Level(spawn.room.name))));
+						var body = __Creep.getBody(request.body, level);
                         var result = spawn.createCreep(body, request.name, request.args);
 						
                         if (_.isString(result)) {
+							if (Memory['options']['console'] == 'on') {
+								console.log("<font color="#19C800">Spawning a level " + level + " (of " + request.level + ") " + request.body 
+								+ " at " + spawn.room.name + " for " + request.room + "</font>");
+							}
                             listSpawns[s] = null;
                             listRequests[r] = null;
                         }

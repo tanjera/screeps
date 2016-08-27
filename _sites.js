@@ -245,8 +245,7 @@ var _Sites = {
 						_Tasks.addTask(rmColony, 
 							{   type: 'industry', subtype: 'withdraw', 
 								resource: listing['supply1']['mineral'], 
-								id: storage.id, 
-								target: listing['supply1']['lab'], 
+								id: storage.id, 								
 								timer: 10, creeps: 8, priority: 3 
 							});							
 						_Tasks.addTask(rmColony, 
@@ -263,8 +262,7 @@ var _Sites = {
 						_Tasks.addTask(rmColony, 
 							{   type: 'industry', subtype: 'withdraw', 
 								resource: listing['supply2']['mineral'], 
-								id: storage.id, 
-								target: listing['supply2']['lab'], 
+								id: storage.id,  
 								timer: 10, creeps: 8, priority: 3 
 							});
 						_Tasks.addTask(rmColony, 

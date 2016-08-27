@@ -4,12 +4,20 @@ var _Hive = require('_hive');
 module.exports.loop = function () {
 
     /* TO DO: 
+		* To debug:
+			- Memory['hive'] -> Memory... everything populating and reading properly?
+				- Spawns all spawning properly??
+				- Tasks populating and being accepted properly?
+			- Terminal code working?
+				- Terminal requests functioning?
+				- Tasks being created for courier to fill terminals?
+	
 		* logging
 			- look for and process Memory._requests
 			- console.log based on Memory._options.logging
 	
 		* economy/terminal management
-			- implement _Hive.runEconomy()
+			- continue implementing _Hive.runEconomy()
 	
         * CPU management
             - add wait task for multirole!
