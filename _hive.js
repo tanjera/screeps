@@ -41,57 +41,70 @@ var _Hive = {
         }
     },
 
-    initMemory: function() {
-        if (Memory['hive'] == null) { 
-            Memory['hive'] = {}; 
+    initMemory: function() {        
         }
-        if (Memory['hive']['rooms'] == null) { 
-            Memory['hive']['rooms'] = {}; 
-        }
+        if (Memory['_rooms'] == null) Memory['_rooms'] = {};         
 
         // Populate empty room memories
-        for (var k = 0; k < Object.keys(Game['rooms']).length; k++) {
-            var r = Object.keys(Game['rooms'])[k];
-            if (Memory['hive']['rooms'][r] == null) {
-                Memory['hive']['rooms'][r] = {};
-            }
-            if (Memory['hive']['rooms'][r]['tasks'] == null) {
-                Memory['hive']['rooms'][r]['tasks'] = {};
-            }
+        for (var r in Game['rooms']) {            
+            if (Memory['_rooms'][r] == null) Memory['_rooms'][r] = {};            
+            if (Memory['_tasks'][r] == null) Memory['_tasks'][r] = {};            
         }
 
         // Set allies
-        Memory['hive']['allies'] = {    Pantek59: '',
-                                        Atavus: '',
-                                        BlackLotus: '',
-                                        Moria: '',
-                                        shedletsky: '' };
+        Memory['_allies'] = {   Pantek59: '',
+								Atavus: '',
+								BlackLotus: '',
+								Moria: '',
+								shedletsky: '' };
 
-        Memory['hive']['population_balance'] = {};  // Reset data for population balancing
-        Memory['hive']['spawn_requests'] = {};      // Reset all spawn requests   
+        Memory['_population_balance'] = {};  // Reset data for population balancing
+        Memory['_spawn_requests'] = {};      // Reset all spawn requests
+		
+		if (Memory['_request'] == null) Memory['request'] = {};
+		if (Memory['_options'] == null) Memory['options'] = { console: 'on' };
     },    
 
     initTasks: function() {
         var _Tasks = require('_tasks');
-        var startCpu = Game.cpu.getUsed();        
-        if (_Hive.isPulse()) {            
+        if (_Hive.isPulse()) {
+			Memory['_tasks'] = {};
             for (var r in Game['rooms']) {            
-                Memory['hive']['rooms'][r]['tasks'] = {};
+                Memory['_tasks'][r] = {};
                 _Tasks.compileTasks(r);
             }
         }
-        var elapsed = Game.cpu.getUsed() - startCpu;
-        //console.log(elapsed + ' CPU on Tasks.compileTasks');
     },
-
-
+	
+	processRequests: function() {
+		/* IMPLEMENT!!!! 		
+			- sweep Memory['_request] for any requests
+			- switch per request type (task injection, log request, terminal send order, etc.)
+			- run switch
+		*/
+	},
+	
+	runEconomy: function() {
+		/* IMPLEMENT!!!! 
+			- on isPulse()
+			- cycle through each Game['rooms'], note each terminal (owned by me!)
+			- have settings for default energy and mineral levels for each terminal
+				- 25K energy per terminal
+			- see which minerals are in excess of default values			
+			
+			- also add courier tasks for each terminal!
+			- add a _Sites.Industry for the room to process. *OR* do a _Sites.Commerce that uses a creep of type
+				'courier' (overlaps tasks but not functionality with _Sites.Industry)
+		*/
+	}
+	
     populationTally: function(rmName, popTarget, popActual) {
         // Tallies the target population for a colony, to be used for spawn load balancing
-        if (Memory['hive']['population_balance'][rmName] == null) {
-            Memory['hive']['population_balance'][rmName] = {target: popTarget, actual: popActual, total: null};
+        if (Memory['_population_balance'][rmName] == null) {
+            Memory['_population_balance'][rmName] = {target: popTarget, actual: popActual, total: null};
         } else {
-            Memory['hive']['population_balance'][rmName]['target'] += popTarget;
-            Memory['hive']['population_balance'][rmName]['actual'] += popActual; 
+            Memory['_population_balance'][rmName]['target'] += popTarget;
+            Memory['_population_balance'][rmName]['actual'] += popActual; 
         }
     },
 
@@ -109,33 +122,33 @@ var _Hive = {
             spawnDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
 
-        var i = Object.keys(Memory['hive']['spawn_requests']).length;
-        Memory['hive']['spawn_requests'][i] = {room: rmName, distance: spawnDistance, priority: lvlPriority, level: tgtLevel, body: cBody, name: cName, args: cArgs};
+        var i = Object.keys(Memory['_spawn_requests']).length;
+        Memory['_spawn_requests'][i] = {room: rmName, distance: spawnDistance, priority: lvlPriority, level: tgtLevel, body: cBody, name: cName, args: cArgs};
 	},
 
 
     processSpawnRequests: function() {
         // Determine percentage each colony meets its target population
-        for (var i = 0; i < Object.keys(Memory['hive']['population_balance']).length; i++) {
-            var n = Object.keys(Memory['hive']['population_balance'])[i];
-            Memory['hive']['population_balance'][n]['total'] = Memory['hive']['population_balance'][n]['actual'] / Memory['hive']['population_balance'][n]['target'];
+        for (var n in Memory['_population_balance']) {            
+            Memory['_population_balance'][n]['total'] = Memory['_population_balance'][n]['actual'] / Memory['_population_balance'][n]['target'];
         }
 
-        var listRequests = Object.keys(Memory['hive']['spawn_requests']).sort(function(a, b) { 
-            return Memory['hive']['spawn_requests'][a].priority - Memory['hive']['spawn_requests'][b].priority; } );
+        var listRequests = Object.keys(Memory['_spawn_requests']).sort(function(a, b) { 
+            return Memory['_spawn_requests'][a]['priority'] - Memory['_spawn_requests'][b]['priority']; } );
         var listSpawns = Object.keys(Game['spawns']).filter(function(a) { return Game['spawns'][a].spawning == null; });
         var __Creep = require('__creep');
 
-        for (var r = 0; r < listRequests.length; r++) {
-            for (var s = 0; s < listSpawns.length; s++) {
-                if (listSpawns[s] != null && listRequests[r] != null) {                    
-                    var request = Memory['hive']['spawn_requests'][listRequests[r]];                    
-                    if (Game.map.getRoomLinearDistance(Game['spawns'][listSpawns[s]].room.name, request.room) <= request.distance) {                        
+        for (var r in listRequests) {
+            for (var s in listSpawns) {
+                if (listSpawns[s] != null && listRequests[r] != null) {
+					var spawn = Game['spawns'][listSpawns[s]];
+                    var request = Memory['_spawn_requests'][listRequests[r]];
+                    if (Game.map.getRoomLinearDistance(spawn.room.name, request.room) <= request.distance) {
                         var body = __Creep.getBody(request.body, 
-                            Math.max(1, Math.ceil(Memory['hive']['population_balance'][request.room]['total'] 
-                                * Math.min(request.level, _Hive.getRoom_Level(Game['spawns'][listSpawns[s]].room.name)))));
-                        var result = Game['spawns'][listSpawns[s]].createCreep(body, request.name, request.args);
-
+                            Math.max(1, Math.ceil(Memory['_population_balance'][request.room]['total'] 
+                                * Math.min(request.level, _Hive.getRoom_Level(spawn.room.name)))));
+                        var result = spawn.createCreep(body, request.name, request.args);
+						
                         if (_.isString(result)) {
                             listSpawns[s] = null;
                             listRequests[r] = null;
@@ -149,7 +162,7 @@ var _Hive = {
     processSpawnRenewing: function() {
         var __Creep = require('__creep');
         var listSpawns = Object.keys(Game['spawns']).filter(function(a) { return Game['spawns'][a].spawning == null; });
-        for (var s = 0; s < listSpawns.length; s++) {
+        for (var s in listSpawns) {
             var spawn = Game['spawns'][listSpawns[s]];
             var creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
             for (var c = 0; c < creeps.length; c++) {

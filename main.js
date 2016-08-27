@@ -4,6 +4,13 @@ var _Hive = require('_hive');
 module.exports.loop = function () {
 
     /* TO DO: 
+		* logging
+			- look for and process Memory._requests
+			- console.log based on Memory._options.logging
+	
+		* economy/terminal management
+			- implement _Hive.runEconomy()
+	
         * CPU management
             - add wait task for multirole!
 
@@ -28,7 +35,9 @@ module.exports.loop = function () {
     _Hive.clearDeadMemory();
     _Hive.initMemory();
     _Hive.initTasks();
-
+	_Hive.processRequests();
+	_Hive.runEconomy();
+	
 
     /* Colony #1, W18S43 */
     _Sites.Colony('W18S43', 2,

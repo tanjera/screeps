@@ -4,8 +4,8 @@ var _Hive = require('_hive');
 
 var _Sites = {
     Colony: function(rmColony, spawnDistance, listPopulation, listLinks) {
-        if (Memory['hive']['rooms'][rmColony] == null) {
-            Memory['hive']['rooms'][rmColony] = {};
+        if (Memory['_rooms'][rmColony] == null) {
+            Memory['_rooms'][rmColony] = {};
         }
          
         var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == 'worker' && creep.memory.subrole == null && creep.memory.room == rmColony);
@@ -23,7 +23,7 @@ var _Sites = {
 
         if ((listPopulation['soldier'] != null && lSoldier.length < listPopulation['soldier']['amount']) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length)) {            
+                        return !Object.keys(Memory['_allies']).includes(c.owner.username); }}).length)) {            
             _Hive.requestSpawn(rmColony, 0, 0, (listPopulation['soldier'] == null ? 8 : listPopulation['soldier']['level']), 'soldier', 
                 null, {role: 'soldier', room: rmColony});
         } else if (listPopulation['worker'] != null && lWorker.length < listPopulation['worker']['amount']) {
@@ -56,7 +56,7 @@ var _Sites = {
             var tower = listTowers[t];
             
             var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
-                        return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }});
+                        return !Object.keys(Memory['_allies']).includes(c.owner.username); }});
             if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;
@@ -79,7 +79,7 @@ var _Sites = {
 
         // Process links via listLinks parameter (an array of [id: '', role: 'send/receive'])
         if (listLinks != null) {
-            Memory['hive']['rooms'][rmColony]['links'] = listLinks;
+            Memory['_rooms'][rmColony]['links'] = listLinks;
 
             var linksSend = _.filter(listLinks, (obj) => { return obj.id && obj['role'] == 'send'; });
             var linksReceive = _.filter(listLinks, (obj) => { return obj.id && obj['role'] == 'receive'; });
@@ -117,10 +117,10 @@ var _Sites = {
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length > 0) {
+                        {filter: function(c) { return !Object.keys(Memory['_allies']).includes(c.owner.username); }}).length > 0) {
             var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == 'soldier' && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length) {
+                        {filter: function(c) { return !Object.keys(Memory['_allies']).includes(c.owner.username); }}).length) {
                 _Hive.requestSpawn(rmColony, 0, 0, 8, 'soldier', null, {role: 'soldier', room: rmHarvest, colony: rmColony});
             }
         }
@@ -175,7 +175,7 @@ var _Sites = {
                 // If the room is safe to run mining operations... run _Roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return !Object.keys(Memory['hive']['allies']).includes(c.owner.username); }}).length == 0)) {
+                        { filter: function(c) { return !Object.keys(Memory['_allies']).includes(c.owner.username); }}).length == 0)) {
                     if (creep.memory.role == 'miner' || creep.memory.role == 'burrower' || creep.memory.role == 'carrier') {
                         _Roles.Mining(creep, rmColony, rmHarvest, listRoute);
                     } else if (creep.memory.role == 'multirole') {
@@ -235,46 +235,55 @@ var _Sites = {
                 var listing = listLabs[l];
 
                 // Populate tasks for the courier to load and unload labs
-                if (listing['action'] == 'reaction') {
-                    var storage = Game.rooms[rmColony].storage;
-                    if (storage == null) break;
-                                        
-                    listTasks[_Tasks.randomName()] = 
-                        {   type: 'industry',  subtype: 'withdraw', 
-                            resource: listing['supply1']['mineral'], 
-                            id: storage.id, 
-                            target: listing['supply1']['lab'], 
-                            timer: 10, creeps: 8, priority: 3 
-                        };
+                if (listing['action'] == 'reaction') {                    
+					var storage = Game.rooms[rmColony].storage;
+                    if (storage == null) break;			
+                                 
+                    var target = Game.getObjectById(listing['supply1']['lab']);
+                    if (Object.keys(storage.store).includes(listing['supply1']['mineral']) 
+							&& target.mineralAmount < target.mineralCapacity * 0.5) {
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'withdraw', 
+								resource: listing['supply1']['mineral'], 
+								id: storage.id, 
+								target: listing['supply1']['lab'], 
+								timer: 10, creeps: 8, priority: 3 
+							});							
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'deposit', 
+								resource: listing['supply1']['mineral'],
+								id: listing['supply1']['lab'],
+								timer: 10, creeps: 8, priority: 3 
+							});
+					}
+                    
+                    var target = Game.getObjectById(listing['supply2']['lab']);
+                    if (Object.keys(storage.store).includes(listing['supply2']['mineral']) 
+							&& target.mineralAmount < target.mineralCapacity * 0.5) {
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'withdraw', 
+								resource: listing['supply2']['mineral'], 
+								id: storage.id, 
+								target: listing['supply2']['lab'], 
+								timer: 10, creeps: 8, priority: 3 
+							});
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'deposit', 
+								resource: listing['supply2']['mineral'],
+								id: listing['supply2']['lab'],
+								timer: 10, creeps: 8, priority: 3 
+							});
+					}
 
-                    listTasks[_Tasks.randomName()] = 
-                        {   type: 'industry', subtype: 'withdraw', 
-                            resource: listing['supply2']['mineral'], 
-                            id: storage.id, 
-                            target: listing['supply2']['lab'], 
-                            timer: 10, creeps: 8, priority: 3 
-                        };
-
-                    listTasks[_Tasks.randomName()] =
-                        {   type: 'industry', subtype: 'deposit', 
-                            resource: listing['supply1']['mineral'],
-                            id: listing['supply1']['lab'],
-                            timer: 10, creeps: 8, priority: 3 
-                        };
-
-                    listTasks[_Tasks.randomName()] =
-                        {   type: 'industry', subtype: 'deposit', 
-                            resource: listing['supply2']['mineral'],
-                            id: listing['supply2']['lab'],
-                            timer: 10, creeps: 8, priority: 3 
-                        };
-
-                    listTasks[_Tasks.randomName()] =
-                        {   type: 'industry', subtype: 'withdraw', 
-                            resource: listing['reactor']['mineral'],
-                            id: listing['reactor']['lab'], 
-                            timer: 10, creeps: 8, priority: 2 
-                        };
+					var obj = Game.getObjectById(listing['reactor']['lab']);
+					if (obj.mineralAmount > obj.mineralCapacity * 0.5) {
+						_Tasks.addTask(rmColony, 
+							{   type: 'industry', subtype: 'withdraw', 
+								resource: listing['reactor']['mineral'],
+								id: listing['reactor']['lab'],
+								timer: 10, creeps: 8, priority: 2 
+							};
+					}
                 }
             }
 
