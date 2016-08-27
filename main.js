@@ -4,13 +4,23 @@ var _Hive = require('_hive');
 module.exports.loop = function () {
 
     /* TO DO: 
+        * CPU management
+            - add wait task for multirole!
+
         * industry:
             - add boosting
-            - add standing terminal withdraw tasks (but if terminal storage doesn't have... then don't add the task)
+                - create task route (in _Tasks.assignTask and __Creep.runTask; type 'boost', subtype 'upgrade | heal')
+                - create action 'boost' in for(var lab) switch (in _Sites.Industry)
+                - inject task via _Sites.Industry
+                - manage lab supply with courier
+
+            - add standing terminal withdraw tasks (to _Sites.Industry)
+                - add a bool to manage terminal automatically
+                - for (var resource in terminal.store) { create 'withdraw' task for courier }
 
         * task system:
-            - add dismantle and combat tasks            
-            - utilCreep: add resource types to things like 'withdraw'
+            - add dismantle tasks
+            - utilCreep: add resource types to all tasks? e.g. 'withdraw'
     */      
 
 
@@ -21,7 +31,7 @@ module.exports.loop = function () {
 
 
     /* Colony #1, W18S43 */
-    _Sites.Colony('W18S43', 3,                      
+    _Sites.Colony('W18S43', 2,
             { worker:   {level: 6, amount: 1},
               repairer: {level: 6, amount: 1},
               upgrader: {level: 7, amount: 1} },
@@ -34,25 +44,23 @@ module.exports.loop = function () {
               carrier:   {level: 7, amount: 2} } );
     _Sites.Industry('W18S43', 2,
             { courier:   {level: 5, amount: 1} },
-            { OH:   {action: 'reaction', labs: ['579f9f2549708a4306732b3e', '57bc12855c9bd87c51d9abda', '57bc7f418cd23da102392560'] },
-              OH_2: {action: 'reaction', labs: ['57bc412f58d9edd776d1a39e', '57bc12855c9bd87c51d9abda', '57bc7f418cd23da102392560'] },
-              GH2O: {action: 'reaction', labs: ['57a0539e25bdfd7a71d9a527', '57a02f90b712db3b1f1c399c', '579f9f2549708a4306732b3e'] } },
-            { GH_s:   {type: 'industry', subtype: 'withdraw', resource: 'GH', id: '5784906f1336e9037d76403c', target: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },              
-              GH_l:   {type: 'industry', subtype: 'deposit', resource: 'GH', id: '57a02f90b712db3b1f1c399c', timer: 10, creeps: 8, priority: 2 },
-              H_s:   {type: 'industry', subtype: 'withdraw', resource: 'H', id: '5784906f1336e9037d76403c', target: '57bc7f418cd23da102392560', timer: 10, creeps: 8, priority: 2 },              
-              H_l:   {type: 'industry', subtype: 'deposit', resource: 'H', id: '57bc7f418cd23da102392560', timer: 10, creeps: 8, priority: 2 },
-              O_s:   {type: 'industry', subtype: 'withdraw', resource: 'O', id: '5784906f1336e9037d76403c', target: '57bc12855c9bd87c51d9abda', timer: 10, creeps: 8, priority: 2 },              
-              O_l:   {type: 'industry', subtype: 'deposit', resource: 'O', id: '57bc12855c9bd87c51d9abda', timer: 10, creeps: 8, priority: 2 },
-              GH20_l:  {type: 'industry', subtype: 'withdraw', resource: 'GH2O', id: '57a0539e25bdfd7a71d9a527', timer: 10, creeps: 8, priority: 1 },
-              GH20_s:  {type: 'industry', subtype: 'deposit', resource: 'GH2O', id: '5784906f1336e9037d76403c', timer: 10, creeps: 8, priority: 1 },
-              OH_l1:  {type: 'industry', subtype: 'withdraw', resource: 'OH', id: '579f9f2549708a4306732b3e', timer: 10, creeps: 8, priority: 1 },
-              OH_l2:  {type: 'industry', subtype: 'withdraw', resource: 'OH', id: '57bc412f58d9edd776d1a39e', timer: 10, creeps: 8, priority: 1 },
-              OH_s:  {type: 'industry', subtype: 'deposit', resource: 'OH', id: '5784906f1336e9037d76403c', timer: 10, creeps: 8, priority: 1 },
-              U_term:  {type: 'industry', subtype: 'withdraw', resource: 'U', id: '57a03063c20303fd1e5e125a', timer: 10, creeps: 8, priority: 2 },
-              H_term:  {type: 'industry', subtype: 'withdraw', resource: 'H', id: '57a03063c20303fd1e5e125a', timer: 10, creeps: 8, priority: 2 } } );
+            { UH1:   { action: 'reaction', 
+                      reactor: {mineral: 'UH',  lab: '57bc412f58d9edd776d1a39e'},
+                      supply1: {mineral: 'U',   lab: '57bc12855c9bd87c51d9abda'},
+                      supply2: {mineral: 'H',   lab: '57bc7f418cd23da102392560'} },
+              UH2:   { action: 'reaction', 
+                      reactor: {mineral: 'UH',  lab: '57a0539e25bdfd7a71d9a527'},
+                      supply1: {mineral: 'U',   lab: '57bc12855c9bd87c51d9abda'},
+                      supply2: {mineral: 'H',   lab: '57bc7f418cd23da102392560'} },
+              UH2O:   { action: 'reaction', 
+                      reactor: {mineral: 'UH2O',  lab: '579f9f2549708a4306732b3e'},
+                      supply1: {mineral: 'UH',   lab: '57bc412f58d9edd776d1a39e'},
+                      supply2: {mineral: 'OH',   lab: '57a02f90b712db3b1f1c399c'} } },
+            { t_H:  {type: 'industry', subtype: 'withdraw', resource: 'H', id: '57a03063c20303fd1e5e125a', timer: 10, creeps: 8, priority: 4 },
+              t_en: {type: 'industry', subtype: 'withdraw', resource: 'energy', id: '57a03063c20303fd1e5e125a', timer: 10, creeps: 8, priority: 4 } } );
 
     /* Colony #2, W19S42 */
-    _Sites.Colony('W19S42', 3,
+    _Sites.Colony('W19S42', 2,
             { worker:   {level: 7, amount: 2},
               repairer: {level: 6, amount: 1},
               upgrader: {level: 6, amount: 1} },
@@ -65,7 +73,7 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 1} } );
 
     /* Colony #3, W15S41 */
-    _Sites.Colony('W15S41', 3,
+    _Sites.Colony('W15S41', 2,
             { worker:   {level: 6, amount: 2},
               repairer: {level: 6, amount: 1},
               upgrader: {level: 6, amount: 1} },
@@ -79,19 +87,21 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 2} } );
 
     /* Colony #4, W15S43 */
-    _Sites.Colony('W15S43', 3,
+    _Sites.Colony('W15S43', 2,
             { worker:   {level: 6, amount: 2},
               repairer: {level: 5, amount: 1},
-              upgrader: {level: 6, amount: 1} } );      
+              upgrader: {level: 6, amount: 2} } );      
     _Sites.Mining('W15S43', 'W15S43', 2,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 5, amount: 2} } );
               
     /* Colony #5, W13S41 */
-    _Sites.Colony('W13S41', 3,
-            { worker:   {level: 4, amount: 3},
+    _Sites.Colony('W13S41', 2,
+            { worker:   {level: 4, amount: 4},
               repairer: {level: 4, amount: 1},
-              upgrader: {level: 4, amount: 1} } );      
+              upgrader: {level: 4, amount: 3} },              
+            [{id: '57c04f3012c844604895d81f', role: 'send'},             
+             {id: '57c06b8698040e1908490daf', role: 'receive'}]);      
     _Sites.Mining('W13S41', 'W13S41', 3,
             { burrower:  {level: 4, amount: 2},
               carrier:   {level: 4, amount: 3} } );

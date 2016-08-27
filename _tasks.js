@@ -1,5 +1,12 @@
 var _Tasks = {
 
+    randomName: function() {
+        return index = 'xxxxxx-xxxxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+        },
+
     addTask: function (rmName, incTask) {
         /* Task format:
             type:       combat | work | mine | carry | energy | industry | wait
@@ -15,9 +22,9 @@ var _Tasks = {
          */
 
         var index = incTask['type'] + '-' + incTask['subtype'] + '-' 
-                + 'xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-                return v.toString(16);
+            + 'xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
             });
 
         Memory['hive']['rooms'][rmName]['tasks'][index] = incTask;

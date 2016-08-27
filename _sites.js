@@ -205,20 +205,20 @@ var _Sites = {
         if (listPopulation['courier'] != null && lCourier.length < listPopulation['courier']['amount']) {
             _Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation['courier']['level'], 'courier', 
                 null, {role: 'courier', room: rmColony});            
-        }
+        }        
 
         for (var l in listLabs) {
-             switch (listLabs[l]['action']) {
+            var listing = listLabs[l];
+             switch (listing['action']) {
                 default:
                     break;
 
                 case 'reaction':
-                    if (Object.keys(listLabs[l]['labs']).length != 3) break;
-                    var labMain = Game.getObjectById(listLabs[l]['labs'][0]);
-                    var labSupply1 = Game.getObjectById(listLabs[l]['labs'][1]);
-                    var labSupply2 = Game.getObjectById(listLabs[l]['labs'][2]);  
-                    if (labMain != null && labSupply1 != null && labSupply2 != null) {
-                        labMain.runReaction(labSupply1, labSupply2);
+                    var labReactor = Game.getObjectById(listing['reactor']['lab']);
+                    var labSupply1 = Game.getObjectById(listing['supply1']['lab']);
+                    var labSupply2 = Game.getObjectById(listing['supply2']['lab']);  
+                    if (labReactor != null && labSupply1 != null && labSupply2 != null) {
+                        labReactor.runReaction(labSupply1, labSupply2);
                     }
                     break;
 
@@ -229,6 +229,54 @@ var _Sites = {
 
         if (_Hive.isPulse()) {
             var _Tasks = require('_tasks');
+            if (listTasks == null)  listTasks = {};
+
+            for (var l in listLabs) {                
+                var listing = listLabs[l];
+
+                // Populate tasks for the courier to load and unload labs
+                if (listing['action'] == 'reaction') {
+                    var storage = Game.rooms[rmColony].storage;
+                    if (storage == null) break;
+                                        
+                    listTasks[_Tasks.randomName()] = 
+                        {   type: 'industry',  subtype: 'withdraw', 
+                            resource: listing['supply1']['mineral'], 
+                            id: storage.id, 
+                            target: listing['supply1']['lab'], 
+                            timer: 10, creeps: 8, priority: 3 
+                        };
+
+                    listTasks[_Tasks.randomName()] = 
+                        {   type: 'industry', subtype: 'withdraw', 
+                            resource: listing['supply2']['mineral'], 
+                            id: storage.id, 
+                            target: listing['supply2']['lab'], 
+                            timer: 10, creeps: 8, priority: 3 
+                        };
+
+                    listTasks[_Tasks.randomName()] =
+                        {   type: 'industry', subtype: 'deposit', 
+                            resource: listing['supply1']['mineral'],
+                            id: listing['supply1']['lab'],
+                            timer: 10, creeps: 8, priority: 3 
+                        };
+
+                    listTasks[_Tasks.randomName()] =
+                        {   type: 'industry', subtype: 'deposit', 
+                            resource: listing['supply2']['mineral'],
+                            id: listing['supply2']['lab'],
+                            timer: 10, creeps: 8, priority: 3 
+                        };
+
+                    listTasks[_Tasks.randomName()] =
+                        {   type: 'industry', subtype: 'withdraw', 
+                            resource: listing['reactor']['mineral'],
+                            id: listing['reactor']['lab'], 
+                            timer: 10, creeps: 8, priority: 2 
+                        };
+                }
+            }
 
             for (var t in listTasks) {                
                 var task = listTasks[t];
@@ -246,17 +294,17 @@ var _Sites = {
                             && Object.keys(obj.store).includes(task['resource'])) {
                         if (target == null) {
                             _Tasks.addTask(rmColony, task);
-                        } else if (target.structureType == STRUCTURE_LAB && target.mineralAmount < target.mineralCapacity * 0.75) {
+                        } else if (target.structureType == STRUCTURE_LAB && target.mineralAmount < target.mineralCapacity * 0.5) {
                             _Tasks.addTask(rmColony, task);
                         }
-                    } else if (obj.structureType == STRUCTURE_LAB && obj.mineralAmount > obj.mineralCapacity * 0.75) {
+                    } else if (obj.structureType == STRUCTURE_LAB && obj.mineralAmount > obj.mineralCapacity * 0.5) {
                         _Tasks.addTask(rmColony, task);
                     } else if (obj.structureType == STRUCTURE_TERMINAL && Object.keys(obj.store).includes(task['resource'])) {
                         _Tasks.addTask(rmColony, task);
                     }
                 } else if (task['subtype'] == 'deposit') {
                     if (obj.structureType == STRUCTURE_LAB) {
-                        if (obj.mineralAmount < obj.mineralCapacity * 0.75
+                        if (obj.mineralAmount < obj.mineralCapacity * 0.5
                                 && (obj.mineralType == task['resource'] || obj.mineralType == null)) {
                             _Tasks.addTask(rmColony, task);
                         }                        
