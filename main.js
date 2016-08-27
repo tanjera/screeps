@@ -11,6 +11,7 @@ module.exports.loop = function () {
 			- Terminal code working?
 				- Terminal requests functioning?
 				- Tasks being created for courier to fill terminals?
+				- IF FUNCTIONING: uncomment terminal.send() so it'll work!
 	
 		* logging
 			- look for and process Memory._requests

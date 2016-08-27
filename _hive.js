@@ -119,19 +119,20 @@ var _Hive = {
 				
 			for (var r in listRooms) {
 				if (Memory['_terminals'][r] == null) {
-					Memory['_terminals'][r] = 
-						{ requests: { energy: 25000 } };
+					Memory['_terminals'][r] = // Terminals have minimums storage amounts and active requests
+						{ minimum: { energy: 5000 }, requests: {} };
 				}
 				
-				for (var req in Memory['_terminals'][r]['requests']) {
-					var terminal = Game['rooms'][r].terminal;
+				var terminal = Game['rooms'][r].terminal;
+				
+				for (var req in Memory['_terminals'][r]['minimum']) {					
 					if (Object.keys(terminal.store).includes(req) 
-							&& terminal.store[req] >= Memory['_terminals'][r]['requests'][req])
+							&& terminal.store[req] >= Memory['_terminals'][r]['minimum'][req])
 						continue;					
 						
-					var storage = Game['rooms'][r].storage;
-					if (storage != null && Object.keys(storage.store).includes(req) 
-							&& storage.store[req] > Memory['_terminals'][r]['requests'][req]) {
+					// If there's some in storage, just bring the supply from storage!
+					var storage = Game['rooms'][r].storage;					
+					if (storage != null && Object.keys(storage.store).includes(req)) {
 						_Tasks.addTask(rmColony, 
 							{   type: 'industry', subtype: 'withdraw', 
 								resource: req, id: storage.id, 
@@ -143,12 +144,46 @@ var _Hive = {
 								id: Game['rooms'][r].terminal.id,
 								timer: 10, creeps: 8, priority: 3 
 							});
+							
+						if (Memory['options']['console'] == 'on') {
+							console.log("<font color="#45C9BE">Transferring from storage: terminal " + r
+									+ "placing tasks for " + req + "</font>");
+					}
 
-					/* CYCLE through other terminals & their storages... send excess to this terminal */
+					}
+					
+					// Place any defecit for the supply into orders					
+					var amount = Object.keys(terminal.store).includes(req)
+						? Memory['_terminals'][r]['minimum'][req] - terminal.store[req]
+						: Memory['_terminals'][r]['minimum'][req];
+					Memory['_terminals'][r]['requests'][req] = amount;
+					if (Memory['options']['console'] == 'on') {
+						console.log("<font color="#00BDAD">Requesting order: terminal " + r
+								+ "requesting " + amount + " of " + req + "</font>");
 					}
 				}	
-			}
-			
+				
+				// Recurse all other rooms' terminal orders, see if this terminal can fill the order
+				for (var r2 in listRooms) {
+					if (r2 == r) continue;
+					
+					for (var req in Memory['terminals'][r2]['requests']) {
+						if (Object.keys(terminal.store).includes(req)) {
+							// IMPLEMENT: If this terminal has excess, send excess
+							if (Object.keys(Memory['terminals'][r]['minimum']).contains(req) 
+									|| Object.keys(Memory['terminals'][r]['requests']).contains(req))
+								continue;
+								
+							var amount = Math.min(terminal.store[req], Memory['terminals'][r2]['requests'][req]);
+							if (Memory['options']['console'] == 'on') {
+								console.log("<font color="#008B75">Sending from terminal " + r2 + " to " 
+										+ r1 + " " + amount + " of " + req + "</font>");
+							}
+							//terminal.send(req, amount, r2);
+						}
+					}
+				}
+			}			
 		}		
 	}
 	
@@ -206,7 +241,7 @@ var _Hive = {
                         if (_.isString(result)) {
 							if (Memory['options']['console'] == 'on') {
 								console.log("<font color="#19C800">Spawning a level " + level + " (of " + request.level + ") " + request.body 
-								+ " at " + spawn.room.name + " for " + request.room + "</font>");
+										+ " at " + spawn.room.name + " for " + request.room + "</font>");
 							}
                             listSpawns[s] = null;
                             listRequests[r] = null;
