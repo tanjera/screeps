@@ -1,4 +1,4 @@
-var _Hive = {
+let _Hive = {
 
     isPulse: function() {
         if (Game.cpu.bucket > 9000) {
@@ -34,7 +34,7 @@ var _Hive = {
 
     clearDeadMemory: function() {
         // Clear dead creeps from Memory
-        for (var n in Memory.creeps) {
+        for (let n in Memory.creeps) {
             if (!Game.creeps[n]) {
                 delete Memory.creeps[n];
             }
@@ -46,7 +46,7 @@ var _Hive = {
         if (Memory["_rooms"] == null) Memory["_rooms"] = {};         
 
         // Populate empty room memories
-        for (var r in Game["rooms"]) {            
+        for (let r in Game["rooms"]) {            
             if (Memory["_rooms"][r] == null) Memory["_rooms"][r] = {};            
             if (Memory["_tasks"][r] == null) Memory["_tasks"][r] = {};            
         }
@@ -66,10 +66,10 @@ var _Hive = {
     },    
 
     initTasks: function() {
-        var _Tasks = require("_tasks");
+        let _Tasks = require("_tasks");
         if (_Hive.isPulse()) {
 			Memory["_tasks"] = {};
-            for (var r in Game["rooms"]) {            
+            for (let r in Game["rooms"]) {            
                 Memory["_tasks"][r] = {};
                 _Tasks.compileTasks(r);
             }
@@ -77,52 +77,35 @@ var _Hive = {
     },
 	
 	processRequests: function() {
+		// To be used for injecting tasks or terminal order requests
 		if (Memory["_request"] != null) {
 			switch (Memory["request"]) {
 				default:
-					return;
-					
-				case "log-resources":
-					var __Logs = require("__logs");
-					__Logs.Resources();
-					return;
-					
+					return;					
 			}
 		}
 		
 		Memory["request"] = null;
 	},
 	
-	runEconomy: function() {
-		/* IMPLEMENT!!!! 
-			- on isPulse()
-			- cycle through each Game["rooms"], note each terminal (owned by me!)
-			- have settings for default energy and mineral levels for each terminal
-				- 25K energy per terminal
-			- see which minerals are in excess of default values			
-			
-			- also add courier tasks for each terminal!
-			- add a _Sites.Industry for the room to process. *OR* do a _Sites.Commerce that uses a creep of type
-				"courier" (overlaps tasks but not functionality with _Sites.Industry)
-		*/
-		
-		var _Tasks = require("_tasks");
+	runEconomy: function() {		
+		let _Tasks = require("_tasks");
 		if (Memory["_terminals"] == null) Memory["_terminals"] = {};
 		
         if (_Hive.isPulse()) {
-			var listRooms = Object.keys(Game["rooms"]).filter(function(a)
+			let listRooms = Object.keys(Game["rooms"]).filter((a) => 
 				{ return Game["rooms"][a].terminal != null && Game["rooms"][a].terminal.my == true; });
 				
-			for (var r in listRooms) {
+			for (let r in listRooms) {
 				if (Memory["_terminals"][r] == null) {
 					Memory["_terminals"][r] = // Terminals have minimums storage amounts and active requests
 						{ minimum: { energy: 5000 }, requests: {} };
 				}
 				
-				var terminal = Game["rooms"][r].terminal;
-				var storage = Game["rooms"][r].storage;
+				let terminal = Game["rooms"][r].terminal;
+				let storage = Game["rooms"][r].storage;
 				
-				for (var req in Memory["_terminals"][r]["minimum"]) {					
+				for (let req in Memory["_terminals"][r]["minimum"]) {					
 					if (Object.keys(terminal.store).includes(req) 
 							&& terminal.store[req] >= Memory["_terminals"][r]["minimum"][req])
 						continue;					
@@ -142,37 +125,35 @@ var _Hive = {
 							});
 							
 						if (Memory["options"]["console"] == "on") {
-							console.log("<font color=\"#45C9BE\">Transferring from storage: terminal " + r
-									+ "placing tasks for " + req + "</font>");
+							console.log(`<font color=\"#45C9BE\"> Transferring from storage: terminal ${r} placing tasks for 
+								${req} </font>`);
 						}
 					}
 					
 					// Place any defecit for the supply into orders					
-					var amount = Object.keys(terminal.store).includes(req)
+					let amount = Object.keys(terminal.store).includes(req)
 						? Memory["_terminals"][r]["minimum"][req] - terminal.store[req]
 						: Memory["_terminals"][r]["minimum"][req];
 					Memory["_terminals"][r]["requests"][req] = amount;
 					if (Memory["options"]["console"] == "on") {
-						console.log("<font color=\"#00BDAD\">Requesting order: terminal " + r
-								+ "requesting " + amount + " of " + req + "</font>");
+						console.log(`<font color=\"#00BDAD\"> Requesting order: terminal ${r} requesting ${amount} of ${req} </font>`);
 					}
 				}	
 				
 				// Recurse all other rooms" terminal orders, see if this terminal can fill the order
-				for (var r2 in listRooms) {
+				for (let r2 in listRooms) {
 					if (r2 == r) continue;
 					
-					for (var req in Memory["terminals"][r2]["requests"]) {
+					for (let req in Memory["terminals"][r2]["requests"]) {
 						if (Object.keys(terminal.store).includes(req)) {
 							// IMPLEMENT: If this terminal has excess, send excess
 							if (Object.keys(Memory["terminals"][r]["minimum"]).contains(req) 
 									|| Object.keys(Memory["terminals"][r]["requests"]).contains(req))
 								continue;
 								
-							var amount = Math.min(terminal.store[req], Memory["terminals"][r2]["requests"][req]);
+							let amount = Math.min(terminal.store[req], Memory["terminals"][r2]["requests"][req]);
 							if (Memory["options"]["console"] == "on") {
-								console.log("<font color=\"#008B75\">Sending from terminal " + r2 + " to " 
-										+ r1 + " " + amount + " of " + req + "</font>");
+								console.log(`<font color=\"#008B75\"> Sending from terminal ${r} to ${r2} ${amount} of ${req} </font>`);
 							}
 							//terminal.send(req, amount, r2);
 						}
@@ -192,8 +173,8 @@ var _Hive = {
 								});
 								
 							if (Memory["options"]["console"] == "on") {
-								console.log("<font color=\"#45C9BE\">Transferring from storage: terminal " + r
-										+ "placing tasks for " + req + " (to fulfill order for " + r2 + "</font>");
+								console.log(`<font color=\"#45C9BE\"> Transferring from storage: terminal ${r} placing tasks for ${req} 
+									(to fulfill order for ${r2} </font>`);
 							}
 						}
 					}
@@ -226,37 +207,39 @@ var _Hive = {
             spawnDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
 
-        var i = Object.keys(Memory["_spawn_requests"]).length;
-        Memory["_spawn_requests"][i] = {room: rmName, distance: spawnDistance, priority: lvlPriority, level: tgtLevel, body: cBody, name: cName, args: cArgs};
+        let i = Object.keys(Memory["_spawn_requests"]).length;
+        Memory["_spawn_requests"][i] = 
+			{	room: rmName, distance: spawnDistance, priority: lvlPriority, 
+				level: tgtLevel, body: cBody, name: cName, args: cArgs };
 	},
 
 
     processSpawnRequests: function() {
         // Determine percentage each colony meets its target population
-        for (var n in Memory["_population_balance"]) {            
+        for (let n in Memory["_population_balance"]) {            
             Memory["_population_balance"][n]["total"] = Memory["_population_balance"][n]["actual"] / Memory["_population_balance"][n]["target"];
         }
 
-        var listRequests = Object.keys(Memory["_spawn_requests"]).sort(function(a, b) { 
+        let listRequests = Object.keys(Memory["_spawn_requests"]).sort((a, b) => { 
             return Memory["_spawn_requests"][a]["priority"] - Memory["_spawn_requests"][b]["priority"]; } );
-        var listSpawns = Object.keys(Game["spawns"]).filter(function(a) { return Game["spawns"][a].spawning == null; });
-        var __Creep = require("__creep");
+        let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
+        let __Creep = require("__creep");
 
-        for (var r in listRequests) {
-            for (var s in listSpawns) {
+        for (let r in listRequests) {
+            for (let s in listSpawns) {
                 if (listSpawns[s] != null && listRequests[r] != null) {
-					var spawn = Game["spawns"][listSpawns[s]];
-                    var request = Memory["_spawn_requests"][listRequests[r]];
+					let spawn = Game["spawns"][listSpawns[s]];
+                    let request = Memory["_spawn_requests"][listRequests[r]];
                     if (Game.map.getRoomLinearDistance(spawn.room.name, request.room) <= request.distance) {
-                        var level = Math.max(1, Math.ceil(Memory["_population_balance"][request.room]["total"] 
+                        let level = Math.max(1, Math.ceil(Memory["_population_balance"][request.room]["total"] 
                                 * Math.min(request.level, _Hive.getRoom_Level(spawn.room.name))));
-						var body = __Creep.getBody(request.body, level);
-                        var result = spawn.createCreep(body, request.name, request.args);
+						let body = __Creep.getBody(request.body, level);
+                        let result = spawn.createCreep(body, request.name, request.args);
 						
                         if (_.isString(result)) {
 							if (Memory["options"]["console"] == "on") {
-								console.log("<font color=\"#19C800\">Spawning a level " + level + " (of " + request.level + ") " + request.body 
-										+ " at " + spawn.room.name + " for " + request.room + "</font>");
+								console.log(`<font color=\"#19C800\">Spawning a level ${level} (of ${request.level}) 
+									${request.body} at ${spawn.room.name} for ${request.room}</font>`);
 							}
                             listSpawns[s] = null;
                             listRequests[r] = null;
@@ -268,12 +251,12 @@ var _Hive = {
 	},
 
     processSpawnRenewing: function() {
-        var __Creep = require("__creep");
-        var listSpawns = Object.keys(Game["spawns"]).filter(function(a) { return Game["spawns"][a].spawning == null; });
-        for (var s in listSpawns) {
-            var spawn = Game["spawns"][listSpawns[s]];
-            var creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
-            for (var c in creeps; c++) {
+        let __Creep = require("__creep");
+        let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
+        for (let s in listSpawns) {
+            let spawn = Game["spawns"][listSpawns[s]];
+            let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
+            for (let c in creeps; c++) {
                 if (!__Creep.isBoosted(creeps[c])) {
                     if (spawn.renewCreep(creeps[c]) == OK) {
                         break;

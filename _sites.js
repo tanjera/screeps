@@ -1,24 +1,24 @@
-var __Colony = require("__colony");
-var _Roles = require("_roles");
-var _Hive = require("_hive");
+let __Colony = require("__colony");
+let _Roles = require("_roles");
+let _Hive = require("_hive");
 
-var _Sites = {
+let _Sites = {
     Colony: function(rmColony, spawnDistance, listPopulation, listLinks) {
         if (Memory["_rooms"][rmColony] == null) {
             Memory["_rooms"][rmColony] = {};
         }
          
-        var lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == null && creep.memory.room == rmColony);
-        var lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "repairer" && creep.memory.room == rmColony);
-        var lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "upgrader" && creep.memory.room == rmColony);
-        var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmColony);
+        let lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == null && creep.memory.room == rmColony);
+        let lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "repairer" && creep.memory.room == rmColony);
+        let lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "upgrader" && creep.memory.room == rmColony);
+        let lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmColony);
 
-        var popTarget = 
+        let popTarget = 
             (listPopulation["worker"] == null ? 0 : listPopulation["worker"]["amount"])
             + (listPopulation["repairer"] == null ? 0 : listPopulation["repairer"]["amount"])
             + (listPopulation["upgrader"] == null ? 0 : listPopulation["upgrader"]["amount"])
             + (listPopulation["soldier"] == null ? 0 : listPopulation["soldier"]["amount"]);        
-        var popActual = lWorker.length + lRepairer.length + lUpgrader.length + lSoldier.length;
+        let popActual = lWorker.length + lRepairer.length + lUpgrader.length + lSoldier.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
         if ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) 
@@ -38,8 +38,8 @@ var _Sites = {
         }        
         
         // Run _Roles!
-        for (var n in Game.creeps) {
-            var creep = Game.creeps[n];            
+        for (let n in Game.creeps) {
+            let creep = Game.creeps[n];            
             if (creep.memory.room != null && creep.memory.room == rmColony) {
                 if (creep.memory.role == "worker") {
                     _Roles.Worker(creep);
@@ -51,25 +51,25 @@ var _Sites = {
         }        
 
         // Process Towers
-        var listTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});                            
-        for (var t in listTowers) {
-            var tower = listTowers[t];
+        let listTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});                            
+        for (let t in listTowers) {
+            let tower = listTowers[t];
             
-            var hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
+            let hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
                         return !Object.keys(Memory["_allies"]).includes(c.owner.username); }});
             if (hostile != null) { // Anyone to attack?
                 tower.attack(hostile);
                 continue;
             } 
             
-            var injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
+            let injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
             if (injured != null && tower.energy > tower.energyCapacity * 0.5) { // Anyone to heal?
                 tower.heal(injured);
                 continue;
             } 
             
             if (tower.energy > tower.energyCapacity * 0.5) { // Maintain structures with extra energy
-                var structure = __Colony.findByNeed_RepairCritical(tower.room);
+                let structure = __Colony.findByNeed_RepairCritical(tower.room);
                 if (structure != null) {
                     tower.repair(structure);
                     continue;
@@ -81,13 +81,13 @@ var _Sites = {
         if (listLinks != null) {
             Memory["_rooms"][rmColony]["links"] = listLinks;
 
-            var linksSend = _.filter(listLinks, (obj) => { return obj.id && obj["role"] == "send"; });
-            var linksReceive = _.filter(listLinks, (obj) => { return obj.id && obj["role"] == "receive"; });
+            let linksSend = _.filter(listLinks, (obj) => { return obj.id && obj["role"] == "send"; });
+            let linksReceive = _.filter(listLinks, (obj) => { return obj.id && obj["role"] == "receive"; });
 
-            for (var r = 0; r < linksReceive.length; r++) {
-                for (var s = 0; s < linksSend.length; s++) {
-                    var lSend = Game.getObjectById(linksSend[s]["id"]);
-                    var lReceive = Game.getObjectById(linksReceive[r]["id"]);
+            for (let r = 0; r < linksReceive.length; r++) {
+                for (let s = 0; s < linksSend.length; s++) {
+                    let lSend = Game.getObjectById(linksSend[s]["id"]);
+                    let lReceive = Game.getObjectById(linksReceive[r]["id"]);
                     if (lSend.energy > lSend.energyCapacity * 0.25 && lReceive.energy < lReceive.energyCapacity * 0.9) {
                         lSend.transferEnergy(lReceive);
                     }
@@ -98,29 +98,29 @@ var _Sites = {
 
     Mining: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
 
-        var lBurrower  = _.filter(Game.creeps, (c) => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        var lCarrier  = _.filter(Game.creeps, (c) => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        var lMiner  = _.filter(Game.creeps, (c) => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        var lMultirole  = _.filter(Game.creeps, (c) => c.memory.role == "multirole" && c.memory.room == rmHarvest);
-        var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == "reserver" && c.memory.room == rmHarvest);
-        var lExtractor  = _.filter(Game.creeps, (c) => c.memory.role == "extractor" && c.memory.room == rmHarvest);
+        let lBurrower  = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        let lCarrier  = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        let lMiner  = _.filter(Game.creeps, c => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        let lMultirole  = _.filter(Game.creeps, c => c.memory.role == "multirole" && c.memory.room == rmHarvest);
+        let lReserver  = _.filter(Game.creeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
+        let lExtractor  = _.filter(Game.creeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
 
-        var popTarget =(
+        let popTarget =(
             listPopulation["burrower"] == null ? 0 : listPopulation["burrower"]["amount"])
             + (listPopulation["carrier"] == null ? 0 : listPopulation["carrier"]["amount"])
             + (listPopulation["miner"] == null ? 0 : listPopulation["miner"]["amount"])
             + (listPopulation["multirole"] == null ? 0 : listPopulation["multirole"]["amount"]
             + (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"])
             + (listPopulation["extractor"] == null ? 0 : listPopulation["extractor"]["amount"]));         
-        var popActual = lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
+        let popActual = lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
         // Defend the mining op!
         if (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return !Object.keys(Memory["_allies"]).includes(c.owner.username); }}).length > 0) {
-            var lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmHarvest);
+                        {filter: (c) => { return !Object.keys(Memory["_allies"]).includes(c.owner.username); }}).length > 0) {
+            let lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: function(c) { return !Object.keys(Memory["_allies"]).includes(c.owner.username); }}).length) {
+                        {filter: (c) => { return !Object.keys(Memory["_allies"]).includes(c.owner.username); }}).length) {
                 _Hive.requestSpawn(rmColony, 0, 0, 8, "soldier", null, {role: "soldier", room: rmHarvest, colony: rmColony});
             }
         }
@@ -161,21 +161,21 @@ var _Sites = {
         }
         else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] 
                     && Object.keys(Game.rooms).includes(rmHarvest)
-                    && Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: function(m) { return m.mineralAmount > 0; }}).length > 0) {
+                    && Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0) {
             _Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation["extractor"]["level"], "worker", 
                 null, {role: "extractor", room: rmHarvest, colony: rmColony});    
         }
 
         // Run _Roles!
-        for (var n in Game.creeps) {
-            var creep = Game.creeps[n];                
+        for (let n in Game.creeps) {
+            let creep = Game.creeps[n];                
             if (creep.memory.room != null && creep.memory.colony != null 
                     && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
                 creep.memory.listRoute = listRoute;
                 // If the room is safe to run mining operations... run _Roles. 
                 if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
                         || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: function(c) { return !Object.keys(Memory["_allies"]).includes(c.owner.username); }}).length == 0)) {
+                        { filter: (c) => { return !Object.keys(Memory["_allies"]).includes(c.owner.username); }}).length == 0)) {
                     if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
                         _Roles.Mining(creep, rmColony, rmHarvest, listRoute);
                     } else if (creep.memory.role == "multirole") {
@@ -196,10 +196,10 @@ var _Sites = {
 
 
     Industry: function(rmColony, spawnDistance, listPopulation, listLabs, listTasks) {
-        var lCourier  = _.filter(Game.creeps, (c) => c.memory.role == "courier" && c.memory.room == rmColony && (c.ticksToLive == undefined || c.ticksToLive > 80));
+        let lCourier  = _.filter(Game.creeps, (c) => c.memory.role == "courier" && c.memory.room == rmColony && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
-        var popTarget = (listPopulation["courier"] == null ? 0 : listPopulation["courier"]["amount"]);
-        var popActual = lCourier.length;
+        let popTarget = (listPopulation["courier"] == null ? 0 : listPopulation["courier"]["amount"]);
+        let popActual = lCourier.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {
@@ -216,18 +216,18 @@ var _Sites = {
 			{ action: "empty", lab: "" }			
 		*/
 
-        for (var l in listLabs) {
-            var listing = listLabs[l];
+        for (let l in listLabs) {
+            let listing = listLabs[l];
              switch (listing["action"]) {
                 default:
                     break;
 					
 				case "boost":
-					var __Creep = require("__creep");
-					var lab = Game.getObjectById(listing["lab"]);
-					var creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, 
+					let __Creep = require("__creep");
+					let lab = Game.getObjectById(listing["lab"]);
+					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, 
 						{ filter: (c) => { return c.memory.role == listing["role"] && c.memory.subrole == listing["subrole"] }});
-					for (var c in creeps) {
+					for (let c in creeps) {
 						if (!__Creep.isBoosted(creeps[c])) {
 							lab.boostCreep(creeps[c]);
 						}
@@ -235,9 +235,9 @@ var _Sites = {
 					break;
 
                 case "reaction":
-                    var labReactor = Game.getObjectById(listing["reactor"]["lab"]);
-                    var labSupply1 = Game.getObjectById(listing["supply1"]["lab"]);
-                    var labSupply2 = Game.getObjectById(listing["supply2"]["lab"]);  
+                    let labReactor = Game.getObjectById(listing["reactor"]["lab"]);
+                    let labSupply1 = Game.getObjectById(listing["supply1"]["lab"]);
+                    let labSupply2 = Game.getObjectById(listing["supply2"]["lab"]);  
                     if (labReactor != null && labSupply1 != null && labSupply2 != null) {
                         labReactor.runReaction(labSupply1, labSupply2);
                     }
@@ -246,11 +246,11 @@ var _Sites = {
         }
 
         if (_Hive.isPulse()) {
-            var _Tasks = require("_tasks");
+            let _Tasks = require("_tasks");
             if (listTasks == null)  listTasks = {};
 
-            for (var l in listLabs) {                
-                var listing = listLabs[l];
+            for (let l in listLabs) {                
+                let listing = listLabs[l];
 
                 // Populate tasks for the courier to load and unload labs
                 switch (listing["action"]) {
@@ -258,10 +258,10 @@ var _Sites = {
 						break;
 						
 					case "boost":
-						var storage = Game.rooms[rmColony].storage;
+						let storage = Game.rooms[rmColony].storage;
 						if (storage == null) break;			
 									 
-						var lab = Game.getObjectById(listing["supply1"]["lab"]);
+						let lab = Game.getObjectById(listing["supply1"]["lab"]);
 						if (lab.mineralType != listing["mineral"]) {
 							// The lab has the wrong mineral in it? Old reaction? Clear it out!
 							_Tasks.addTask(rmColony, 
@@ -290,7 +290,7 @@ var _Sites = {
 						break;
 						
 					case "empty":
-						var lab = Game.getObjectById(listing["lab"]);
+						let lab = Game.getObjectById(listing["lab"]);
 						if (lab.mineralAmount > 0) {							
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
@@ -302,10 +302,10 @@ var _Sites = {
 						break;
 						
 					case "reaction":
-						var storage = Game.rooms[rmColony].storage;
+						let storage = Game.rooms[rmColony].storage;
 						if (storage == null) break;			
 									 
-						var lab = Game.getObjectById(listing["supply1"]["lab"]);
+						let lab = Game.getObjectById(listing["supply1"]["lab"]);
 						if (lab.mineralType != listing["supply1"]["mineral"]) {
 							// The lab has the wrong mineral in it? Old reaction? Clear it out!
 							_Tasks.addTask(rmColony, 
@@ -332,7 +332,7 @@ var _Sites = {
 								});
 						}
 						
-						var lab = Game.getObjectById(listing["supply2"]["lab"]);
+						let lab = Game.getObjectById(listing["supply2"]["lab"]);
 						if (lab.mineralType != listing["supply2"]["mineral"]) {
 							// The lab has the wrong mineral in it? Old reaction? Clear it out!
 							_Tasks.addTask(rmColony, 
@@ -358,7 +358,7 @@ var _Sites = {
 								});
 						}
 
-						var obj = Game.getObjectById(listing["reactor"]["lab"]);
+						let obj = Game.getObjectById(listing["reactor"]["lab"]);
 						if (obj.mineralAmount > obj.mineralCapacity * 0.5) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
@@ -372,10 +372,10 @@ var _Sites = {
                 }
             }
 
-            for (var t in listTasks) {                
-                var task = listTasks[t];
+            for (let t in listTasks) {                
+                let task = listTasks[t];
                 
-                var obj = Game.getObjectById(task["id"]);
+                let obj = Game.getObjectById(task["id"]);
                 if (obj == null) {
                     continue;
                 }
@@ -383,7 +383,7 @@ var _Sites = {
                 task["pos"] = obj.pos;
                 
                 if (task["subtype"] == "withdraw") {
-                    var target = Game.getObjectById(task["target"]);
+                    let target = Game.getObjectById(task["target"]);
                     if ((obj.structureType == STRUCTURE_STORAGE || obj.structureType == STRUCTURE_CONTAINER) 
                             && Object.keys(obj.store).includes(task["resource"])) {
                         if (target == null) {
@@ -409,8 +409,8 @@ var _Sites = {
             }
         }
 
-        for (var n in Game.creeps) {
-            var creep = Game.creeps[n];
+        for (let n in Game.creeps) {
+            let creep = Game.creeps[n];
             if (creep.memory.room != null && creep.memory.room == rmColony) {                
                 if (creep.memory.role == "courier") {
                     _Roles.Courier(creep);
@@ -421,10 +421,10 @@ var _Sites = {
 
 
     Reservation: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
-        var lReserver  = _.filter(Game.creeps, (c) => c.memory.role == "reserver" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 80));
+        let lReserver  = _.filter(Game.creeps, (c) => c.memory.role == "reserver" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
-        var popTarget = (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"]);
-        var popActual = lReserver.length;
+        let popTarget = (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"]);
+        let popActual = lReserver.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]) {
@@ -432,8 +432,8 @@ var _Sites = {
                 null, {role: "reserver", room: rmHarvest, colony: rmColony});
         }
 
-        for (var n in Game.creeps) {
-            var creep = Game.creeps[n];
+        for (let n in Game.creeps) {
+            let creep = Game.creeps[n];
             if (creep.memory.room != null && creep.memory.colony != null 
                     && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
                 creep.memory.listRoute = listRoute;
@@ -445,10 +445,10 @@ var _Sites = {
 
 
     Occupation: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
-        var lSoldier  = _.filter(Game.creeps, (c) => c.memory.role == "soldier" && c.memory.room == rmOccupy && (c.ticksToLive == undefined || c.ticksToLive > 80));
+        let lSoldier  = _.filter(Game.creeps, (c) => c.memory.role == "soldier" && c.memory.room == rmOccupy && (c.ticksToLive == undefined || c.ticksToLive > 80));
         
-        var popTarget = (listPopulation["soldier"] == null ? 0 : listPopulation["soldier"]["amount"]);
-        var popActual = lSoldier.length;
+        let popTarget = (listPopulation["soldier"] == null ? 0 : listPopulation["soldier"]["amount"]);
+        let popActual = lSoldier.length;
         _Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) {
@@ -456,8 +456,8 @@ var _Sites = {
                 null, {role: "soldier", room: rmOccupy, colony: rmColony});            
         }
 
-        for (var n in Game.creeps) {
-            var creep = Game.creeps[n];
+        for (let n in Game.creeps) {
+            let creep = Game.creeps[n];
             if (creep.memory.room != null && creep.memory.colony != null 
                     && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
                 creep.memory.listRoute = listRoute;

@@ -1,6 +1,6 @@
-var _Hive = require("_hive");
+let _Hive = require("_hive");
 
-var __Creep = {
+let __Creep = {
 
     runTaskTimer: function(creep) {
         if (creep.memory.task == null) {
@@ -10,7 +10,7 @@ var __Creep = {
             // Process the task timer
             creep.memory.task["timer"] = creep.memory.task["timer"] - 1;
             if (creep.memory.task["timer"] <= 0) {
-                var _Tasks = require("_tasks");
+                let _Tasks = require("_tasks");
                 _Tasks.returnTask(creep, creep.memory.task);
                 delete creep.memory.task;
                 return false;
@@ -25,7 +25,7 @@ var __Creep = {
                 return;
                 
             case "pickup":
-                var obj = Game.getObjectById(creep.memory.task["id"]);
+                let obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
@@ -35,7 +35,7 @@ var __Creep = {
                 }
 
             case "withdraw":
-                var obj = Game.getObjectById(creep.memory.task["id"]);
+                let obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.withdraw(obj, creep.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
@@ -45,8 +45,8 @@ var __Creep = {
                 }
 
             case "harvest":
-                var obj = Game.getObjectById(creep.memory.task["id"]);
-                var result = creep.harvest(obj); 
+                let obj = Game.getObjectById(creep.memory.task["id"]);
+                let result = creep.harvest(obj); 
                 if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
@@ -56,8 +56,8 @@ var __Creep = {
                 } else { return; }
 
             case "upgrade":
-                var controller = Game.getObjectById(creep.memory.task["id"]);
-                var result = creep.upgradeController(controller); 
+                let controller = Game.getObjectById(creep.memory.task["id"]);
+                let result = creep.upgradeController(controller); 
                 if (result == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(controller, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, controller.room.name)) : 1;
@@ -67,8 +67,8 @@ var __Creep = {
                 } else { return; }
 
             case "repair":
-                var structure = Game.getObjectById(creep.memory.task["id"]);
-                var result = creep.repair(structure); 
+                let structure = Game.getObjectById(creep.memory.task["id"]);
+                let result = creep.repair(structure); 
                 if (result == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(structure, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
@@ -78,8 +78,8 @@ var __Creep = {
                 } else { return; }
             
             case "build":
-                var structure = Game.getObjectById(creep.memory.task["id"]);
-                var result = creep.build(structure);
+                let structure = Game.getObjectById(creep.memory.task["id"]);
+                let result = creep.build(structure);
                 if (result == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(structure, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
@@ -90,19 +90,19 @@ var __Creep = {
 
             case "deposit":
                 // Make sure the target hasn"t filled up...
-                var target = Game.getObjectById(creep.memory.task["id"]);
+                let target = Game.getObjectById(creep.memory.task["id"]);
                 if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
                         || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
-                    var _Tasks = require("_tasks");
+                    let _Tasks = require("_tasks");
                     _Tasks.assignTask(creep, false);
                 }
                 // Cycle through all resources and deposit, starting with minerals                
-                for (var r = Object.keys(creep.carry).length; r > 0; r--) {
-                    var resourceType = Object.keys(creep.carry)[r - 1];
+                for (let r = Object.keys(creep.carry).length; r > 0; r--) {
+                    let resourceType = Object.keys(creep.carry)[r - 1];
                     if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                         return creep.moveTo(target, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                             ? creep.moveTo(new RoomPosition(25, 25, target.room.name)) : 1;
@@ -123,14 +123,14 @@ var __Creep = {
 
         if (creep.memory.listRoute != null) {
             if (forwardRoute == true) {
-                for (var i = 1; i < creep.memory.listRoute.length; i++) {
+                for (let i = 1; i < creep.memory.listRoute.length; i++) {
                     if (creep.room.name == creep.memory.listRoute[i - 1]) {
                         creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: _Hive.moveReusePath()});
                         return;
                     }
                 }
             } else if (forwardRoute == false) { 
-                for (var i = creep.memory.listRoute.length - 2; i >= 0; i--) {
+                for (let i = creep.memory.listRoute.length - 2; i >= 0; i--) {
                     if (creep.room.name == creep.memory.listRoute[i + 1]) {
                         creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: _Hive.moveReusePath()});
                         return;
@@ -163,8 +163,8 @@ var __Creep = {
         }},
 
     moveFrom: function(creep, target) {
-        var tgtDir = creep.pos.getDirectionTo(target);
-        var moveDir;
+        let tgtDir = creep.pos.getDirectionTo(target);
+        let moveDir;
         
         switch (tgtDir) {
             case TOP:           moveDir = BOTTOM;       break;
@@ -181,7 +181,7 @@ var __Creep = {
     },
 
     isBoosted: function(creep) {
-        for (var b in creep.body) {
+        for (let b in creep.body) {
             if (creep.body[b].boost) {
                 return true;
             }

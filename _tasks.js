@@ -1,11 +1,11 @@
-var _Tasks = {
+let _Tasks = {
 
     randomName: function() {
-        return index = "xxxxxx-xxxxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-                var r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
+        return index = "xxxxxx-xxxxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+                let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
                 return v.toString(16);
             });
-        },
+	},
 
     addTask: function (rmName, incTask) {
         /* Task format:
@@ -21,18 +21,18 @@ var _Tasks = {
             creeps:     maximum # of creeps to run this task
          */
 
-        var index = incTask["type"] + "-" + incTask["subtype"] + "-" 
-            + "xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
+        let index = incTask["type"] + "-" + incTask["subtype"] + "-" 
+            + "xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+            let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
             return v.toString(16);
             });
 
         Memory["_tasks"][rmName][index] = incTask;
-        },
+	},
 
     giveTask: function(creep, task) {
         // Iterate the room"s task list to see if the room"s task needs updating
-        for (var t in Memory["_tasks"][creep.room.name]) {
+        for (let t in Memory["_tasks"][creep.room.name]) {
             if (Memory["_tasks"][creep.room.name][t] == task) {
                 creep.memory.task = Memory["_tasks"][creep.room.name][t];                
                 
@@ -49,12 +49,12 @@ var _Tasks = {
         // Task not found in the room task list? Possibly individualized task...
         creep.memory.task = task;
         return;
-        },
+	},
 
     returnTask: function(creep, task) {
         task.creeps = 1;
         _Tasks.addTask(creep.room.name, task);
-        },
+	},
 
     assignTask: function(creep, isRefueling) {
         if (creep.memory.task != null && Object.keys(creep.memory.task).length > 0) {            
@@ -84,15 +84,15 @@ var _Tasks = {
                 _Tasks.assignTask_Extract(creep, isRefueling);
                 return;
         }
-        },
+	},
 
     assignTask_Work: function(creep, isRefueling) {
-        var tasks;
+        let tasks;
 
         if (isRefueling) {            
             tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.type == "energy"; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
+                    (t) => { return t.type == "energy"; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
                     "priority");
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
@@ -100,16 +100,16 @@ var _Tasks = {
             }
                         
             tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.subtype == "pickup" && t.resource == "energy"; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    (t) => { return t.subtype == "pickup" && t.resource == "energy"; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
 
             tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.type == "mine" && t.resource == "energy"; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    (t) => { return t.type == "mine" && t.resource == "energy"; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
@@ -117,8 +117,8 @@ var _Tasks = {
         } else {
             if (creep.memory.subrole == "repairer") {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                        function (t) { return t.type == "work" && t.subtype == "repair"; }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        (t) => { return t.type == "work" && t.subtype == "repair"; }), 
+                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority");
             }
             else if (creep.memory.subrole == "upgrader") {
@@ -127,8 +127,8 @@ var _Tasks = {
             
             if (tasks == null || tasks.length == 0) {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                        function (t) { return t.type == "work"; }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        (t) => { return t.type == "work"; }), 
+                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority");
             }
 
@@ -137,15 +137,15 @@ var _Tasks = {
                 return;
             }
         }
-        },
+	},
 
     assignTask_Industry: function(creep, isRefueling) {
-        var tasks;
+        let tasks;
     
         if (isRefueling) {
             tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return (t.type == "industry" && t.subtype == "withdraw"); }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    (t) => { return (t.type == "industry" && t.subtype == "withdraw"); }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority");
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
@@ -155,11 +155,11 @@ var _Tasks = {
                 return;
             }
         } else {
-            var resources = _.sortBy(Object.keys(creep.carry), function (c) { return -creep.carry[c]; });
+            let resources = _.sortBy(Object.keys(creep.carry), (c) => { return -creep.carry[c]; });
             resources = Object.keys(resources).length > 0 ? resources[0] : "energy";                
             tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.type == "industry" && t.subtype == "deposit" && t.resource == resources; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    (t) => { return t.type == "industry" && t.subtype == "deposit" && t.resource == resources; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority");            
             if (tasks.length > 0) {    
                 _Tasks.giveTask(creep, tasks[0]);
@@ -168,8 +168,8 @@ var _Tasks = {
 
             // If stuck without a task... drop off minerals in storage... or wait...
             tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.type == "carry" && t.resource == "mineral"; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    (t) => { return t.type == "carry" && t.resource == "mineral"; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
@@ -178,22 +178,22 @@ var _Tasks = {
                 return;
             }
         }
-        },
+	},
 
     assignTask_Mine: function(creep, isRefueling) {
-        var tasks;
+        let tasks;
 
         if (isRefueling) {
             if (creep.room.name != creep.memory.room) {
-                var __Creep = require("__creep");
+                let __Creep = require("__creep");
                 __Creep.moveToRoom(creep, creep.memory.room, isRefueling);
                 return;
             } 
 
             if (creep.memory.role == "burrower") {
                 tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                        function (t) { return t.type == "mine" && t.resource == "energy"; }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                        (t) => { return t.type == "mine" && t.resource == "energy"; }), 
+                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                 if (tasks.length > 0) {
                     _Tasks.giveTask(creep, tasks[0]);
                     return;                
@@ -201,8 +201,8 @@ var _Tasks = {
             }
             else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
                 tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                        function (t) { return (t.subtype == "pickup" && t.resource == "energy") || (t.type == "energy" && t.structure != "link"); }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        (t) => { return (t.subtype == "pickup" && t.resource == "energy") || (t.type == "energy" && t.structure != "link"); }), 
+                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority");
                 if (tasks.length > 0) {
                     _Tasks.giveTask(creep, tasks[0]);
@@ -211,8 +211,8 @@ var _Tasks = {
 
                 if (creep.getActiveBodyparts("work") > 0) {
                     tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                        function (t) { return t.type == "mine" && t.resource == "energy"; }), 
-                        function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                        (t) => { return t.type == "mine" && t.resource == "energy"; }), 
+                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
                     if (tasks.length > 0) {
                         _Tasks.giveTask(creep, tasks[0]);
                         return;
@@ -232,35 +232,35 @@ var _Tasks = {
             }
         } else {
             if (creep.room.name != creep.memory.colony) {
-                var __Creep = require("__creep");
+                let __Creep = require("__creep");
                 __Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
                 return;
             }
 
             tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    (t) => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority");
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
         }
-        },
+	},
 
     assignTask_Extract: function(creep, isRefueling) {
-        var tasks;
+        let tasks;
 
         if (isRefueling) {
             if (creep.room.name != creep.memory.room) {
-                var __Creep = require("__creep");
+                let __Creep = require("__creep");
                 __Creep.moveToRoom(creep, creep.memory.room, isRefueling);
                 return;
             } 
 
             tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                function (t) { return t.type == "mine" && t.resource == "mineral"; }), 
-                function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                (t) => { return t.type == "mine" && t.resource == "mineral"; }), 
+                (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
@@ -268,24 +268,24 @@ var _Tasks = {
 
         } else {
             if (creep.room.name != creep.memory.colony) {
-                var __Creep = require("__creep");
+                let __Creep = require("__creep");
                 __Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
                 return;
             }
 
             tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    function (t) { return t.type == "carry" && t.resource == "mineral"; }), 
-                    function (t) { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+                    (t) => { return t.type == "carry" && t.resource == "mineral"; }), 
+                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
             if (tasks.length > 0) {
                 _Tasks.giveTask(creep, tasks[0]);
                 return;
             }
         }
-        },
+	},
 
     compileTasks: function (rmName) {
-        var __Colony = require("__colony");
-        var room = Game.rooms[rmName];
+        let __Colony = require("__colony");
+        let room = Game.rooms[rmName];
 
         /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
         if (room.controller != null && room.controller.level > 0) {
@@ -312,8 +312,8 @@ var _Tasks = {
             }
         }
         
-        var structures = __Colony.findByNeed_RepairCritical(room);
-        for (var i in structures) {
+        let structures = __Colony.findByNeed_RepairCritical(room);
+        for (let i in structures) {
             _Tasks.addTask(rmName, 
                 {   type: "work",
                     subtype: "repair",
@@ -325,8 +325,8 @@ var _Tasks = {
                 });                
         }
         
-        var structures = __Colony.findByNeed_RepairMaintenance(room);
-        for (var i in structures) {
+        let structures = __Colony.findByNeed_RepairMaintenance(room);
+        for (let i in structures) {
             _Tasks.addTask(rmName, 
                 {   type: "work",
                     subtype: "repair",
@@ -339,7 +339,7 @@ var _Tasks = {
         }
         
         structures = room.find(FIND_CONSTRUCTION_SITES);
-        for (var i in structures) {
+        for (let i in structures) {
             _Tasks.addTask(rmName, 
                 {   type: "work",
                     subtype: "build",
@@ -352,8 +352,8 @@ var _Tasks = {
         }
 
         /* Carrier-based tasks & energy supply for workers) */
-        var piles = room.find(FIND_DROPPED_ENERGY);
-        for (var i in piles) {
+        let piles = room.find(FIND_DROPPED_ENERGY);
+        for (let i in piles) {
             _Tasks.addTask(rmName, 
                 {   type: "carry",
                     subtype: "pickup",
@@ -366,8 +366,8 @@ var _Tasks = {
                 });
         }
 
-        var sources = room.find(FIND_SOURCES, { filter: function (s) { return s.energy > 0; }});
-        for (var i in sources) {
+        let sources = room.find(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
+        for (let i in sources) {
             _Tasks.addTask(rmName, 
                 {   type: "mine",
                     subtype: "harvest",
@@ -380,10 +380,10 @@ var _Tasks = {
                 });
         }
 
-        var minerals = room.find(FIND_MINERALS, { filter: function (m) { return m.mineralAmount > 0; }});
-        for (var i in minerals) {
-            var look = minerals[i].pos.look();
-            for (var l = 0; l < look.length; l++) {
+        let minerals = room.find(FIND_MINERALS, { filter: (m) => { return m.mineralAmount > 0; }});
+        for (let i in minerals) {
+            let look = minerals[i].pos.look();
+            for (let l = 0; l < look.length; l++) {
                 if (look[l].structure != null && look[l].structure.structureType == "extractor") {
                     _Tasks.addTask(rmName, 
                         {   type: "mine",
@@ -399,10 +399,10 @@ var _Tasks = {
             }
         }
 
-        var storages = room.find(FIND_STRUCTURES, { filter: function (s) { 
+        let storages = room.find(FIND_STRUCTURES, { filter: (s) => { 
             return (s.structureType == STRUCTURE_STORAGE)
                 || (s.structureType == STRUCTURE_CONTAINER); }});
-        for (var i in storages) {            
+        for (let i in storages) {            
             if (storages[i].store[RESOURCE_ENERGY] > 0) {
                 _Tasks.addTask(rmName, 
                     {   type: "energy",
@@ -443,9 +443,9 @@ var _Tasks = {
         } 
 
         if (Memory["_rooms"][rmName]["links"] != null) {
-            var links = Memory["_rooms"][rmName]["links"];
-            for (var l in links) {
-                var link = Game.getObjectById(links[l]["id"]);
+            let links = Memory["_rooms"][rmName]["links"];
+            for (let l in links) {
+                let link = Game.getObjectById(links[l]["id"]);
                 if (links[l]["role"] == "send" && link != null && link.energy < link.energyCapacity * 0.9) {
                     _Tasks.addTask(rmName, 
                     {   type: "carry",
@@ -474,9 +474,9 @@ var _Tasks = {
             }
         }
 
-        var towers = room.find(FIND_MY_STRUCTURES, { filter: function (s) {
+        let towers = room.find(FIND_MY_STRUCTURES, { filter: (s) => {
             return s.structureType == STRUCTURE_TOWER; }});
-        for (var i in towers) {
+        for (let i in towers) {
             if (towers[i].energy < towers[i].energyCapacity * 0.4) {
                 _Tasks.addTask(rmName, 
                 {   type: "carry",
@@ -504,10 +504,10 @@ var _Tasks = {
             }
         }
 
-        var structures = room.find(FIND_MY_STRUCTURES, { filter: function (s) {
+        let structures = room.find(FIND_MY_STRUCTURES, { filter: (s) => {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
-        for (var i in structures) {
+        for (let i in structures) {
                 _Tasks.addTask(rmName, 
                 {   type: "carry",
                     subtype: "deposit",
@@ -522,26 +522,26 @@ var _Tasks = {
         }
 
         /* Cycle through all creeps in the room- remove the task if it"s already taken */
-            for (var t in Memory["_tasks"][rmName]) {
-                var task = Memory["_tasks"][rmName][t];
-                if (task["creeps"] != null) {
-                    for (var c in Game.creeps) {
-                        if (Game.creeps[c].room.name == rmName) {
-                            var creep = Game.creeps[c];
-                            if (creep.memory.task != null
-                                    && creep.memory.task.type == task.type && creep.memory.task.subtype == task.subtype
-                                    && creep.memory.task.id == task.id && creep.memory.task.structure == task.structure
-                                    && creep.memory.task.resource == task.resource) {
-                                task["creeps"] -= 1;
-                            }
-                        }
-                    }
-                    if (task["creeps"] <= 0) {
-                        delete Memory["_tasks"][rmName][t];
-                    }
-                }
-            }  
-        },
+		for (let t in Memory["_tasks"][rmName]) {
+			let task = Memory["_tasks"][rmName][t];
+			if (task["creeps"] != null) {
+				for (let c in Game.creeps) {
+					if (Game.creeps[c].room.name == rmName) {
+						let creep = Game.creeps[c];
+						if (creep.memory.task != null
+								&& creep.memory.task.type == task.type && creep.memory.task.subtype == task.subtype
+								&& creep.memory.task.id == task.id && creep.memory.task.structure == task.structure
+								&& creep.memory.task.resource == task.resource) {
+							task["creeps"] -= 1;
+						}
+					}
+				}
+				if (task["creeps"] <= 0) {
+					delete Memory["_tasks"][rmName][t];
+				}
+			}
+		}  
+	}
 }
 
 module.exports = _Tasks;

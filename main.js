@@ -1,43 +1,50 @@
-var _Sites = require("_sites");
-var _Hive = require("_hive");
+let _Sites = require("_sites");
+let _Hive = require("_hive");
+
+const var __Logs = require("__logs");
 
 module.exports.loop = function () {
 
-    /* TO DO: 
-		* To debug:
-			- Ensure spawn renewing still works (changed for(var i = 0; ...; i++) to for (var i in ...)
+    /* To do: 
+		* Needs debugging!!!
+			- Ensure spawn renewing still works (changed for(let i = 0; ...; i++) to for (let i in ...)
 			- Memory["hive"] -> Memory... everything populating and reading properly?
 				- Spawns all spawning properly??
 				- Tasks populating and being accepted properly?
 			- Terminal code working?
 				- Terminal requests functioning?
 				- Tasks being created for courier to fill terminals?
-				- IF FUNCTIONING: uncomment terminal.send() so it"ll work!
+				- If functioning: uncomment terminal.send() so it"ll work!
 			- Sites.Industry
 				- action: empty running properly?
 				- if lab has wrong mineral, task to empty lab functioning?
 				- boosting works?? supplies lab properly? boosts creeps properly??
 				- everything working as expected?
+			- Game.__Logs work from console??!?
+			        
+		* _Hive.runEconomy
+			- ensure a courier is available and working! May need to invoke a _Sites.Industry for it?
+			- add standing terminal withdraw tasks (but don't overlap with orders!)
+				- for (let resource in terminal.store) { create "withdraw" task for courier }
 			
-	
-        * CPU management
+		* CPU management
             - add wait task for multirole!
+			- implement creeps moving by path? e.g.:
+				if (creep.moveByPath(creep.memory.path) == ERR_NOT_FOUND) {
+					creep.memory.path = creep.pos.findPathTo(destination);
+					creep.moveByPath(creep.memory.path)
+				}
 
-		* runEconomy
-			- ensure a courier is available and working!
-			
-        * industry:
+        * _Sites.Industry & _Tasks:
             - integrate boosting into regular tasks!
                 - create task route (in _Tasks.assignTask and __Creep.runTask; type "boost", subtype "upgrade | heal")                
-                - inject task via _Sites.Industry                
+                - inject task via _Sites.Industry                            
 
-            - add standing terminal withdraw tasks (to _Sites.Industry)
-                - add a bool to manage terminal automatically
-                - for (var resource in terminal.store) { create "withdraw" task for courier }
-
-        * task system:
+        * _Tasks
             - add dismantle tasks
             - utilCreep: add resource types to all tasks? e.g. "withdraw"
+			
+		* screeps-profiler?
     */      
 
 
@@ -45,7 +52,7 @@ module.exports.loop = function () {
     _Hive.clearDeadMemory();
     _Hive.initMemory();
     _Hive.initTasks();
-	_Hive.processRequests();
+	//_Hive.processRequests();
 	//_Hive.runEconomy();
 	
 
