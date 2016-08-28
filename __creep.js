@@ -1,4 +1,4 @@
-var _Hive = require('_hive');
+var _Hive = require("_hive");
 
 var __Creep = {
 
@@ -6,11 +6,11 @@ var __Creep = {
         if (creep.memory.task == null) {
             return false;
         } 
-        else if (creep.memory.task['timer'] != null) {
+        else if (creep.memory.task["timer"] != null) {
             // Process the task timer
-            creep.memory.task['timer'] = creep.memory.task['timer'] - 1;
-            if (creep.memory.task['timer'] <= 0) {
-                var _Tasks = require('_tasks');
+            creep.memory.task["timer"] = creep.memory.task["timer"] - 1;
+            if (creep.memory.task["timer"] <= 0) {
+                var _Tasks = require("_tasks");
                 _Tasks.returnTask(creep, creep.memory.task);
                 delete creep.memory.task;
                 return false;
@@ -20,12 +20,12 @@ var __Creep = {
         return true; },
 
     runTask: function(creep) {
-        switch (creep.memory.task['subtype']) {
-            case 'wait':
+        switch (creep.memory.task["subtype"]) {
+            case "wait":
                 return;
                 
-            case 'pickup':
-                var obj = Game.getObjectById(creep.memory.task['id']);
+            case "pickup":
+                var obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
@@ -34,9 +34,9 @@ var __Creep = {
                     return;
                 }
 
-            case 'withdraw':
-                var obj = Game.getObjectById(creep.memory.task['id']);
-                if (creep.withdraw(obj, creep.memory.task['resource']) == ERR_NOT_IN_RANGE) {
+            case "withdraw":
+                var obj = Game.getObjectById(creep.memory.task["id"]);
+                if (creep.withdraw(obj, creep.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
                         ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
                 } else {    // Action takes one tick... task complete... delete task...
@@ -44,8 +44,8 @@ var __Creep = {
                     return;
                 }
 
-            case 'harvest':
-                var obj = Game.getObjectById(creep.memory.task['id']);
+            case "harvest":
+                var obj = Game.getObjectById(creep.memory.task["id"]);
                 var result = creep.harvest(obj); 
                 if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
@@ -55,8 +55,8 @@ var __Creep = {
                     return;
                 } else { return; }
 
-            case 'upgrade':
-                var controller = Game.getObjectById(creep.memory.task['id']);
+            case "upgrade":
+                var controller = Game.getObjectById(creep.memory.task["id"]);
                 var result = creep.upgradeController(controller); 
                 if (result == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(controller, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
@@ -66,8 +66,8 @@ var __Creep = {
                     return;
                 } else { return; }
 
-            case 'repair':
-                var structure = Game.getObjectById(creep.memory.task['id']);
+            case "repair":
+                var structure = Game.getObjectById(creep.memory.task["id"]);
                 var result = creep.repair(structure); 
                 if (result == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(structure, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
@@ -77,8 +77,8 @@ var __Creep = {
                     return;
                 } else { return; }
             
-            case 'build':
-                var structure = Game.getObjectById(creep.memory.task['id']);
+            case "build":
+                var structure = Game.getObjectById(creep.memory.task["id"]);
                 var result = creep.build(structure);
                 if (result == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(structure, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
@@ -88,16 +88,16 @@ var __Creep = {
                     return;
                 } else { return; }
 
-            case 'deposit':
-                // Make sure the target hasn't filled up...
-                var target = Game.getObjectById(creep.memory.task['id']);
+            case "deposit":
+                // Make sure the target hasn"t filled up...
+                var target = Game.getObjectById(creep.memory.task["id"]);
                 if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
                         || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
                         || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
-                    var _Tasks = require('_tasks');
+                    var _Tasks = require("_tasks");
                     _Tasks.assignTask(creep, false);
                 }
                 // Cycle through all resources and deposit, starting with minerals                
@@ -117,7 +117,7 @@ var __Creep = {
 
     moveToRoom: function(creep, tgtRoom, forwardRoute) {
         if (creep.room.name == tgtRoom) {
-            console.log('Error: trying to move creep ' + creep.name + ' to its own room... check logic!!!');
+            console.log("Error: trying to move creep " + creep.name + " to its own room... check logic!!!");
             return;
         } 
 
@@ -191,16 +191,16 @@ var __Creep = {
 
     getBody: function(type, level) {
         switch (type) {
-            case 'soldier': return __Creep.getBody_Soldier(level);
-            case 'archer': return __Creep.getBody_Archer(level);
-            case 'healer': return __Creep.getBody_Healer(level);
-            case 'multirole': return __Creep.getBody_Multirole(level); 
-            case 'worker': return __Creep.getBody_Worker(level);
-            case 'burrower': return __Creep.getBody_Burrower(level);
-            case 'courier':
-            case 'carrier': return __Creep.getBody_Carrier(level);
-            case 'carrier_at': return __Creep.getBody_Carrier_AT(level);
-            case 'reserver': return __Creep.getBody_Reserver(level);
+            case "soldier": return __Creep.getBody_Soldier(level);
+            case "archer": return __Creep.getBody_Archer(level);
+            case "healer": return __Creep.getBody_Healer(level);
+            case "multirole": return __Creep.getBody_Multirole(level); 
+            case "worker": return __Creep.getBody_Worker(level);
+            case "burrower": return __Creep.getBody_Burrower(level);
+            case "courier":
+            case "carrier": return __Creep.getBody_Carrier(level);
+            case "carrier_at": return __Creep.getBody_Carrier_AT(level);
+            case "reserver": return __Creep.getBody_Reserver(level);
         }},
 
     getBody_Soldier: function(level) {
