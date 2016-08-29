@@ -1,4 +1,4 @@
-var __Colony = {
+let __Colony = {
 
     getRoom_Level: function(room) {
         if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
@@ -20,7 +20,7 @@ var __Colony = {
 		},
         
     repairWalls_Critical: function(level) {
-        var t = [0, 
+        let t = [0, 
                     1000,
                     2500,
                     5000,
@@ -33,7 +33,7 @@ var __Colony = {
 		},
 
     repairWalls_Maintenance: function(level) {
-        var t = [0, 
+        let t = [0, 
                     10000,
                     25000,
                     35000,
@@ -47,31 +47,31 @@ var __Colony = {
 
     findByNeed_RepairCritical: function(room) {
         return room.find(FIND_STRUCTURES, {
-                            filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < __Colony.repairWalls_Critical(__Colony.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < __Colony.repairWalls_Critical(__Colony.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.2)
-                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.2);
-                            }}).sort(function(a, b) {return a.hits - b.hits});    
+                            filter: (s) => {
+                                return (s.structureType == STRUCTURE_RAMPART && s.hits < __Colony.repairWalls_Critical(__Colony.getRoom_Level(room)))
+                                    || (s.structureType == STRUCTURE_WALL && s.hits < __Colony.repairWalls_Critical(__Colony.getRoom_Level(room)))
+                                    || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.2)
+                                    || (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.2);
+                            }}).sort((a, b) => {return a.hits - b.hits});    
     },
     
     findByNeed_RepairMaintenance: function(room) {
         return room.find(FIND_STRUCTURES, {
-                            filter: function(structure) {
-                                return (structure.structureType == STRUCTURE_RAMPART && structure.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_WALL && structure.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(room)))
-                                    || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.8)
-                                    || (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.8);
-                            }}).sort(function(a, b) {return a.hits - b.hits});        
+                            filter: (s) => {
+                                return (s.structureType == STRUCTURE_RAMPART && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(room)))
+                                    || (s.structureType == STRUCTURE_WALL && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(room)))
+                                    || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.8)
+                                    || (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8);
+                            }}).sort((a, b) => {return a.hits - b.hits});        
     },
 
     findByRange_RepairMaintenance: function(creep) {
         return creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                                filter: function(structure) {
-                                    return (structure.structureType == STRUCTURE_ROAD && structure.hits < structure.hitsMax * 0.8)
-                                        || (structure.structureType == STRUCTURE_CONTAINER && structure.hits < structure.hitsMax * 0.8)
-                                        || (structure.structureType == STRUCTURE_RAMPART && structure.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(creep.room)))
-                                        || (structure.structureType == STRUCTURE_WALL && structure.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(creep.room)));
+                                filter: (s) => {
+                                    return (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8)
+                                        || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.8)
+                                        || (s.structureType == STRUCTURE_RAMPART && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(creep.room)))
+                                        || (s.structureType == STRUCTURE_WALL && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(creep.room)));
                                 } 
                         });
     }
