@@ -159,7 +159,7 @@ let _Roles = {
         }
         else {
             let targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                return !Object.keys(Memory["hive"]["allies"]).includes(c.owner.username); }});
+                return !Object.keys(Memory["_allies"]).includes(c.owner.username); }});
             
             if (targets.length > 0) {
                 if(creep.attack(targets[0]) == ERR_NOT_IN_RANGE) {
@@ -174,7 +174,7 @@ let _Roles = {
         }
         else {
             let allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                    return !Object.keys(Memory["hive"]["allies"]).includes(c.owner.username); }});
+                    return !Object.keys(Memory["_allies"]).includes(c.owner.username); }});
             let nearTargets = creep.pos.findInRange(allTargets, 3);
             
             if (nearTargets.length == 0) {

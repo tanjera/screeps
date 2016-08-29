@@ -23,8 +23,18 @@ let __Creep = {
         switch (creep.memory.task["subtype"]) {
             case "wait":
                 return;
-                
-            case "pickup":
+            
+			case "boost": {
+				let lab = Game.getObjectById(creep.memory.task["id"]);
+                if (!creep.pos.inRangeTo(lab, 1)) {
+                    return creep.moveTo(lab, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
+                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                } else {    // Wait out timer- should be boosted by then.                    
+                    return;
+                }
+			}
+			
+            case "pickup": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
@@ -33,8 +43,9 @@ let __Creep = {
                     delete creep.memory.task;
                     return;
                 }
+            }
 
-            case "withdraw":
+            case "withdraw": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.withdraw(obj, creep.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
                     return creep.moveTo(obj, {reusePath: _Hive.moveReusePath()}) == ERR_NO_PATH
@@ -43,8 +54,9 @@ let __Creep = {
                     delete creep.memory.task;
                     return;
                 }
+            }
 
-            case "harvest":
+            case "harvest": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.harvest(obj); 
                 if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
@@ -54,8 +66,9 @@ let __Creep = {
                     delete creep.memory.task;
                     return;
                 } else { return; }
-
-            case "upgrade":
+            }
+            
+            case "upgrade": {
                 let controller = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.upgradeController(controller); 
                 if (result == ERR_NOT_IN_RANGE) {
@@ -65,8 +78,9 @@ let __Creep = {
                     delete creep.memory.task;
                     return;
                 } else { return; }
+            }
 
-            case "repair":
+            case "repair": {
                 let structure = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.repair(structure); 
                 if (result == ERR_NOT_IN_RANGE) {
@@ -76,8 +90,9 @@ let __Creep = {
                     delete creep.memory.task;
                     return;
                 } else { return; }
+            }
             
-            case "build":
+            case "build": {
                 let structure = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.build(structure);
                 if (result == ERR_NOT_IN_RANGE) {
@@ -87,8 +102,9 @@ let __Creep = {
                     delete creep.memory.task;
                     return;
                 } else { return; }
+            }
 
-            case "deposit":
+            case "deposit": {
                 // Make sure the target hasn"t filled up...
                 let target = Game.getObjectById(creep.memory.task["id"]);
                 if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
@@ -111,7 +127,7 @@ let __Creep = {
                         return;
                     }
                 }
-
+            }
         }
     },
 

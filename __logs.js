@@ -1,22 +1,18 @@
 let __Logs = {
 
-	List: function() {
-		console.log("List of functions: Storage()");
-	},
-
-    Storage: function() {        
+    Storage: function() {
+		let color = "#D3FFA3";
+        console.log(`<font color=\"${color}">*** Storage Report: Tick # ${Game.time} ***</font>`);
+        
 		for (let i = 0; i < Object.keys(Game.rooms).length; i++) {
 			let room = Game.rooms[Object.keys(Game.rooms)[i]];
-
-			console.log(`<font color=\"#0001C8\">\t\t Storage Report: Tick # ${Game.time} </font>`);
-			
 			if (room.storage != null) {
 				if (_.sum(room.storage) == 0) {
 					console.log(`${room.name} storage: empty`);
 				} else {
-					let output = `${room.name} storage: `;
+					let output = `<font color=\"${color}\">${room.name}</font> storage: `;
 					for (let res in room.storage.store) {						
-						output += `${res}: ${_.floor(room.storage.store[res] / 1000)}k \t\t`;
+						output += `<font color=\"${color}\">${res}</font>: ${_.floor(room.storage.store[res] / 1000)}k;  `;
 					}
 					console.log(output);
 				}
@@ -26,9 +22,9 @@ let __Logs = {
 				if (_.sum(room.terminal) == 0) {
 					console.log(`${room.name} terminal: empty`);
 				} else {
-					let output = `${room.name} terminal: `;
+					let output = `<font color=\"${color}\">${room.name}</font> terminal: `;
 					for (let res in room.terminal.store) {
-						output += `${res} x ${_.floor(room.terminal.store[res] / 1000)}k \t\t`;						
+						output += `<font color=\"${color}\">${res}</font>: ${_.floor(room.terminal.store[res] / 1000)}k;  `;
 					}
 					console.log(output);
 				}

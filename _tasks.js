@@ -60,7 +60,19 @@ let _Tasks = {
         if (creep.memory.task != null && Object.keys(creep.memory.task).length > 0) {            
             return;
         }
+		
+		// Assign a boost if needed and available
+		let __creep = require("__creep");
+		if (creep.ticksToLive > 1400 && !__creep.isBoosted(creep)) {
+			let tasks = _.filter(Memory["_tasks"][creep.room.name], 
+					(t) => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; });				
+			if (tasks.length > 0) {
+				_Tasks.giveTask(creep, tasks[0]);
+				return;
+			}
+		}
 
+		// Assign role tasks
         switch (creep.memory.role) {
             default: 
                 return;
@@ -166,13 +178,23 @@ let _Tasks = {
                 return;
             }
 
-            // If stuck without a task... drop off minerals in storage... or wait...
-            tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
-                    (t) => { return t.type == "carry" && t.resource == "mineral"; }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
-            if (tasks.length > 0) {
-                _Tasks.giveTask(creep, tasks[0]);
-                return;
+            // If stuck without a task... drop off energy/minerals in storage... or wait...
+            if (Object.keys(creep.carry).includes("energy")) {
+				tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
+						(t) => { return t.type == "carry" && t.resource == "energy"; }), 
+						(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+				if (tasks.length > 0) {
+					_Tasks.giveTask(creep, tasks[0]);
+					return;
+				}
+			} else if (Object.keys(creep.carry).length > 0) {
+				tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
+						(t) => { return t.type == "carry" && t.resource == "mineral"; }), 
+						(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
+				if (tasks.length > 0) {
+					_Tasks.giveTask(creep, tasks[0]);
+					return;
+				}
             } else {
                 _Tasks.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
                 return;
@@ -284,6 +306,7 @@ let _Tasks = {
 	},
 
     compileTasks: function (rmName) {
+        var structures;
         let __Colony = require("__colony");
         let room = Game.rooms[rmName];
 
@@ -312,7 +335,7 @@ let _Tasks = {
             }
         }
         
-        let structures = __Colony.findByNeed_RepairCritical(room);
+        structures = __Colony.findByNeed_RepairCritical(room);
         for (let i in structures) {
             _Tasks.addTask(rmName, 
                 {   type: "work",
@@ -325,7 +348,7 @@ let _Tasks = {
                 });                
         }
         
-        let structures = __Colony.findByNeed_RepairMaintenance(room);
+        structures = __Colony.findByNeed_RepairMaintenance(room);
         for (let i in structures) {
             _Tasks.addTask(rmName, 
                 {   type: "work",
@@ -411,7 +434,7 @@ let _Tasks = {
                         resource: "energy",
                         id: storages[i].id,
                         pos: storages[i].pos,
-                        timer: 5,
+                        timer: 10,
                         creeps: 8,
                         priority: 3
                     });
@@ -504,7 +527,7 @@ let _Tasks = {
             }
         }
 
-        let structures = room.find(FIND_MY_STRUCTURES, { filter: (s) => {
+        structures = room.find(FIND_MY_STRUCTURES, { filter: (s) => {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
         for (let i in structures) {

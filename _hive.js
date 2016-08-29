@@ -41,10 +41,10 @@ let _Hive = {
         }
     },
 
-    initMemory: function() {        
-        }
+    initMemory: function() {
         if (Memory["_rooms"] == null) Memory["_rooms"] = {};         
-
+        if (Memory["_tasks"] == null) Memory["_tasks"] = {};
+        
         // Populate empty room memories
         for (let r in Game["rooms"]) {            
             if (Memory["_rooms"][r] == null) Memory["_rooms"][r] = {};            
@@ -61,8 +61,8 @@ let _Hive = {
         Memory["_population_balance"] = {};  // Reset data for population balancing
         Memory["_spawn_requests"] = {};      // Reset all spawn requests
 		
-		if (Memory["_request"] == null) Memory["request"] = {};
-		if (Memory["_options"] == null) Memory["options"] = { console: "on" };
+		if (Memory["request"] == null) Memory["request"] = {};
+		if (Memory["options"] == null) Memory["options"] = { console: "on" };
     },    
 
     initTasks: function() {
@@ -78,10 +78,16 @@ let _Hive = {
 	
 	processRequests: function() {
 		// To be used for injecting tasks or terminal order requests
-		if (Memory["_request"] != null) {
+		if (Memory["request"] != null) {
 			switch (Memory["request"]) {
 				default:
-					return;					
+					break;	
+
+				case "log-storage": {
+					let __Logs = require("__logs");
+					__Logs.Storage();
+					break;
+				}
 			}
 		}
 		
@@ -181,7 +187,7 @@ let _Hive = {
 				}
 			}			
 		}		
-	}
+	},
 	
     populationTally: function(rmName, popTarget, popActual) {
         // Tallies the target population for a colony, to be used for spawn load balancing
@@ -238,8 +244,8 @@ let _Hive = {
 						
                         if (_.isString(result)) {
 							if (Memory["options"]["console"] == "on") {
-								console.log(`<font color=\"#19C800\">Spawning a level ${level} (of ${request.level}) 
-									${request.body} at ${spawn.room.name} for ${request.room}</font>`);
+								console.log(`<font color=\"#19C800\">Spawning</font> a lvl ${level} (of ${request.level}) `
+									+ `${request.body} at ${spawn.room.name} (-> ${request.room})`);
 							}
                             listSpawns[s] = null;
                             listRequests[r] = null;
@@ -256,7 +262,7 @@ let _Hive = {
         for (let s in listSpawns) {
             let spawn = Game["spawns"][listSpawns[s]];
             let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
-            for (let c in creeps; c++) {
+            for (let c in creeps) {
                 if (!__Creep.isBoosted(creeps[c])) {
                     if (spawn.renewCreep(creeps[c]) == OK) {
                         break;

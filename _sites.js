@@ -249,7 +249,8 @@ let _Sites = {
             let _Tasks = require("_tasks");
             if (listTasks == null)  listTasks = {};
 
-            for (let l in listLabs) {                
+            for (let l in listLabs) {
+                var lab, storage;
                 let listing = listLabs[l];
 
                 // Populate tasks for the courier to load and unload labs
@@ -258,62 +259,93 @@ let _Sites = {
 						break;
 						
 					case "boost":
-						let storage = Game.rooms[rmColony].storage;
+						storage = Game.rooms[rmColony].storage;
 						if (storage == null) break;			
 									 
-						let lab = Game.getObjectById(listing["supply1"]["lab"]);
-						if (lab.mineralType != listing["mineral"]) {
+						lab = Game.getObjectById(listing["lab"]);
+						if (lab.mineralType != null && lab.mineralType != listing["mineral"]) {
 							// The lab has the wrong mineral in it? Old reaction? Clear it out!
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: lab.mineralType,
-									id: listing["lab"],
+									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 2 
-								};
-						}
-						else if (Object.keys(storage.store).includes(listing["mineral"]) 
-							// Good to go? Supply the lab!
-								&& lab.mineralAmount < lab.mineralCapacity * 0.5) {
+								});
+						} else if (lab.energy < lab.energyCapacity * 0.75 && Object.keys(storage.store).includes("energy")) {
+							// Supply the lab!							
+							_Tasks.addTask(rmColony, 
+								{   type: "industry", subtype: "withdraw", 
+									resource: "energy", 
+									id: storage.id, pos: storage.pos,								
+									timer: 10, creeps: 8, priority: 3 
+								});							
+							_Tasks.addTask(rmColony, 
+								{   type: "industry", subtype: "deposit", 
+									resource: "energy",
+									id: lab.id, pos: lab.pos,
+									timer: 10, creeps: 8, priority: 3 
+								});	
+						} else if (lab.mineralAmount < lab.mineralCapacity * 0.75 && Object.keys(storage.store).includes(listing["mineral"])) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["mineral"], 
-									id: storage.id, 								
+									id: storage.id, pos: storage.pos,								
 									timer: 10, creeps: 8, priority: 3 
 								});							
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "deposit", 
 									resource: listing["mineral"],
-									id: listing["lab"],
+									id: lab.id, pos: lab.pos,
+									timer: 10, creeps: 8, priority: 3 
+								});								
+						}
+						
+						if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 0 && lab.energy > 0) {
+							// Create the boost task!!
+							_Tasks.addTask(rmColony, 
+								{   type: "boost", subtype: "boost", 
+									role: listing["role"], subrole: listing["subrole"],
+									resource: listing["mineral"],
+									id: lab.id, pos: lab.pos,
+									timer: 10, creeps: 8, priority: 1 
+								});	
+						}						
+						
+						break;
+						
+					case "empty":
+						lab = Game.getObjectById(listing["lab"]);
+						if (lab.mineralAmount > 0) {							
+							_Tasks.addTask(rmColony, 
+								{   type: "industry", subtype: "withdraw", 
+									resource: lab.mineralType,
+									id: listing["lab"], pos: lab.pos,
+									timer: 10, creeps: 8, priority: 3 
+								});
+						}
+						if (lab.energy > 0) {							
+							_Tasks.addTask(rmColony, 
+								{   type: "industry", subtype: "withdraw", 
+									resource: "energy",
+									id: listing["lab"], pos: lab.pos,
 									timer: 10, creeps: 8, priority: 3 
 								});
 						}
 						break;
 						
-					case "empty":
-						let lab = Game.getObjectById(listing["lab"]);
-						if (lab.mineralAmount > 0) {							
-							_Tasks.addTask(rmColony, 
-								{   type: "industry", subtype: "withdraw", 
-									resource: lab.mineralType,
-									id: listing["lab"],
-									timer: 10, creeps: 8, priority: 3 
-								};
-						}					
-						break;
-						
 					case "reaction":
-						let storage = Game.rooms[rmColony].storage;
+						storage = Game.rooms[rmColony].storage;
 						if (storage == null) break;			
 									 
-						let lab = Game.getObjectById(listing["supply1"]["lab"]);
-						if (lab.mineralType != listing["supply1"]["mineral"]) {
+						lab = Game.getObjectById(listing["supply1"]["lab"]);
+						if (lab.mineralType != null && lab.mineralType != listing["supply1"]["mineral"]) {
 							// The lab has the wrong mineral in it? Old reaction? Clear it out!
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: lab.mineralType,
-									id: listing["supply1"]["lab"],
+									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 3 
-								};
+								});
 						}
 						else if (Object.keys(storage.store).includes(listing["supply1"]["mineral"]) 
 							// Good to go? Supply the lab!
@@ -321,51 +353,59 @@ let _Sites = {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["supply1"]["mineral"], 
-									id: storage.id, 								
+									id: storage.id, pos: storage.pos,								
 									timer: 10, creeps: 8, priority: 3 
 								});							
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "deposit", 
 									resource: listing["supply1"]["mineral"],
-									id: listing["supply1"]["lab"],
+									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 3 
 								});
 						}
 						
-						let lab = Game.getObjectById(listing["supply2"]["lab"]);
-						if (lab.mineralType != listing["supply2"]["mineral"]) {
+						lab = Game.getObjectById(listing["supply2"]["lab"]);
+						if (lab.mineralType != null && lab.mineralType != listing["supply2"]["mineral"]) {
 							// The lab has the wrong mineral in it? Old reaction? Clear it out!
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: lab.mineralType,
-									id: listing["supply2"]["lab"],
+									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 3 
-								};
+								});
 						}
 						else if (Object.keys(storage.store).includes(listing["supply2"]["mineral"]) 
 								&& lab.mineralAmount < lab.mineralCapacity * 0.5) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["supply2"]["mineral"], 
-									id: storage.id,  
+									id: storage.id, pos: storage.pos,
 									timer: 10, creeps: 8, priority: 3 
 								});
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "deposit", 
 									resource: listing["supply2"]["mineral"],
-									id: listing["supply2"]["lab"],
+									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 3 
 								});
 						}
 
-						let obj = Game.getObjectById(listing["reactor"]["lab"]);
-						if (obj.mineralAmount > obj.mineralCapacity * 0.5) {
+						lab = Game.getObjectById(listing["reactor"]["lab"]);
+						if (lab.mineralType != null && lab.mineralType != listing["reactor"]["mineral"]) {
+							// The lab has the wrong mineral in it? Old reaction? Clear it out!
+							_Tasks.addTask(rmColony, 
+								{   type: "industry", subtype: "withdraw", 
+									resource: lab.mineralType,
+									id: lab.id, pos: lab.pos,
+									timer: 10, creeps: 8, priority: 3 
+								});
+						} else if (lab.mineralAmount > lab.mineralCapacity * 0.5) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["reactor"]["mineral"],
-									id: listing["reactor"]["lab"],
+									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 2 
-								};
+								});
 						}
 						
 						break;
