@@ -329,7 +329,7 @@ let _Tasks = {
                         id: room.controller.id,
                         pos: room.controller.pos,
                         timer: 20,
-                        creeps: 15,
+                        creeps: 20,
                         priority: 5
                     });
             }
@@ -435,7 +435,7 @@ let _Tasks = {
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 10,
-                        creeps: 8,
+                        creeps: 10,
                         priority: 3
                     });
             }
@@ -448,7 +448,7 @@ let _Tasks = {
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 20,
-                        creeps: 8,
+                        creeps: 10,
                         priority: 9
                     });
                 _Tasks.addTask(rmName, 
@@ -459,7 +459,7 @@ let _Tasks = {
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 20,
-                        creeps: 8,
+                        creeps: 10,
                         priority: 9
                     });     
             }

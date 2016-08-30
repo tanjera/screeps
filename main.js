@@ -58,16 +58,17 @@ module.exports.loop = function () {
             [ { action: "reaction", 
 				reactor: {mineral: "UL", lab: "579f9f2549708a4306732b3e"}, 
 				supply1: {mineral: "U", lab: "57a0539e25bdfd7a71d9a527"}, 
-				supply2: {mineral: "L", lab: "57bc412f58d9edd776d1a39e"} } ],
-			[ { type: "industry", subtype: "withdraw", 
-				resource: "U",
-				id: "57a03063c20303fd1e5e125a",
-				timer: 10, creeps: 8, priority: 3 
-			},{ type: "industry", subtype: "deposit", 
-				resource: "L",
-				id: "57a03063c20303fd1e5e125a",
-				timer: 10, creeps: 8, priority: 3 
-			} ] );
+				supply2: {mineral: "L", lab: "57bc412f58d9edd776d1a39e"} },
+			  { action: "reaction", 
+				reactor: {mineral: "G", lab: "57a02f90b712db3b1f1c399c"}, 
+				supply1: {mineral: "ZK", lab: "57bc12855c9bd87c51d9abda"}, 
+				supply2: {mineral: "UL", lab: "579f9f2549708a4306732b3e"} },
+			  { action: "reaction", 
+				reactor: {mineral: "G", lab: "57bc7f418cd23da102392560"},
+				supply1: {mineral: "ZK", lab: "57bc12855c9bd87c51d9abda"}, 
+				supply2: {mineral: "UL", lab: "579f9f2549708a4306732b3e"} } ],
+			[ { type: "industry", subtype: "withdraw", resource: "U", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 },
+			  { type: "industry", subtype: "withdraw", resource: "L", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 }]);
 			
     /* Colony #2, W19S42 */
     _Sites.Colony("W19S42", 2,
@@ -107,52 +108,40 @@ module.exports.loop = function () {
     _Sites.Mining("W15S43", "W15S43", 2,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 5, amount: 2} } );
-	_Sites.Industry("W15S43", 1,
-            { courier:   {level: 5, amount: 1} },
-            { },
-			[ { type: "industry", subtype: "withdraw", 
-				resource: "U",
-				id: "57b5cbedd1472abb57f262a8",
-				timer: 10, creeps: 8, priority: 3 
-			},{ type: "industry", subtype: "deposit", 
-				resource: "U",
-				id: "57be092c9611444d51e8d458",
-				timer: 10, creeps: 8, priority: 3 
-			} ] );
-			
+	_Sites.Industry("W15S43", 2,
+            { courier:   {level: 4, amount: 1} },
+            [ { action: "reaction", 
+				reactor: {mineral: "UL", lab: "57be56f1e02d93c93cf460c7"}, 
+				supply1: {mineral: "U", lab: "57c3fdcc823703630339213d"}, 
+				supply2: {mineral: "L", lab: "57c4a633e06148377d95b97d"} } ],
+			[ { type: "industry", subtype: "withdraw", resource: "L", id: "57be092c9611444d51e8d458", timer: 10, creeps: 8, priority: 3 }]);
+			  
     /* Colony #5, W13S41 */
     _Sites.Colony("W13S41", 2,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 4, amount: 1},
               upgrader: {level: 5, amount: 6} },              
-            [{id: "57c04f3012c844604895d81f", role: "send"},             
+            [{id: "57c04f3012c844604895d81f", role: "send"},
              {id: "57c06b8698040e1908490daf", role: "receive"},
 			 {id: "57c3eabdc480f8a72a2cdb75", role: "receive"}]);
-    _Sites.Mining("W13S41", "W13S41", 3,
+    _Sites.Mining("W13S41", "W13S41", 2,
             { burrower:  {level: 4, amount: 2},
               carrier:   {level: 4, amount: 3},
 			  extractor: {level: 6, amount: 2} } );
   	_Sites.Industry("W13S41", 2,
             { courier:   {level: 5, amount: 1} },
-            { boost: { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" } },
-			[ { type: "industry", subtype: "withdraw", 
-				resource: "energy",
-				id: "57bcfb7755b7fdcc755571ba",
-				timer: 10, creeps: 8, priority: 3 
-			},{ type: "industry", subtype: "deposit", 
-				resource: "energy",
-				id: "57c3e85d4e9f13dc1dadbab4",
-				timer: 10, creeps: 8, priority: 3 
-			} ] );
+            [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" } ]);
+			/*[ { type: "industry", subtype: "withdraw", resource: "L", id: "57bcfb7755b7fdcc755571ba", timer: 10, creeps: 8, priority: 3 },
+			  { type: "industry", subtype: "deposit", resource: "L", id: "57c3e85d4e9f13dc1dadbab4", timer: 10, creeps: 8, priority: 3 }]);*/
               
     /* Colony #6, W11S44 */
     _Sites.Colony("W11S44", 1,
             { worker:   {level: 4, amount: 2},
               repairer: {level: 4, amount: 1},
-              upgrader: {level: 4, amount: 2} });
-    _Sites.Mining("W1144", "W11S44", 1,
-            { burrower:  {level: 4, amount: 2},
-              carrier:   {level: 4, amount: 3} } );
+              upgrader: {level: 4, amount: 4} });
+    _Sites.Mining("W11S44", "W11S44", 1,
+            { burrower:  {level: 4, amount: 1},
+              carrier:   {level: 4, amount: 2} } );
               
 
     /* Remote mining operations for Colony #1, W18S43 */

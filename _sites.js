@@ -78,9 +78,8 @@ let _Sites = {
         }
 
         // Process links via listLinks parameter (an array of [id: "", role: "send/receive"])
-        if (listLinks != null) {
-            Memory["_rooms"][rmColony]["links"] = listLinks;
-
+        Memory["_rooms"][rmColony]["links"] = listLinks;
+		if (listLinks != null) {
             let linksSend = _.filter(listLinks, (obj) => { return obj.id && obj["role"] == "send"; });
             let linksReceive = _.filter(listLinks, (obj) => { return obj.id && obj["role"] == "receive"; });
 
@@ -349,7 +348,7 @@ let _Sites = {
 						}
 						else if (Object.keys(storage.store).includes(listing["supply1"]["mineral"]) 
 							// Good to go? Supply the lab!
-								&& lab.mineralAmount < lab.mineralCapacity * 0.5) {
+								&& lab.mineralAmount < lab.mineralCapacity * 0.2) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["supply1"]["mineral"], 
@@ -375,7 +374,7 @@ let _Sites = {
 								});
 						}
 						else if (Object.keys(storage.store).includes(listing["supply2"]["mineral"]) 
-								&& lab.mineralAmount < lab.mineralCapacity * 0.5) {
+								&& lab.mineralAmount < lab.mineralCapacity * 0.2) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["supply2"]["mineral"], 
@@ -399,7 +398,7 @@ let _Sites = {
 									id: lab.id, pos: lab.pos,
 									timer: 10, creeps: 8, priority: 3 
 								});
-						} else if (lab.mineralAmount > lab.mineralCapacity * 0.5) {
+						} else if (lab.mineralAmount > lab.mineralCapacity * 0.8) {
 							_Tasks.addTask(rmColony, 
 								{   type: "industry", subtype: "withdraw", 
 									resource: listing["reactor"]["mineral"],
