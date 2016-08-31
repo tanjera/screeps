@@ -227,7 +227,7 @@ let _Sites = {
 					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, 
 						{ filter: (c) => { return c.memory.role == listing["role"] && c.memory.subrole == listing["subrole"] }});
 					for (let c in creeps) {
-						if (!__Creep.isBoosted(creeps[c])) {
+						if (creeps[c].ticksToLive > 1400 && !__Creep.isBoosted(creeps[c])) {
 							lab.boostCreep(creeps[c]);
 						}
 					}
