@@ -280,6 +280,15 @@ let _Tasks = {
                 return;
             } 
 
+			tasks = _.sortBy(_.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
+				(t) => { return t.subtype == "pickup" && t.resource == "mineral"; }), 
+				(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+					"priority");
+			if (tasks.length > 0) {
+				_Tasks.giveTask(creep, tasks[0]);
+				return;
+			}
+			
             tasks = _.sortBy(_.filter(Memory["_tasks"][creep.room.name], 
                 (t) => { return t.type == "mine" && t.resource == "mineral"; }), 
                 (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); });
@@ -376,7 +385,7 @@ let _Tasks = {
 
         /* Carrier-based tasks & energy supply for workers) */
         let piles = room.find(FIND_DROPPED_ENERGY);
-        for (let i in piles) {
+        for (let i in piles) {			
             _Tasks.addTask(rmName, 
                 {   type: "carry",
                     subtype: "pickup",
