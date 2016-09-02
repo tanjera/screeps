@@ -1,10 +1,11 @@
-let __Creep = require("__creep");
-let _Tasks = require("_tasks");
+let _Creep = require("util.creep");
+let Tasks = require("tasks");
 
-let _Roles = {
+module.exports = {
+	
     Worker: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            __Creep.moveToRoom(creep, creep.memory.room);
+            _Creep.moveToRoom(creep, creep.memory.room);
         }
         else if (creep.memory.state == "refueling") {
             if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
@@ -13,9 +14,9 @@ let _Roles = {
                 return;
             }
             
-            _Tasks.assignTask(creep, true);        
-            if (__Creep.runTaskTimer(creep)) {
-                __Creep.runTask(creep);
+            Tasks.assignTask(creep, true);        
+            if (_Creep.runTaskTimer(creep)) {
+                _Creep.runTask(creep);
             }
             return;
 
@@ -26,9 +27,9 @@ let _Roles = {
                     return;
                 }
             
-            _Tasks.assignTask(creep, false);
-            if (__Creep.runTaskTimer(creep)) {
-                __Creep.runTask(creep);
+            Tasks.assignTask(creep, false);
+            if (_Creep.runTaskTimer(creep)) {
+                _Creep.runTask(creep);
             }
             return;
 
@@ -45,9 +46,9 @@ let _Roles = {
                 return;
             }
             
-            _Tasks.assignTask(creep, true);        
-            if (__Creep.runTaskTimer(creep)) {
-                __Creep.runTask(creep);
+            Tasks.assignTask(creep, true);        
+            if (_Creep.runTaskTimer(creep)) {
+                _Creep.runTask(creep);
             }
             return;
 
@@ -59,9 +60,9 @@ let _Roles = {
                 return;
             }
 
-            _Tasks.assignTask(creep, false);
-            if (__Creep.runTaskTimer(creep)) {
-                __Creep.runTask(creep);
+            Tasks.assignTask(creep, false);
+            if (_Creep.runTaskTimer(creep)) {
+                _Creep.runTask(creep);
             }
             return;
 
@@ -72,7 +73,7 @@ let _Roles = {
 
     Courier: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            __Creep.moveToRoom(creep, creep.memory.room);
+            _Creep.moveToRoom(creep, creep.memory.room);
         }
         else if (creep.memory.state == "loading") {
             if (_.sum(creep.carry) > 0) {
@@ -81,9 +82,9 @@ let _Roles = {
                 return;
             }
             
-            _Tasks.assignTask(creep, true);        
-            if (__Creep.runTaskTimer(creep)) {
-                __Creep.runTask(creep);
+            Tasks.assignTask(creep, true);        
+            if (_Creep.runTaskTimer(creep)) {
+                _Creep.runTask(creep);
             }
             return;
 
@@ -94,9 +95,9 @@ let _Roles = {
                     return;
                 }
             
-            _Tasks.assignTask(creep, false);
-            if (__Creep.runTaskTimer(creep)) {
-                __Creep.runTask(creep);
+            Tasks.assignTask(creep, false);
+            if (_Creep.runTaskTimer(creep)) {
+                _Creep.runTask(creep);
             }
             return;
 
@@ -113,9 +114,9 @@ let _Roles = {
                     creep.memory.state = "deliver";
                 }
 
-                _Tasks.assignTask(creep, true);
-                if (__Creep.runTaskTimer(creep)) {
-                    __Creep.runTask(creep);
+                Tasks.assignTask(creep, true);
+                if (_Creep.runTaskTimer(creep)) {
+                    _Creep.runTask(creep);
                 }
             return;
 
@@ -124,16 +125,16 @@ let _Roles = {
                     creep.memory.state = "get_minerals";
                 }
 
-                _Tasks.assignTask(creep, false);
-                if (__Creep.runTaskTimer(creep)) {
-                    __Creep.runTask(creep);
+                Tasks.assignTask(creep, false);
+                if (_Creep.runTaskTimer(creep)) {
+                    _Creep.runTask(creep);
                 }
             return;
         } },
 
     Reserver: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            __Creep.moveToRoom(creep, creep.memory.room, true);
+            _Creep.moveToRoom(creep, creep.memory.room, true);
             return;
         }
         else {
@@ -142,10 +143,10 @@ let _Roles = {
                 creep.moveTo(creep.room.controller)
                 return;
             } else if (result == OK) {
-                if (Game.time % 4 == 0) {  // Don"t park next to a source (and possibly block it!)
+                if (Game.time % 4 == 0) {  // Don't park next to a source (and possibly block it!)
                     let sources = creep.pos.findInRange(FIND_SOURCES, 1);
                     if (sources != null && sources.length > 0) {
-                        let __creep = require("__creep");
+                        let __creep = require("util.creep");
                         __creep.moveFrom(creep, sources[0]);
                     }
                 }
@@ -155,11 +156,11 @@ let _Roles = {
 
     Soldier: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            __Creep.moveToRoom(creep, creep.memory.room);
+            _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             let targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                return !Object.keys(Memory["_allies"]).includes(c.owner.username); }});
+                return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
             
             if (targets.length > 0) {
                 if(creep.attack(targets[0]) == ERR_NOT_IN_RANGE) {
@@ -170,11 +171,11 @@ let _Roles = {
 
     Archer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            __Creep.moveToRoom(creep, creep.memory.room);
+            _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             let allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                    return !Object.keys(Memory["_allies"]).includes(c.owner.username); }});
+                    return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
             let nearTargets = creep.pos.findInRange(allTargets, 3);
             
             if (nearTargets.length == 0) {
@@ -186,14 +187,14 @@ let _Roles = {
             } else if (nearTargets.length > 0) {
                 creep.rangedAttack(nearTargets[0]);
                 if (creep.pos.getRangeTo(nearTargets[0]) < 2) {
-                    __Creep.moveFrom(creep, nearTargets[0]);
+                    _Creep.moveFrom(creep, nearTargets[0]);
                 }
             }
         } },
 
     Healer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            __Creep.moveToRoom(creep, creep.memory.room);
+            _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: (c) => { 
@@ -205,5 +206,3 @@ let _Roles = {
             }
         } }
 };
-
-module.exports = _Roles;

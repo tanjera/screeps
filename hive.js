@@ -1,4 +1,4 @@
-let _Hive = {
+let Hive = {
 
     isPulse: function() {
         if (Game.cpu.bucket > 9000) {
@@ -42,36 +42,33 @@ let _Hive = {
     },
 
     initMemory: function() {
-        if (Memory["_rooms"] == null) Memory["_rooms"] = {};         
-        if (Memory["_tasks"] == null) Memory["_tasks"] = {};
+        if (Memory["rooms"] == null) Memory["rooms"] = {};        
         
-        // Populate empty room memories
         for (let r in Game["rooms"]) {            
-            if (Memory["_rooms"][r] == null) Memory["_rooms"][r] = {};            
-            if (Memory["_tasks"][r] == null) Memory["_tasks"][r] = {};            
+            if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};            
+            if (Memory["rooms"][r]["tasks"] == null) Memory["rooms"][r]["tasks"] = {};            
+			Memory["rooms"][r]["population_balance"] = {};
+			
         }
 
-        // Set allies
-        Memory["_allies"] = {   Pantek59: "",
+        Memory["allies"] =  {   Pantek59: "",
 								Atavus: "",
 								BlackLotus: "",
 								Moria: "",
-								shedletsky: "" };
-
-        Memory["_population_balance"] = {};  // Reset data for population balancing
-        Memory["_spawn_requests"] = {};      // Reset all spawn requests
+								shedletsky: "" };        		
+		
+		Memory["spawn_requests"] = {};
 		
 		if (Memory["request"] == null) Memory["request"] = {};
 		if (Memory["options"] == null) Memory["options"] = { console: "on" };
     },    
 
     initTasks: function() {
-        let _Tasks = require("_tasks");
-        if (_Hive.isPulse()) {
-			Memory["_tasks"] = {};
+        let Tasks = require("tasks");
+        if (Hive.isPulse()) {			
             for (let r in Game["rooms"]) {            
-                Memory["_tasks"][r] = {};
-                _Tasks.compileTasks(r);
+                Memory["rooms"][r]["tasks"] = {};
+                Tasks.compileTasks(r);
             }
         }
     },
@@ -84,8 +81,8 @@ let _Hive = {
 					break;	
 
 				case "log-storage": {
-					let __Logs = require("__logs");
-					__Logs.Storage();
+					let _Logs = require("util.logs");
+					_Logs.Storage();
 					break;
 				}
 			}
@@ -96,11 +93,11 @@ let _Hive = {
 	
     populationTally: function(rmName, popTarget, popActual) {
         // Tallies the target population for a colony, to be used for spawn load balancing
-        if (Memory["_population_balance"][rmName] == null) {
-            Memory["_population_balance"][rmName] = {target: popTarget, actual: popActual, total: null};
+        if (Memory["rooms"][rmName]["population_balance"] == null) {
+            Memory["rooms"][rmName]["population_balance"] = {target: popTarget, actual: popActual, total: null};
         } else {
-            Memory["_population_balance"][rmName]["target"] += popTarget;
-            Memory["_population_balance"][rmName]["actual"] += popActual; 
+            Memory["rooms"][rmName]["population_balance"]["target"] += popTarget;
+            Memory["rooms"][rmName]["population_balance"]["actual"] += popActual; 
         }
     },
 
@@ -117,34 +114,32 @@ let _Hive = {
             tgtLevel is the target level of the creep"s body (per util.creep)
             spawnDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
-
-        let i = Object.keys(Memory["_spawn_requests"]).length;
-        Memory["_spawn_requests"][i] = 
-			{	room: rmName, distance: spawnDistance, priority: lvlPriority, 
-				level: tgtLevel, body: cBody, name: cName, args: cArgs };
+        
+        Memory["spawn_requests"].push({
+			room: rmName, distance: spawnDistance, priority: lvlPriority, 
+			level: tgtLevel, body: cBody, name: cName, args: cArgs });
 	},
 
 
     processSpawnRequests: function() {
-        // Determine percentage each colony meets its target population
-        for (let n in Memory["_population_balance"]) {            
-            Memory["_population_balance"][n]["total"] = Memory["_population_balance"][n]["actual"] / Memory["_population_balance"][n]["target"];
-        }
-
-        let listRequests = Object.keys(Memory["_spawn_requests"]).sort((a, b) => { 
-            return Memory["_spawn_requests"][a]["priority"] - Memory["_spawn_requests"][b]["priority"]; } );
+        let listRequests = Object.keys(Memory["spawn_requests"]).sort((a, b) => { 
+            return Memory["spawn_requests"][a]["priority"] - Memory["spawn_requests"][b]["priority"]; } );
         let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
-        let __Creep = require("__creep");
+        let _Creep = require("util.creep");
 
-        for (let r in listRequests) {
-            for (let s in listSpawns) {
+		for (let s in listSpawns) {
+			for (let r in listRequests) {
                 if (listSpawns[s] != null && listRequests[r] != null) {
 					let spawn = Game["spawns"][listSpawns[s]];
-                    let request = Memory["_spawn_requests"][listRequests[r]];
+                    let request = Memory["spawn_requests"][listRequests[r]];
                     if (Game.map.getRoomLinearDistance(spawn.room.name, request.room) <= request.distance) {
-                        let level = Math.max(1, Math.ceil(Memory["_population_balance"][request.room]["total"] 
-                                * Math.min(request.level, _Hive.getRoom_Level(spawn.room.name))));
-						let body = __Creep.getBody(request.body, level);
+						
+						Memory["rooms"][request.room]["population_balance"]["total"] = 
+							Memory["rooms"][request.room]["population_balance"]["actual"] / Memory["rooms"][request.room]["population_balance"]["target"];
+						
+                        let level = Math.max(1, Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] 
+                                * Math.min(request.level, Hive.getRoom_Level(spawn.room.name))));
+						let body = _Creep.getBody(request.body, level);
                         let result = spawn.createCreep(body, request.name, request.args);
 						
                         if (_.isString(result)) {
@@ -162,13 +157,13 @@ let _Hive = {
 	},
 
     processSpawnRenewing: function() {
-        let __Creep = require("__creep");
+        let _Creep = require("util.creep");
         let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
         for (let s in listSpawns) {
             let spawn = Game["spawns"][listSpawns[s]];
             let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
             for (let c in creeps) {
-                if (!__Creep.isBoosted(creeps[c])) {
+                if (!_Creep.isBoosted(creeps[c])) {
                     if (spawn.renewCreep(creeps[c]) == OK) {
                         break;
                     }
@@ -198,4 +193,4 @@ let _Hive = {
 		},
 };
 
-module.exports = _Hive;
+module.exports = Hive;

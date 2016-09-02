@@ -1,4 +1,4 @@
-let __Logs = {
+module.exports = {
 
     Storage: function() {
 		let color = "#D3FFA3";
@@ -31,6 +31,4 @@ let __Logs = {
 			}            
         }
     }
-}
-
-module.exports = __Logs;
+};

@@ -1,4 +1,4 @@
-let __Colony = {
+module.exports = {
 
     getRoom_Level: function(room) {
         if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
@@ -48,8 +48,8 @@ let __Colony = {
     findByNeed_RepairCritical: function(room) {
         return room.find(FIND_STRUCTURES, {
                             filter: (s) => {
-                                return (s.structureType == STRUCTURE_RAMPART && s.hits < __Colony.repairWalls_Critical(__Colony.getRoom_Level(room)))
-                                    || (s.structureType == STRUCTURE_WALL && s.hits < __Colony.repairWalls_Critical(__Colony.getRoom_Level(room)))
+                                return (s.structureType == STRUCTURE_RAMPART && s.hits < this.repairWalls_Critical(this.getRoom_Level(room)))
+                                    || (s.structureType == STRUCTURE_WALL && s.hits < this.repairWalls_Critical(this.getRoom_Level(room)))
                                     || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.2)
                                     || (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.2);
                             }}).sort((a, b) => {return a.hits - b.hits});    
@@ -58,8 +58,8 @@ let __Colony = {
     findByNeed_RepairMaintenance: function(room) {
         return room.find(FIND_STRUCTURES, {
                             filter: (s) => {
-                                return (s.structureType == STRUCTURE_RAMPART && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(room)))
-                                    || (s.structureType == STRUCTURE_WALL && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(room)))
+                                return (s.structureType == STRUCTURE_RAMPART && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(room)))
+                                    || (s.structureType == STRUCTURE_WALL && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(room)))
                                     || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.8)
                                     || (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8);
                             }}).sort((a, b) => {return a.hits - b.hits});        
@@ -70,11 +70,9 @@ let __Colony = {
                                 filter: (s) => {
                                     return (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8)
                                         || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.8)
-                                        || (s.structureType == STRUCTURE_RAMPART && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(creep.room)))
-                                        || (s.structureType == STRUCTURE_WALL && s.hits < __Colony.repairWalls_Maintenance(__Colony.getRoom_Level(creep.room)));
+                                        || (s.structureType == STRUCTURE_RAMPART && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(creep.room)))
+                                        || (s.structureType == STRUCTURE_WALL && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(creep.room)));
                                 } 
                         });
     }
 };
-
-module.exports = __Colony;
