@@ -7,7 +7,7 @@ let _Roles = {
             __Creep.moveToRoom(creep, creep.memory.room);
         }
         else if (creep.memory.state == "refueling") {
-            if (_.sum(creep.carry) == creep.carryCapacity) {
+            if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
                 creep.memory.state = "working";
                 delete creep.memory.task;
                 return;
@@ -39,7 +39,7 @@ let _Roles = {
 
     Mining: function(creep) {
         if (creep.memory.state == "refueling") {
-            if (_.sum(creep.carry) == creep.carryCapacity && creep.carryCapacity > 0) {
+            if (_.sum(creep.carry) >= creep.carryCapacity * 0.9 && creep.carryCapacity > 0) {
                 creep.memory.state = "delivering";
                 delete creep.memory.task;
                 return;
@@ -109,7 +109,7 @@ let _Roles = {
         switch (creep.memory.state) {
             default:
             case "get_minerals":
-                if (_.sum(creep.carry) == creep.carryCapacity) {
+                if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
                     creep.memory.state = "deliver";
                 }
 

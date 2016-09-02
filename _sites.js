@@ -225,11 +225,11 @@ let _Sites = {
 					let __Creep = require("__creep");
 					let lab = Game.getObjectById(listing["lab"]);
 					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, 
-						{ filter: (c) => { return c.memory.role == listing["role"] && c.memory.subrole == listing["subrole"] }});
-					for (let c in creeps) {
-						if (creeps[c].ticksToLive > 1400 && !__Creep.isBoosted(creeps[c])) {
-							lab.boostCreep(creeps[c]);
-						}
+						{ filter: (c) => { return c.memory.role == listing["role"] 
+							&& c.memory.subrole == listing["subrole"]
+							&& c.ticksToLive > 1100 && !__Creep.isBoosted(c) }});
+					if (creeps.length > 0) {						
+						lab.boostCreep(creeps[0]);						
 					}
 					break;
 

@@ -5,6 +5,12 @@ module.exports.loop = function () {
 
     /* To do:
 	
+		* Next room: W11S45 
+			- has U
+			- closer to several rooms with 2x sources
+			- load balancing with W11S44
+			- increased presence in area
+	
 		* Terminal code
 			- Each room has standing minimums
 			
@@ -35,8 +41,7 @@ module.exports.loop = function () {
     /* Colony #1, W18S43 */
     _Sites.Colony("W18S43", 2,
             { worker:   {level: 6, amount: 1},
-              repairer: {level: 6, amount: 1},
-              upgrader: {level: 7, amount: 1} },
+              repairer: {level: 6, amount: 1} },
             [{id: "57a2465268244ab107a96d5e", role: "send"},
              {id: "57a24a31e620955e29e63e27", role: "send"},
              {id: "57a24f9cacbffcb869dc9d21", role: "receive"},
@@ -45,37 +50,17 @@ module.exports.loop = function () {
             { burrower:  {level: 7, amount: 1},
               carrier:   {level: 7, amount: 2} } );
 	_Sites.Industry("W18S43", 2,
-            { courier:   {level: 5, amount: 1} },
-            [ { action: "reaction", 
-				reactor: {mineral: "GH", lab: "57bc412f58d9edd776d1a39e"}, 
-				supply1: {mineral: "G", lab: "57bc12855c9bd87c51d9abda"}, 
-				supply2: {mineral: "H", lab: "579f9f2549708a4306732b3e"} },
-			  { action: "reaction", 
-				reactor: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
-				supply1: {mineral: "G", lab: "57bc12855c9bd87c51d9abda"}, 
-				supply2: {mineral: "H", lab: "579f9f2549708a4306732b3e"} },
-			  { action: "reaction", 
-				reactor: {mineral: "GH2O", lab: "57a02f90b712db3b1f1c399c"}, 
+            { courier:   {level: 5, amount: 1} },            
+			[ { action: "reaction", 
+				reactor: {mineral: "GH20", lab: "57a02f90b712db3b1f1c399c"}, 
 				supply1: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
-				supply2: {mineral: "OH", lab: "57bc7f418cd23da102392560"} } ],
-			/*[ { action: "reaction", 
-				reactor: {mineral: "G", lab: "57bc412f58d9edd776d1a39e"}, 
-				supply1: {mineral: "ZK", lab: "57bc12855c9bd87c51d9abda"}, 
-				supply2: {mineral: "UL", lab: "579f9f2549708a4306732b3e"} },
+				supply2: {mineral: "OH", lab: "57bc412f58d9edd776d1a39e"} },
 			  { action: "reaction", 
-				reactor: {mineral: "G", lab: "57a0539e25bdfd7a71d9a527"}, 
-				supply1: {mineral: "ZK", lab: "57bc12855c9bd87c51d9abda"}, 
-				supply2: {mineral: "UL", lab: "579f9f2549708a4306732b3e"} },
-			  { action: "reaction", 
-				reactor: {mineral: "G", lab: "57a02f90b712db3b1f1c399c"}, 
-				supply1: {mineral: "ZK", lab: "57bc12855c9bd87c51d9abda"}, 
-				supply2: {mineral: "UL", lab: "579f9f2549708a4306732b3e"} },
-			  { action: "reaction", 
-				reactor: {mineral: "G", lab: "57bc7f418cd23da102392560"},
-				supply1: {mineral: "ZK", lab: "57bc12855c9bd87c51d9abda"}, 
-				supply2: {mineral: "UL", lab: "579f9f2549708a4306732b3e"} } ],*/
-			[ /*{ type: "industry", subtype: "withdraw", resource: "GH2O", id: "5784906f1336e9037d76403c", timer: 10, creeps: 8, priority: 3 },
-			  { type: "industry", subtype: "deposit", resource: "GH2O", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 },*/
+				reactor: {mineral: "GH", lab: "57bc7f418cd23da102392560"}, 
+				supply1: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
+				supply2: {mineral: "OH", lab: "57bc412f58d9edd776d1a39e"} } ],
+			[ { type: "industry", subtype: "withdraw", resource: "GH2O", id: "5784906f1336e9037d76403c", timer: 10, creeps: 8, priority: 3 },
+			  { type: "industry", subtype: "deposit", resource: "GH2O", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "H", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "ZK", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "UL", id: "57a03063c20303fd1e5e125a", timer: 10, creeps: 8, priority: 3 }]);
@@ -94,27 +79,14 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 1} } );
 	_Sites.Industry("W19S42", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "reaction", 
-				reactor: {mineral: "ZK", lab: "57c5fe753e0f0b8a4bea3b20"}, 
-				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
-				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} },
-			  { action: "reaction", 
-				reactor: {mineral: "ZK", lab: "57c6113e4f347e0c484670a3"}, 
-				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
-				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} },
-			  { action: "reaction", 
-				reactor: {mineral: "ZK", lab: "57a48664032cde75790b60f0"}, 
-				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
-				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} },
-			  { action: "reaction", 
+            [ 	
+			/*{ action: "reaction", 
 				reactor: {mineral: "ZK", lab: "57a45a183e04cec61d7e0a37"},
 				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
-				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} } ],
+				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} }*/ ],
 			[ { type: "industry", subtype: "withdraw", resource: "Z", id: "57a43625eacd469b3cf3c4cd", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "ZK", id: "579da11e660f6f1d315c8368", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "deposit", resource: "ZK", id: "57a43625eacd469b3cf3c4cd", timer: 10, creeps: 8, priority: 3 }]);
-
-
 
     /* Colony #3, W15S41 */
     _Sites.Colony("W15S41", 2,
@@ -131,24 +103,43 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 2} } );
 	_Sites.Industry("W15S41", 2,
             { courier:   {level: 5, amount: 1} },
-            { boost: { action: "boost", mineral: "GH2O", lab: "57b27619ad1bf23613f2e881", role: "worker", subrole: "upgrader" } });
+            [ { action: "boost", mineral: "GH2O", lab: "57b27619ad1bf23613f2e881", role: "worker", subrole: "upgrader" },												
+			  { action: "reaction", 
+				reactor: {mineral: "LH2O", lab: "57c5f390539ef49836106e44"}, 
+				supply1: {mineral: "LH", lab: "57b271ddc939eb5d4a418e12"}, 
+				supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} },
+			  { action: "reaction", 
+				reactor: {mineral: "LH", lab: "57b271ddc939eb5d4a418e12"}, 
+				supply1: {mineral: "L", lab: "57c5a6b34d14be183f0a2d3a"}, 
+				supply2: {mineral: "H", lab: "57b2800ff68d846c1323e3d6"} } ],
+			[ { type: "industry", subtype: "withdraw", resource: "L", id: "57af93cb52624def264c9472", timer: 10, creeps: 8, priority: 4 },
+			  { type: "industry", subtype: "withdraw", resource: "OH", id: "57af93cb52624def264c9472", timer: 10, creeps: 8, priority: 4 },
+			  { type: "industry", subtype: "withdraw", resource: "GH2O", id: "57af93cb52624def264c9472", timer: 10, creeps: 8, priority: 4 } ]);
 				
     /* Colony #4, W15S43 */
     _Sites.Colony("W15S43", 2,
             { worker:   {level: 6, amount: 1},
               repairer: {level: 5, amount: 1},
-              upgrader: {level: 6, amount: 2} } );      
+              upgrader: {level: 6, amount: 0} } );      
     _Sites.Mining("W15S43", "W15S43", 2,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 5, amount: 2} } );
 	_Sites.Industry("W15S43", 2,
             { courier:   {level: 4, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57c4a633e06148377d95b97d", role: "worker", subrole: "upgrader" }
-            /*{ action: "reaction", 
-				reactor: {mineral: "UL", lab: "57be56f1e02d93c93cf460c7"}, 
-				supply1: {mineral: "U", lab: "57c3fdcc823703630339213d"}, 
-				supply2: {mineral: "L", lab: "57c4a633e06148377d95b97d"} }*/ ],
-			[ { type: "industry", subtype: "withdraw", resource: "GH2O", id: "57be092c9611444d51e8d458", timer: 10, creeps: 8, priority: 3 },
+            [ { action: "reaction", 
+				reactor: {mineral: "UH", lab: "57be56f1e02d93c93cf460c7"}, 
+				supply1: {mineral: "U", lab: "57c8cb46e9b21a95363affa3"}, 
+				supply2: {mineral: "H", lab: "57c8dc805e86b05c1d5892e3"} }, 
+			  { action: "reaction", 
+				reactor: {mineral: "UH", lab: "57c3fdcc823703630339213d"}, 
+				supply1: {mineral: "U", lab: "57c8cb46e9b21a95363affa3"}, 
+				supply2: {mineral: "H", lab: "57c8dc805e86b05c1d5892e3"} }, 
+			  { action: "reaction", 
+				reactor: {mineral: "UH2O", lab: "57c4a633e06148377d95b97d"}, 
+				supply1: {mineral: "UH", lab: "57c3fdcc823703630339213d"}, 
+				supply2: {mineral: "OH", lab: "57c8ef2b1d3d4c8e3969d068"} }],
+			[ { type: "industry", subtype: "withdraw", resource: "H", id: "57be092c9611444d51e8d458", timer: 10, creeps: 8, priority: 3 },
+			  { type: "industry", subtype: "withdraw", resource: "OH", id: "57be092c9611444d51e8d458", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "U", id: "57be092c9611444d51e8d458", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "L", id: "57be092c9611444d51e8d458", timer: 10, creeps: 8, priority: 3 },
 			  { type: "industry", subtype: "withdraw", resource: "UL", id: "57b5cbedd1472abb57f262a8", timer: 10, creeps: 8, priority: 3 },
@@ -158,7 +149,7 @@ module.exports.loop = function () {
     _Sites.Colony("W13S41", 2,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 4, amount: 1},
-              upgrader: {level: 5, amount: 6} },              
+              upgrader: {level: 5, amount: 3} },              
             [{id: "57c04f3012c844604895d81f", role: "send"},
              {id: "57c06b8698040e1908490daf", role: "receive"},
 			 {id: "57c3eabdc480f8a72a2cdb75", role: "receive"}]);
@@ -169,16 +160,20 @@ module.exports.loop = function () {
   	_Sites.Industry("W13S41", 2,
             { courier:   {level: 5, amount: 1} },
             [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" } ],
-            [ { type: "industry", subtype: "withdraw", resource: "GH2O", id: "57c3e85d4e9f13dc1dadbab4", timer: 10, creeps: 8, priority: 3 } ]);
+            [ { type: "industry", subtype: "withdraw", resource: "GH2O", id: "57c3e85d4e9f13dc1dadbab4", timer: 10, creeps: 8, priority: 3 },
+			  { type: "industry", subtype: "deposit", resource: "L", id: "57c3e85d4e9f13dc1dadbab4", timer: 10, creeps: 8, priority: 3 },
+			  { type: "industry", subtype: "withdraw", resource: "L", id: "57bcfb7755b7fdcc755571ba", timer: 10, creeps: 8, priority: 3 } ]);
               
     /* Colony #6, W11S44 */
     _Sites.Colony("W11S44", 1,
-            { worker:   {level: 4, amount: 2},
-              repairer: {level: 4, amount: 1},
-              upgrader: {level: 4, amount: 4} });
+            { worker:   {level: 5, amount: 1},
+              repairer: {level: 5, amount: 1},
+              upgrader: {level: 5, amount: 1} });
     _Sites.Mining("W11S44", "W11S44", 1,
-            { burrower:  {level: 4, amount: 1},
-              carrier:   {level: 4, amount: 2} } );
+            { burrower:  {level: 5, amount: 1},
+              carrier:   {level: 5, amount: 2} },
+			[{id: "57c8c4ae926658ea75161a21", role: "send"},            
+			 {id: "57c8ca7749e338931cf1fa66", role: "receive"}]);
               
 
     /* Remote mining operations for Colony #1, W18S43 */
@@ -245,6 +240,13 @@ module.exports.loop = function () {
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
 
+	/* Remote mining operations for Colony #6, W11S44 */
+    _Sites.Mining("W11S44", "W11S45", 1,
+            { burrower:  {level: 4, amount: 1},
+              carrier:   {level: 4, amount: 3},
+              multirole: {level: 4, amount: 1},
+              reserver:  {level: 4, amount: 1} } );
+			  
 
     /* Run end-tick _Hive functions */
     _Hive.processSpawnRequests();
