@@ -62,10 +62,10 @@ let _Tasks = {
         }
 		
 		// Assign a boost if needed and available
-		let __creep = require("__creep");
-		if (creep.ticksToLive > 1400 && !__creep.isBoosted(creep)) {
+		let __creep = require("__creep");		
+		if (creep.ticksToLive > 1100 && !__creep.isBoosted(creep)) {
 			let tasks = _.filter(Memory["_tasks"][creep.room.name], 
-					(t) => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; });				
+				(t) => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; });				
 			if (tasks.length > 0) {
 				_Tasks.giveTask(creep, tasks[0]);
 				return;
