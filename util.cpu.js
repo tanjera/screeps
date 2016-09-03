@@ -10,8 +10,8 @@ module.exports = {
 		if (Memory["profiler"]["status"] != "on")
 			return;
 		
-		if (Memory["profiler"]["cycles"] == null || Memory["profiler"]["cycles"] == 0) {
-			Memory["profiler"]["cycles"] = 1;
+		if (Memory["profiler"]["cycles"] == null)
+			Memory["profiler"]["cycles"] = 0;
 		else
 			Memory["profiler"]["cycles"] -= 1;
 		
@@ -47,26 +47,25 @@ module.exports = {
 	
 	Finish: function() {
 		if (Memory["profiler"]["status"] != "on")
-			return;
+			return;		
 		
-		if (Memory["profiler"]["cycles"] == 0) {
-			
-			
-			let color = "#D3FFA3";		
+		if (Memory["profiler"]["cycles"] <= 0) {			
 			for (let r in Memory["profiler"]["current"]) {
-				let output = `<font color=\"${color}\">CPU report for ${r}</font>: `;
+				let output = `<font color=\"#D3FFA3">CPU report for ${r}</font>: `;
 				
 				for (let n in Memory["profiler"]["current"][r]) {					
 					let used = 0;					
-					let cycles = Object.keys(Memory["profiler"]["current"][r][n]);					
-					_.forEach(Memory["profiler"]["current"][r][n], c => used += c["used"]; ).					
-					output += `${n} ${parseFloat(used / cycles).toFixed(2)}; \t`;
+					let cycles = Object.keys(Memory["profiler"]["current"][r][n]).length;					
+				_.forEach(Memory["profiler"]["current"][r][n], c => { used += c["used"]; } );
+					output += `<br>(${parseFloat(used).toFixed(2)} / ${cycles}) : \t ${parseFloat(used / cycles).toFixed(2)} \t ${n}`;
 				}				
 				console.log(output);
 			}			
 			
 			Memory["profiler"]["status"] = "off";			
 			Memory["profiler"]["current"] = new Object();	// Wipe for the next use			
+		} else if (Memory["profiler"]["cycles"] % 10 == 0) {
+			console.log(`<font color=\"#D3FFA3\">[CPU]</font> Profiler running, ${Memory["profiler"]["cycles"]} ticks remaining.`);
 		}
 	}
 };

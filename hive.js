@@ -65,18 +65,18 @@ let Hive = {
 		if (Memory["options"] == null) Memory["options"] = { console: "on" };
     },    
 
-    initTasks: function() {
-		_CPU.Start("Hive", "initTasks");
-		
+    initTasks: function() {		
         let Tasks = require("tasks");
         if (Hive.isPulse()) {			
+			_CPU.Start("Hive", "initTasks");
+			
             for (let r in Game["rooms"]) {            
                 Memory["rooms"][r]["tasks"] = {};
                 Tasks.compileTasks(r);
             }
-        }
-		
-		_CPU.End("Hive", "initTasks");
+			
+			_CPU.End("Hive", "initTasks");
+        }		
     },
 	
 	processRequests: function() {
