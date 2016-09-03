@@ -21,14 +21,14 @@ let Tasks = {
             creeps:     maximum # of creeps to run this task
          */
 
-		 /*
+		 
         let index = incTask["type"] + "-" + incTask["subtype"] + "-" 
             + "xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
             let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
             return v.toString(16);
             });
-		*/
-        Memory["rooms"][rmName]["tasks"].push(incTask);
+		
+        Memory["rooms"][rmName]["tasks"][index] = incTask;
 	},
 
     giveTask: function(creep, task) {

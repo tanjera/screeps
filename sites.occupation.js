@@ -4,7 +4,7 @@ let Hive = require("hive");
 
 module.exports = {
 	
-	Occupation: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
+	Run: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
         let lSoldier  = _.filter(Game.creeps, (c) => c.memory.role == "soldier" && c.memory.room == rmOccupy && (c.ticksToLive == undefined || c.ticksToLive > 80));
         
         let popTarget = (listPopulation["soldier"] == null ? 0 : listPopulation["soldier"]["amount"]);

@@ -47,7 +47,7 @@ let Hive = {
         for (let r in Game["rooms"]) {            
             if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};            
             if (Memory["rooms"][r]["tasks"] == null) Memory["rooms"][r]["tasks"] = {};            
-			Memory["rooms"][r]["population_balance"] = {};
+			Memory["rooms"][r]["population_balance"] = null;
 			
         }
 
@@ -57,7 +57,7 @@ let Hive = {
 								Moria: "",
 								shedletsky: "" };        		
 		
-		Memory["spawn_requests"] = {};
+		Memory["spawn_requests"] = new Array();
 		
 		if (Memory["request"] == null) Memory["request"] = {};
 		if (Memory["options"] == null) Memory["options"] = { console: "on" };
@@ -143,10 +143,10 @@ let Hive = {
                         let result = spawn.createCreep(body, request.name, request.args);
 						
                         if (_.isString(result)) {
-							if (Memory["options"]["console"] == "on") {
-								console.log(`<font color=\"#19C800\">Spawning</font> a lvl ${level} (of ${request.level}) `
+							if (Memory["options"]["console"] == "on")
+								console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning a lvl ${level} (of ${request.level}) `
 									+ `${request.body} at ${spawn.room.name} (-> ${request.room})`);
-							}
+							
                             listSpawns[s] = null;
                             listRequests[r] = null;
                         }

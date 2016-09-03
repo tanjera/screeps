@@ -1,17 +1,17 @@
 let Roles = require("roles");
 let Hive = require("hive");
-
+let Tasks = require("tasks");
 
 module.exports = {
 	
-	Industry: function(rmColony, spawnDistance, listPopulation, listLabs) {
+	Run: function(rmColony, spawnDistance, listPopulation, listLabs) {
 
 		this.runPopulation(rmColony, spawnDistance, listPopulation);
-		this.runLabs(rmColony);
+		this.runLabs(rmColony, listLabs);
 		
 		if (Hive.isPulse()) {
-			this.createTasks(rmColony);
-			this.runTerminals(rmColony);
+			this.createTasks(rmColony, listLabs);
+			this.runTerminal(rmColony);
 		}
 	
 		this.runCreeps(rmColony);
@@ -32,7 +32,7 @@ module.exports = {
         }
 	},
 	
-	runLabs: function(rmColony) {
+	runLabs: function(rmColony, listLabs) {
 		
 		/* Arguments for listLabs:
 			{ action: "boost", mineral: "", lab: "", role: "", subrole: "" }
@@ -73,16 +73,14 @@ module.exports = {
         }
 	},
 	
-	createTasks: function(rmColony) {
+	createTasks: function(rmColony, listLabs) {
 		/* Terminal task priorities:
 		 * 2: emptying labs
 		 * 3: filling labs
 		 * ...
 		 * 5: filling orders
 		 * 6: emptying terminal
-		 */
-
-		let Tasks = require("tasks");
+		 */		
 
 		for (let l in listLabs) {
 			var lab, storage;
@@ -194,54 +192,107 @@ module.exports = {
 	runTerminal: function (rmColony) {
 		if (Game.rooms[rmColony].terminal != null && Game.rooms[rmColony].terminal.my) {
 			if (Memory["terminal_orders"] == null)
-				Memory["terminal_orders"] == {};
+				Memory["terminal_orders"] = {};
 			if (Memory["rooms"][rmColony]["stockpile"] == null)
-				Memory["rooms"][rmColony]["stockpile"] = { };
+				Memory["rooms"][rmColony]["stockpile"] = {};
 
+			let shortage = {};
 			let storage = Game.rooms[rmColony].storage;
-			let terminal = Game.rooms[rmColony].terminal;
-			let shortage = Memory["rooms"][rmColony]["stockpile"];
+			let terminal = Game.rooms[rmColony].terminal;			
 
-			for (let res in shortage) {
-				shortage -= terminal.store[res];
-				if (storage != null) 
-					shortage -= storage.store[res];
+			for (let res in Memory["rooms"][rmColony]["stockpile"]) {
+				shortage[res] = Memory["rooms"][rmColony]["stockpile"][res];
+				
+				if (terminal.store[res] != null) 
+					shortage[res] -= terminal.store[res];
+				if (storage != null && storage.store[res] != null) 
+					shortage[res] -= storage.store[res];
 				
 				if (shortage[res] > 0) {
-					Memory["terminal_orders"].push(
-						{ room: rmColony, resource: res, amount: shortage[res] });
+					Memory["terminal_orders"][`${rmColony}-${res}`] = { room: rmColony, resource: res, amount: shortage[res] };
 				}
 			}
 
 			let orders = Memory["terminal_orders"];
-			let filling = [];
+			let filling = new Array();
 			for (let o in orders) {
-				let resource = orders[o]["resource"];
-				if (!shortage.includes(resource) || shortage[resource] < 0) {
-					if (terminal.store[resource] != null) {
-						filling.push(resource);
-						console.log(`Attempting terminal.send(${resource}, ${Math.min(orders[o]["amount"], terminal.store[resource])},`
-							+ `${orders[o]["room"]})!!!`);
-						//terminal.send(resource, Math.min(orders[o]["amount"], terminal.store[resource]), orders[o]["room"]);
-					} else if (storage != null && storage.store[resource] != null) {
-						filling.push(resource);
+				let res = orders[o]["resource"];
+								
+				if (!Object.keys(shortage).includes(res) || shortage[res] < 0) {
+					if (terminal.store[res] != null && terminal.store[res] > 0) {
+						
+						filling.push(res);						
+						let amount = Math.min(orders[o]["amount"], terminal.store[res]);
+						let cost = Game.market.calcTransactionCost(amount, rmColony, orders[o]["room"]);
+						
+						if (terminal.store["energy"] >= cost) {
+							let result = terminal.send(res, amount, orders[o]["room"]);
+							if (result == OK) {
+								delete Memory["terminal_orders"][o];
+								if (Memory["options"]["console"] == "on")
+									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Successfully sent `
+										+ `${Math.min(orders[o]["amount"], terminal.store[res])} of ${res} `
+										+ `${rmColony} -> ${orders[o]["room"]}`);										
+								
+							} else {
+								if (Memory["options"]["console"] == "on")
+									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Failed to send `
+										+ `${Math.min(orders[o]["amount"], terminal.store[res])} of ${res} `
+										+ `${rmColony} -> ${orders[o]["room"]} (code: ${result})`);
+							}
+						} else {
+							if (storage != null && storage.store["energy"] > 0) {
+								filling.push("energy");								
+								Tasks.addTask(rmColony, { 
+									type: "industry", subtype: "withdraw", resource: "energy", 
+									id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
+								Tasks.addTask(rmColony, { 
+									type: "industry", subtype: "deposit", resource: "energy", 
+									id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
+							} else {
+								Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };
+								if (Memory["options"]["console"] == "on")
+									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Placing energy order in ${rmColony}... `
+										+ `unable to fill order for ${res} -> ${orders[o]["room"]}`);								
+							}
+						}
+					
+					} else if (storage != null && storage.store[res] != null) {												
+						filling.push(res);
+						if (Memory["options"]["console"] == "on")
+							console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to fill order for ${res} in ${rmColony}`);
+						
 						Tasks.addTask(rmColony, { 
-							type: "industry", subtype: "withdraw", resource: resource, 
+							type: "industry", subtype: "withdraw", resource: res, 
 							id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
 						Tasks.addTask(rmColony, { 
-							type: "industry", subtype: "deposit", resource: resource, 
-							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
-					}
+							type: "industry", subtype: "deposit", resource: res, 
+							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });					
+					}						
 				}
 			}
 
-			for (let res in terminal.store) {
+			// Create generic tasks for carrying minerals to storage
+			let resource_list = [ 
+				"energy",
+				"H", "O", "U", "L", "K", "Z", "X", "G", 
+				"OH", "ZK", "UL", 
+				"UH", "UO", "KH", "KO", "LH", "LO", "ZH", "ZO", "GH", "GO",
+				"UH2O", "UHO2", "KH2O", "KHO2", "LH2O", "LHO2", "ZH2O", "ZHO2", "GH2O", "GHO2",
+				"XUH2O", "XUHO2", "XKH2O", "XKHO2", "XLH2O", "XLHO2", "XZH2O", "XZHO2", "XGH2O", "XGHO2" ];
+	
+			for (let r in resource_list) {
+				let res = resource_list[r];
+				
 				if (!filling.includes(res)) {
+					if (Memory["options"]["console"] == "on" && terminal.store[res] != null)
+						console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to empty ${res} from terminal in ${rmColony}`);					
+					
 					Tasks.addTask(rmColony, { 
-						type: "industry", subtype: "withdraw", resource: resource, 
+						type: "industry", subtype: "withdraw", resource: res, 
 						id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 6 });
 					Tasks.addTask(rmColony, { 
-						type: "industry", subtype: "deposit", resource: resource, 
+						type: "industry", subtype: "deposit", resource: res, 
 						id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 6 });
 				}
 			}		

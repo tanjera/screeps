@@ -1,7 +1,7 @@
 
 module.exports = {
 	
-	Colony: function(rmColony, spawnDistance, listPopulation, listLinks) {
+	Run: function(rmColony, spawnDistance, listPopulation, listLinks) {
         
 		if (Memory["rooms"][rmColony] == null) 
 			Memory["rooms"][rmColony] = {};                 

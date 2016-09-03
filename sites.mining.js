@@ -4,7 +4,7 @@ let Hive = require("hive");
 
 module.exports = {
 	
-	Mining: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
+	Run: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
 
         let lBurrower  = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lCarrier  = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
