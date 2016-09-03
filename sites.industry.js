@@ -50,13 +50,13 @@ module.exports = {
 		
 		/* Arguments for listLabs:
 			{ action: "boost", mineral: "", lab: "", role: "", subrole: "" }
-			{ action: "reaction", 
+			{ action: "reaction", amount: -1,
 				reactor: {mineral: "", lab: ""}, 
 				supply1: {mineral: "", lab: ""}, 
 				supply2: {mineral: "", lab: ""} }
 			{ action: "empty", lab: "" }			
-		*/
-
+		*/		
+		
         for (let l in listLabs) {
             let listing = listLabs[l];
              switch (listing["action"]) {
@@ -79,7 +79,16 @@ module.exports = {
                     let labReactor = Game.getObjectById(listing["reactor"]["lab"]);
                     let labSupply1 = Game.getObjectById(listing["supply1"]["lab"]);
                     let labSupply2 = Game.getObjectById(listing["supply2"]["lab"]);  
-                    if (labReactor != null && labSupply1 != null && labSupply2 != null) {
+                    
+					if (labReactor != null && labSupply1 != null && labSupply2 != null) {
+						if (listing["amount"] != null && listing["amount"] > 0) {
+							let mineral = listing["reactor"]["mineral"]
+							let amount = (Game.rooms[rmColony].storage.store[mineral] == null ? 0 : Game.rooms[rmColony].storage.store[mineral])
+									+ (Game.rooms[rmColony].terminal.store[mineral] == null ? 0 : Game.rooms[rmColony].terminal.store[mineral]);
+							if (amount > listing["amount"])
+								break;
+						}
+						
                         labReactor.runReaction(labSupply1, labSupply2);
                     }
                     break;

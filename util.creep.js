@@ -222,6 +222,8 @@ let _Creep = {
     getBody_Soldier: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Soldier, ${level} is not a proper number!`);
+				return;
             case 1:
                 return [ // 190 energy, 1x TOUGH, 1x ATTACK, 2x MOVE
                         TOUGH, MOVE,   
@@ -269,6 +271,9 @@ let _Creep = {
     getBody_Archer: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Archer, ${level} is not a proper number!`);
+				return;
+            case 1:
             case 1:
                 return [ // 260 energy, 1x TOUGH, 1x RANGED_ATTACK, 2x MOVE
                         TOUGH, 
@@ -318,6 +323,8 @@ let _Creep = {
     getBody_Healer: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Healer, ${level} is not a proper number!`);
+				return;
             case 1:
             case 2:
                 return [ // 300 energy, 1x HEAL, 1x MOVE
@@ -355,6 +362,8 @@ let _Creep = {
     getBody_Multirole: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Multirole, ${level} is not a proper number!`);
+				return;
             case 1:
                 return [ // 280 energy, 1x WORK, 1x CARRY, 1x MOVE, 1x ATTACK
                         WORK, CARRY,   
@@ -411,6 +420,8 @@ let _Creep = {
     getBody_Worker: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Worker, ${level} is not a proper number!`);
+				return;
             case 1:
                 return [ // 300 energy, 1x WORK, 2x CARRY, 2x MOVE
                         WORK,  
@@ -462,6 +473,8 @@ let _Creep = {
     getBody_Burrower: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Burrower, ${level} is not a proper number!`);
+				return;
             case 1:
                 return [ // 300 energy, 2x WORK, 2x MOVE
                         WORK, MOVE, WORK, MOVE]; 
@@ -504,6 +517,9 @@ let _Creep = {
     
     getBody_Carrier: function(level) {
         switch (level) {
+			default:
+				console.log(`Error @ getBody_Carrier, ${level} is not a proper number!`);
+				return;
             case 1:
             		return [ // 300 energy, 3x CARRY, 3x MOVE
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE]; 
@@ -545,6 +561,8 @@ let _Creep = {
     getBody_Carrier_AT: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Carrier_AT, ${level} is not a proper number!`);
+				return;
             case 1:
             		return [ // 300 energy, 3x CARRY, 3x MOVE
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE]; 
@@ -585,6 +603,8 @@ let _Creep = {
     getBody_Reserver: function(level) {
         switch (level) {
             default:
+				console.log(`Error @ getBody_Reserver, ${level} is not a proper number!`);
+				return;
             case 1:
             case 2:
                 return null; 

@@ -16,12 +16,14 @@ module.exports = {
             return 4;
         else if (room.energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
             return 5;
-        else if (room.energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
+        else if (room.energyCapacityAvailable < 5600)     // lvl 6, 2300 energy
             return 6;
-        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
+        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5600 energy
             return 7;
-        else if (room.energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
+        else if (room.energyCapacityAvailable == 12900)   // lvl 8, 12900 energy
             return 8;
+		else
+			return 1;
 		},
         
     repairWalls_Critical: function(level) {

@@ -164,8 +164,9 @@ let Hive = {
 							Memory["rooms"][request.room]["population_balance"]["actual"] / Memory["rooms"][request.room]["population_balance"]["target"];
 						
 						let _Colony = require("util.colony");
-                        let level = Math.max(1, Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] 
-                                * Math.min(request.level, _Colony.getRoom_Level(spawn.room))));
+                        let level = Math.max(1, Math.min(
+								Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
+								_Colony.getRoom_Level(spawn.room)));
 						let body = _Creep.getBody(request.body, level);
                         let result = spawn.createCreep(body, request.name, request.args);
 						
