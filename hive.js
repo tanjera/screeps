@@ -59,8 +59,8 @@ let Hive = {
 		
 		Memory["spawn_requests"] = new Array();
 		
-		if (Memory["request"] == null) Memory["request"] = {};
-		if (Memory["options"] == null) Memory["options"] = { console: "on" };
+		if (Memory["request"] == null) Memory["request"] = {};		
+		if (Memory["options"] == null) Memory["options"] = { console: "on", profiler: "off" };
     },    
 
     initTasks: function() {
@@ -80,6 +80,16 @@ let Hive = {
 				default:
 					break;	
 
+				case "reset-stockpiles": {					
+					Memory["terminal_orders"] = new Object();
+					for (var r in Memory["rooms"]) {
+						Memory["rooms"][r]["stockpile"] = new Object();
+					}
+					
+					console.log("All Memory.rooms.[r].stockpile reset!");
+					break;
+				}
+					
 				case "log-storage": {
 					let _Logs = require("util.logs");
 					_Logs.Storage();

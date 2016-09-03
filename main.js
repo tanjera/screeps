@@ -1,5 +1,6 @@
 let Sites = require("sites");
 let Hive = require("hive");
+let _CPU = require("util.cpu");
 
 module.exports.loop = function () {
 
@@ -31,6 +32,9 @@ module.exports.loop = function () {
     */      
 
 
+	/* Prepare memory profiler */
+	_CPU.Init();
+	
     /* Prepare memory for this tick */
     Hive.clearDeadMemory();
     Hive.initMemory();
@@ -51,14 +55,7 @@ module.exports.loop = function () {
               carrier:   {level: 7, amount: 2} } );
 	Sites.Industry("W18S43", 2,
             { courier:   {level: 5, amount: 1} },            
-            [ { action: "reaction", 
-                reactor: {mineral: "GH2O", lab: "57a02f90b712db3b1f1c399c"}, 
-                supply1: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
-                supply2: {mineral: "OH", lab: "57bc412f58d9edd776d1a39e"} },
-              { action: "reaction", 
-                reactor: {mineral: "GH2O", lab: "57bc7f418cd23da102392560"}, 
-                supply1: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
-                supply2: {mineral: "OH", lab: "57bc412f58d9edd776d1a39e"} } ] );
+            [ ] );
 			
     /* Colony #2, W19S42 */
     Sites.Colony("W19S42", 2,
@@ -90,15 +87,19 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W15S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57b27619ad1bf23613f2e881", role: "worker", subrole: "upgrader" },												
+            [ { action: "boost", mineral: "GH2O", lab: "57b27619ad1bf23613f2e881", role: "worker", subrole: "upgrader" },
               { action: "reaction", 
                 reactor: {mineral: "LH2O", lab: "57c5f390539ef49836106e44"}, 
-                supply1: {mineral: "LH", lab: "57b271ddc939eb5d4a418e12"}, 
+                supply1: {mineral: "LH", lab: "57c5a6b34d14be183f0a2d3a"}, 
                 supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} },
               { action: "reaction", 
-                reactor: {mineral: "LH", lab: "57b271ddc939eb5d4a418e12"}, 
-                supply1: {mineral: "L", lab: "57c5a6b34d14be183f0a2d3a"}, 
-                supply2: {mineral: "H", lab: "57b2800ff68d846c1323e3d6"} } ] );
+                reactor: {mineral: "LH2O", lab: "57b2800ff68d846c1323e3d6"}, 
+                supply1: {mineral: "LH", lab: "57c5a6b34d14be183f0a2d3a"}, 
+                supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} },
+              { action: "reaction", 
+                reactor: {mineral: "LH2O", lab: "57b271ddc939eb5d4a418e12"}, 
+                supply1: {mineral: "LH", lab: "57c5a6b34d14be183f0a2d3a"}, 
+                supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} } ] );
 				
     /* Colony #4, W15S43 */
     Sites.Colony("W15S43", 2,
@@ -111,16 +112,20 @@ module.exports.loop = function () {
 	Sites.Industry("W15S43", 2,
             { courier:   {level: 4, amount: 1} },
             [ { action: "reaction", 
-                reactor: {mineral: "UH", lab: "57be56f1e02d93c93cf460c7"}, 
-                supply1: {mineral: "U", lab: "57c8cb46e9b21a95363affa3"}, 
-                supply2: {mineral: "H", lab: "57c8dc805e86b05c1d5892e3"} }, 
+                reactor: {mineral: "UH2O", lab: "57c3fdcc823703630339213d"}, 
+                supply1: {mineral: "UH", lab: "57be56f1e02d93c93cf460c7"}, 
+                supply2: {mineral: "OH", lab: "57c8ef2b1d3d4c8e3969d068"} }, 
               { action: "reaction", 
-                reactor: {mineral: "UH", lab: "57c3fdcc823703630339213d"}, 
-                supply1: {mineral: "U", lab: "57c8cb46e9b21a95363affa3"}, 
-                supply2: {mineral: "H", lab: "57c8dc805e86b05c1d5892e3"} }, 
+                reactor: {mineral: "UH2O", lab: "57c8cb46e9b21a95363affa3"}, 
+                supply1: {mineral: "UH", lab: "57be56f1e02d93c93cf460c7"}, 
+                supply2: {mineral: "OH", lab: "57c8ef2b1d3d4c8e3969d068"} }, 
               { action: "reaction", 
                 reactor: {mineral: "UH2O", lab: "57c4a633e06148377d95b97d"}, 
-                supply1: {mineral: "UH", lab: "57c3fdcc823703630339213d"}, 
+                supply1: {mineral: "UH", lab: "57be56f1e02d93c93cf460c7"}, 
+                supply2: {mineral: "OH", lab: "57c8ef2b1d3d4c8e3969d068"} }, 
+              { action: "reaction", 
+                reactor: {mineral: "UH2O", lab: "57c8dc805e86b05c1d5892e3"}, 
+                supply1: {mineral: "UH", lab: "57be56f1e02d93c93cf460c7"}, 
                 supply2: {mineral: "OH", lab: "57c8ef2b1d3d4c8e3969d068"} } ] );
 			  
     /* Colony #5, W13S41 */
@@ -226,4 +231,7 @@ module.exports.loop = function () {
     /* Run end-tick Hive functions */
     Hive.processSpawnRequests();
     Hive.processSpawnRenewing();
+	
+	/* Finish the profiler cycle */
+	_CPU.Finish();
 }

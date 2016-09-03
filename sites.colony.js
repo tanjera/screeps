@@ -1,13 +1,24 @@
+let _CPU = require("util.cpu");
 
 module.exports = {
 	
 	Run: function(rmColony, spawnDistance, listPopulation, listLinks) {
-        
+		
+		_CPU.Start(rmColony, "Colony-runPopulation");
 		this.runPopulation(rmColony, spawnDistance, listPopulation);
-        this.runCreeps(rmColony);
-        this.runTowers(rmColony);
-        this.runLinks(rmColony, listLinks);
-        
+        _CPU.End(rmColony, "Colony-runPopulation");
+		
+		_CPU.Start(rmColony, "Colony-runCreeps");
+		this.runCreeps(rmColony);
+        _CPU.End(rmColony, "Colony-runCreeps");
+		
+		_CPU.Start(rmColony, "Colony-runTowers");
+		this.runTowers(rmColony);
+        _CPU.End(rmColony, "Colony-runCreeps");
+		
+		_CPU.Start(rmColony, "Colony-runLinks");
+		this.runLinks(rmColony, listLinks);
+        _CPU.End(rmColony, "Colony-runCreeps");
 	},
 	
 	

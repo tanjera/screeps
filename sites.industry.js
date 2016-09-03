@@ -2,19 +2,33 @@ let Roles = require("roles");
 let Hive = require("hive");
 let Tasks = require("tasks");
 
+let _CPU = require("util.cpu");
+
 module.exports = {
 	
 	Run: function(rmColony, spawnDistance, listPopulation, listLabs) {
 
+		_CPU.Start(rmColony, "Industry-runPopulation");
 		this.runPopulation(rmColony, spawnDistance, listPopulation);
+		_CPU.End(rmColony, "Industry-runPopulation");
+		
+		_CPU.Start(rmColony, "Industry-runLabs");
 		this.runLabs(rmColony, listLabs);
+		_CPU.End(rmColony, "Industry-runLabs");
 		
 		if (Hive.isPulse()) {
+			_CPU.Start(rmColony, "Industry-createTasks");
 			this.createTasks(rmColony, listLabs);
+			_CPU.End(rmColony, "Industry-createTasks");
+			
+			_CPU.Start(rmColony, "Industry-runTerminal");
 			this.runTerminal(rmColony);
+			_CPU.End(rmColony, "Industry-runTerminal");
 		}
 	
+		_CPU.Start(rmColony, "Industry-runCreeps");
 		this.runCreeps(rmColony);
+		_CPU.End(rmColony, "Industry-runCreeps");
 	},
 	
 	
@@ -195,7 +209,7 @@ module.exports = {
 			if (Memory["terminal_orders"] == null)
 				Memory["terminal_orders"] = new Object();
 			if (Memory["rooms"][rmColony]["stockpile"] == null)
-				Memory["rooms"][rmColony]["stockpile"] = {};			
+				Memory["rooms"][rmColony]["stockpile"] = new Object();			
 
 			let shortage = {};
 			let storage = Game.rooms[rmColony].storage;
@@ -219,17 +233,22 @@ module.exports = {
 				let order = Memory["terminal_orders"][o];
 				let res = order["resource"];
 				
-				if (rmColony == order["room"])
+				if ((rmColony == order["room"])
+					|| (order["from"] != null && rmColony != order["from"]))
 					continue;
+				
 				
 				if (!Object.keys(shortage).includes(res) || shortage[res] < 0) {
 					if (terminal.store[res] != null && terminal.store[res] > 0) {
 						
 						filling.push(res);						
-						let amount = Math.max(Math.min(order["amount"], terminal.store[res]), 100);
+						let amount = Math.ceil((res == "energy")
+							? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.65, 100)
+							: Math.max(Math.min(order["amount"], terminal.store[res]), 100));
 						let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 						
-						if (terminal.store["energy"] >= cost) {
+						if ((res != "energy" && terminal.store["energy"] >= cost)
+								|| (res == "energy" && terminal.store["energy"] >= cost + amount)) {
 							let result = terminal.send(res, amount, order["room"]);
 							if (result == OK) {																
 								if (Memory["options"]["console"] == "on")
@@ -242,6 +261,7 @@ module.exports = {
 									delete Memory["terminal_orders"][o];
 								}
 								
+								break;								
 							} else {
 								if (Memory["options"]["console"] == "on")
 									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Failed to send `
@@ -294,10 +314,7 @@ module.exports = {
 				
 				if (filling.includes(res)
 					|| ((res != "energy" && terminal.store[res] == null) || (res == "energy" && terminal.store[res] == 0)))
-					continue;
-								
-				if (Memory["options"]["console"] == "on") 
-					console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to empty ${res} from terminal in ${rmColony}`);					
+					continue;			
 				
 				Tasks.addTask(rmColony, { 
 					type: "industry", subtype: "withdraw", resource: res, 
