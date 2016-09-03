@@ -3,9 +3,6 @@ module.exports = {
 	
 	Run: function(rmColony, spawnDistance, listPopulation, listLinks) {
         
-		if (Memory["rooms"][rmColony] == null) 
-			Memory["rooms"][rmColony] = {};                 
-        
 		this.runPopulation(rmColony, spawnDistance, listPopulation);
         this.runCreeps(rmColony);
         this.runTowers(rmColony);

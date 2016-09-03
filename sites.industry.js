@@ -191,10 +191,11 @@ module.exports = {
 	
 	runTerminal: function (rmColony) {
 		if (Game.rooms[rmColony].terminal != null && Game.rooms[rmColony].terminal.my) {
+			
 			if (Memory["terminal_orders"] == null)
-				Memory["terminal_orders"] = {};
+				Memory["terminal_orders"] = new Object();
 			if (Memory["rooms"][rmColony]["stockpile"] == null)
-				Memory["rooms"][rmColony]["stockpile"] = {};
+				Memory["rooms"][rmColony]["stockpile"] = {};			
 
 			let shortage = {};
 			let storage = Game.rooms[rmColony].storage;
@@ -208,37 +209,44 @@ module.exports = {
 				if (storage != null && storage.store[res] != null) 
 					shortage[res] -= storage.store[res];
 				
-				if (shortage[res] > 0) {
+				if (shortage[res] > 0) {					
 					Memory["terminal_orders"][`${rmColony}-${res}`] = { room: rmColony, resource: res, amount: shortage[res] };
 				}
 			}
-
-			let orders = Memory["terminal_orders"];
+			
 			let filling = new Array();
-			for (let o in orders) {
-				let res = orders[o]["resource"];
-								
+			for (let o in Memory["terminal_orders"]) {
+				let order = Memory["terminal_orders"][o];
+				let res = order["resource"];
+				
+				if (rmColony == order["room"])
+					continue;
+				
 				if (!Object.keys(shortage).includes(res) || shortage[res] < 0) {
 					if (terminal.store[res] != null && terminal.store[res] > 0) {
 						
 						filling.push(res);						
-						let amount = Math.min(orders[o]["amount"], terminal.store[res]);
-						let cost = Game.market.calcTransactionCost(amount, rmColony, orders[o]["room"]);
+						let amount = Math.max(Math.min(order["amount"], terminal.store[res]), 100);
+						let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 						
 						if (terminal.store["energy"] >= cost) {
-							let result = terminal.send(res, amount, orders[o]["room"]);
-							if (result == OK) {
-								delete Memory["terminal_orders"][o];
+							let result = terminal.send(res, amount, order["room"]);
+							if (result == OK) {																
 								if (Memory["options"]["console"] == "on")
 									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Successfully sent `
-										+ `${Math.min(orders[o]["amount"], terminal.store[res])} of ${res} `
-										+ `${rmColony} -> ${orders[o]["room"]}`);										
+										+ `${amount} of ${res} ${rmColony} -> ${order["room"]}`);										
+								
+								Memory["terminal_orders"][o]["amount"] -= amount;
+								
+								if (Memory["terminal_orders"][o]["amount"] <= 0) {
+									delete Memory["terminal_orders"][o];
+								}
 								
 							} else {
 								if (Memory["options"]["console"] == "on")
 									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Failed to send `
-										+ `${Math.min(orders[o]["amount"], terminal.store[res])} of ${res} `
-										+ `${rmColony} -> ${orders[o]["room"]} (code: ${result})`);
+										+ `${Math.min(order["amount"], terminal.store[res])} of ${res} `
+										+ `${rmColony} -> ${order["room"]} (code: ${result})`);
 							}
 						} else {
 							if (storage != null && storage.store["energy"] > 0) {
@@ -253,7 +261,7 @@ module.exports = {
 								Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };
 								if (Memory["options"]["console"] == "on")
 									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Placing energy order in ${rmColony}... `
-										+ `unable to fill order for ${res} -> ${orders[o]["room"]}`);								
+										+ `unable to fill order for ${res} -> ${order["room"]}`);								
 							}
 						}
 					
@@ -284,17 +292,19 @@ module.exports = {
 			for (let r in resource_list) {
 				let res = resource_list[r];
 				
-				if (!filling.includes(res)) {
-					if (Memory["options"]["console"] == "on" && terminal.store[res] != null)
-						console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to empty ${res} from terminal in ${rmColony}`);					
-					
-					Tasks.addTask(rmColony, { 
-						type: "industry", subtype: "withdraw", resource: res, 
-						id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 6 });
-					Tasks.addTask(rmColony, { 
-						type: "industry", subtype: "deposit", resource: res, 
-						id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 6 });
-				}
+				if (filling.includes(res)
+					|| ((res != "energy" && terminal.store[res] == null) || (res == "energy" && terminal.store[res] == 0)))
+					continue;
+								
+				if (Memory["options"]["console"] == "on") 
+					console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to empty ${res} from terminal in ${rmColony}`);					
+				
+				Tasks.addTask(rmColony, { 
+					type: "industry", subtype: "withdraw", resource: res, 
+					id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 6 });
+				Tasks.addTask(rmColony, { 
+					type: "industry", subtype: "deposit", resource: res, 
+					id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 6 });			
 			}		
         }
 	},

@@ -30,5 +30,23 @@ module.exports = {
 				}
 			}            
         }
+    },
+	
+	Stockpile: function() {
+		let color = "#D3FFA3";
+        console.log(`<font color=\"${color}">*** Stockpile Report: Tick # ${Game.time} ***</font>`);
+        
+		for (var r in Memory["rooms"]) {						
+			if (Memory["rooms"][r]["stockpile"] == null || Object.keys(Memory["rooms"][r]["stockpile"]).length == 0)
+				continue;
+				
+			let output = `<font color=\"${color}\">${r}</font>: `;
+			
+			for (var res in Memory["rooms"][r]["stockpile"]) {
+				output += `<font color=\"${color}\">${res}</font>: ${Memory["rooms"][r]["stockpile"][res]};  `;
+			}
+			
+			console.log(output);
+        }
     }
 };

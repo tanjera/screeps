@@ -85,6 +85,12 @@ let Hive = {
 					_Logs.Storage();
 					break;
 				}
+				
+				case "log-stockpile": {
+					let _Logs = require("util.logs");
+					_Logs.Stockpile();
+					break;
+				}
 			}
 		}
 		

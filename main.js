@@ -52,11 +52,11 @@ module.exports.loop = function () {
 	Sites.Industry("W18S43", 2,
             { courier:   {level: 5, amount: 1} },            
             [ { action: "reaction", 
-                reactor: {mineral: "GH20", lab: "57a02f90b712db3b1f1c399c"}, 
+                reactor: {mineral: "GH2O", lab: "57a02f90b712db3b1f1c399c"}, 
                 supply1: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
                 supply2: {mineral: "OH", lab: "57bc412f58d9edd776d1a39e"} },
               { action: "reaction", 
-                reactor: {mineral: "GH", lab: "57bc7f418cd23da102392560"}, 
+                reactor: {mineral: "GH2O", lab: "57bc7f418cd23da102392560"}, 
                 supply1: {mineral: "GH", lab: "57a0539e25bdfd7a71d9a527"}, 
                 supply2: {mineral: "OH", lab: "57bc412f58d9edd776d1a39e"} } ] );
 			
