@@ -1,3 +1,5 @@
+let _CPU = require("util.cpu");
+
 let Hive = {
 
     isPulse: function() {
@@ -60,10 +62,12 @@ let Hive = {
 		Memory["spawn_requests"] = new Array();
 		
 		if (Memory["request"] == null) Memory["request"] = {};		
-		if (Memory["options"] == null) Memory["options"] = { console: "on", profiler: "off" };
+		if (Memory["options"] == null) Memory["options"] = { console: "on" };
     },    
 
     initTasks: function() {
+		_CPU.Start("Hive", "initTasks");
+		
         let Tasks = require("tasks");
         if (Hive.isPulse()) {			
             for (let r in Game["rooms"]) {            
@@ -71,6 +75,8 @@ let Hive = {
                 Tasks.compileTasks(r);
             }
         }
+		
+		_CPU.End("Hive", "initTasks");
     },
 	
 	processRequests: function() {
@@ -138,6 +144,8 @@ let Hive = {
 
 
     processSpawnRequests: function() {
+		_CPU.Start("Hive", "processSpawnRequests");
+		
         let listRequests = Object.keys(Memory["spawn_requests"]).sort((a, b) => { 
             return Memory["spawn_requests"][a]["priority"] - Memory["spawn_requests"][b]["priority"]; } );
         let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
@@ -170,9 +178,13 @@ let Hive = {
                 }
             }
         }
+		
+		_CPU.End("Hive", "processSpawnRequests");
 	},
 
     processSpawnRenewing: function() {
+		_CPU.Start("Hive", "processSpawnRenewing");
+		
         let _Creep = require("util.creep");
         let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
         for (let s in listSpawns) {
@@ -186,6 +198,8 @@ let Hive = {
                 }
             }
         }
+		
+		_CPU.End("Hive", "processSpawnRenewing");
     },
 
 

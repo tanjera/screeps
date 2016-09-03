@@ -14,11 +14,11 @@ module.exports = {
 		
 		_CPU.Start(rmColony, "Colony-runTowers");
 		this.runTowers(rmColony);
-        _CPU.End(rmColony, "Colony-runCreeps");
+        _CPU.End(rmColony, "Colony-runTowers");
 		
 		_CPU.Start(rmColony, "Colony-runLinks");
 		this.runLinks(rmColony, listLinks);
-        _CPU.End(rmColony, "Colony-runCreeps");
+        _CPU.End(rmColony, "Colony-runLinks");
 	},
 	
 	
@@ -75,32 +75,36 @@ module.exports = {
 	
 	runTowers: function (rmColony) {
 		let _Colony = require("util.colony");
-		let listTowers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});  
+		let towers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});  
 		
-        for (let t in listTowers) {
-            let tower = listTowers[t];
-            
-            let hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: function(c) {
-                        return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
-            if (hostile != null) { // Anyone to attack?
-                tower.attack(hostile);
-                continue;
-            } 
-            
-            let injured = tower.pos.findClosestByRange(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }});
-            if (injured != null && tower.energy > tower.energyCapacity * 0.5) { // Anyone to heal?
-                tower.heal(injured);
-                continue;
-            } 
-            
-            if (tower.energy > tower.energyCapacity * 0.5) { // Maintain structures with extra energy
-                let structure = _Colony.findByNeed_RepairCritical(tower.room);
-                if (structure != null) {
-                    tower.repair(structure);
-                    continue;
-                } 
-            }
+		let hostile = _.head(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) {
+				return !Object.keys(Memory["allies"]).includes(c.owner.username); }}));
+		if (hostile != null) { // Anyone to attack?
+			for (let t in towers) {
+				towers[t].attack(hostile);
+			}
+			return;            
         }
+            
+		let injured = _.head(Game.rooms[rmColony].find(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }}));
+        if (injured != null) { // Anyone to heal?
+			for (let t in towers) {
+				if (towers[t].energy > towers[t].energyCapacity * 0.5) {
+					towers[t].heal(injured);
+				}
+			}
+			return;            
+        }
+			
+		let structure = _Colony.findByNeed_RepairCritical(Game.rooms[rmColony]);
+		if (structure != null) {
+			for (let t in towers) {
+				if (towers[t].energy > towers[t].energyCapacity * 0.5) { // Maintain structures with extra energy
+					towers[t].repair(structure);
+				}
+			}
+			return;
+		}
 	},
 	
 	
