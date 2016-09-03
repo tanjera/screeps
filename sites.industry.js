@@ -287,8 +287,10 @@ module.exports = {
 					
 					} else if (storage != null && storage.store[res] != null) {												
 						filling.push(res);
+						/*
 						if (Memory["options"]["console"] == "on")
 							console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to fill order for ${res} in ${rmColony}`);
+						*/
 						
 						Tasks.addTask(rmColony, { 
 							type: "industry", subtype: "withdraw", resource: res, 

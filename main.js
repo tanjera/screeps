@@ -87,19 +87,7 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W15S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57b27619ad1bf23613f2e881", role: "worker", subrole: "upgrader" },
-              { action: "reaction", 
-                reactor: {mineral: "LH2O", lab: "57c5f390539ef49836106e44"}, 
-                supply1: {mineral: "LH", lab: "57c5a6b34d14be183f0a2d3a"}, 
-                supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} },
-              { action: "reaction", 
-                reactor: {mineral: "LH2O", lab: "57b2800ff68d846c1323e3d6"}, 
-                supply1: {mineral: "LH", lab: "57c5a6b34d14be183f0a2d3a"}, 
-                supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} },
-              { action: "reaction", 
-                reactor: {mineral: "LH2O", lab: "57b271ddc939eb5d4a418e12"}, 
-                supply1: {mineral: "LH", lab: "57c5a6b34d14be183f0a2d3a"}, 
-                supply2: {mineral: "OH", lab: "57c5b9b779a498330e74eb2d"} } ] );
+            [ { action: "boost", mineral: "GH2O", lab: "57b27619ad1bf23613f2e881", role: "worker", subrole: "upgrader" } ] );
 				
     /* Colony #4, W15S43 */
     Sites.Colony("W15S43", 2,
@@ -132,17 +120,17 @@ module.exports.loop = function () {
     Sites.Colony("W13S41", 2,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 4, amount: 1},
-              upgrader: {level: 5, amount: 3} },              
-            [ {id: "57c04f3012c844604895d81f", role: "send"},
+              upgrader: {level: 5, amount: 1} },              
+            [ //{id: "57c04f3012c844604895d81f", role: "send"},
               {id: "57c06b8698040e1908490daf", role: "receive"},
-			        {id: "57c3eabdc480f8a72a2cdb75", role: "receive"} ] );
+			  {id: "57c3eabdc480f8a72a2cdb75", role: "receive"} ] );
     Sites.Mining("W13S41", "W13S41", 2,
             { burrower:  {level: 4, amount: 2},
               carrier:   {level: 4, amount: 3},
 			        extractor: {level: 6, amount: 2} } );
   	Sites.Industry("W13S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" } ] );
+            [ { action: "boost", mineral: "LH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: null } ] );
               
     /* Colony #6, W11S44 */
     Sites.Colony("W11S44", 1,

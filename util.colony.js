@@ -1,6 +1,11 @@
 module.exports = {
 
     getRoom_Level: function(room) {
+		
+		if (typeof(room) == "string") {
+			room = Game["rooms"][room];
+		}
+		
         if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
             return 1;
         else if (room.energyCapacityAvailable < 800)      // lvl 2, 550 energy

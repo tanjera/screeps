@@ -81,9 +81,11 @@ let Hive = {
 	
 	processRequests: function() {
 		// To be used for injecting tasks or terminal order requests
-		if (Memory["request"] != null) {
+		if (Memory["request"] != "") {
 			switch (Memory["request"]) {
+				
 				default:
+					console.log("Invalid request.")
 					break;	
 
 				case "reset-stockpiles": {					
@@ -110,7 +112,7 @@ let Hive = {
 			}
 		}
 		
-		Memory["request"] = null;
+		Memory["request"] = "";
 	},	
 	
     populationTally: function(rmName, popTarget, popActual) {
@@ -161,8 +163,9 @@ let Hive = {
 						Memory["rooms"][request.room]["population_balance"]["total"] = 
 							Memory["rooms"][request.room]["population_balance"]["actual"] / Memory["rooms"][request.room]["population_balance"]["target"];
 						
+						let _Colony = require("util.colony");
                         let level = Math.max(1, Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] 
-                                * Math.min(request.level, Hive.getRoom_Level(spawn.room.name))));
+                                * Math.min(request.level, _Colony.getRoom_Level(spawn.room))));
 						let body = _Creep.getBody(request.body, level);
                         let result = spawn.createCreep(body, request.name, request.args);
 						
@@ -200,27 +203,7 @@ let Hive = {
         }
 		
 		_CPU.End("Hive", "processSpawnRenewing");
-    },
-
-
-    getRoom_Level: function(rmName) {
-        if (Game["rooms"][rmName].energyCapacityAvailable < 550)           // lvl 1, 300 energy
-            return 1;
-        else if (Game["rooms"][rmName].energyCapacityAvailable < 800)      // lvl 2, 550 energy
-            return 2;
-        else if (Game["rooms"][rmName].energyCapacityAvailable < 1300)     // lvl 3, 800 energy
-            return 3;
-        else if (Game["rooms"][rmName].energyCapacityAvailable < 1800)     // lvl 4, 1300 energy
-            return 4;
-        else if (Game["rooms"][rmName].energyCapacityAvailable < 2300)     // lvl 5, 1800 energy
-            return 5;
-        else if (Game["rooms"][rmName].energyCapacityAvailable < 5300)     // lvl 6, 2300 energy
-            return 6;
-        else if (Game["rooms"][rmName].energyCapacityAvailable < 12300)    // lvl 7, 5300 energy
-            return 7;
-        else if (Game["rooms"][rmName].energyCapacityAvailable == 12300)   // lvl 8, 12300 energy
-            return 8;
-		},
+    }
 };
 
 module.exports = Hive;
