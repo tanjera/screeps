@@ -252,18 +252,21 @@ module.exports.loop = function () {
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
-    Sites.Mining("W13S41", "W13S42", 2,
+    /*	Paused for CPU consumption :(
+	Sites.Mining("W13S41", "W13S42", 2,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
-
+	*/
+	
 	/* Remote mining operations for Colony #6, W11S44 */
     Sites.Mining("W11S44", "W11S45", 1,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
+	/*	Paused for CPU consumption :(
 	Sites.Mining("W11S44", "W12S44", 1,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
@@ -271,7 +274,7 @@ module.exports.loop = function () {
               reserver:  {level: 4, amount: 1} } );
     Sites.Occupation("W11S44", "W12S44", 1,
             { soldier:   {level: 4, amount: 1} } );
-			  
+	*/	
 
     /* Run end-tick Hive functions */
     Hive.processSpawnRequests();

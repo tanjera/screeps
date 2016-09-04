@@ -51,15 +51,22 @@ module.exports = {
 		
 		if (Memory["profiler"]["cycles"] <= 0) {			
 			for (let r in Memory["profiler"]["current"]) {
-				let output = `<font color=\"#D3FFA3">CPU report for ${r}</font>: `;
+				let output = "";
+				let room_used = 0, room_cycles = 0;
 				
 				for (let n in Memory["profiler"]["current"][r]) {					
-					let used = 0;					
+					let used = 0;
 					let cycles = Object.keys(Memory["profiler"]["current"][r][n]).length;					
-				_.forEach(Memory["profiler"]["current"][r][n], c => { used += c["used"]; } );
+					_.forEach(Memory["profiler"]["current"][r][n], c => { used += c["used"]; } );
 					output += `<br>(${parseFloat(used).toFixed(2)} / ${cycles}) : \t ${parseFloat(used / cycles).toFixed(2)} \t ${n}`;
-				}				
-				console.log(output);
+					
+					room_used += used;
+					room_cycles = Math.max(room_cycles, cycles);					
+				}
+				
+				console.log(`<font color=\"#D3FFA3">CPU report for ${r}</font> :: `
+					+ `(${parseFloat(room_used).toFixed(2)} / ${room_cycles}) : \t ${parseFloat(room_used / room_cycles).toFixed(2)} `
+					+ `${output}`);
 			}			
 			
 			Memory["profiler"]["status"] = "off";			

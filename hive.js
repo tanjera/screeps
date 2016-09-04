@@ -10,27 +10,27 @@ let Hive = {
         } else if (Game.cpu.bucket > 5000) {
             return Game.time % 15 == 0;
         } else if (Game.cpu.bucket > 3000) {
-            return Game.time % 20 == 0;
-        } else if (Game.cpu.bucket > 1000) {
             return Game.time % 30 == 0;
+        } else if (Game.cpu.bucket > 1000) {
+            return Game.time % 40 == 0;
         } else if (Game.cpu.bucket <= 1000) {
-            return Game.time % 45 == 0;
+            return Game.time % 60 == 0;
         }
     },
 
     moveReusePath: function() {
         if (Game.cpu.bucket > 9000) {
-            return 5;
+            return 8;
         } else if (Game.cpu.bucket > 7000) {
-            return 10;
+            return 11;
         } else if (Game.cpu.bucket > 5000) {
             return 15;
         } else if (Game.cpu.bucket > 3000) {
-            return 20;
-        } else if (Game.cpu.bucket > 1000) {
             return 30;
+        } else if (Game.cpu.bucket > 1000) {
+            return 40;
         } else if (Game.cpu.bucket <= 1000) {
-            return 45;
+            return 60;
         }
     },
 

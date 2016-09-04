@@ -1,10 +1,13 @@
 let Roles = require("roles");
 let Hive = require("hive");
 
+let _CPU = require("util.cpu");
 
 module.exports = {
 	
 	Run: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
+		_CPU.Start(rmColony, `Occupy-${rmOccupy}`);
+		
         let lSoldier  = _.filter(Game.creeps, (c) => c.memory.role == "soldier" && c.memory.room == rmOccupy && (c.ticksToLive == undefined || c.ticksToLive > 80));
         
         let popTarget = (listPopulation["soldier"] == null ? 0 : listPopulation["soldier"]["amount"]);
@@ -26,5 +29,6 @@ module.exports = {
                 }
             }            
         } 
+		_CPU.End(rmColony, `Occupy-${rmOccupy}`);
 	}
 };
