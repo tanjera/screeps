@@ -86,7 +86,8 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 1} } );
 	Sites.Industry("W19S42", 2,
             { courier:   {level: 5, amount: 1} },
-			[ { action: "reaction", amount: 5000,
+			[ { action: "boost", mineral: "GH2O", lab: "57a45a183e04cec61d7e0a37", role: "worker", subrole: "upgrader" },
+			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "ZK", lab: "57c5fe753e0f0b8a4bea3b20"}, 
 				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
 				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} },
@@ -114,7 +115,8 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W15S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "reaction", amount: 5000,
+            [ { action: "boost", mineral: "GH2O", lab: "57b2800ff68d846c1323e3d6", role: "worker", subrole: "upgrader" },
+			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "GH", lab: "57b27619ad1bf23613f2e881"}, 
 				supply1: {mineral: "G", lab: "57c5a6b34d14be183f0a2d3a"}, 
 				supply2: {mineral: "H", lab: "57c5b9b779a498330e74eb2d"} },
@@ -166,7 +168,8 @@ module.exports.loop = function () {
 			  extractor: {level: 6, amount: 2} } );
   	Sites.Industry("W13S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "reaction", amount: 5000,
+            [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" },
+			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "UL", lab: "57c5ab258a3658822748cc62"}, 
 				supply1: {mineral: "U", lab: "57c5bdceb44f52600e9b2116"}, 
 				supply2: {mineral: "L", lab: "57cb34e3d80e43e128862a09"} },
@@ -261,6 +264,13 @@ module.exports.loop = function () {
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
+	Sites.Mining("W11S44", "W12S44", 1,
+            { burrower:  {level: 4, amount: 1},
+              carrier:   {level: 4, amount: 3},
+              multirole: {level: 4, amount: 1},
+              reserver:  {level: 4, amount: 1} } );
+    Sites.Occupation("W11S44", "W12S44", 1,
+            { soldier:   {level: 4, amount: 1} } );
 			  
 
     /* Run end-tick Hive functions */

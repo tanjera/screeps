@@ -19,7 +19,7 @@ module.exports = {
         for (let n in Game.creeps) {
             let creep = Game.creeps[n];
             if (creep.memory.room != null && creep.memory.colony != null 
-                    && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
+                    && creep.memory.room == rmOccupy && creep.memory.colony == rmColony) {
                 creep.memory.listRoute = listRoute;
                 if (creep.memory.role == "soldier") {
                     Roles.Soldier(creep);

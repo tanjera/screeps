@@ -246,14 +246,14 @@ module.exports = {
 					|| (order["from"] != null && rmColony != order["from"]))
 					continue;
 				
-				
-				if (!Object.keys(shortage).includes(res) || shortage[res] < 0) {
-					if (terminal.store[res] != null && terminal.store[res] > 0) {
-						
+				// Note: minimum transfer amount is 100!!
+				if (!Object.keys(shortage).includes(res) || shortage[res] < -100) {
+					
+					if (terminal.store[res] != null && terminal.store[res] > 100) {					
 						filling.push(res);						
 						let amount = Math.ceil((res == "energy")
-							? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.65, 100)
-							: Math.max(Math.min(order["amount"], terminal.store[res]), 100));
+							? Math.min(order["amount"], terminal.store[res]) * 0.65
+							: Math.min(order["amount"], terminal.store[res]));
 						let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 						
 						if ((res != "energy" && terminal.store["energy"] >= cost)
@@ -261,8 +261,8 @@ module.exports = {
 							let result = terminal.send(res, amount, order["room"]);
 							if (result == OK) {																
 								if (Memory["options"]["console"] == "on")
-									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Successfully sent `
-										+ `${amount} of ${res} ${rmColony} -> ${order["room"]}`);										
+									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Sent ${amount} of ${res},  ${rmColony}`
+										+ ` -> ${order["room"]},  # ${o}`);
 								
 								Memory["terminal_orders"][o]["amount"] -= amount;
 								
@@ -274,8 +274,7 @@ module.exports = {
 							} else {
 								if (Memory["options"]["console"] == "on")
 									console.log(`<font color=\"#DC00FF\">[Terminals]</font> Failed to send `
-										+ `${Math.min(order["amount"], terminal.store[res])} of ${res} `
-										+ `${rmColony} -> ${order["room"]} (code: ${result})`);
+										+ `${amount} of ${res} ${rmColony} -> ${order["room"]} (code: ${result})`);
 							}
 						} else {
 							if (storage != null && storage.store["energy"] > 0) {
@@ -294,12 +293,8 @@ module.exports = {
 							}
 						}
 					
-					} else if (storage != null && storage.store[res] != null) {												
+					} else if (storage != null && storage.store[res] != null) {
 						filling.push(res);
-						/*
-						if (Memory["options"]["console"] == "on")
-							console.log(`<font color=\"#DC00FF\">[Terminals]</font> Tasking to fill order for ${res} in ${rmColony}`);
-						*/
 						
 						Tasks.addTask(rmColony, { 
 							type: "industry", subtype: "withdraw", resource: res, 

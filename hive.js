@@ -172,8 +172,10 @@ let Hive = {
 						
                         if (_.isString(result)) {
 							if (Memory["options"]["console"] == "on")
-								console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning a lvl ${level} (of ${request.level}) `
-									+ `${request.body} at ${spawn.room.name} (-> ${request.room})`);
+								console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning lvl ${level} / ${request.level} ${request.body},  `
+									+ `${spawn.room.name} -> ${request.room},  `
+									+ `${result} (${request.args["role"]}`
+									+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]})`);
 							
                             listSpawns[s] = null;
                             listRequests[r] = null;

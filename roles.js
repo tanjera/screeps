@@ -159,15 +159,28 @@ module.exports = {
             _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
-            let targets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
-            
-            if (targets.length > 0) {
-                if(creep.attack(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
+            let target;
+			
+			target = _.head(creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
+                return !Object.keys(Memory["allies"]).includes(c.owner.username); }}));            
+            if (target != null) {
+                if (creep.attack(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);					
                 }
+				return;
             }
-        } },
+			
+			target = _.head(_.sortBy(creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: 
+					s => { return !Object.keys(Memory["allies"]).includes(s.owner.username); }}),
+					s => { return s.hits; } ));	// Sort by hits to prevent attacking massive ramparts/walls
+            if (target != null) {
+                if (creep.attack(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);					
+                }
+				return;
+            }			
+        } 
+	},
 
     Archer: function(creep) {
         if (creep.memory.room != null && creep.room.name != creep.memory.room) {
