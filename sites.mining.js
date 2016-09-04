@@ -1,11 +1,22 @@
-let Roles = require("roles");
-let Hive = require("hive");
-
+let _CPU = require("util.cpu");
 
 module.exports = {
 	
 	Run: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
 
+		_CPU.Start(rmColony, `Mining-${rmHarvest}-runPopulation`);
+		this.runPopulation(rmColony, rmHarvest, spawnDistance, listPopulation);
+		_CPU.End(rmColony, `Mining-${rmHarvest}-runPopulation`);
+	
+		_CPU.Start(rmColony, `Mining-${rmHarvest}-runCreeps`);
+		this.runCreeps(rmColony, rmHarvest, listRoute);
+		_CPU.End(rmColony, `Mining-${rmHarvest}-runCreeps`);
+	},
+	
+	
+	runPopulation: function(rmColony, rmHarvest, spawnDistance, listPopulation) {
+		let Hive = require("hive");
+		
         let lBurrower  = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lCarrier  = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lMiner  = _.filter(Game.creeps, c => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
@@ -73,17 +84,24 @@ module.exports = {
             Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation["extractor"]["level"], "worker", 
                 null, {role: "extractor", room: rmHarvest, colony: rmColony});    
         }
-
-        // Run Roles!
+	},
+	
+	
+	runCreeps: function(rmColony, rmHarvest, listRoute) {
+		let Roles = require("roles");
+		
+		let isSafe = !Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
+					|| Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => 
+						{ return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length == 0;
+		
         for (let n in Game.creeps) {
             let creep = Game.creeps[n];                
             if (creep.memory.room != null && creep.memory.colony != null 
                     && creep.memory.room == rmHarvest && creep.memory.colony == rmColony) {
-                creep.memory.listRoute = listRoute;
-                // If the room is safe to run mining operations... run Roles. 
-                if (!Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
-                        || (Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        { filter: (c) => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length == 0)) {
+                
+				creep.memory.listRoute = listRoute;
+                
+				if (isSafe == true) {
                     if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
                         Roles.Mining(creep, rmColony, rmHarvest, listRoute);
                     } else if (creep.memory.role == "multirole") {
@@ -94,8 +112,7 @@ module.exports = {
                         Roles.Extracter(creep, rmColony, rmHarvest, listRoute);
                     } 
                 }
-            } else {
-                // If it"s not safe... attack!
+            } else {                
                 if (creep.memory.role == "soldier" || creep.memory.role == "multirole") {
                     Roles.Soldier(creep, listRoute);
                 }

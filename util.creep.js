@@ -1,6 +1,7 @@
 let Hive = require("hive");
+let _CPU = require("util.cpu");
 
-let _Creep = {
+module.exports = {
 
     runTaskTimer: function(creep) {
         if (creep.memory.task == null) {
@@ -137,7 +138,7 @@ let _Creep = {
             return;
         } 
 
-        if (creep.memory.listRoute != null) {
+		if (creep.memory.listRoute != null) {
             if (forwardRoute == true) {
                 for (let i = 1; i < creep.memory.listRoute.length; i++) {
                     if (creep.room.name == creep.memory.listRoute[i - 1]) {
@@ -154,8 +155,8 @@ let _Creep = {
                 }
             }
         } 
-        
-        if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route == ERR_NO_PATH 
+		
+		if (creep.memory.route == null || creep.memory.route.length == 0 || creep.memory.route == ERR_NO_PATH 
                 || creep.memory.route[0].room == creep.room.name || creep.memory.exit == null
                 || creep.memory.exit.roomName != creep.room.name) {
             
@@ -164,19 +165,14 @@ let _Creep = {
             if (creep.memory.route == ERR_NO_PATH) {
                 delete creep.memory.route;
                 return;
-            }
-            
+            }        
             creep.memory.exit = creep.pos.findClosestByPath(creep.memory.route[0].exit);
         }
 
         if (creep.memory.exit) {
-            creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: Hive.moveReusePath()});
-            
-            /* if (r == ERR_NO_PATH) {
-                delete creep.memory.route;
-                delete creep.memory.exit;
-            } */
-        }},
+            creep.moveTo(new RoomPosition(creep.memory.exit.x, creep.memory.exit.y, creep.memory.exit.roomName), {reusePath: Hive.moveReusePath()});		
+        }
+	},
 
     moveFrom: function(creep, target) {
         let tgtDir = creep.pos.getDirectionTo(target);
@@ -207,16 +203,16 @@ let _Creep = {
 
     getBody: function(type, level) {
         switch (type) {
-            case "soldier": return _Creep.getBody_Soldier(level);
-            case "archer": return _Creep.getBody_Archer(level);
-            case "healer": return _Creep.getBody_Healer(level);
-            case "multirole": return _Creep.getBody_Multirole(level); 
-            case "worker": return _Creep.getBody_Worker(level);
-            case "burrower": return _Creep.getBody_Burrower(level);
+            case "soldier": return this.getBody_Soldier(level);
+            case "archer": return this.getBody_Archer(level);
+            case "healer": return this.getBody_Healer(level);
+            case "multirole": return this.getBody_Multirole(level); 
+            case "worker": return this.getBody_Worker(level);
+            case "burrower": return this.getBody_Burrower(level);
             case "courier":
-            case "carrier": return _Creep.getBody_Carrier(level);
-            case "carrier_at": return _Creep.getBody_Carrier_AT(level);
-            case "reserver": return _Creep.getBody_Reserver(level);
+            case "carrier": return this.getBody_Carrier(level);
+            case "carrier_at": return this.getBody_Carrier_AT(level);
+            case "reserver": return this.getBody_Reserver(level);
         }},
 
     getBody_Soldier: function(level) {
@@ -622,5 +618,3 @@ let _Creep = {
     },
 
 };
-
-module.exports = _Creep;

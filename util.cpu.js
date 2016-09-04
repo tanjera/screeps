@@ -64,7 +64,7 @@ module.exports = {
 			
 			Memory["profiler"]["status"] = "off";			
 			Memory["profiler"]["current"] = new Object();	// Wipe for the next use			
-		} else if (Memory["profiler"]["cycles"] % 10 == 0) {
+		} else if (Memory["profiler"]["cycles"] % 5 == 0) {
 			console.log(`<font color=\"#D3FFA3\">[CPU]</font> Profiler running, ${Memory["profiler"]["cycles"]} ticks remaining.`);
 		}
 	}
