@@ -61,12 +61,14 @@ module.exports = {
 					output += `<br>(${parseFloat(used).toFixed(2)} / ${cycles}) : \t ${parseFloat(used / cycles).toFixed(2)} \t ${n}`;
 					
 					room_used += used;
-					room_cycles = Math.max(room_cycles, cycles);					
+					if (typeof(room_cycles) != Number)
+						room_cycles = 0;					
+					room_cycles = Math.max(room_cycles, cycles);
 				}
 				
 				console.log(`<font color=\"#D3FFA3">CPU report for ${r}</font> :: `
-					+ `(${parseFloat(room_used).toFixed(2)} / ${room_cycles}) : \t ${parseFloat(room_used / room_cycles).toFixed(2)} `
-					+ `${output}`);
+					+ `(${parseFloat(room_used).toFixed(2)} / ${parseInt(room_cycles)}) : `
+					+ `<font color=\"#D3FFA3">${parseFloat(room_used / room_cycles).toFixed(2)}</font> ${output}`);
 			}			
 			
 			Memory["profiler"]["status"] = "off";			

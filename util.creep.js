@@ -18,7 +18,8 @@ module.exports = {
             }
         }
 
-        return true; },
+        return true; 
+	},
 
     runTask: function(creep) {
         switch (creep.memory.task["subtype"]) {
@@ -28,8 +29,8 @@ module.exports = {
 			case "boost": {
 				let lab = Game.getObjectById(creep.memory.task["id"]);
                 if (!creep.pos.inRangeTo(lab, 1)) {
-                    return creep.moveTo(lab, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                    creep.moveTo(lab, {reusePath: Hive.moveReusePath()});
+					return;
                 } else {    // Wait out timer- should be boosted by then.                    
                     return;
                 }
@@ -38,8 +39,8 @@ module.exports = {
             case "pickup": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.pickup(obj) == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(obj, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                    creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
+					return;
                 } else {    // Action takes one tick... task complete... delete task...
                     delete creep.memory.task;
                     return;
@@ -49,8 +50,8 @@ module.exports = {
             case "withdraw": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
                 if (creep.withdraw(obj, creep.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(obj, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                    creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
+                    return;
                 } else {    // Action takes one tick... task complete... delete task...
                     delete creep.memory.task;
                     return;
@@ -61,8 +62,8 @@ module.exports = {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.harvest(obj); 
                 if (result == ERR_NOT_IN_RANGE || result == ERR_NOT_ENOUGH_RESOURCES) {
-                    return creep.moveTo(obj, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, obj.room.name)) : 1;
+                    creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
+					return;
                 } else if (result != OK) {
                     delete creep.memory.task;
                     return;
@@ -73,8 +74,8 @@ module.exports = {
                 let controller = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.upgradeController(controller); 
                 if (result == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(controller, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, controller.room.name)) : 1;
+                    creep.moveTo(controller, {reusePath: Hive.moveReusePath()});
+                    return;
                 } else if (result != OK) {
                     delete creep.memory.task;
                     return;
@@ -85,8 +86,8 @@ module.exports = {
                 let structure = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.repair(structure); 
                 if (result == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(structure, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                    creep.moveTo(structure, {reusePath: Hive.moveReusePath()});
+					return;
                 } else if (result != OK || structure.hits == structure.hitsMax) {
                     delete creep.memory.task;
                     return;
@@ -97,8 +98,8 @@ module.exports = {
                 let structure = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.build(structure);
                 if (result == ERR_NOT_IN_RANGE) {
-                    return creep.moveTo(structure, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                        ? creep.moveTo(new RoomPosition(25, 25, structure.room.name)) : 1;
+                    creep.moveTo(structure, {reusePath: Hive.moveReusePath()});
+					return;
                 } else if (result != OK) {
                     delete creep.memory.task;
                     return;
@@ -109,11 +110,11 @@ module.exports = {
                 // Make sure the target hasn"t filled up...
                 let target = Game.getObjectById(creep.memory.task["id"]);
                 if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
-                        || (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
-                        || (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
+				|| (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
+				|| (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
+				|| (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
+				|| (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
+				|| (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
                     let Tasks = require("tasks");
                     Tasks.assignTask(creep, false);
                 }
@@ -121,8 +122,8 @@ module.exports = {
                 for (let r = Object.keys(creep.carry).length; r > 0; r--) {
                     let resourceType = Object.keys(creep.carry)[r - 1];
                     if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-                        return creep.moveTo(target, {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH
-                            ? creep.moveTo(new RoomPosition(25, 25, target.room.name)) : 1;
+                        creep.moveTo(target, {reusePath: Hive.moveReusePath()});
+						return;
                     } else {
                         delete creep.memory.task;
                         return;

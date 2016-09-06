@@ -10,7 +10,7 @@ module.exports = {
         else if (creep.memory.state == "refueling") {
             if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
                 creep.memory.state = "working";
-                delete creep.memory.task;
+                Tasks.returnTask(creep, creep.memory.task);
                 return;
             }
             
@@ -23,7 +23,7 @@ module.exports = {
         } else if (creep.memory.state == "working") {            
             if (creep.carry[RESOURCE_ENERGY] == 0) {
                     creep.memory.state = "refueling";
-                    delete creep.memory.task;
+                    Tasks.returnTask(creep, creep.memory.task);
                     return;
                 }
             
@@ -42,7 +42,7 @@ module.exports = {
         if (creep.memory.state == "refueling") {
             if (_.sum(creep.carry) >= creep.carryCapacity * 0.9 && creep.carryCapacity > 0) {
                 creep.memory.state = "delivering";
-                delete creep.memory.task;
+                Tasks.returnTask(creep, creep.memory.task);
                 return;
             }
             
@@ -56,7 +56,7 @@ module.exports = {
             if (creep.carryCapacity == 0
                 || (creep.carry[RESOURCE_ENERGY] == 0 && _.sum(creep.carry) < creep.carryCapacity)) {
                 creep.memory.state = "refueling";
-                delete creep.memory.task;
+                Tasks.returnTask(creep, creep.memory.task);
                 return;
             }
 
@@ -78,7 +78,7 @@ module.exports = {
         else if (creep.memory.state == "loading") {
             if (_.sum(creep.carry) > 0) {
                 creep.memory.state = "delivering";
-                delete creep.memory.task;
+                Tasks.returnTask(creep, creep.memory.task);
                 return;
             }
             
@@ -91,7 +91,7 @@ module.exports = {
         } else if (creep.memory.state == "delivering") {            
             if (_.sum(creep.carry) == 0) {
                     creep.memory.state = "loading";
-                    delete creep.memory.task;
+                    Tasks.returnTask(creep, creep.memory.task);
                     return;
                 }
             

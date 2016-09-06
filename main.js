@@ -5,23 +5,19 @@ let _CPU = require("util.cpu");
 module.exports.loop = function () {
 
     /* To do:
+	
 		* Next room: W11S45 
 			- has U
 			- closer to several rooms with 2x sources
 			- load balancing with W11S44
-			- increased presence in area
+			- increased presence in area		
 	
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
 			
-		* CPU management
-            - add wait task for multirole!
-			- implement creeps moving by path? e.g.:
-				if (creep.moveByPath(creep.memory.path) == ERR_NOT_FOUND) {
-					creep.memory.path = creep.pos.findPathTo(destination);
-					creep.moveByPath(creep.memory.path)
-				}        
-
+		- CPU Profiler
+			- room_cycles always equals cycles in Math.max(room_cycles, cycles)
+			
         * Tasks
             - add dismantle tasks
             - utilCreep: add resource types to all tasks? e.g. "withdraw"			
@@ -104,7 +100,7 @@ module.exports.loop = function () {
     Sites.Colony("W15S41", 2,
             { worker:   {level: 6, amount: 1},
               repairer: {level: 6, amount: 1},
-              upgrader: {level: 6, amount: 2} },
+              upgrader: {level: 7, amount: 3} },
             [ {id: "57abd1d35c977d2d5fec0d0f", role: "send"},
               {id: "57bcc544ee84657d138c5866", role: "send"},            
               {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
@@ -168,8 +164,7 @@ module.exports.loop = function () {
 			  extractor: {level: 6, amount: 2} } );
   	Sites.Industry("W13S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" },
-			  { action: "reaction", amount: 5000,
+            [ { action: "reaction", amount: 5000,
 				reactor: {mineral: "UL", lab: "57c5ab258a3658822748cc62"}, 
 				supply1: {mineral: "U", lab: "57c5bdceb44f52600e9b2116"}, 
 				supply2: {mineral: "L", lab: "57cb34e3d80e43e128862a09"} },
@@ -187,11 +182,16 @@ module.exports.loop = function () {
             { worker:   {level: 5, amount: 1},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 5, amount: 1} },
-		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},            
-              {id: "57c8ca7749e338931cf1fa66", role: "receive"} ]);
+		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
+			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
+              {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
     Sites.Mining("W11S44", "W11S44", 1,
             { burrower:  {level: 5, amount: 1},
-              carrier:   {level: 5, amount: 2} } );
+              carrier:   {level: 5, amount: 2},
+			  extractor: {level: 6, amount: 2} } );
+	Sites.Industry("W11S44", 1,
+            { courier:   {level: 5, amount: 1} },
+			[ { action: "boost", mineral: "GH2O", lab: "57cdbb01297293a13858f822", role: "worker", subrole: "upgrader" } ]);
               
 
     /* Remote mining operations for Colony #1, W18S43 */
@@ -228,11 +228,7 @@ module.exports.loop = function () {
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 3},
               multirole: {level: 5, amount: 1},
-              reserver:  {level: 5, amount: 1} } );
-    Sites.Mining("W15S41", "W16S41", 2,
-            { multirole: {level: 3, amount: 1} } );
-    Sites.Mining("W15S41", "W14S41", 2,
-            { multirole: {level: 3, amount: 1} } );
+              reserver:  {level: 5, amount: 1} } );    
     Sites.Mining("W15S41", "W16S42", 3,
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 3},
@@ -252,12 +248,12 @@ module.exports.loop = function () {
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
-    /*	Paused for CPU consumption :(
+	/* Paused for CPU
 	Sites.Mining("W13S41", "W13S42", 2,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
-              reserver:  {level: 4, amount: 1} } );
+              reserver:  {level: 4, amount: 1} } );	
 	*/
 	
 	/* Remote mining operations for Colony #6, W11S44 */
@@ -265,16 +261,13 @@ module.exports.loop = function () {
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
-              reserver:  {level: 4, amount: 1} } );
-	/*	Paused for CPU consumption :(
+              reserver:  {level: 4, amount: 1} } );	
 	Sites.Mining("W11S44", "W12S44", 1,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );
-    Sites.Occupation("W11S44", "W12S44", 1,
-            { soldier:   {level: 4, amount: 1} } );
-	*/	
+    
 
     /* Run end-tick Hive functions */
     Hive.processSpawnRequests();
