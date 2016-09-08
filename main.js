@@ -12,6 +12,10 @@ module.exports.loop = function () {
 			- load balancing with W11S44
 			- increased presence in area		
 	
+		* Terminals
+			- After fulfilling part of an order, continue the tasks to continue the order
+				e.g. After terminal.send, courier is emptying energy from terminal!
+	
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
 			
@@ -36,7 +40,7 @@ module.exports.loop = function () {
 
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
-            { worker:   {level: 6, amount: 1},
+            { worker:   {level: 7, amount: 1},
               repairer: {level: 6, amount: 1} },
             [ {id: "57a2465268244ab107a96d5e", role: "send"},
               {id: "57a24a31e620955e29e63e27", role: "send"},
@@ -164,7 +168,8 @@ module.exports.loop = function () {
 			  extractor: {level: 6, amount: 2} } );
   	Sites.Industry("W13S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "reaction", amount: 5000,
+            [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" },
+              { action: "reaction", amount: 5000,
 				reactor: {mineral: "UL", lab: "57c5ab258a3658822748cc62"}, 
 				supply1: {mineral: "U", lab: "57c5bdceb44f52600e9b2116"}, 
 				supply2: {mineral: "L", lab: "57cb34e3d80e43e128862a09"} },
@@ -181,7 +186,7 @@ module.exports.loop = function () {
     Sites.Colony("W11S44", 1,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 5, amount: 1},
-              upgrader: {level: 5, amount: 1} },
+              upgrader: {level: 6, amount: 1} },
 		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
 			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
               {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);

@@ -450,9 +450,9 @@ module.exports = {
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 7:
-                return [ // 3100 energy, 16x WORK, 13x CARRY, 17x MOVE
+                return [ // 3000 energy, 15x WORK, 13x CARRY, 17x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
-                        WORK, WORK, WORK, WORK, WORK, WORK,  
+                        WORK, WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
                         CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,

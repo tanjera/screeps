@@ -512,7 +512,7 @@ let Tasks = {
                     id: towers[i].id,
                     pos: towers[i].pos,
                     structure: towers[i].structureType,
-                    timer: 20,
+                    timer: 30,
                     creeps: 1,
                     priority: 1 
                 });
@@ -524,7 +524,7 @@ let Tasks = {
                     id: towers[i].id,
                     pos: towers[i].pos,
                     structure: towers[i].structureType,
-                    timer: 20,
+                    timer: 30,
                     creeps: 1,
                     priority: 5
                 });

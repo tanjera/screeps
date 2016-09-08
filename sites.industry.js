@@ -10,7 +10,9 @@ module.exports = {
 
 		/* Terminal order format (from: is optional!)
 		 * For internal transfers: Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: ""};
-		 * For market trading: Memory["terminal_orders"][""] = { market_id: "", room: "", resource: "", amount: , from: ""};
+		 * For market trading: 
+				Memory["terminal_orders"][""] = { market_id: "", amount: , from: ""};
+				Memory["terminal_orders"][""] = { market_id: "", amount: , to: ""};
 		*/
 		 
 	
@@ -253,75 +255,182 @@ module.exports = {
 	runTerminal_Orders: function (rmColony, storage, terminal, shortage, filling) {
 		for (let o in Memory["terminal_orders"]) {
 			let order = Memory["terminal_orders"][o];
-			let res = order["resource"];
+			order["name"] = o;
 			
-			if ((rmColony == order["room"])
-				|| (order["from"] != null && rmColony != order["from"]))
+			if (order["active"] != null && order["active"] == false)
 				continue;
 			
-			// Note: minimum transfer amount is 100!!
-			if (!Object.keys(shortage).includes(res) || shortage[res] < -100) {
+			if (this.runOrder_Sync(order, rmColony) == false)
+				continue;
+			
+			if ((rmColony == order["room"])
+				|| (order["from"] != null && rmColony != order["from"])
+				|| (order["to"] != null && rmColony != order["to"]))
+				continue;
+			
+			if (order["market_id"] == null || order["type"] == "buy") {	// Buy order means I'm selling...
+				if (this.runOrder_Send(rmColony, order, storage, terminal, shortage, filling) == true)
+					return;
+			} else if (order["market_id"] != null && order["type"] == "sell") { // Sell order means I'm buying...
+				if (this.runOrder_Receive(rmColony, order, storage, terminal, filling) == true)
+					return;
+			}
+		}
+	},
+	
+	runOrder_Sync: function (order, rmColony) {
+		let o = order["name"];
+		
+		if (order["market_id"] != null) {	// Sync market orders, update/find new if expired...
+			if (order["sync"] != Game.time) {
+				order["sync"] = Game.time;					
+				let sync = _.head(Game.market.getAllOrders(obj => obj.id == order["market_id"]));
 				
-				if (terminal.store[res] != null 
-				&& ((res != "energy" && terminal.store[res] > 100) || (res == "energy" && terminal.store[res] > 200))) {
-					filling.push(res);						
-					let amount = Math.ceil((res == "energy")
-						? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.65, 100)
-						: Math.max(Math.min(order["amount"], terminal.store[res]), 100));
-					let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
+				if (sync != null) {
+					order["market_item"] = sync;
+					order["type"] = sync.type;
+					order["room"] = sync.roomName;
+					order["resource"] = sync.resourceType;					
+				} else {
+					let replacement = _.head(_.sortBy(Game.market.getAllOrders(
+						obj => { return obj.resourceType == order["market_item"].resource 
+							&& obj.type == order["market_item"].type && obj.price == order["market_item"].price; })),
+						obj => { return Game.map.getRoomLinearDistance(rmColony, obj.roomName); });
 					
-					if ((res != "energy" && terminal.store["energy"] >= cost)
-							|| (res == "energy" && terminal.store["energy"] >= cost + amount)) {
+					if (replacement != null) {
+						order["market_item"] = replacement;
+						order["market_id"] = replacement.id;
+						order["type"] = replacement.type;
+						order["room"] = replacement.roomName;
+						order["resource"] = replacement.resourceType;						
 						
-						let result = (order["market_id"] == null)
-							? terminal.send(res, amount, order["room"])
-							: Game.market.deal(order["market_id"], amount, rmColony);
-							
-						if (result == OK) {																
-							if (Memory["options"]["console"] == "on")
-								console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} sent, ${rmColony}`
-									+ ` -> ${order["room"]}`);
-							
-							Memory["terminal_orders"][o]["amount"] -= amount;							
-							if (Memory["terminal_orders"][o]["amount"] <= 0)
-								delete Memory["terminal_orders"][o];							
-							
-							return;
-							
-						} else {
-							if (Memory["options"]["console"] == "on")
-								console.log(`<font color=\"#DC00FF\">[Terminals]</font> Failed to send `
-									+ `${amount} of ${res} ${rmColony} -> ${order["room"]} (code: ${result})`);
-						}
-					} else {
-						if (storage != null && storage.store["energy"] > 0) {
-							filling.push("energy");								
-							Tasks.addTask(rmColony, { 
-								type: "industry", subtype: "withdraw", resource: "energy", 
-								id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
-							Tasks.addTask(rmColony, { 
-								type: "industry", subtype: "deposit", resource: "energy", 
-								id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
-						} else {
-							Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };
-							if (Memory["options"]["console"] == "on")
-								console.log(`<font color=\"#DC00FF\">[Terminals]</font> Placing energy order in ${rmColony}... `
-									+ `unable to fill order for ${res} -> ${order["room"]}`);								
-						}
+						if (Memory["options"]["console"] == "on")
+							console.log(`<font color=\"#00F0FF\">[Market]</font> Replacement market order found for ${o}!`);
+					} else {							
+						if (Memory["options"]["console"] == "on")
+							console.log(`<font color=\"#00F0FF\">[Market]</font> No replacement market order found for ${o}; order deleted!`);
+						
+						delete order;
+						return false;
 					}
-				
-				} else if (storage != null && storage.store[res] != null) {
-					filling.push(res);
-					
-					Tasks.addTask(rmColony, { 
-						type: "industry", subtype: "withdraw", resource: res, 
-						id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
-					Tasks.addTask(rmColony, { 
-						type: "industry", subtype: "deposit", resource: res, 
-						id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });					
 				}
 			}
 		}
+		
+		return true;
+	},
+	
+	runOrder_Send: function (rmColony, order, storage, terminal, shortage, filling) {
+		// Note: Minimum transfer amount is 100.
+		
+		let o = order["name"];
+		let res = order["resource"];
+		
+		if (!Object.keys(shortage).includes(res) || shortage[res] < -100) {			
+			if (terminal.store[res] != null && ((res != "energy" && terminal.store[res] > 100) || (res == "energy" && terminal.store[res] > 200))) {
+				filling.push(res);
+				filling.push("energy");
+				
+				let amount = Math.ceil((res == "energy")
+					? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.65, 100)
+					: Math.max(Math.min(order["amount"], terminal.store[res]), 100));
+				let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
+				
+				if ((res != "energy" && terminal.store["energy"] >= cost)
+						|| (res == "energy" && terminal.store["energy"] >= cost + amount)) {
+					
+					let result = (order["market_id"] == null)
+						? terminal.send(res, amount, order["room"])
+						: Game.market.deal(order["market_id"], amount, rmColony);
+						
+					if (result == OK) {
+						if (Memory["options"]["console"] == "on")
+							console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} sent, ${rmColony}`
+								+ ` -> ${order["room"]}`);
+						
+						Memory["terminal_orders"][o]["amount"] -= amount;							
+						if (Memory["terminal_orders"][o]["amount"] <= 0)
+							delete Memory["terminal_orders"][o];							
+						
+						return true;
+						
+					} else {
+						if (Memory["options"]["console"] == "on")
+							console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: failed to send , `
+								+ `${amount} of ${res} ${rmColony} -> ${order["room"]} (code: ${result})`);
+					}
+				} else {
+					if (storage != null && storage.store["energy"] > 0) {
+						Tasks.addTask(rmColony, { 
+							type: "industry", subtype: "withdraw", resource: "energy", 
+							id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
+						Tasks.addTask(rmColony, { 
+							type: "industry", subtype: "deposit", resource: "energy", 
+							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
+					} else if (res != "energy") {
+						Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };						
+					}
+				}			
+			} else if (storage != null && storage.store[res] != null) {					
+				filling.push(res);
+				filling.push("energy");
+				
+				Tasks.addTask(rmColony, { 
+					type: "industry", subtype: "withdraw", resource: res, 
+					id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
+				Tasks.addTask(rmColony, { 
+					type: "industry", subtype: "deposit", resource: res, 
+					id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });					
+			}
+		}
+		
+		return false;
+	},
+	
+	runOrder_Receive: function (rmColony, order, storage, terminal, filling) {				
+	/* Notes: Minimum transfer amount is 100
+	 * And always buy in small amounts! ~500-1000
+	 */
+	 
+		let o = order["name"];
+		let res = order["resource"];
+		let amount = 500;
+		let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
+	 
+		if (terminal.store["energy"] != null && terminal.store["energy"] > cost) {
+			filling.push("energy");
+				
+			let result = Game.market.deal(order["market_id"], amount, rmColony);
+					
+			if (result == OK) {
+				if (Memory["options"]["console"] == "on")
+					console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} received, ${order["room"]}`
+						+ ` -> ${rmColony} `);
+				
+				Memory["terminal_orders"][o]["amount"] -= amount;							
+				if (Memory["terminal_orders"][o]["amount"] <= 0)
+					delete Memory["terminal_orders"][o];							
+				
+				return true;				
+			} else {
+				if (Memory["options"]["console"] == "on")
+					console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: failed to receive`
+						+ ` ${amount} of ${res} ${order["room"]} -> ${rmColony} (code: ${result})`);
+			}				
+		} else {
+			if (storage != null && storage.store["energy"] > 0) {
+				filling.push("energy");
+				
+				Tasks.addTask(rmColony, { 
+					type: "industry", subtype: "withdraw", resource: "energy", 
+					id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
+				Tasks.addTask(rmColony, { 
+					type: "industry", subtype: "deposit", resource: "energy", 
+					id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
+			}
+		}
+		
+		return false;
 	},
 	
 	runTerminal_Empty: function (rmColony, storage, terminal, filling) {
