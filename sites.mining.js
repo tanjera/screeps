@@ -38,7 +38,7 @@ module.exports = {
 
         if (listPopulation["paladin"] != null && lPaladin.length < listPopulation["paladin"]["amount"]) {
 			Hive.requestSpawn(rmColony, 0, 1, listPopulation["paladin"]["level"], "paladin", 
-				null, {role: "soldier", room: rmHarvest, colony: rmColony});
+				null, {role: "paladin", room: rmHarvest, colony: rmColony});
 		} else if (hasKeepers == false && Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         {filter: (c) => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length > 0) {
             let lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmHarvest);
@@ -128,7 +128,7 @@ module.exports = {
 						Roles.Worker(creep, true);					
 					} else if (creep.memory.role == "extractor") {
 						Roles.Extracter(creep, true);
-					} else if (creep.memory.role == "soldier") {
+					} else if (creep.memory.role == "soldier" || creep.memory.role == "paladin") {
 						Roles.Soldier(creep, false);
 					}
 				}

@@ -197,8 +197,8 @@ module.exports = {
         else {
             let target;
 			
-			target = _.head(creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                return !Object.keys(Memory["allies"]).includes(c.owner.username); }}));            
+			target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: (c) => { 
+                return !Object.keys(Memory["allies"]).includes(c.owner.username); }});            
             if (target != null) {
                 if (creep.attack(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);

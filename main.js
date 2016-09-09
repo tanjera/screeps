@@ -7,16 +7,7 @@ module.exports.loop = function () {
     /* To do:
 	
 		* Pop adjusts
-			W19S42: @ RCL 8, 1x upgrader lvl 7, 1x repairer lvl 5		
-	
-		* Source Keeper mining
-			- Remove isSafe... find hostiles in range instead
-				Also remove rally
-			- Implement a worker to construct roads!
-				Can't be multirole... that would attack source keepers...
-	
-		* Logs:
-			- Overhaul output of Logs.Resources() to show "by resource"
+			W19S42: @ RCL 8, 1x upgrader lvl 7, 1x repairer lvl 5	
 	
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
@@ -133,16 +124,17 @@ module.exports.loop = function () {
 				
     /* Colony #4, W15S43 */
     Sites.Colony("W15S43", 2,
-            { worker:   {level: 6, amount: 1},
+            { worker:   {level: 5, amount: 1},
               repairer: {level: 5, amount: 1},
-              upgrader: {level: 6, amount: 0} } );      
+              upgrader: {level: 7, amount: 1} } );      
     Sites.Mining("W15S43", "W15S43", 2, false,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 5, amount: 2}, 
 			  extractor: {level: 6, amount: 1} } );
 	Sites.Industry("W15S43", 2,
             { courier:   {level: 4, amount: 1} },
-            [ { action: "reaction", amount: 5000,
+            [ { action: "boost", mineral: "GH2O", lab: "57c8ef2b1d3d4c8e3969d068", role: "worker", subrole: "upgrader" },
+			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "OH", lab: "57be56f1e02d93c93cf460c7"}, 
 				supply1: {mineral: "O", lab: "57c8cb46e9b21a95363affa3"}, 
 				supply2: {mineral: "H", lab: "57c8dc805e86b05c1d5892e3"} },
@@ -201,11 +193,12 @@ module.exports.loop = function () {
 			  
 	/* Colony #7, W11S45 */
     Sites.Colony("W11S45", 1,
-            { worker:   {level: 5, amount: 1},
+            { worker:   {level: 5, amount: 2},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 5, amount: 2} });
     Sites.Mining("W11S45", "W11S45", 1, false,
-            { burrower:  {level: 5, amount: 1} } );	
+            { burrower:  {level: 5, amount: 1},
+			  carrier:   {level: 5, amount: 2} } );	
 	          
 
     /* Remote mining operations for Colony #1, W18S43 */
@@ -255,11 +248,12 @@ module.exports.loop = function () {
             { burrower:  {level: 5, amount: 4},
               carrier:   {level: 5, amount: 12, body: "all-terrain"},
               multirole: {level: 5, amount: 1} } );
-	/*Sites.Mining_SK("W15S43", "W15S44", 0,
-			{ soldier: 	{level: 7, amount: 1},
-			  burrower:	{level: 5, amount: 1},
-			  carrier:   {level: 5, amount: 4} } );
-	*/
+	Sites.Mining("W15S43", "W15S44", 0, true,
+			{ paladin: 	 {level: 8, amount: 1},
+			  burrower:	 {level: 5, amount: 2},
+			  carrier:   {level: 5, amount: 8, body: "all-terrain"},
+              multirole: {level: 5, amount: 1} } );
+	
 		
     /* Remote mining operations for Colony #5, W13S41 */
     Sites.Mining("W13S41", "W12S41", 1, false,
