@@ -7,10 +7,11 @@ module.exports.loop = function () {
     /* To do:
 	
 		* Pop adjusts
-			W15S41: @ RCL 8, 1x upgrader lvl 7, 1x repairer lvl 5
 			W19S42: @ RCL 8, 1x upgrader lvl 7, 1x repairer lvl 5		
 	
 		* Source Keeper mining
+			- Remove isSafe... find hostiles in range instead
+				Also remove rally
 			- Implement a worker to construct roads!
 				Can't be multirole... that would attack source keepers...
 	
@@ -47,7 +48,7 @@ module.exports.loop = function () {
               {id: "57a24a31e620955e29e63e27", role: "send"},
               {id: "57a24f9cacbffcb869dc9d21", role: "receive"},
               {id: "57a25c61958cffd536325056", role: "receive"} ] );
-    Sites.Mining("W18S43", "W18S43", 2,
+    Sites.Mining("W18S43", "W18S43", 2, false,
             { burrower:  {level: 7, amount: 1},
               carrier:   {level: 7, amount: 2} } );
 	Sites.Industry("W18S43", 2,
@@ -81,7 +82,7 @@ module.exports.loop = function () {
             [ {id: "57a23067cf975f59293d8a28", role: "send"},
               {id: "57a23201113c59e97f7e364e", role: "receive"},
               {id: "57a6a9d62d673fac4f21a62a", role: "receive"}]);    
-    Sites.Mining("W19S42", "W19S42", 2,
+    Sites.Mining("W19S42", "W19S42", 2, false,
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 2},              
               extractor: {level: 6, amount: 1} } );
@@ -104,13 +105,13 @@ module.exports.loop = function () {
     /* Colony #3, W15S41 */
     Sites.Colony("W15S41", 2,
             { worker:   {level: 6, amount: 1},
-              repairer: {level: 6, amount: 1},
-              upgrader: {level: 6, amount: 2} },
+              repairer: {level: 5, amount: 1},
+              upgrader: {level: 5, amount: 1} },
             [ {id: "57abd1d35c977d2d5fec0d0f", role: "send"},
               {id: "57bcc544ee84657d138c5866", role: "send"},            
               {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
               {id: "57af99d528986c413c0a8f4c", role: "receive"} ] );
-    Sites.Mining("W15S41", "W15S41", 2,
+    Sites.Mining("W15S41", "W15S41", 2, false,
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 2},              
               extractor: {level: 6, amount: 2} } );
@@ -135,7 +136,7 @@ module.exports.loop = function () {
             { worker:   {level: 6, amount: 1},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 6, amount: 0} } );      
-    Sites.Mining("W15S43", "W15S43", 2,
+    Sites.Mining("W15S43", "W15S43", 2, false,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 5, amount: 2}, 
 			  extractor: {level: 6, amount: 1} } );
@@ -163,7 +164,7 @@ module.exports.loop = function () {
 			  {id: "57cb36bd7d58704651710ab0", role: "send"},
               {id: "57c06b8698040e1908490daf", role: "receive"},
 			  {id: "57c3eabdc480f8a72a2cdb75", role: "receive"} ] );
-    Sites.Mining("W13S41", "W13S41", 2,
+    Sites.Mining("W13S41", "W13S41", 2, false,
             { burrower:  {level: 4, amount: 2},
               carrier:   {level: 4, amount: 3},
 			  extractor: {level: 6, amount: 2} } );
@@ -191,56 +192,58 @@ module.exports.loop = function () {
 		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
 			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
               {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
-    Sites.Mining("W11S44", "W11S44", 1,
+    Sites.Mining("W11S44", "W11S44", 1, false,
             { burrower:  {level: 5, amount: 1},
               carrier:   {level: 5, amount: 2},
 			  extractor: {level: 6, amount: 2} } );
+	Sites.Industry("W11S44", 1,
+            { courier:   {level: 5, amount: 1} });
 			  
 	/* Colony #7, W11S45 */
     Sites.Colony("W11S45", 1,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 5, amount: 2} });
-    Sites.Mining("W11S45", "W11S45", 1,
+    Sites.Mining("W11S45", "W11S45", 1, false,
             { burrower:  {level: 5, amount: 1} } );	
 	          
 
     /* Remote mining operations for Colony #1, W18S43 */
-    Sites.Mining("W18S43", "W17S43", 2,
+    Sites.Mining("W18S43", "W17S43", 2, false,
             { burrower:  {level: 7, amount: 1},
               carrier:   {level: 7, amount: 3},
               multirole: {level: 6, amount: 1},
               reserver:  {level: 6, amount: 1} } );
-    Sites.Mining("W18S43", "W19S43", 2,
+    Sites.Mining("W18S43", "W19S43", 2, false,
             { burrower:  {level: 5, amount: 1},
               carrier:   {level: 5, amount: 2},
               multirole: {level: 5, amount: 1},
               reserver:  {level: 5, amount: 1} } );
-    Sites.Mining("W18S43", "W17S42", 2,
+    Sites.Mining("W18S43", "W17S42", 2, false,
             { burrower:  {level: 5, amount: 1},
               carrier:   {level: 5, amount: 2},
               multirole: {level: 5, amount: 1},
               reserver:  {level: 5, amount: 1} } );
     
     /* Remote mining operations for Colony #2, W19S42 */
-    Sites.Mining("W19S42", "W18S42", 2,
+    Sites.Mining("W19S42", "W18S42", 2, false,
             { burrower:  {level: 7, amount: 1},
               carrier:   {level: 7, amount: 3},
               multirole: {level: 6, amount: 1},
               reserver:  {level: 6, amount: 1} } );
     
     /* Remote mining operations for Colony #3, W15S41 */
-    Sites.Mining("W15S41", "W15S42", 1,
+    Sites.Mining("W15S41", "W15S42", 1, false,
             { burrower:  {level: 5, amount: 1},
               carrier:   {level: 6, amount: 3},
               multirole: {level: 5, amount: 1},
               reserver:  {level: 5, amount: 1} } );
-    Sites.Mining("W15S41", "W14S42", 2,
+    Sites.Mining("W15S41", "W14S42", 2, false,
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 3},
               multirole: {level: 5, amount: 1},
               reserver:  {level: 5, amount: 1} } );    
-    Sites.Mining("W15S41", "W16S42", 3,
+    Sites.Mining("W15S41", "W16S42", 3, false,
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 3},
               multirole: {level: 5, amount: 1},
@@ -248,31 +251,31 @@ module.exports.loop = function () {
             ["W15S41", "W16S41", "W16S42"]);
     
     /* Remote mining operations for Colony #4, W15S43 */
-    Sites.Mining("W15S43", "W15S45", 0,
+    Sites.Mining("W15S43", "W15S45", 0, false,
             { burrower:  {level: 5, amount: 4},
               carrier:   {level: 5, amount: 12, body: "all-terrain"},
               multirole: {level: 5, amount: 1} } );
-	Sites.Mining_SK("W15S43", "W15S44", 0,
-			"577b934d0f9d51615fa47f12", new RoomPosition(28, 4, "W15S44"),
-			{ soldier_sk: 	{level: 7, amount: 1},
-			  burrower_sk:	{level: 5, amount: 1},
-			  carrier_sk:   {level: 5, amount: 4} } );
+	/*Sites.Mining_SK("W15S43", "W15S44", 0,
+			{ soldier: 	{level: 7, amount: 1},
+			  burrower:	{level: 5, amount: 1},
+			  carrier:   {level: 5, amount: 4} } );
+	*/
 		
     /* Remote mining operations for Colony #5, W13S41 */
-    Sites.Mining("W13S41", "W12S41", 1,
+    Sites.Mining("W13S41", "W12S41", 1, false,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );	
 	/* Pause for CPU vvvv */
-	Sites.Mining("W13S41", "W13S42", 2,
+	Sites.Mining("W13S41", "W13S42", 2, false,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},
               reserver:  {level: 4, amount: 1} } );		
 	
 	/* Remote mining operations for Colony #6, W11S44 */
-    Sites.Mining("W11S44", "W12S44", 1,
+    Sites.Mining("W11S44", "W12S44", 1, false,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 4, amount: 3},
               multirole: {level: 4, amount: 1},

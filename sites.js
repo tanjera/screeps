@@ -8,12 +8,7 @@ module.exports = {
 	Mining: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
 		let Mining = require("sites.mining");
 		Mining.Run(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute);
-	},
-	
-	Mining_SK: function(rmColony, rmHarvest, spawnDistance, idSource, posRally, listPopulation, listRoute) {
-		let Mining_SK = require("sites.mining.keeper");
-		Mining_SK.Run(rmColony, rmHarvest, spawnDistance, idSource, posRally, listPopulation, listRoute);
-	},
+	},	
 	
     Industry: function(rmColony, spawnDistance, listPopulation, listLabs) {
 		let Industry = require("sites.industry");

@@ -205,7 +205,7 @@ module.exports = {
     getBody: function(type, level) {
         switch (type) {
             case "soldier": return this.getBody_Soldier(level);
-			case "soldier_sk": return this.getBody_Soldier_SK(level);
+			case "paladin": return this.getBody_Paladin(level);
             case "archer": return this.getBody_Archer(level);
             case "healer": return this.getBody_Healer(level);
             case "multirole": return this.getBody_Multirole(level); 
@@ -268,10 +268,10 @@ module.exports = {
 
 		
 		
-	getBody_Soldier_SK: function(level) {
+	getBody_Paladin: function(level) {
         switch (level) {
             default:
-				console.log(`Error @ getBody_Soldier, ${level} is not a proper number!`);
+				console.log(`Error @ getBody_Paladin, ${level} is not a proper number!`);
 				return;
             case 1:
             case 2:
