@@ -1,6 +1,6 @@
 module.exports = {
 
-    Storage: function() {
+    Resources: function() {
 		let color = "#D3FFA3";
         console.log(`<font color=\"${color}">*** Storage Report: Tick # ${Game.time} ***</font>`);
         

@@ -9,7 +9,8 @@ module.exports = {
 	Run: function(rmColony, spawnDistance, listPopulation, listLabs) {
 
 		/* Terminal order format (from: is optional!)
-		 * For internal transfers: Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: ""};
+		 * For internal transfers: 
+				Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: ""};
 		 * For market trading: 
 				Memory["terminal_orders"][""] = { market_id: "", amount: , from: ""};
 				Memory["terminal_orders"][""] = { market_id: "", amount: , to: ""};
@@ -293,9 +294,9 @@ module.exports = {
 					order["resource"] = sync.resourceType;					
 				} else {
 					let replacement = _.head(_.sortBy(Game.market.getAllOrders(
-						obj => { return obj.resourceType == order["market_item"].resource 
-							&& obj.type == order["market_item"].type && obj.price == order["market_item"].price; })),
-						obj => { return Game.map.getRoomLinearDistance(rmColony, obj.roomName); });
+						obj => { return obj.resourceType == order["market_item"].resourceType 
+							&& obj.type == order["market_item"].type && obj.price == order["market_item"].price; }),
+						obj => { return Game.map.getRoomLinearDistance(rmColony, obj.roomName); }));
 					
 					if (replacement != null) {
 						order["market_item"] = replacement;
@@ -310,7 +311,7 @@ module.exports = {
 						if (Memory["options"]["console"] == "on")
 							console.log(`<font color=\"#00F0FF\">[Market]</font> No replacement market order found for ${o}; order deleted!`);
 						
-						delete order;
+						delete Memory["terminal_orders"][o];
 						return false;
 					}
 				}

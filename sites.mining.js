@@ -17,20 +17,20 @@ module.exports = {
 	runPopulation: function(rmColony, rmHarvest, spawnDistance, listPopulation) {
 		let Hive = require("hive");
 		
-        let lBurrower  = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        let lCarrier  = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        let lMiner  = _.filter(Game.creeps, c => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        let lMultirole  = _.filter(Game.creeps, c => c.memory.role == "multirole" && c.memory.room == rmHarvest);
-        let lReserver  = _.filter(Game.creeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
-        let lExtractor  = _.filter(Game.creeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
+		let lBurrower = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        let lCarrier = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        let lMiner = _.filter(Game.creeps, c => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
+        let lMultirole = _.filter(Game.creeps, c => c.memory.role == "multirole" && c.memory.room == rmHarvest);
+        let lReserver = _.filter(Game.creeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
+        let lExtractor = _.filter(Game.creeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
 
-        let popTarget =(
-            listPopulation["burrower"] == null ? 0 : listPopulation["burrower"]["amount"])
+        let popTarget =
+            (listPopulation["burrower"] == null ? 0 : listPopulation["burrower"]["amount"])
             + (listPopulation["carrier"] == null ? 0 : listPopulation["carrier"]["amount"])
             + (listPopulation["miner"] == null ? 0 : listPopulation["miner"]["amount"])
-            + (listPopulation["multirole"] == null ? 0 : listPopulation["multirole"]["amount"]
+            + (listPopulation["multirole"] == null ? 0 : listPopulation["multirole"]["amount"])
             + (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"])
-            + (listPopulation["extractor"] == null ? 0 : listPopulation["extractor"]["amount"]));         
+            + (listPopulation["extractor"] == null ? 0 : listPopulation["extractor"]["amount"]);
         let popActual = lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
@@ -81,7 +81,7 @@ module.exports = {
         else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] 
                     && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0) {
-            Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation["extractor"]["level"], "worker", 
+            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["extractor"]["level"], "worker", 
                 null, {role: "extractor", room: rmHarvest, colony: rmColony});    
         }
 	},
@@ -103,18 +103,18 @@ module.exports = {
                 
 				if (isSafe == true) {
                     if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
-                        Roles.Mining(creep, rmColony, rmHarvest, listRoute);
+                        Roles.Mining(creep);
                     } else if (creep.memory.role == "multirole") {
-                        Roles.Worker(creep, listRoute);
+                        Roles.Worker(creep);
                     } else if (creep.memory.role == "reserver") {
-                        Roles.Reserver(creep, listRoute);
+                        Roles.Reserver(creep);
                     } else if (creep.memory.role == "extractor") {
-                        Roles.Extracter(creep, rmColony, rmHarvest, listRoute);
+                        Roles.Extracter(creep);
                     } 
                 }
             } else {                
                 if (creep.memory.role == "soldier" || creep.memory.role == "multirole") {
-                    Roles.Soldier(creep, listRoute);
+                    Roles.Soldier(creep);
                 }
             }
         } 

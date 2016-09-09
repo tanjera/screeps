@@ -81,6 +81,11 @@ let Tasks = {
                 Tasks.assignTask_Mine(creep, isRefueling);
                 return;
 
+			case "burrower_sk":
+            case "carrier_sk":
+                Tasks.assignTask_Mine_SK(creep, isRefueling);
+                return;
+				
             case "extractor":
                 Tasks.assignTask_Extract(creep, isRefueling);
                 return;
@@ -238,7 +243,7 @@ let Tasks = {
                 
                 if (creep.memory.task == null) {
                     // If there is no energy to get... deliver or wait.
-                    if (_.sum(creep.carry) > creep.carryCapacity * 0.8) {
+                    if (_.sum(creep.carry) > creep.carryCapacity * 0.85) {
                         creep.memory.state = "delivering";
                         return;
                     } else {
@@ -306,6 +311,83 @@ let Tasks = {
 				Tasks.giveTask(creep, task);
                 return;
             }
+        }
+	},
+	
+	assignTask_Mine_SK: function(creep, isRefueling) {
+        let task;
+
+        if (isRefueling) {
+			let source = Game.getObjectById(creep.memory.source);
+			
+            if (creep.room.name != creep.memory.room) {
+                let _Creep = require("util.creep");
+                _Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+                return;
+            } 
+
+            if (creep.memory.role == "burrower_sk") {
+                task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+                        (t) => { return t.type == "mine" && source.pos.getRangeTo(t.pos) < 5; }));
+                if (task != null) {
+                    Tasks.giveTask(creep, task);
+                    return;                
+                }
+            }
+            else if (creep.memory.role == "carrier_sk") {
+                task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+                        (t) => { return (t.subtype == "pickup" || t.type == "energy") && source.pos.getRangeTo(t.pos) < 5; }));
+                if (task != null) {
+                    Tasks.giveTask(creep, task);
+                    return;
+                }
+
+                if (creep.getActiveBodyparts("work") > 0) {
+                    task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+                        (t) => { return t.type == "mine" && source.pos.getRangeTo(t.pos) < 5; }));
+                    if (task != null) {
+						Tasks.giveTask(creep, task);
+                        return;
+                    }
+                }
+                
+                if (creep.memory.task == null) {
+                    // If there is no energy to get... deliver or wait.
+                    if (_.sum(creep.carry) > creep.carryCapacity * 0.85) {
+                        creep.memory.state = "delivering";
+                        return;
+                    } else {
+                        Tasks.giveTask(creep, {type: "wait", subtype: "wait", timer: 5});
+                        return;
+                    }
+                }
+            }
+        } else {
+            if (creep.room.name != creep.memory.colony) {
+                let _Creep = require("util.creep");
+                _Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
+                return;
+            }
+
+			if (creep.carry["energy"] != null && creep.carry["energy"] > 0) {
+				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+						(t) => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+						(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+						"priority"));
+				if (task != null) {
+					Tasks.giveTask(creep, task);
+					return;
+				}
+			} else {
+				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+						(t) => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
+						(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+						"priority"));
+				if (task != null) {
+					Tasks.giveTask(creep, task);
+					return;
+				}
+			}
         }
 	},
 
