@@ -54,14 +54,14 @@ module.exports.loop = function () {
 				supply2: {mineral: "OH", lab: "57cae6e2ea11208817fa6f10"} } ]);
       */
 
-	Sites.Colony("W18S43", 2,
+	Sites.Colony("W16S52", 2,
             { worker:   {level: 1, amount: 1},
               repairer: {level: 1, amount: 1} },
            /* [ {id: "57a2465268244ab107a96d5e", role: "send"},
               {id: "57a24a31e620955e29e63e27", role: "send"},
               {id: "57a24f9cacbffcb869dc9d21", role: "receive"},
               {id: "57a25c61958cffd536325056", role: "receive"} ]*/ );
-	Sites.Mining("W18S43", "W18S43", 2, false,
+	Sites.Mining("W16S52", "W16S52", 2, false,
             { burrower:  {level: 1, amount: 1},
               carrier:   {level: 1, amount: 2} } );
 	/* Sites.Industry("W18S43", 2,
