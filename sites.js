@@ -5,10 +5,10 @@ module.exports = {
 		Colony.Run(rmColony, spawnDistance, listPopulation, listLinks)
 	},
 	
-	Mining: function(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute) {
+	Mining: function(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation, listRoute) {
 		let Mining = require("sites.mining");
-		Mining.Run(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute);
-	},
+		Mining.Run(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation, listRoute);
+	},	
 	
     Industry: function(rmColony, spawnDistance, listPopulation, listLabs) {
 		let Industry = require("sites.industry");

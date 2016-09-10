@@ -205,6 +205,7 @@ module.exports = {
     getBody: function(type, level) {
         switch (type) {
             case "soldier": return this.getBody_Soldier(level);
+			case "paladin": return this.getBody_Paladin(level);
             case "archer": return this.getBody_Archer(level);
             case "healer": return this.getBody_Healer(level);
             case "multirole": return this.getBody_Multirole(level); 
@@ -265,12 +266,38 @@ module.exports = {
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
         }},
 
+		
+		
+	getBody_Paladin: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Paladin, ${level} is not a proper number!`);
+				return;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+				return null;
+			
+            case 7:
+            case 8:
+                return [ // ?? energy, 20x MOVE, 20x ATTACK, 5x HEAL
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, 
+						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, 
+						HEAL, HEAL, HEAL, HEAL, HEAL];
+        }},
+		
+		
+		
     getBody_Archer: function(level) {
         switch (level) {
             default:
 				console.log(`Error @ getBody_Archer, ${level} is not a proper number!`);
 				return;
-            case 1:
             case 1:
                 return [ // 260 energy, 1x TOUGH, 1x RANGED_ATTACK, 2x MOVE
                         TOUGH, 

@@ -54,7 +54,7 @@ let Tasks = {
 		let __creep = require("util.creep");		
 		if (creep.ticksToLive > 1100 && !__creep.isBoosted(creep)) {
 			let task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-				(t) => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; }));
+				t => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; }));
 			if (task != null) {
 				Tasks.giveTask(creep, task);
 				return;
@@ -80,7 +80,7 @@ let Tasks = {
             case "carrier":
                 Tasks.assignTask_Mine(creep, isRefueling);
                 return;
-
+				
             case "extractor":
                 Tasks.assignTask_Extract(creep, isRefueling);
                 return;
@@ -92,8 +92,8 @@ let Tasks = {
 
         if (isRefueling) {            
             task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.type == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
+                    t => { return t.type == "energy" && (t.creeps == null || t.creeps > 0); }), 
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
                     "priority"));
             if (task != null) {
 				Tasks.giveTask(creep, task);
@@ -101,16 +101,16 @@ let Tasks = {
             }
                         
             task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.subtype == "pickup" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+                    t => { return t.subtype == "pickup" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
 				Tasks.giveTask(creep, task);
                 return;
             }
 
             task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+                    t => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
 				Tasks.giveTask(creep, task);
                 return;
@@ -118,20 +118,20 @@ let Tasks = {
         } else {
             if (creep.memory.subrole == "repairer") {
                 task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                        (t) => { return t.type == "work" && t.subtype == "repair" && (t.creeps == null || t.creeps > 0); }), 
-                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        t => { return t.type == "work" && t.subtype == "repair" && (t.creeps == null || t.creeps > 0); }), 
+                        t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority"));
             }
             else if (creep.memory.subrole == "upgrader") {
                 task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-						(t) => { return t.type == "work" && t.subtype == "upgrade" && (t.creeps == null || t.creeps > 0); }), 
+						t => { return t.type == "work" && t.subtype == "upgrade" && (t.creeps == null || t.creeps > 0); }), 
 						"priority"));
             }
             
             if (task == null) {
                 task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                        (t) => { return t.type == "work" && (t.creeps == null || t.creeps > 0); }), 
-                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        t => { return t.type == "work" && (t.creeps == null || t.creeps > 0); }), 
+                        t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority"));
             }
 
@@ -150,8 +150,8 @@ let Tasks = {
     
         if (isRefueling) {
             task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.type == "industry" && t.subtype == "withdraw" && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    t => { return t.type == "industry" && t.subtype == "withdraw" && (t.creeps == null || t.creeps > 0); }), 
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority"));
             if (task != null) {
                     Tasks.giveTask(creep, task);
@@ -164,8 +164,8 @@ let Tasks = {
             let resources = _.sortBy(Object.keys(creep.carry), (c) => { return -creep.carry[c]; });
             resources = Object.keys(resources).length > 0 ? resources[0] : "energy";                
             task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.type == "industry" && t.subtype == "deposit" && t.resource == resources && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    t => { return t.type == "industry" && t.subtype == "deposit" && t.resource == resources && (t.creeps == null || t.creeps > 0); }), 
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority"));
             if (task != null) {
                     Tasks.giveTask(creep, task);
@@ -175,16 +175,16 @@ let Tasks = {
             // If stuck without a task... drop off energy/minerals in storage... or wait...
             if (Object.keys(creep.carry).includes("energy")) {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-						(t) => { return t.type == "carry" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
-						(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+						t => { return t.type == "carry" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 				if (task != null) {
                     Tasks.giveTask(creep, task);
 					return;
 				}
 			} else if (Object.keys(creep.carry).length > 0) {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-						(t) => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
-						(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+						t => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
+						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 				if (task != null) {
                     Tasks.giveTask(creep, task);
 					return;
@@ -208,8 +208,8 @@ let Tasks = {
 
             if (creep.memory.role == "burrower") {
                 task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                        (t) => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+                        t => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+                        t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
                 if (task != null) {
                     Tasks.giveTask(creep, task);
                     return;                
@@ -217,9 +217,9 @@ let Tasks = {
             }
             else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
                 task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                        (t) => { return ((t.subtype == "pickup" && t.resource == "energy") || (t.type == "energy" && t.structure != "link")) 
+                        t => { return ((t.subtype == "pickup" && t.resource == "energy") || (t.type == "energy" && t.structure != "link")) 
 							&& (t.creeps == null || t.creeps > 0); }), 
-                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                        t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority"));
                 if (task != null) {
                     Tasks.giveTask(creep, task);
@@ -228,8 +228,8 @@ let Tasks = {
 
                 if (creep.getActiveBodyparts("work") > 0) {
                     task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                        (t) => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                        (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+                        t => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+                        t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
                     if (task != null) {
 						Tasks.giveTask(creep, task);
                         return;
@@ -238,7 +238,7 @@ let Tasks = {
                 
                 if (creep.memory.task == null) {
                     // If there is no energy to get... deliver or wait.
-                    if (_.sum(creep.carry) > creep.carryCapacity * 0.8) {
+                    if (_.sum(creep.carry) > creep.carryCapacity * 0.85) {
                         creep.memory.state = "delivering";
                         return;
                     } else {
@@ -255,8 +255,8 @@ let Tasks = {
             }
 
             task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+                    t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority"));
             if (task != null) {
 				Tasks.giveTask(creep, task);
@@ -276,8 +276,8 @@ let Tasks = {
             } 
 
 			task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-				(t) => { return t.subtype == "pickup" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
-				(t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+				t => { return t.subtype == "pickup" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
+				t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 					"priority"));
 			if (task != null) {
 				Tasks.giveTask(creep, task);
@@ -285,8 +285,8 @@ let Tasks = {
 			}
 			
             task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                (t) => { return t.type == "mine" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
-                (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+                t => { return t.type == "mine" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
+                t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
 				Tasks.giveTask(creep, task);
                 return;
@@ -300,8 +300,8 @@ let Tasks = {
             }
 
             task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
-                    (t) => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
-                    (t) => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+				t => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
+				t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
 				Tasks.giveTask(creep, task);
                 return;

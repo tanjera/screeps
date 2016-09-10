@@ -98,6 +98,12 @@ let Hive = {
 					break;
 				}
 					
+				case "log-resources": {
+					let _Logs = require("util.logs");
+					_Logs.Resources();
+					break;
+				}
+				
 				case "log-storage": {
 					let _Logs = require("util.logs");
 					_Logs.Storage();
