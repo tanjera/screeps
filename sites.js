@@ -23,6 +23,11 @@ module.exports = {
 	Occupation: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
 		let Occupation = require("sites.occupation");
 		Occupation.Run(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute);
+	},
+	
+	Invasion: function(rmColony, rmInvading, spawnDistance, listArmy, listTargets, posRally, listRoute) {
+		let Invasion = require("sites.invasion");
+		Invasion.Run(rmColony, rmInvading, spawnDistance, listArmy, listTargets, posRally, listRoute);
 	}
     
 };

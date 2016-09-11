@@ -5,6 +5,13 @@ let _CPU = require("util.cpu");
 module.exports.loop = function () {
 
     /* To do:
+	
+		- Pop adjust
+			- All RCL 8 with GH2O boosting for worker/upgrader
+	
+		* Sites.Invasion()
+			- Test machine state logic (memory-based)
+			- Test filtering (let creeps = _.filter(Game.creeps, ...))
 			
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
