@@ -281,11 +281,12 @@ module.exports = {
             case 6:
 				return null;
 			
-            case 7:
+            case 7:				
             case 8:
-                return [ // ?? energy, 20x MOVE, 20x ATTACK, 5x HEAL
+                return [ // 4100 energy, 25x MOVE, 20x ATTACK, 5x HEAL
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
 						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+						MOVE, MOVE, MOVE, MOVE, MOVE, 
 						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, 
 						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, 
 						HEAL, HEAL, HEAL, HEAL, HEAL];

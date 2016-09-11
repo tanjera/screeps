@@ -18,6 +18,7 @@ module.exports = {
 		let Hive = require("hive");
 		
 		let lPaladin = _.filter(Game.creeps, c => c.memory.role == "paladin" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 200));
+		let lHealer = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 100));		
 		let lBurrower = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lCarrier = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lMiner = _.filter(Game.creeps, c => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
@@ -27,13 +28,14 @@ module.exports = {
 
         let popTarget =
               (listPopulation["paladin"] == null ? 0 : listPopulation["paladin"]["amount"])
+			+ (listPopulation["healer"] == null ? 0 : listPopulation["healer"]["amount"])
 			+ (listPopulation["burrower"] == null ? 0 : listPopulation["burrower"]["amount"])
             + (listPopulation["carrier"] == null ? 0 : listPopulation["carrier"]["amount"])
             + (listPopulation["miner"] == null ? 0 : listPopulation["miner"]["amount"])
             + (listPopulation["multirole"] == null ? 0 : listPopulation["multirole"]["amount"])
             + (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"])
             + (listPopulation["extractor"] == null ? 0 : listPopulation["extractor"]["amount"]);
-        let popActual = lPaladin.length + lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
+        let popActual = lPaladin.length + lHealer.length + lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["paladin"] != null && lPaladin.length < listPopulation["paladin"]["amount"]) {
@@ -46,6 +48,10 @@ module.exports = {
                         {filter: (c) => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length) {
                 Hive.requestSpawn(rmColony, 0, 0, 8, "soldier", null, {role: "soldier", room: rmHarvest, colony: rmColony});
             }
+        }
+		else if (listPopulation["healer"] != null && lHealer.length < listPopulation["healer"]["amount"]) {
+            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["healer"]["level"], "healer", 
+                null, {role: "healer", room: rmHarvest, colony: rmColony});
         }
         else if (listPopulation["miner"] != null && lMiner.length < listPopulation["miner"]["amount"]) {
             if (lMiner.length == 0) { // Possibly colony wiped? Need restart?
@@ -73,7 +79,8 @@ module.exports = {
             }
         }
         else if (listPopulation["multirole"] != null && lMultirole.length < listPopulation["multirole"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation["multirole"]["level"], "multirole", 
+            Hive.requestSpawn(rmColony, spawnDistance, 2, listPopulation["multirole"]["level"], 
+				hasKeepers == false ? "multirole" : "worker", 
                 null, {role: "multirole", room: rmHarvest, colony: rmColony});
         }
         else if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"] 
@@ -115,10 +122,14 @@ module.exports = {
 							Roles.Reserver(creep);
 						} else if (creep.memory.role == "extractor") {
 							Roles.Extracter(creep);
-						} 
+						} else if (creep.memory.role == "healer") {
+							Roles.Healer(creep);
+						}
 					} else {
 						if (creep.memory.role == "soldier" || creep.memory.role == "multirole") {
 							Roles.Soldier(creep);
+						} else if (creep.memory.role == "healer") {
+							Roles.Healer(creep);
 						}
 					}
 				} else if (hasKeepers == true) {
@@ -130,6 +141,8 @@ module.exports = {
 						Roles.Extracter(creep, true);
 					} else if (creep.memory.role == "soldier" || creep.memory.role == "paladin") {
 						Roles.Soldier(creep, false);
+					} else if (creep.memory.role == "healer") {
+							Roles.Healer(creep);
 					}
 				}
             }

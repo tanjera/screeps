@@ -5,10 +5,7 @@ let _CPU = require("util.cpu");
 module.exports.loop = function () {
 
     /* To do:
-	
-		* Pop adjusts
-			W19S42: @ RCL 8, 1x upgrader lvl 7, 1x repairer lvl 5	
-	
+			
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
 			
@@ -67,9 +64,8 @@ module.exports.loop = function () {
 			
     /* Colony #2, W19S42 */
     Sites.Colony("W19S42", 2,
-            { worker:   {level: 6, amount: 1},
-              repairer: {level: 6, amount: 1},
-              upgrader: {level: 6, amount: 1} },
+            { worker:   {level: 7, amount: 1},
+              repairer: {level: 5, amount: 1} },
             [ {id: "57a23067cf975f59293d8a28", role: "send"},
               {id: "57a23201113c59e97f7e364e", role: "receive"},
               {id: "57a6a9d62d673fac4f21a62a", role: "receive"}]);    
@@ -126,7 +122,7 @@ module.exports.loop = function () {
     Sites.Colony("W15S43", 2,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 5, amount: 1},
-              upgrader: {level: 7, amount: 1} } );      
+              upgrader: {level: 7, amount: 3} } );      
     Sites.Mining("W15S43", "W15S43", 2, false,
             { burrower:  {level: 4, amount: 1},
               carrier:   {level: 5, amount: 2}, 
@@ -246,12 +242,13 @@ module.exports.loop = function () {
     /* Remote mining operations for Colony #4, W15S43 */
     Sites.Mining("W15S43", "W15S45", 0, false,
             { burrower:  {level: 5, amount: 4},
-              carrier:   {level: 5, amount: 12, body: "all-terrain"},
+              carrier:   {level: 5, amount: 10},
               multirole: {level: 5, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", 0, true,
 			{ paladin: 	 {level: 8, amount: 1},
+			  healer:	 {level: 4, amount: 1},
 			  burrower:	 {level: 5, amount: 2},
-			  carrier:   {level: 5, amount: 8, body: "all-terrain"},
+			  carrier:   {level: 5, amount: 8},
               multirole: {level: 5, amount: 1} } );
 	
 		

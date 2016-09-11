@@ -254,19 +254,29 @@ module.exports = {
 	},
 
     Healer: function(creep) {
-        if (creep.memory.room != null && creep.room.name != creep.memory.room) {
+		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             _Creep.moveToRoom(creep, creep.memory.room);
         }
-        else {
-            let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: 
-				c => { return c.hits < c.hitsMax; }});
-            
-            if (wounded != null && creep.heal(wounded) == ERR_NOT_IN_RANGE) {                
-                creep.rangedHeal(wounded);
-                creep.moveTo(wounded);
+        else {			
+			let hostile = _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
+				c => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}));
+			
+			if (hostile == null) {
+				let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: 
+					c => { return c.hits < c.hitsMax; }});
+				
+				if (wounded != null && creep.heal(wounded) == ERR_NOT_IN_RANGE) {                
+					creep.rangedHeal(wounded);
+					creep.moveTo(wounded);
+					return;
+				} else if (creep.hits < creep.hitsMax) {
+					creep.heal(creep)
+				}
+			} else if (hostile != null) {
+				let _Creep = require("util.creep");
+				creep.heal(creep);
+				_Creep.moveFrom(creep, hostile);				
 				return;
-            } else if (creep.hits < creep.hitsMax) {
-				creep.heal(creep)
 			}
         } 
 	},
