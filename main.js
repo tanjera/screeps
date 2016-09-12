@@ -5,10 +5,6 @@ let _CPU = require("util.cpu");
 module.exports.loop = function () {
 
     /* To do:
-	
-		- Pop adjust
-			- All RCL 8 with GH2O boosting for worker/upgrader
-	
 		* Sites.Invasion()
 			- Test machine state logic (memory-based)
 			- Test filtering (let creeps = _.filter(Game.creeps, ...))
@@ -48,7 +44,8 @@ module.exports.loop = function () {
               carrier:   {level: 7, amount: 2} } );
 	Sites.Industry("W18S43", 2,
             { courier:   {level: 5, amount: 1} },            
-            [ { action: "reaction", amount: 5000,
+            [ { action: "boost", mineral: "GH2O", lab: "57cab60bd4b9cf800582649b", role: "worker", subrole: null },
+			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "G", lab: "57bc412f58d9edd776d1a39e"}, 
 				supply1: {mineral: "UL", lab: "57ca9ba307e97e58106a3eeb"}, 
 				supply2: {mineral: "ZK", lab: "57a0539e25bdfd7a71d9a527"} },
@@ -82,7 +79,7 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 1} } );
 	Sites.Industry("W19S42", 2,
             { courier:   {level: 5, amount: 1} },
-			[ { action: "boost", mineral: "GH2O", lab: "57a45a183e04cec61d7e0a37", role: "worker", subrole: "upgrader" },
+			[ { action: "boost", mineral: "GH2O", lab: "57a45a183e04cec61d7e0a37", role: "worker", subrole: null },
 			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "ZK", lab: "57c5fe753e0f0b8a4bea3b20"}, 
 				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
@@ -98,9 +95,8 @@ module.exports.loop = function () {
 
     /* Colony #3, W15S41 */
     Sites.Colony("W15S41", 2,
-            { worker:   {level: 6, amount: 1},
-              repairer: {level: 5, amount: 1},
-              upgrader: {level: 5, amount: 1} },
+            { worker:   {level: 7, amount: 1},
+              repairer: {level: 5, amount: 1} },
             [ {id: "57abd1d35c977d2d5fec0d0f", role: "send"},
               {id: "57bcc544ee84657d138c5866", role: "send"},            
               {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
@@ -111,7 +107,7 @@ module.exports.loop = function () {
               extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W15S41", 2,
             { courier:   {level: 5, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57b2800ff68d846c1323e3d6", role: "worker", subrole: "upgrader" },
+            [ { action: "boost", mineral: "GH2O", lab: "57b2800ff68d846c1323e3d6", role: "worker", subrole: null },
 			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "GH", lab: "57b27619ad1bf23613f2e881"}, 
 				supply1: {mineral: "G", lab: "57c5a6b34d14be183f0a2d3a"}, 
@@ -183,7 +179,7 @@ module.exports.loop = function () {
     Sites.Colony("W11S44", 1,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 5, amount: 1},
-              upgrader: {level: 5, amount: 1} },
+              upgrader: {level: 5, amount: 3} },
 		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
 			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
               {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
@@ -192,7 +188,8 @@ module.exports.loop = function () {
               carrier:   {level: 5, amount: 2},
 			  extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W11S44", 1,
-            { courier:   {level: 5, amount: 1} });
+            { courier:   {level: 5, amount: 1} },
+			[ { action: "boost", mineral: "GH2O", lab: "57cdbb01297293a13858f822", role: "worker", subrole: "upgrader" } ] );
 			  
 	/* Colony #7, W11S45 */
     Sites.Colony("W11S45", 1,

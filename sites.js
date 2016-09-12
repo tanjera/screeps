@@ -25,9 +25,9 @@ module.exports = {
 		Occupation.Run(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute);
 	},
 	
-	Invasion: function(rmColony, rmInvading, spawnDistance, listArmy, listTargets, posRally, listRoute) {
+	Invasion: function(rmColony, rmInvade, spawnDistance, listArmy, listTargets, posRally, listRoute) {
 		let Invasion = require("sites.invasion");
-		Invasion.Run(rmColony, rmInvading, spawnDistance, listArmy, listTargets, posRally, listRoute);
+		Invasion.Run(rmColony, rmInvade, spawnDistance, listArmy, listTargets, posRally, listRoute);
 	}
     
 };
