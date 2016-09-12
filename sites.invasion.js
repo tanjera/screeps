@@ -17,36 +17,36 @@ module.exports = {
 	
 	
 	runPopulation: function(rmColony, rmInvade, spawnDistance, listArmy) {
-		let state = Memory["rooms"][rmColony][`${rmInvade}`];
-		state = "spawning";
-		
-        let lSoldier  = _.filter(Game.creeps, c => c.memory.role == "soldier" && c.memory.room == rmInvade && c.memory.colony == rmColony);
-		let lArcher  = _.filter(Game.creeps, c => c.memory.role == "archer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
-		let lHealer  = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
+		if (Memory["rooms"][rmColony][`invasion_${rmInvade}`] == null)
+			Memory["rooms"][rmColony][`invasion_${rmInvade}`] = { state: "spawning" };
+		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];		
         
-        /* Sites.Invasion() is meant to be used temporarily, transiently. 
-		 * It will consume energy, spawn time, and probably lots of CPU...
-		*/
-
-        if (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["soldier"]["level"], "soldier", 
-                null, {role: "soldier", room: rmInvade, colony: rmColony});            
-        } else if (listPopulation["archer"] != null && lArcher.length < listPopulation["archer"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["archer"]["level"], "archer", 
-                null, {role: "archer", room: rmInvade, colony: rmColony});            
-        } else if (listPopulation["healer"] != null && lHealer.length < listPopulation["healer"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["healer"]["level"], "healer", 
-                null, {role: "healer", room: rmInvade, colony: rmColony});            
-        } else {
-			state = "rallying";
+		if (memory.state == "spawning") {
+			let lSoldier  = _.filter(Game.creeps, c => c.memory.role == "soldier" && c.memory.room == rmInvade && c.memory.colony == rmColony);
+			let lArcher  = _.filter(Game.creeps, c => c.memory.role == "archer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
+			let lHealer  = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
+			
+			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {
+				Hive.requestSpawn(rmColony, spawnDistance, 1, listArmy["soldier"]["level"], "soldier", 
+					null, {role: "soldier", room: rmInvade, colony: rmColony});            
+			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {
+				Hive.requestSpawn(rmColony, spawnDistance, 1, listArmy["archer"]["level"], "archer", 
+					null, {role: "archer", room: rmInvade, colony: rmColony});            
+			} else if (listArmy["healer"] != null && lHealer.length < listArmy["healer"]["amount"]) {
+				Hive.requestSpawn(rmColony, spawnDistance, 1, listArmy["healer"]["level"], "healer", 
+					null, {role: "healer", room: rmInvade, colony: rmColony});            
+			} else if (memory.state == "spawning") {
+				memory.state = "rallying";
+			}
 		}
 	},
 	
 	runCreeps: function(rmColony, rmInvade, listTargets, posRally, listRoute) {
-		let state = Memory["rooms"][rmColony][`${rmInvade}`];
+		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];
 		let creeps = _.filter(Game.creeps, c => c.memory.room == rmInvade && c.memory.colony == rmColony);
+		let rallyRange = 3;
 		
-		switch (state) {
+		switch (memory.state) {
 			default:
 				break;
 				
@@ -58,27 +58,33 @@ module.exports = {
 					creep.memory.listRoute = listRoute;
 					
 					if (creep.room.name != posRally.roomName)
-						_Creep.moveToRoom(creep, posRally.roomName);
-					else if (creep.room.name == posRally.roomName && !posRally.inRangeTo(creep.pos, 5))
+						_Creep.moveToRoom(creep, posRally.roomName, true);
+					else if (creep.room.name == posRally.roomName && !posRally.inRangeTo(creep.pos, rallyRange))
 						creep.moveTo(posRally);
 				}
 				
-				state = (_.filter(creeps, c => creep.room.name == posRally.roomName && posRally.inRangeTo(creep.pos, 5)).length == creeps.length)
-					? "attacking" : state;
-			
+				if (Game.time % 5 == 0) {
+					memory.state = (_.filter(creeps, 
+						c => c.room.name == posRally.roomName && posRally.inRangeTo(c.pos, rallyRange)).length == creeps.length)
+						? "attacking" : memory.state;
+				}			
 				break;			
 			
 			case "attacking":
 				for (var c in creeps) {
 					let creep = creeps[c];
 					if (creep.memory.role == "soldier") {
-						Roles.Soldier(creep, listTargets);
+						Roles.Soldier(creep, true, listTargets);
 					} else if (creep.memory.role == "archer") {
-						Roles.Archer(creep, listTargets);
+						Roles.Archer(creep, true, listTargets);
 					} else if (creep.memory.role == "healer") {
 						Roles.Healer(creep);
 					}
 				}
+				
+				if (creeps.length == 0)
+					memory.state = "complete";
+				
 				break;
 		}		
 	}

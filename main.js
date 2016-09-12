@@ -31,6 +31,17 @@ module.exports.loop = function () {
 	Hive.processRequests();
 	
 
+	/*
+	Sites.Invasion("W15S43", "W13S45", 2, 
+	    { soldier:   {level: 7, amount: 5},
+	      archer:    {level: 7, amount: 2},
+	      healer:    {level: 7, amount: 3} },
+	    [ "57c9165283debd8a0673f956",
+	      "57c7ff53cfab4fcb74b265f0" ],
+	      new RoomPosition(32, 27, "W14S45"),
+	      ["W14S44", "W15S44", "W14S43", "W15S43", "W15S44", "W15S45", "W14S45", "W13S45"] );
+	*/
+	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
             { worker:   {level: 7, amount: 1},

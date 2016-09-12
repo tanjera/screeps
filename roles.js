@@ -199,8 +199,9 @@ module.exports = {
 			
 			for (let t in listTargets) {
 				target = Game.getObjectById(listTargets[t]);
-				if (target != null && creep.attack(target) == ERR_NOT_IN_RANGE) {
-					creep.moveTo(target);
+				if (target != null) {
+					if (creep.attack(target) == ERR_NOT_IN_RANGE)
+						creep.moveTo(target);
 					creep.heal(creep);				
 					return;					
 				}
@@ -235,15 +236,16 @@ module.exports = {
         } 
 	},
 
-    Archer: function(creep, listTargets) {
+    Archer: function(creep, destroyStructures, listTargets) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
 			for (let t in listTargets) {
 				let target = Game.getObjectById(listTargets[t]);				
-				if (target != null && creep.rangedAttack(target) == ERR_NOT_IN_RANGE) {
-					creep.moveTo(target);
+				if (target != null) {
+					if (creep.rangedAttack(target) == ERR_NOT_IN_RANGE)
+						creep.moveTo(target);
 					creep.heal(creep);
 					return;
 				}
@@ -278,27 +280,17 @@ module.exports = {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             _Creep.moveToRoom(creep, creep.memory.room);
         }
-        else {			
-			let hostile = _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
-				c => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}));
+        else {
+			let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: 
+				c => { return c.hits < c.hitsMax; }});
 			
-			if (hostile == null) {
-				let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: 
-					c => { return c.hits < c.hitsMax; }});
-				
-				if (wounded != null && creep.heal(wounded) == ERR_NOT_IN_RANGE) {                
-					creep.rangedHeal(wounded);
-					creep.moveTo(wounded);
-					return;
-				} else if (creep.hits < creep.hitsMax) {
-					creep.heal(creep)
-				}
-			} else if (hostile != null) {
-				let _Creep = require("util.creep");
-				creep.heal(creep);
-				_Creep.moveFrom(creep, hostile);				
+			if (wounded != null && creep.heal(wounded) == ERR_NOT_IN_RANGE) {                
+				creep.rangedHeal(wounded);
+				creep.moveTo(wounded);
 				return;
-			}
+			} else if (creep.hits < creep.hitsMax) {
+				creep.heal(creep)
+			}			 
         } 
 	},
 };
