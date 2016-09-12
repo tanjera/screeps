@@ -190,15 +190,27 @@ module.exports = {
         } 
 	},
 		
-    Soldier: function(creep, destroyStructures) {
+    Soldier: function(creep, destroyStructures, listTargets) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
             let target;
 			
-			target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                return !Object.keys(Memory["allies"]).includes(c.owner.username); }});            
+			for (let t in listTargets) {
+				target = Game.getObjectById(listTargets[t]);
+				if (target != null && creep.attack(target) == ERR_NOT_IN_RANGE) {
+					creep.moveTo(target);
+					creep.heal(creep);				
+					return;					
+				}
+			}
+			
+			if (target == null) {
+				target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: (c) => { 
+					return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
+			}
+			
             if (target != null) {
                 if (creep.attack(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
@@ -223,11 +235,20 @@ module.exports = {
         } 
 	},
 
-    Archer: function(creep) {
+    Archer: function(creep, listTargets) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             _Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
+			for (let t in listTargets) {
+				let target = Game.getObjectById(listTargets[t]);				
+				if (target != null && creep.rangedAttack(target) == ERR_NOT_IN_RANGE) {
+					creep.moveTo(target);
+					creep.heal(creep);
+					return;
+				}
+			}
+			
             let allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
                     return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
             let nearTargets = creep.pos.findInRange(allTargets, 3);
