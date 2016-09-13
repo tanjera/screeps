@@ -5,10 +5,6 @@ let _CPU = require("util.cpu");
 module.exports.loop = function () {
 
     /* To do:
-		* Sites.Invasion()
-			- Test machine state logic (memory-based)
-			- Test filtering (let creeps = _.filter(Game.creeps, ...))
-			
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
 			
@@ -29,23 +25,28 @@ module.exports.loop = function () {
     Hive.initMemory();
     Hive.initTasks();
 	Hive.processRequests();
-	
 
-	/*
-	Sites.Invasion("W15S43", "W13S45", 2, 
-	    { soldier:   {level: 7, amount: 5},
-	      archer:    {level: 7, amount: 2},
-	      healer:    {level: 7, amount: 3} },
-	    [ "57c9165283debd8a0673f956",
-	      "57c7ff53cfab4fcb74b265f0" ],
-	      new RoomPosition(32, 27, "W14S45"),
-	      ["W14S44", "W15S44", "W14S43", "W15S43", "W15S44", "W15S45", "W14S45", "W13S45"] );
-	*/
+	/* Ally list <3 */
+	Memory["allies"] = [
+		"Pantek59", "king_lispi", "Atavus", "BlackLotus",
+		"Moria", "Atlan", "Ashburnie", "seancl" ];
+	
+	
+	/* Temporary fixes... */
+	Sites.Occupation("W13S41", "W12S42", 0, 
+		{ soldier:   {level: 7, amount: 1} },
+		null, ["W13S41", "W13S42", "W12S42"])
+	
+	Sites.Mining("W11S45", "W11S46", 1, false,
+			{ multirole:   {level: 7, amount: 1} } );
+			
+	Sites.Mining("W11S45", "W11S44", 2, false,
+            { carrier:   {level: 7, amount: 1} } );
 	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
-            { worker:   {level: 7, amount: 1},
-              repairer: {level: 5, amount: 1} },
+            { worker:   {level: 8, amount: 1},
+              repairer: {level: 4, amount: 1} },
             [ {id: "57a2465268244ab107a96d5e", role: "send"},
               {id: "57a24a31e620955e29e63e27", role: "send"},
               {id: "57a24f9cacbffcb869dc9d21", role: "receive"},
@@ -79,8 +80,8 @@ module.exports.loop = function () {
 			
     /* Colony #2, W19S42 */
     Sites.Colony("W19S42", 2,
-            { worker:   {level: 7, amount: 1},
-              repairer: {level: 5, amount: 1} },
+            { worker:   {level: 8, amount: 1},
+              repairer: {level: 4, amount: 1} },
             [ {id: "57a23067cf975f59293d8a28", role: "send"},
               {id: "57a23201113c59e97f7e364e", role: "receive"},
               {id: "57a6a9d62d673fac4f21a62a", role: "receive"}]);    
@@ -106,8 +107,8 @@ module.exports.loop = function () {
 
     /* Colony #3, W15S41 */
     Sites.Colony("W15S41", 2,
-            { worker:   {level: 7, amount: 1},
-              repairer: {level: 5, amount: 1} },
+            { worker:   {level: 8, amount: 1},
+              repairer: {level: 4, amount: 1} },
             [ {id: "57abd1d35c977d2d5fec0d0f", role: "send"},
               {id: "57bcc544ee84657d138c5866", role: "send"},            
               {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
@@ -135,7 +136,7 @@ module.exports.loop = function () {
     /* Colony #4, W15S43 */
     Sites.Colony("W15S43", 2,
             { worker:   {level: 5, amount: 1},
-              repairer: {level: 5, amount: 1},
+              repairer: {level: 4, amount: 1},
               upgrader: {level: 7, amount: 3} } );      
     Sites.Mining("W15S43", "W15S43", 2, false,
             { burrower:  {level: 4, amount: 1},
@@ -161,7 +162,7 @@ module.exports.loop = function () {
     Sites.Colony("W13S41", 2,
             { worker:   {level: 5, amount: 1},
               repairer: {level: 4, amount: 1},
-              upgrader: {level: 5, amount: 1} },              
+              upgrader: {level: 7, amount: 2} },              
             [ {id: "57cb35b4fea5b2332f74815a", role: "send"},
 			  {id: "57cb36bd7d58704651710ab0", role: "send"},
               {id: "57c06b8698040e1908490daf", role: "receive"},
@@ -189,8 +190,8 @@ module.exports.loop = function () {
     /* Colony #6, W11S44 */
     Sites.Colony("W11S44", 1,
             { worker:   {level: 5, amount: 1},
-              repairer: {level: 5, amount: 1},
-              upgrader: {level: 5, amount: 3} },
+              repairer: {level: 4, amount: 1},
+              upgrader: {level: 6, amount: 3} },
 		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
 			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
               {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
@@ -205,11 +206,11 @@ module.exports.loop = function () {
 	/* Colony #7, W11S45 */
     Sites.Colony("W11S45", 1,
             { worker:   {level: 5, amount: 2},
-              repairer: {level: 5, amount: 1},
+              repairer: {level: 4, amount: 1},
               upgrader: {level: 5, amount: 2} });
     Sites.Mining("W11S45", "W11S45", 1, false,
-            { burrower:  {level: 5, amount: 1},
-			  carrier:   {level: 5, amount: 2} } );	
+            { burrower:  {level: 5, amount: 2},
+			  carrier:   {level: 5, amount: 3} } );	
 	          
 
     /* Remote mining operations for Colony #1, W18S43 */
@@ -269,23 +270,22 @@ module.exports.loop = function () {
 		
     /* Remote mining operations for Colony #5, W13S41 */
     Sites.Mining("W13S41", "W12S41", 1, false,
-            { burrower:  {level: 4, amount: 1},
-              carrier:   {level: 4, amount: 3},
-              multirole: {level: 4, amount: 1},
-              reserver:  {level: 4, amount: 1} } );	
-	/* Pause for CPU vvvv */
+            { burrower:  {level: 6, amount: 1},
+              carrier:   {level: 6, amount: 3},
+              multirole: {level: 5, amount: 1},
+              reserver:  {level: 5, amount: 1} } );		
 	Sites.Mining("W13S41", "W13S42", 2, false,
-            { burrower:  {level: 4, amount: 1},
-              carrier:   {level: 4, amount: 3},
-              multirole: {level: 4, amount: 1},
-              reserver:  {level: 4, amount: 1} } );		
+            { burrower:  {level: 6, amount: 1},
+              carrier:   {level: 6, amount: 3},
+              multirole: {level: 5, amount: 1},
+              reserver:  {level: 5, amount: 1} } );		
 	
 	/* Remote mining operations for Colony #6, W11S44 */
     Sites.Mining("W11S44", "W12S44", 1, false,
-            { burrower:  {level: 4, amount: 1},
-              carrier:   {level: 4, amount: 3},
-              multirole: {level: 4, amount: 1},
-              reserver:  {level: 4, amount: 1} } );
+            { burrower:  {level: 6, amount: 1},
+              carrier:   {level: 6, amount: 3},
+              multirole: {level: 5, amount: 1},
+              reserver:  {level: 5, amount: 1} } );
     
 
     /* Run end-tick Hive functions */

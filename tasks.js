@@ -14,6 +14,7 @@ let Tasks = {
             priority:   on a scale of 1-10; only competes with tasks of same type
             structure:  link | storage
             resource:   energy | mineral
+			amount:		#
             id:         target gameobject id
             pos:        room position
             timer:      run for x ticks
@@ -121,14 +122,11 @@ let Tasks = {
                         t => { return t.type == "work" && t.subtype == "repair" && (t.creeps == null || t.creeps > 0); }), 
                         t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority"));
-            }
-            else if (creep.memory.subrole == "upgrader") {
+            } else if (creep.memory.subrole == "upgrader") {
                 task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
 						t => { return t.type == "work" && t.subtype == "upgrade" && (t.creeps == null || t.creeps > 0); }), 
 						"priority"));
-            }
-            
-            if (task == null) {
+            } else {
                 task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
                         t => { return t.type == "work" && (t.creeps == null || t.creeps > 0); }), 
                         t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),

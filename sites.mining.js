@@ -42,10 +42,10 @@ module.exports = {
 			Hive.requestSpawn(rmColony, 0, 1, listPopulation["paladin"]["level"], "paladin", 
 				null, {role: "paladin", room: rmHarvest, colony: rmColony});
 		} else if (hasKeepers == false && Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: (c) => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length > 0) {
+                        {filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length > 0) {
             let lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
-                        {filter: (c) => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length) {
+                        {filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length) {
                 Hive.requestSpawn(rmColony, 0, 0, 8, "soldier", null, {role: "soldier", room: rmHarvest, colony: rmColony});
             }
         }
@@ -103,7 +103,7 @@ module.exports = {
 		
 		let isSafe = !Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
 					|| Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => 
-						{ return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length == 0;
+						{ return Memory["allies"].indexOf(c.owner.username) < 0; }}).length == 0;
 		
         for (let n in Game.creeps) {
             let creep = Game.creeps[n];                

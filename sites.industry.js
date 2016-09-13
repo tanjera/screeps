@@ -26,9 +26,9 @@ module.exports = {
 		_CPU.End(rmColony, "Industry-runLabs");
 		
 		if (Hive.isPulse()) {
-			_CPU.Start(rmColony, "Industry-createTasks");
-			this.createTasks(rmColony, listLabs);
-			_CPU.End(rmColony, "Industry-createTasks");
+			_CPU.Start(rmColony, "Industry-createLabTasks");
+			this.createLabTasks(rmColony, listLabs);
+			_CPU.End(rmColony, "Industry-createLabTasks");
 			
 			_CPU.Start(rmColony, "Industry-runTerminal");
 			this.runTerminal(rmColony);
@@ -105,7 +105,7 @@ module.exports = {
         }
 	},
 	
-	createTasks: function(rmColony, listLabs) {
+	createLabTasks: function(rmColony, listLabs) {
 		/* Terminal task priorities:
 		 * 2: emptying labs
 		 * 3: filling labs
@@ -123,10 +123,18 @@ module.exports = {
 					break;
 					
 				case "boost":
+					lab = Game.getObjectById(listing["lab"]);					
+					
+					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
+					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
+						Tasks.addTask(rmColony, {   
+							type: "boost", subtype: "boost", role: listing["role"], subrole: listing["subrole"],
+							resource: listing["mineral"], id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 1 });	
+					}
+					
 					storage = Game.rooms[rmColony].storage;
-					if (storage == null) break;			
-								 
-					lab = Game.getObjectById(listing["lab"]);
+					if (storage == null) break;
+										
 					if (lab.mineralType != null && lab.mineralType != listing["mineral"]) {
 						Tasks.addTask(rmColony, {   
 							type: "industry", subtype: "withdraw", resource: lab.mineralType,
@@ -145,15 +153,7 @@ module.exports = {
 						Tasks.addTask(rmColony, {   
 							type: "industry", subtype: "deposit", resource: listing["mineral"],
 							id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 3 });								
-					}
-					
-					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
-					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
-						Tasks.addTask(rmColony, {   
-							type: "boost", subtype: "boost", role: listing["role"], subrole: listing["subrole"],
-							resource: listing["mineral"], id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 1 });	
-					}						
-					
+					}					
 					break;
 					
 				case "empty":
@@ -322,12 +322,14 @@ module.exports = {
 	},
 	
 	runOrder_Send: function (rmColony, order, storage, terminal, shortage, filling) {
-		// Note: Minimum transfer amount is 100.
+		/* Notes: Minimum transfer amount is 100.
+		 *	 Don't try fulfilling orders with near-shortages- can cause an endless send loop and confuse couriers
+		*/
 		
 		let o = order["name"];
 		let res = order["resource"];
 		
-		if (!Object.keys(shortage).includes(res) || shortage[res] < -100) {			
+		if (!Object.keys(shortage).includes(res) || shortage[res] < -2000) {
 			if (terminal.store[res] != null && ((res != "energy" && terminal.store[res] > 100) || (res == "energy" && terminal.store[res] > 200))) {
 				filling.push(res);
 				filling.push("energy");
@@ -369,15 +371,16 @@ module.exports = {
 							type: "industry", subtype: "deposit", resource: "energy", 
 							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
 					} else if (res != "energy") {
+						shortage["energy"] = (shortage["energy"] == null) ? cost : shortage["energy"] + cost;
 						Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };						
 					}
 				}			
 			} else if (storage != null && storage.store[res] != null) {					
 				filling.push(res);
-				filling.push("energy");
 				
 				Tasks.addTask(rmColony, { 
 					type: "industry", subtype: "withdraw", resource: res, 
+					amount: Object.keys(shortage).includes(res) ? Math.abs(shortage[res] + 100) : null,
 					id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
 				Tasks.addTask(rmColony, { 
 					type: "industry", subtype: "deposit", resource: res, 

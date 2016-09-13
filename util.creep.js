@@ -49,7 +49,7 @@ module.exports = {
 
             case "withdraw": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
-                if (creep.withdraw(obj, creep.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
+                if (creep.withdraw(obj, creep.memory.task["resource"], creep.memory.task["amount"]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
                     return;
                 } else {    // Action takes one tick... task complete... delete task...
@@ -227,29 +227,25 @@ module.exports = {
                         TOUGH, MOVE,   
                         MOVE, ATTACK]; 
             case 2:
-                return [ // 380 energy, 2x TOUGH, 2x ATTACK, 4x MOVE
-                        TOUGH, TOUGH, MOVE, MOVE,
-                        MOVE, ATTACK, MOVE, ATTACK]; 
-            case 3:
-                return [ // 570 energy, 3x TOUGH, 3x ATTACK, 6x MOVE
-                        TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, 
+                return [ // 390 energy, 3x ATTACK, 3x MOVE
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
+            case 3:
+                return [ // 650 energy, 4x ATTACK, 4x MOVE
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
             case 4:
-                return [ // 950 energy, 5x TOUGH, 5x ATTACK, 10x MOVE
-                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, 
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                return [ // 910 energy, 6x ATTACK, 6x MOVE
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+						MOVE, ATTACK];
             case 5:
-                return [ // 1390 energy, 8x TOUGH, 7x ATTACK, 15x MOVE
-                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,  
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                return [ // 1560 energy, 12x ATTACK, 12x MOVE
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
-                        MOVE, ATTACK, MOVE, ATTACK]; 
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+						MOVE, ATTACK, MOVE, ATTACK]; 
             case 6:
-                return [ // 1720 energy, 10x TOUGH, 8x ATTACK, 18x MOVE
-                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                return [ // 1950 energy, 15x ATTACK, 15x MOVE
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK]; 
             case 7:
                 return [ // 3250 energy, 25x MOVE, 25x ATTACK
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, 
@@ -300,10 +296,8 @@ module.exports = {
 				console.log(`Error @ getBody_Archer, ${level} is not a proper number!`);
 				return;
             case 1:
-                return [ // 260 energy, 1x TOUGH, 1x RANGED_ATTACK, 2x MOVE
-                        TOUGH, 
-                        MOVE, MOVE, 
-                        RANGED_ATTACK]; 
+                return [ // 200 energy, 1x RANGED_ATTACK, 1x MOVE
+                        MOVE, RANGED_ATTACK]; 
             case 2:
                 return [ // 460 energy, 1x TOUGH, 2x RANGED_ATTACK, 3x MOVE
                         TOUGH, 
@@ -315,21 +309,16 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, 
                         RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK]; 
             case 4:
-                return [ // 1120 energy, 2x TOUGH, 5x RANGED_ATTACK, 7x MOVE
-                        TOUGH, TOUGH, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
-                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+                return [ // 1000 energy, 5x RANGED_ATTACK, 5x MOVE
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
             case 5:
-                return [ // 1580 energy, 2x TOUGH, 5x RANGED_ATTACK, 7x MOVE
-                        TOUGH, TOUGH, TOUGH,  
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK]; 
+                return [ // 1600 energy, 8x RANGED_ATTACK, 8x MOVE
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
+						MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
             case 6:
-                return [ // 2020 energy, 7x TOUGH, 8x RANGED_ATTACK, 15x MOVE
-                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
-                        MOVE, MOVE, MOVE, MOVE, MOVE,
-                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+                return [ // 2000 energy, 10x RANGED_ATTACK, 10x MOVE
+                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
+						MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
             case 7:
                 return [ // 4000 energy, 20x RANGED_ATTACK, 20x MOVE                                                 
                         MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, 

@@ -53,7 +53,7 @@ module.exports = {
 			case "rallying":
 			case "spawning":
 				let _Creep = require("util.creep");
-                for (var c in creeps) {					
+                for (let c in creeps) {					
 					let creep = creeps[c];
 					creep.memory.listRoute = listRoute;
 					
@@ -71,7 +71,7 @@ module.exports = {
 				break;			
 			
 			case "attacking":
-				for (var c in creeps) {
+				for (let c in creeps) {
 					let creep = creeps[c];
 					if (creep.memory.role == "soldier") {
 						Roles.Soldier(creep, true, listTargets);

@@ -40,7 +40,7 @@ module.exports = {
 
         if ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return !Object.keys(Memory["allies"]).includes(c.owner.username); }}).length)) {            
+                        return Memory["allies"].indexOf(c.owner.username) < 0; }}).length)) {            
             Hive.requestSpawn(rmColony, 0, 0, (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]), "soldier", 
                 null, {role: "soldier", room: rmColony});
         } else if (listPopulation["worker"] != null && lWorker.length < listPopulation["worker"]["amount"]) {
@@ -78,7 +78,7 @@ module.exports = {
 		let towers = Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }});  
 		
 		let hostile = _.head(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) {
-				return !Object.keys(Memory["allies"]).includes(c.owner.username); }}));
+				return Memory["allies"].indexOf(c.owner.username) < 0; }}));
 		if (hostile != null) { // Anyone to attack?
 			for (let t in towers) {
 				towers[t].attack(hostile);
