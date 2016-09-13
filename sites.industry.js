@@ -371,6 +371,7 @@ module.exports = {
 							type: "industry", subtype: "deposit", resource: "energy", 
 							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
 					} else if (res != "energy") {
+						shortage["energy"] = (shortage["energy"] == null) ? cost : shortage["energy"] + cost;
 						Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };						
 					}
 				}			

@@ -224,7 +224,8 @@ module.exports = {
 			
 			if (destroyStructures != null && destroyStructures == true) {
 				target = _.head(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter: 
-					s => { return s.hits != null && (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
+					s => { return s.hits != null && s.hits > 0 
+							&& (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
 					s => { return s.hits; } ));	// Sort by hits to prevent attacking massive ramparts/walls forever
 				if (target != null) {
 					if (creep.attack(target) == ERR_NOT_IN_RANGE) {

@@ -32,15 +32,16 @@ module.exports.loop = function () {
 		"Moria", "Atlan", "Ashburnie", "seancl" ];
 	
 	
+	/* Temporary fixes... */
 	Sites.Occupation("W13S41", "W12S42", 0, 
-		{ soldier:   {level: 7, amount: 2} },
+		{ soldier:   {level: 7, amount: 1} },
 		null, ["W13S41", "W13S42", "W12S42"])
-		
-	Sites.Occupation("W11S45", "W11S46", 1, 
-		{ soldier:   {level: 7, amount: 2} },
-		[	"57827770fe4a6275718bb4be", "5782776a959d29314808dd32", 
-			"5782776757f605ef5dd9d8e0", "578277644fd6ee1239cd4f07", 
-			"578276c3fa4c1f4b48641ff6"]);
+	
+	Sites.Mining("W11S45", "W11S46", 1, false,
+			{ multirole:   {level: 7, amount: 1} } );
+			
+	Sites.Mining("W11S45", "W11S44", 2, false,
+            { carrier:   {level: 7, amount: 1} } );
 	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
