@@ -6,7 +6,7 @@ module.exports = {
     Worker: function(creep, hasKeepers) {
         let hostile = (hasKeepers == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
-				c => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}))
+				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			
 		if (hostile == null) {
@@ -53,7 +53,7 @@ module.exports = {
     Mining: function(creep, hasKeepers) {
 		let hostile = (hasKeepers == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
-				c => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}))
+				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			
 		if (hostile == null) {
@@ -132,7 +132,7 @@ module.exports = {
     Extracter: function(creep, hasKeepers) {
 		let hostile = (hasKeepers == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
-				c => { return !Object.keys(Memory["allies"]).includes(c.owner.username); }}))
+				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			
 		if (hostile == null) {
@@ -209,7 +209,7 @@ module.exports = {
 			
 			if (target == null) {
 				target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-					return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
+					return Memory["allies"].indexOf(c.owner.username) < 0; }});
 			}
 			
             if (target != null) {
@@ -223,9 +223,9 @@ module.exports = {
 			creep.heal(creep);
 			
 			if (destroyStructures != null && destroyStructures == true) {
-				target = _.head(_.sortBy(creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: 
-						s => { return !Object.keys(Memory["allies"]).includes(s.owner.username); }}),
-						s => { return s.hits; } ));	// Sort by hits to prevent attacking massive ramparts/walls
+				target = _.head(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter: 
+					s => { return s.hits != null && (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
+					s => { return s.hits; } ));	// Sort by hits to prevent attacking massive ramparts/walls forever
 				if (target != null) {
 					if (creep.attack(target) == ERR_NOT_IN_RANGE) {
 						creep.moveTo(target);					
@@ -252,7 +252,7 @@ module.exports = {
 			}
 			
             let allTargets = creep.room.find(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-                    return !Object.keys(Memory["allies"]).includes(c.owner.username); }});
+                    return Memory["allies"].indexOf(c.owner.username) < 0; }});
             let nearTargets = creep.pos.findInRange(allTargets, 3);
             
             if (nearTargets.length == 0) {

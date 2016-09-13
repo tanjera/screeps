@@ -20,9 +20,9 @@ module.exports = {
 		Reservation.Run(rmColony, rmHarvest, spawnDistance, listPopulation, listRoute)
 	},
     
-	Occupation: function(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute) {
+	Occupation: function(rmColony, rmOccupy, spawnDistance, listPopulation, listTargets, listRoute) {
 		let Occupation = require("sites.occupation");
-		Occupation.Run(rmColony, rmOccupy, spawnDistance, listPopulation, listRoute);
+		Occupation.Run(rmColony, rmOccupy, spawnDistance, listPopulation, listTargets, listRoute);
 	},
 	
 	Invasion: function(rmColony, rmInvade, spawnDistance, listArmy, listTargets, posRally, listRoute) {

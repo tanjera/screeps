@@ -52,12 +52,6 @@ let Hive = {
 			Memory["rooms"][r]["population_balance"] = null;
 			
         }
-
-        Memory["allies"] =  {   Pantek59: "",
-								Atavus: "",
-								BlackLotus: "",
-								Moria: "",
-								shedletsky: "" };        		
 		
 		Memory["spawn_requests"] = new Array();
 		
