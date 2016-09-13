@@ -26,15 +26,15 @@ module.exports = {
 			let lArcher  = _.filter(Game.creeps, c => c.memory.role == "archer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
 			let lHealer  = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
 			
-			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {
-				Hive.requestSpawn(rmColony, spawnDistance, 1, listArmy["soldier"]["level"], "soldier", 
-					null, {role: "soldier", room: rmInvade, colony: rmColony});            
-			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {
-				Hive.requestSpawn(rmColony, spawnDistance, 1, listArmy["archer"]["level"], "archer", 
-					null, {role: "archer", room: rmInvade, colony: rmColony});            
+			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {				
+				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listPopulation["soldier"]["level"], 
+					body: "soldier", name: null, args: {role: "soldier", room: rmInvade, colony: rmColony} });
+			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {				
+				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listPopulation["archer"]["level"], 
+					body: "archer", name: null, args: {role: "archer", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["healer"] != null && lHealer.length < listArmy["healer"]["amount"]) {
-				Hive.requestSpawn(rmColony, spawnDistance, 1, listArmy["healer"]["level"], "healer", 
-					null, {role: "healer", room: rmInvade, colony: rmColony});            
+				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listPopulation["healer"]["level"], 
+					body: "healer", name: null, args: {role: "healer", room: rmInvade, colony: rmColony} });
 			} else if (memory.state == "spawning") {
 				memory.state = "rallying";
 			}

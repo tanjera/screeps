@@ -11,9 +11,9 @@ module.exports = {
         let popActual = lReserver.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
-        if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["reserver"]["level"], "reserver", 
-                null, {role: "reserver", room: rmHarvest, colony: rmColony});
+        if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["reserver"]["level"], 
+				body: "reserver", name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
         }
 
         for (let n in Game.creeps) {

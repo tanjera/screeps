@@ -5,6 +5,9 @@ let _CPU = require("util.cpu");
 module.exports.loop = function () {
 
     /* To do:
+		* To add:
+			- W15S41 send link
+	
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
 			
@@ -32,20 +35,9 @@ module.exports.loop = function () {
 		"Moria", "Atlan", "Ashburnie", "seancl" ];
 	
 	
-	/* Temporary fixes... */
-	Sites.Occupation("W13S41", "W12S42", 0, 
-		{ soldier:   {level: 7, amount: 1} },
-		null, ["W13S41", "W13S42", "W12S42"])
-	
-	Sites.Mining("W11S45", "W11S46", 1, false,
-			{ multirole:   {level: 7, amount: 1} } );
-			
-	Sites.Mining("W11S45", "W11S44", 2, false,
-            { carrier:   {level: 7, amount: 1} } );
-	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
-            { worker:   {level: 8, amount: 1},
+            { worker:   {level: 8, amount: 3},
               repairer: {level: 4, amount: 1} },
             [ {id: "57a2465268244ab107a96d5e", role: "send"},
               {id: "57a24a31e620955e29e63e27", role: "send"},
@@ -55,8 +47,9 @@ module.exports.loop = function () {
             { burrower:  {level: 7, amount: 1},
               carrier:   {level: 7, amount: 2} } );
 	Sites.Industry("W18S43", 2,
-            { courier:   {level: 5, amount: 1} },            
-            [ { action: "boost", mineral: "GH2O", lab: "57cab60bd4b9cf800582649b", role: "worker", subrole: null },
+            { courier:   {level: 5, amount: 1} });
+			/*
+			[ { action: "boost", mineral: "GH2O", lab: "57cab60bd4b9cf800582649b", role: "worker", subrole: null },
 			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "G", lab: "57bc412f58d9edd776d1a39e"}, 
 				supply1: {mineral: "UL", lab: "57ca9ba307e97e58106a3eeb"}, 
@@ -77,10 +70,11 @@ module.exports.loop = function () {
 				reactor: {mineral: "GH2O", lab: "57caf9bcbf1f329f2edfb424"}, 
 				supply1: {mineral: "GH", lab: "57ca814fc399a295425001a0"}, 
 				supply2: {mineral: "OH", lab: "57cae6e2ea11208817fa6f10"} } ]);
+			*/
 			
     /* Colony #2, W19S42 */
     Sites.Colony("W19S42", 2,
-            { worker:   {level: 8, amount: 1},
+            { worker:   {level: 8, amount: 3},
               repairer: {level: 4, amount: 1} },
             [ {id: "57a23067cf975f59293d8a28", role: "send"},
               {id: "57a23201113c59e97f7e364e", role: "receive"},
@@ -90,7 +84,8 @@ module.exports.loop = function () {
               carrier:   {level: 6, amount: 2},              
               extractor: {level: 6, amount: 1} } );
 	Sites.Industry("W19S42", 2,
-            { courier:   {level: 5, amount: 1} },
+            { courier:   {level: 5, amount: 1} });			
+			/*
 			[ { action: "boost", mineral: "GH2O", lab: "57a45a183e04cec61d7e0a37", role: "worker", subrole: null },
 			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "ZK", lab: "57c5fe753e0f0b8a4bea3b20"}, 
@@ -104,21 +99,21 @@ module.exports.loop = function () {
 				reactor: {mineral: "ZK", lab: "57c6113e4f347e0c484670a3"}, 
 				supply1: {mineral: "Z", lab: "57c5cac2cad5928e7395fd20"}, 
 				supply2: {mineral: "K", lab: "57a4917b14b34a194adc9721"} } ]);
+			*/
 
     /* Colony #3, W15S41 */
     Sites.Colony("W15S41", 2,
-            { worker:   {level: 8, amount: 1},
+            { worker:   {level: 8, amount: 3},
               repairer: {level: 4, amount: 1} },
-            [ {id: "57abd1d35c977d2d5fec0d0f", role: "send"},
-              {id: "57bcc544ee84657d138c5866", role: "send"},            
-              {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
+            [ {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
               {id: "57af99d528986c413c0a8f4c", role: "receive"} ] );
     Sites.Mining("W15S41", "W15S41", 2, false,
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 2},              
               extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W15S41", 2,
-            { courier:   {level: 5, amount: 1} },
+            { courier:   {level: 5, amount: 1} });
+			/*
             [ { action: "boost", mineral: "GH2O", lab: "57b2800ff68d846c1323e3d6", role: "worker", subrole: null },
 			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "GH", lab: "57b27619ad1bf23613f2e881"}, 
@@ -132,10 +127,11 @@ module.exports.loop = function () {
 				reactor: {mineral: "GH", lab: "57c5f390539ef49836106e44"}, 
 				supply1: {mineral: "G", lab: "57c5a6b34d14be183f0a2d3a"}, 
 				supply2: {mineral: "H", lab: "57c5b9b779a498330e74eb2d"} } ]);
+			*/
 				
     /* Colony #4, W15S43 */
     Sites.Colony("W15S43", 2,
-            { worker:   {level: 5, amount: 1},
+            { worker:   {level: 7, amount: 1},
               repairer: {level: 4, amount: 1},
               upgrader: {level: 7, amount: 3} } );      
     Sites.Mining("W15S43", "W15S43", 2, false,
@@ -143,7 +139,8 @@ module.exports.loop = function () {
               carrier:   {level: 5, amount: 2}, 
 			  extractor: {level: 6, amount: 1} } );
 	Sites.Industry("W15S43", 2,
-            { courier:   {level: 4, amount: 1} },
+            { courier:   {level: 4, amount: 1} });
+			/*
             [ { action: "boost", mineral: "GH2O", lab: "57c8ef2b1d3d4c8e3969d068", role: "worker", subrole: "upgrader" },
 			  { action: "reaction", amount: 5000,
 				reactor: {mineral: "OH", lab: "57be56f1e02d93c93cf460c7"}, 
@@ -157,6 +154,7 @@ module.exports.loop = function () {
 				reactor: {mineral: "OH", lab: "57c4a633e06148377d95b97d"}, 
 				supply1: {mineral: "O", lab: "57c8cb46e9b21a95363affa3"}, 
 				supply2: {mineral: "H", lab: "57c8dc805e86b05c1d5892e3"} } ] );
+			*/
 			  
     /* Colony #5, W13S41 */
     Sites.Colony("W13S41", 2,
@@ -172,8 +170,9 @@ module.exports.loop = function () {
               carrier:   {level: 4, amount: 3},
 			  extractor: {level: 6, amount: 2} } );
   	Sites.Industry("W13S41", 2,
-            { courier:   {level: 5, amount: 1} },
-            [ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" },
+            { courier:   {level: 5, amount: 1} });
+			/*
+			[ { action: "boost", mineral: "GH2O", lab: "57c3ef8850ba39ec2725c182", role: "worker", subrole: "upgrader" },
               { action: "reaction", amount: 5000,
 				reactor: {mineral: "UL", lab: "57c5ab258a3658822748cc62"}, 
 				supply1: {mineral: "U", lab: "57c5bdceb44f52600e9b2116"}, 
@@ -186,6 +185,7 @@ module.exports.loop = function () {
 				reactor: {mineral: "UL", lab: "57cb1fd496dc10bb3b50728c"}, 
 				supply1: {mineral: "U", lab: "57c5bdceb44f52600e9b2116"}, 
 				supply2: {mineral: "L", lab: "57cb34e3d80e43e128862a09"} } ]);
+			*/
               
     /* Colony #6, W11S44 */
     Sites.Colony("W11S44", 1,
@@ -207,7 +207,9 @@ module.exports.loop = function () {
     Sites.Colony("W11S45", 1,
             { worker:   {level: 5, amount: 2},
               repairer: {level: 4, amount: 1},
-              upgrader: {level: 5, amount: 2} });
+              upgrader: {level: 5, amount: 2} },			  
+			[ {id: "57d61ddf2ff0d3ea25976f78", role: "send"},
+              {id: "57d65b3a157ae32c0ec94734", role: "receive"} ]);
     Sites.Mining("W11S45", "W11S45", 1, false,
             { burrower:  {level: 5, amount: 2},
 			  carrier:   {level: 5, amount: 3} } );	
@@ -261,7 +263,7 @@ module.exports.loop = function () {
               carrier:   {level: 5, amount: 10},
               multirole: {level: 5, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", 0, true,
-			{ paladin: 	 {level: 8, amount: 1},
+			{ paladin: 	 {level: 8, amount: 1, scale_level: false},
 			  healer:	 {level: 4, amount: 1},
 			  burrower:	 {level: 5, amount: 2},
 			  carrier:   {level: 5, amount: 8},
@@ -287,6 +289,12 @@ module.exports.loop = function () {
               multirole: {level: 5, amount: 1},
               reserver:  {level: 5, amount: 1} } );
     
+	/* Remote mining operations for Colony #7, W11S45 */
+    Sites.Mining("W11S45", "W11S46", 1, false,
+            { burrower:  {level: 6, amount: 1},
+              carrier:   {level: 6, amount: 3},
+              multirole: {level: 5, amount: 1},
+              reserver:  {level: 5, amount: 1} } );
 
     /* Run end-tick Hive functions */
     Hive.processSpawnRequests();

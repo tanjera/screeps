@@ -49,9 +49,9 @@ module.exports = {
         let popActual = lCourier.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
-        if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation["courier"]["level"], "courier", 
-                null, {role: "courier", room: rmColony});            
+        if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 4, level: listPopulation["courier"]["level"], 
+				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
 	},
 	

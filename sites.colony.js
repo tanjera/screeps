@@ -40,18 +40,19 @@ module.exports = {
 
         if ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
-                        return Memory["allies"].indexOf(c.owner.username) < 0; }}).length)) {            
-            Hive.requestSpawn(rmColony, 0, 0, (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]), "soldier", 
-                null, {role: "soldier", room: rmColony});
-        } else if (listPopulation["worker"] != null && lWorker.length < listPopulation["worker"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 3, listPopulation["worker"]["level"], "worker", 
-                null, {role: "worker", room: rmColony});
-        } else if (listPopulation["repairer"] != null && lRepairer.length < listPopulation["repairer"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation["repairer"]["level"], "worker", 
-                null, {role: "worker", subrole: "repairer", room: rmColony});
-        } else if (listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 4, listPopulation["upgrader"]["level"], "worker", 
-                null, {role: "worker", subrole: "upgrader", room: rmColony});
+                        return Memory["allies"].indexOf(c.owner.username) < 0; }}).length)) {                        
+			Memory["spawn_requests"].push({ room: rmColony, distance: 0, priority: 0, 
+				level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]), 
+				body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
+        } else if (listPopulation["worker"] != null && lWorker.length < listPopulation["worker"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 3, level: listPopulation["worker"]["level"], 
+				body: "worker", name: null, args: {role: "worker", room: rmColony} });
+        } else if (listPopulation["repairer"] != null && lRepairer.length < listPopulation["repairer"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 4, level: listPopulation["repairer"]["level"], 
+				body: "worker", name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
+        } else if (listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 4, level: listPopulation["upgrader"]["level"], 
+				body: "worker", name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
         }
 	},
 	

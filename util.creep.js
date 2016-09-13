@@ -49,7 +49,9 @@ module.exports = {
 
             case "withdraw": {
                 let obj = Game.getObjectById(creep.memory.task["id"]);
-                if (creep.withdraw(obj, creep.memory.task["resource"], creep.memory.task["amount"]) == ERR_NOT_IN_RANGE) {
+                if (creep.withdraw(obj, creep.memory.task["resource"], 
+						(creep.memory.task["amount"] > creep.carryCapacity - _.sum(creep.carry) ? null : creep.memory.task["amount"])) 
+						== ERR_NOT_IN_RANGE) {
                     creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
                     return;
                 } else {    // Action takes one tick... task complete... delete task...

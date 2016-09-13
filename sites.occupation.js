@@ -28,15 +28,15 @@ module.exports = {
         let popActual = lSoldier.length + lArcher.length + lHealer.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
-        if (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["soldier"]["level"], "soldier", 
-                null, {role: "soldier", room: rmOccupy, colony: rmColony});            
-        } else if (listPopulation["archer"] != null && lArcher.length < listPopulation["archer"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["archer"]["level"], "archer", 
-                null, {role: "archer", room: rmOccupy, colony: rmColony});            
+        if (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["soldier"]["level"], 
+				body: "soldier", name: null, args: {role: "soldier", room: rmOccupy, colony: rmColony} });
+        } else if (listPopulation["archer"] != null && lArcher.length < listPopulation["archer"]["amount"]) {            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["archer"]["level"], 
+				body: "archer", name: null, args: {role: "archer", room: rmOccupy, colony: rmColony} });
         } else if (listPopulation["healer"] != null && lHealer.length < listPopulation["healer"]["amount"]) {
-            Hive.requestSpawn(rmColony, spawnDistance, 1, listPopulation["healer"]["level"], "healer", 
-                null, {role: "healer", room: rmOccupy, colony: rmColony});            
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["healer"]["level"], 
+				body: "healer", name: null, args: {role: "healer", room: rmOccupy, colony: rmColony} });            
         }
 	},
 	

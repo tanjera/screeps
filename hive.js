@@ -125,9 +125,8 @@ let Hive = {
         }
     },
 
-
-    requestSpawn: function(rmName, spawnDistance, lvlPriority, tgtLevel, cBody, cName, cArgs) {
-        /*  lvlPriority is an integer rating priority, e.g.:
+    processSpawnRequests: function() {
+		/*  lvlPriority is an integer rating priority, e.g.:
                 0: Defense (active, imminent danger)
                 1: Mining operations (critical)
                 2: Mining operations (regular)
@@ -138,14 +137,7 @@ let Hive = {
             tgtLevel is the target level of the creep"s body (per util.creep)
             spawnDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
 		*/
-        
-        Memory["spawn_requests"].push({
-			room: rmName, distance: spawnDistance, priority: lvlPriority, 
-			level: tgtLevel, body: cBody, name: cName, args: cArgs });
-	},
-
-
-    processSpawnRequests: function() {
+		
 		_CPU.Start("Hive", "processSpawnRequests");
 		
         let listRequests = Object.keys(Memory["spawn_requests"]).sort((a, b) => { 
@@ -164,9 +156,9 @@ let Hive = {
 							Memory["rooms"][request.room]["population_balance"]["actual"] / Memory["rooms"][request.room]["population_balance"]["target"];
 						
 						let _Colony = require("util.colony");
-                        let level = Math.max(1, Math.min(
-								Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
-								_Colony.getRoom_Level(spawn.room)));
+                        let level = (request.scale_level != null && request.scale_level == false) ? request.level
+								: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
+									_Colony.getRoom_Level(spawn.room)));
 						let body = _Creep.getBody(request.body, level);
                         let result = spawn.createCreep(body, request.name, request.args);
 						
