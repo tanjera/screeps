@@ -198,7 +198,53 @@ let Hive = {
         }
 		
 		_CPU.End("Hive", "processSpawnRenewing");
-    }
+    },
+	
+	sellExcessResources: function(overflow) {
+		if (!Hive.isPulse())
+			return;
+		
+		let resources = new Object();		
+				
+		for (let res in overflow) {			
+			for (let r in Game.rooms) {
+				let room = Game.rooms[r];
+				
+				if (room.storage != null) {				
+					if (room.storage.store[res] != null && room.storage.store[res] > 0) {
+						if (resources[res] == null) 
+							resources[res] = {};					
+						
+						resources[res][r] = room.storage.store[res];
+					}
+				}
+				
+				if (room.terminal != null) {
+					if (room.terminal.store[res] != null && room.terminal.store[res] > 0) {
+						if (resources[res] == null) 
+							resources[res] = {};
+						
+						if (resources[res][r] == null)
+							resources[res][r] = room.terminal.store[res];
+						else
+							resources[res][r] += room.terminal.store[res];
+					}
+				}
+			}
+		}
+				
+		for (let res in resources) {
+			let excess = _.sum(resources[res]) - overflow[res]["limit"];
+			if (excess > 0) {
+				let room = _.head(_.sortBy(Object.keys(resources[res]), r => { return -resources[res][r]; }));
+				let id = _.head(_.sortBy(Game.market.getAllOrders(
+					o => { return o.type == "buy" && o.resourceType == res && o.price == overflow[res]["price"]; }),
+					o => { return Game.map.getRoomLinearDistance(o.roomName, room); })).id;
+								
+				_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: id, amount: excess, from: room, priority: 4 });
+			}			
+		}
+	}
 };
 
 module.exports = Hive;

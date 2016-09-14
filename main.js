@@ -4,9 +4,13 @@ let _CPU = require("util.cpu");
 
 module.exports.loop = function () {
 
-    /* To do:
+    /* TO DO:
 		* To add:
 			- W15S41 send link
+			
+		* Stockpile overflow auto-sell
+			- Imp sellOverflow()
+			- Test
 	
 		* Overload Game.room?
 			- room.resource(resource) return terminal + storage if has resource?
@@ -20,7 +24,7 @@ module.exports.loop = function () {
     */      
 
 
-	/* Prepare memory profiler */
+	/* Prepare CPU profiler */
 	_CPU.Init();
 	
     /* Prepare memory for this tick */
@@ -29,11 +33,26 @@ module.exports.loop = function () {
     Hive.initTasks();
 	Hive.processRequests();
 
+	
+	/* MISCELLANEOUS DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+	
 	/* Ally list <3 */
 	Memory["allies"] = [
 		"Pantek59", "king_lispi", "Atavus", "BlackLotus",
 		"Moria", "Atlan", "Ashburnie", "seancl" ];
-	
+		
+	/* Auto-sell excess stockpile */	
+	Hive.sellExcessResources({
+		O: { limit: 175000, price: 0.5 },
+		H: { limit: 175000, price: 0.5 },
+		U: { limit: 100000, price: 1.0 },
+		L: { limit: 100000, price: 1.0 },
+		Z: { limit: 100000, price: 1.0 },
+		K: { limit: 100000, price: 1.0 } });
+		
+	/* COLONY DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
@@ -213,8 +232,11 @@ module.exports.loop = function () {
     Sites.Mining("W11S45", "W11S45", 1, false,
             { burrower:  {level: 5, amount: 2},
 			  carrier:   {level: 5, amount: 3} } );	
-	          
-
+	        
+			
+	/* REMOTE MINING DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+			  
     /* Remote mining operations for Colony #1, W18S43 */
     Sites.Mining("W18S43", "W17S43", 2, false,
             { burrower:  {level: 7, amount: 1},

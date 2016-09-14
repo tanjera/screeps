@@ -10,10 +10,10 @@ module.exports = {
 
 		/* Terminal order format (from: is optional!)
 		 * For internal transfers: 
-				Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: ""};
+				Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: "", priority: 1};
 		 * For market trading: 
-				Memory["terminal_orders"][""] = { market_id: "", amount: , from: ""};
-				Memory["terminal_orders"][""] = { market_id: "", amount: , to: ""};
+				Memory["terminal_orders"][""] = { market_id: "", amount: , from: "", priority: 4};
+				Memory["terminal_orders"][""] = { market_id: "", amount: , to: "", priority: 4};
 		*/
 		 
 	
@@ -243,7 +243,7 @@ module.exports = {
 					shortage[res] -= storage.store[res];
 				
 				if (shortage[res] > 0) {					
-					Memory["terminal_orders"][`${rmColony}-${res}`] = { room: rmColony, resource: res, amount: shortage[res] };
+					Memory["terminal_orders"][`${rmColony}-${res}`] = { room: rmColony, resource: res, amount: shortage[res], priority: 2 };
 				}
 			}
 			
@@ -254,9 +254,21 @@ module.exports = {
 	},
 	
 	runTerminal_Orders: function (rmColony, storage, terminal, shortage, filling) {
-		for (let o in Memory["terminal_orders"]) {
-			let order = Memory["terminal_orders"][o];
-			order["name"] = o;
+		/* Priority list for terminal orders:
+		 * 	1: console injected...
+		 * 	2: filling a shortage (internal transfers)
+		 * 	3: filling energy for an internal transfer
+		 *	4: filling a market order
+		 *	5: filling energy for a market order
+		*/
+		
+		for (let o in Memory["terminal_orders"])
+			Memory["terminal_orders"][o]["name"] = o;
+	
+		let orders = _.sortBy(Memory["terminal_orders"], "priority");
+		
+		for (let n in orders) {
+			let order = orders[n];
 			
 			if (order["active"] != null && order["active"] == false)
 				continue;
@@ -371,8 +383,9 @@ module.exports = {
 							type: "industry", subtype: "deposit", resource: "energy", 
 							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
 					} else if (res != "energy") {
-						shortage["energy"] = (shortage["energy"] == null) ? cost : shortage["energy"] + cost;
-						Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };						
+						shortage["energy"] = (shortage["energy"] == null) ? cost : shortage["energy"] + cost;						
+						Memory["terminal_orders"][`${rmColony}-energy`] = 
+							{ room: rmColony, resource: "energy", amount: cost, priority: order["market_id"] == null ? 3 : 5 };
 					}
 				}			
 			} else if (storage != null && storage.store[res] != null) {					
@@ -393,12 +406,12 @@ module.exports = {
 	
 	runOrder_Receive: function (rmColony, order, storage, terminal, filling) {				
 	/* Notes: Minimum transfer amount is 100
-	 * And always buy in small amounts! ~500-1000
+	 * And always buy in small amounts! ~500-2000
 	 */
 	 
 		let o = order["name"];
 		let res = order["resource"];
-		let amount = 500;
+		let amount = Math.max(100, Math.min(Memory["terminal_orders"][o]["amount"], 2000));
 		let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 	 
 		if (terminal.store["energy"] != null && terminal.store["energy"] > cost) {
@@ -431,6 +444,8 @@ module.exports = {
 				Tasks.addTask(rmColony, { 
 					type: "industry", subtype: "deposit", resource: "energy", 
 					id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
+			} else if (res != "energy") {				
+				Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost };
 			}
 		}
 		
