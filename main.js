@@ -4,26 +4,6 @@ let _CPU = require("util.cpu");
 
 module.exports.loop = function () {
 
-    /* TO DO:
-		* To add:
-			- W15S41 send link
-			
-		* Stockpile overflow auto-sell
-			- Imp sellOverflow()
-			- Test
-	
-		* Overload Game.room?
-			- room.resource(resource) return terminal + storage if has resource?
-			
-		- CPU Profiler
-			- room_cycles always equals cycles in Math.max(room_cycles, cycles)
-			
-        * Tasks
-            - add dismantle tasks
-            - utilCreep: add resource types to all tasks? e.g. "withdraw"			
-    */      
-
-
 	/* Prepare CPU profiler */
 	_CPU.Init();
 	
