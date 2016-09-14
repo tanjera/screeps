@@ -2,6 +2,9 @@
 * To add:
 	- W15S41 send link
 	
+* TEST:
+	moveExcessEnergy!!!!!
+	
 * Overload Game.room?
 	- room.resource(resource) return terminal + storage if has resource?
 	

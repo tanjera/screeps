@@ -210,16 +210,16 @@ let Hive = {
 			for (let r in Game.rooms) {
 				let room = Game.rooms[r];
 				
-				if (room.storage != null) {				
-					if (room.storage.store[res] != null && room.storage.store[res] > 0) {
-						if (resources[res] == null) 
-							resources[res] = {};					
-						
-						resources[res][r] = room.storage.store[res];
-					}
-				}
+				if (room.terminal != null && room.terminal.my) {	// Only count rooms with my terminals... 
+					if (room.storage != null) {				
+						if (room.storage.store[res] != null && room.storage.store[res] > 0) {
+							if (resources[res] == null) 
+								resources[res] = {};					
+							
+							resources[res][r] = room.storage.store[res];
+						}
+					}				
 				
-				if (room.terminal != null) {
 					if (room.terminal.store[res] != null && room.terminal.store[res] > 0) {
 						if (resources[res] == null) 
 							resources[res] = {};
@@ -240,9 +240,43 @@ let Hive = {
 				let id = _.head(_.sortBy(Game.market.getAllOrders(
 					o => { return o.type == "buy" && o.resourceType == res && o.price == overflow[res]["price"]; }),
 					o => { return Game.map.getRoomLinearDistance(o.roomName, room); })).id;
-								
-				_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: id, amount: excess, from: room, priority: 4 });
+				
+				if (id != null)
+					_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: id, amount: excess, from: room, priority: 4 });				
 			}			
+		}
+	},
+	
+	moveExcessEnergy: function(limit) {
+		if (!Hive.isPulse())
+			return;
+		
+		let energy = new Object();		
+					
+		for (let r in Game.rooms) {
+			let room = Game.rooms[r];
+			
+			if (room.terminal != null && room.terminal.my) {
+				if (room.storage != null && room.storage.store["energy"] != null) {
+					energy[r] = room.storage.store["energy"];				
+				}
+				
+				if (room.terminal.store["energy"] != null && room.terminal.store["energy"] > 0) {					
+					if (energy[r] == null)
+						energy[r] = room.terminal.store["energy"];
+					else
+						energy[r] += room.terminal.store["energy"];			
+				}
+			}
+		}
+	
+		for (let r in energy) {
+			if (energy[r] > limit) {
+				room = _.head(_.filter(energy, n => { return n < limit; } ));
+				if (room != null)
+					console.log(`_.set(Memory, ["terminal_orders", overflow_energy_${r}], { room: ${room}, resource: "energy", amount: ${energy[r] - limit}, from: ${r}, priority: 2 });`);
+					//_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: room, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
+			}
 		}
 	}
 };
