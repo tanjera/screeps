@@ -1,7 +1,3 @@
-
-* To add:
-	- W15S41 send link
-	
 * TEST:
 	moveExcessEnergy!!!!!
 	

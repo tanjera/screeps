@@ -27,13 +27,13 @@ module.exports = {
 			let lHealer  = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
 			
 			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {				
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listPopulation["soldier"]["level"], 
+				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["soldier"]["level"], 
 					body: "soldier", name: null, args: {role: "soldier", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {				
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listPopulation["archer"]["level"], 
+				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["archer"]["level"], 
 					body: "archer", name: null, args: {role: "archer", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["healer"] != null && lHealer.length < listArmy["healer"]["amount"]) {
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listPopulation["healer"]["level"], 
+				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["healer"]["level"], 
 					body: "healer", name: null, args: {role: "healer", room: rmInvade, colony: rmColony} });
 			} else if (memory.state == "spawning") {
 				memory.state = "rallying";
