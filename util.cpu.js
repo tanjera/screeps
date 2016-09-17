@@ -1,6 +1,17 @@
 module.exports = {
-
 	Init: function() {
+		profiler = new Object();
+		profiler.run = function(cycles) {
+			Memory["profiler"]["cycles"] = (cycles == null) ? 1 : cycles;
+			Memory["profiler"]["status"] = "on";
+			return "<font color=\"#D3FFA3\">[CPU]</font> Profiler started"
+		};
+		
+		profiler.stop = function() {
+			Memory["profiler"]["cycles"] = 0;
+			return "<font color=\"#D3FFA3\">[CPU]</font> Profiler stopped"
+		};
+		
 		if (Memory["profiler"] == null) 
 			Memory["profiler"] = new Object();
 		
@@ -18,7 +29,7 @@ module.exports = {
 		if (Memory["profiler"]["current"] == null)
 			Memory["profiler"]["current"] = new Object();
 	},
-
+	
 	Start: function(room, name) {
 		if (Memory["profiler"]["status"] != "on")
 			return;

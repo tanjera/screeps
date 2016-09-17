@@ -57,6 +57,9 @@ let Hive = {
 		
 		if (Memory["request"] == null) Memory["request"] = {};		
 		if (Memory["options"] == null) Memory["options"] = { console: "on" };
+		
+		let _Console = require("util.console");
+		_Console.Init();
     },    
 
     initTasks: function() {		
@@ -72,49 +75,7 @@ let Hive = {
 			_CPU.End("Hive", "initTasks");
         }		
     },
-	
-	processRequests: function() {
-		// To be used for injecting tasks or terminal order requests
-		if (Memory["request"] != "") {
-			switch (Memory["request"]) {
-				
-				default:
-					console.log("Invalid request.")
-					break;	
-
-				case "reset-stockpiles": {					
-					Memory["terminal_orders"] = new Object();
-					for (var r in Memory["rooms"]) {
-						Memory["rooms"][r]["stockpile"] = new Object();
-					}
-					
-					console.log("All Memory.rooms.[r].stockpile reset!");
-					break;
-				}
-					
-				case "log-resources": {
-					let _Logs = require("util.logs");
-					_Logs.Resources();
-					break;
-				}
-				
-				case "log-storage": {
-					let _Logs = require("util.logs");
-					_Logs.Storage();
-					break;
-				}
-				
-				case "log-stockpile": {
-					let _Logs = require("util.logs");
-					_Logs.Stockpile();
-					break;
-				}
-			}
-		}
 		
-		Memory["request"] = "";
-	},	
-	
     populationTally: function(rmName, popTarget, popActual) {
         // Tallies the target population for a colony, to be used for spawn load balancing
         if (Memory["rooms"][rmName]["population_balance"] == null) {
@@ -272,10 +233,11 @@ let Hive = {
 	
 		for (let r in energy) {
 			if (energy[r] > limit) {
-				room = _.head(_.filter(energy, n => { return n < limit; } ));
-				if (room != null)
-					console.log(`_.set(Memory, ["terminal_orders", overflow_energy_${r}], { room: ${room}, resource: "energy", amount: ${energy[r] - limit}, from: ${r}, priority: 2 });`);
-					//_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: room, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
+				room = _.head(_.sortBy(_.filter(Object.keys(energy), 
+					n => { return energy[n] < limit; } ),
+					n => { return energy[n]; }));
+				if (room != null)					
+					_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: room, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
 			}
 		}
 	}
