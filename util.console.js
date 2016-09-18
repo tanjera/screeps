@@ -1,5 +1,8 @@
 module.exports = {
 	Init: function() {
+		let command_list = new Array();
+		
+		command_list.push("log_resources()");
 		log_resources = function() {
 			let resources = new Object();
 			let resource_list = [ 
@@ -48,6 +51,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		}
 		
+		command_list.push("log_storage()");
 		log_storage = function() {		
 			console.log(`<font color=\"#D3FFA3">log-storage</font>`);
 			
@@ -82,16 +86,40 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		}
 		
+		command_list.push("log_can_build()");
+		log_can_build = function() {
+			let rooms = _.filter(Game.rooms, n => { return n.controller != null && n.controller.my; });
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Buildable structures:");
+			for (let r in rooms) {
+				room = rooms[r];
+				
+				let output = `${room.name}: `;				
+				for (let s in CONTROLLER_STRUCTURES) {
+					if (s == "road" || s == "constructedWall" || s == "rampart")
+						continue;
+					
+					let amount = CONTROLLER_STRUCTURES[s][room.controller.level] 
+						- room.find(FIND_STRUCTURES, { filter: t => { return t.structureType == s; }}).length;
+					output += amount < 1 ? "" : `${amount} x ${s};  `;
+				}
+				console.log(output);				
+			}
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		}
+		
+		command_list.push("");
+		command_list.push("stockpile(rmName, resource, amount)");
 		stockpile = function (rmName, resource, amount) {
 			if (amount < 1) {
-				delete Memory.rooms.rmName.stockpile.resource;
-				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms.${rmName}.stockpile.${resource} deleted`;
+				delete Memory.rooms[rmName].stockpile[resource];
+				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms[${rmName}].stockpile[${resource}] deleted`;
 			} else {
-				Memory.rooms.rmName.stockpile.resource = amount;
-				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms.${rmName}.stockpile.${resource} = amount`;
+				Memory.rooms[rmName].stockpile[resource] = amount;
+				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms[${rmName}].stockpile[${resource}] = ${amount}`;
 			}
 		}
 		
+		command_list.push("log_stockpile()");
 		log_stockpile = function() {
 			console.log(`<font color=\"#D3FFA3">log-stockpile</font>`);
 			
@@ -110,6 +138,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		}
 		
+		command_list.push("reset_stockpiles()");
 		reset_stockpiles = function() {
 			Memory["terminal_orders"] = new Object();
 			for (var r in Memory["rooms"]) {
@@ -117,6 +146,11 @@ module.exports = {
 			}
 			
 			return "<font color=\"#D3FFA3\">[Console]</font> All Memory.rooms.[r].stockpile reset!";					
-		}		
+		}
+
+		commands = function() {
+			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Command list complete";
+		}
 	}
 };
