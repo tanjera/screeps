@@ -23,8 +23,8 @@ module.exports.loop = function () {
 		
 	/* Auto-sell excess stockpile */	
 	Hive.sellExcessResources({
-		O: { limit: 225000, price: 0.5 },
-		H: { limit: 225000, price: 0.5 },
+		O: { limit: 250000, price: 0.5 },
+		H: { limit: 250000, price: 0.5 },
 		U: { limit: 150000, price: 1.0 },
 		L: { limit: 150000, price: 1.0 },
 		Z: { limit: 150000, price: 1.0 },
@@ -238,16 +238,6 @@ module.exports.loop = function () {
               carrier:   {level: 7, amount: 3},
               multirole: {level: 6, amount: 1},
               reserver:  {level: 6, amount: 1} } );
-    Sites.Mining("W18S43", "W19S43", 2, false,
-            { burrower:  {level: 5, amount: 1},
-              carrier:   {level: 5, amount: 2},
-              multirole: {level: 5, amount: 1},
-              reserver:  {level: 5, amount: 1} } );
-    Sites.Mining("W18S43", "W17S42", 2, false,
-            { burrower:  {level: 5, amount: 1},
-              carrier:   {level: 5, amount: 2},
-              multirole: {level: 5, amount: 1},
-              reserver:  {level: 5, amount: 1} } );
     
     /* Remote mining operations for Colony #2, W19S42 */
     Sites.Mining("W19S42", "W18S42", 2, false,
@@ -276,14 +266,14 @@ module.exports.loop = function () {
     
     /* Remote mining operations for Colony #4, W15S43 */
     Sites.Mining("W15S43", "W15S45", 0, false,
-            { burrower:  {level: 5, amount: 4},
-              carrier:   {level: 5, amount: 10},
+            { burrower:  {level: 5, amount: 3},
+              carrier:   {level: 5, amount: 9},
               multirole: {level: 5, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", 0, true,
 			{ paladin: 	 {level: 8, amount: 1, scale_level: false},
 			  healer:	 {level: 4, amount: 1},
-			  burrower:	 {level: 5, amount: 2},
-			  carrier:   {level: 5, amount: 8},
+			  burrower:	 {level: 5, amount: 3},
+			  carrier:   {level: 5, amount: 9},
               multirole: {level: 5, amount: 1} } );
 	
 		

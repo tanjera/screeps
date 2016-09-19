@@ -121,7 +121,13 @@ let Hive = {
 								: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
 									_Colony.getRoom_Level(spawn.room)));
 						let body = _Creep.getBody(request.body, level);
-                        let result = spawn.createCreep(body, request.name, request.args);
+						let name = request.name != null ? request.name 
+							: request.args["role"].substring(0, 4)
+								+ (request.args["subrole"] == null ? "" : `-${request.args["subrole"].substring(0, 2)}`)
+								+ ":xxxx".replace(/[xy]/g, (c) => {
+										let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
+										return v.toString(16); });
+                        let result = spawn.createCreep(body, name, request.args);
 						
                         if (_.isString(result)) {
 							if (Memory["options"]["console"] == "on")

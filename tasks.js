@@ -1,4 +1,4 @@
-let Tasks = {
+module.exports = {
 
     randomName: function() {
         return index = "xxxxxx-xxxxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -57,7 +57,7 @@ let Tasks = {
 			let task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
 				t => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; }));
 			if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
 				return;
 			}
 		}
@@ -69,21 +69,21 @@ let Tasks = {
 
             case "multirole":
             case "worker": 
-                Tasks.assignTask_Work(creep, isRefueling);
+                this.assignTask_Work(creep, isRefueling);
                 return;
 
             case "courier":
-                Tasks.assignTask_Industry(creep, isRefueling);
+                this.assignTask_Industry(creep, isRefueling);
                 return;
 
             case "miner":
             case "burrower":
             case "carrier":
-                Tasks.assignTask_Mine(creep, isRefueling);
+                this.assignTask_Mine(creep, isRefueling);
                 return;
 				
             case "extractor":
-                Tasks.assignTask_Extract(creep, isRefueling);
+                this.assignTask_Extract(creep, isRefueling);
                 return;
         }
 	},
@@ -92,12 +92,11 @@ let Tasks = {
         let task;
 
         if (isRefueling) {            
-            task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+            task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
                     t => { return t.type == "energy" && (t.creeps == null || t.creeps > 0); }), 
-                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }), 
-                    "priority"));
+                    t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
                 return;
             }
                         
@@ -105,7 +104,7 @@ let Tasks = {
                     t => { return t.subtype == "pickup" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
                     t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
                 return;
             }
 
@@ -113,7 +112,7 @@ let Tasks = {
                     t => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
                     t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
                 return;
             }        
         } else {
@@ -134,10 +133,10 @@ let Tasks = {
             }
 
             if (task != null) {
-                Tasks.giveTask(creep, task);        
+                this.giveTask(creep, task);        
                 return;
             } else {
-				Tasks.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
                 return;
 			}
         }
@@ -152,10 +151,10 @@ let Tasks = {
                     t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority"));
             if (task != null) {
-                    Tasks.giveTask(creep, task);
+                    this.giveTask(creep, task);
                 return;
             } else {    // If no tasks, then wait                
-                Tasks.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+                this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
                 return;
             }
         } else {
@@ -166,7 +165,7 @@ let Tasks = {
                     t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority"));
             if (task != null) {
-                    Tasks.giveTask(creep, task);
+                    this.giveTask(creep, task);
                 return;
             }
 
@@ -176,7 +175,7 @@ let Tasks = {
 						t => { return t.type == "carry" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 				if (task != null) {
-                    Tasks.giveTask(creep, task);
+                    this.giveTask(creep, task);
 					return;
 				}
 			} else if (Object.keys(creep.carry).length > 0) {
@@ -184,11 +183,11 @@ let Tasks = {
 						t => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 				if (task != null) {
-                    Tasks.giveTask(creep, task);
+                    this.giveTask(creep, task);
 					return;
 				}
             } else {
-                Tasks.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+                this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
                 return;
             }
         }
@@ -209,7 +208,7 @@ let Tasks = {
                         t => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
                         t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
                 if (task != null) {
-                    Tasks.giveTask(creep, task);
+                    this.giveTask(creep, task);
                     return;                
                 }
             }
@@ -220,7 +219,7 @@ let Tasks = {
                         t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                         "priority"));
                 if (task != null) {
-                    Tasks.giveTask(creep, task);
+                    this.giveTask(creep, task);
                     return;
                 }
 
@@ -229,7 +228,7 @@ let Tasks = {
                         t => { return t.type == "mine" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }), 
                         t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
                     if (task != null) {
-						Tasks.giveTask(creep, task);
+						this.giveTask(creep, task);
                         return;
                     }
                 }
@@ -240,7 +239,7 @@ let Tasks = {
                         creep.memory.state = "delivering";
                         return;
                     } else {
-                        Tasks.giveTask(creep, {type: "wait", subtype: "wait", timer: 5});
+                        this.giveTask(creep, {type: "wait", subtype: "wait", timer: 5});
                         return;
                     }
                 }
@@ -257,7 +256,7 @@ let Tasks = {
                     t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
                     "priority"));
             if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
                 return;
             }
         }
@@ -278,7 +277,7 @@ let Tasks = {
 				t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 					"priority"));
 			if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
 				return;
 			}
 			
@@ -286,7 +285,7 @@ let Tasks = {
                 t => { return t.type == "mine" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
                 t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
             if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
                 return;
             }            
 
@@ -297,11 +296,12 @@ let Tasks = {
                 return;
             }
 
-            task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
+            task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"], 
 				t => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }), 
-				t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
+				t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+				"priority"));
             if (task != null) {
-				Tasks.giveTask(creep, task);
+				this.giveTask(creep, task);
                 return;
             }
         }
@@ -315,7 +315,7 @@ let Tasks = {
         /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
         if (room.controller != null && room.controller.level > 0) {
             if (room.controller.ticksToDowngrade < 3500) {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                     {   type: "work",
                         subtype: "upgrade",
                         id: room.controller.id,
@@ -325,7 +325,7 @@ let Tasks = {
                         priority: 1
                     });
             } else {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                     {   type: "work",
                         subtype: "upgrade",
                         id: room.controller.id,
@@ -339,7 +339,7 @@ let Tasks = {
         
         structures = __Colony.findByNeed_RepairCritical(room);
         for (let i in structures) {
-            Tasks.addTask(rmName, 
+            this.addTask(rmName, 
                 {   type: "work",
                     subtype: "repair",
                     id: structures[i].id,
@@ -352,7 +352,7 @@ let Tasks = {
         
         structures = __Colony.findByNeed_RepairMaintenance(room);
         for (let i in structures) {
-            Tasks.addTask(rmName, 
+            this.addTask(rmName, 
                 {   type: "work",
                     subtype: "repair",
                     id: structures[i].id,
@@ -365,7 +365,7 @@ let Tasks = {
         
         structures = room.find(FIND_CONSTRUCTION_SITES);
         for (let i in structures) {
-            Tasks.addTask(rmName, 
+            this.addTask(rmName, 
                 {   type: "work",
                     subtype: "build",
                     id: structures[i].id,
@@ -379,7 +379,7 @@ let Tasks = {
         /* Carrier-based tasks & energy supply for workers) */
         let piles = room.find(FIND_DROPPED_ENERGY);
         for (let i in piles) {			
-            Tasks.addTask(rmName, 
+            this.addTask(rmName, 
                 {   type: "carry",
                     subtype: "pickup",
                     resource: piles[i].resourceType == "energy" ? "energy" : "mineral",
@@ -391,26 +391,28 @@ let Tasks = {
                 });
         }
 
-        let sources = room.find(FIND_SOURCES, { filter: (s) => { return s.energy > 0; }});
+        let sources = room.find(FIND_SOURCES, { filter: s => { return s.energy > 0; }});
         for (let i in sources) {
-            Tasks.addTask(rmName, 
+			let container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:  
+				s => { return s.structureType == "container"; } }));
+            this.addTask(rmName, 
                 {   type: "mine",
                     subtype: "harvest",
                     resource: "energy",
                     id: sources[i].id,
-                    pos: sources[i].pos,
+                    pos: (container != null ? container.pos : sources[i].pos),
                     timer: 15,
                     creeps: 2,
                     priority: 1
                 });
         }
 
-        let minerals = room.find(FIND_MINERALS, { filter: (m) => { return m.mineralAmount > 0; }});
+        let minerals = room.find(FIND_MINERALS, { filter: m => { return m.mineralAmount > 0; }});
         for (let i in minerals) {
             let look = minerals[i].pos.look();
             for (let l = 0; l < look.length; l++) {
                 if (look[l].structure != null && look[l].structure.structureType == "extractor") {
-                    Tasks.addTask(rmName, 
+                    this.addTask(rmName, 
                         {   type: "mine",
                             subtype: "harvest",
                             resource: "mineral",
@@ -424,12 +426,12 @@ let Tasks = {
             }
         }
 
-        let storages = room.find(FIND_STRUCTURES, { filter: (s) => { 
+        let storages = room.find(FIND_STRUCTURES, { filter: s => { 
             return (s.structureType == STRUCTURE_STORAGE)
                 || (s.structureType == STRUCTURE_CONTAINER); }});
         for (let i in storages) {            
             if (storages[i].store[RESOURCE_ENERGY] > 0) {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                     {   type: "energy",
                         subtype: "withdraw",
                         structure: storages[i].structureType,
@@ -438,11 +440,11 @@ let Tasks = {
                         pos: storages[i].pos,
                         timer: 10,
                         creeps: 10,
-                        priority: 3
+                        priority: (storages[i].structureType == "container" ? 2 : 3)
                     });
             }
             if (_.sum(storages[i].store) < storages[i].storeCapacity) {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                     {   type: "carry",
                         subtype: "deposit",
                         structure: storages[i].structureType,
@@ -451,9 +453,9 @@ let Tasks = {
                         pos: storages[i].pos,
                         timer: 20,
                         creeps: 10,
-                        priority: 9
+                        priority: (storages[i].structureType == "container" ? 9 : 8)
                     });
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                     {   type: "carry",
                         subtype: "deposit",
                         structure: storages[i].structureType,
@@ -462,7 +464,7 @@ let Tasks = {
                         pos: storages[i].pos,
                         timer: 20,
                         creeps: 10,
-                        priority: 9
+                        priority: (storages[i].structureType == "container" ? 9 : 8)
                     });     
             }
         } 
@@ -472,7 +474,7 @@ let Tasks = {
             for (let l in links) {
                 let link = Game.getObjectById(links[l]["id"]);
                 if (links[l]["role"] == "send" && link != null && link.energy < link.energyCapacity * 0.9) {
-                    Tasks.addTask(rmName, 
+                    this.addTask(rmName, 
                     {   type: "carry",
                         subtype: "deposit",
                         structure: "link",
@@ -484,7 +486,7 @@ let Tasks = {
                         priority: 3
                      });
                 } else if (links[l]["role"] == "receive" && link != null && link.energy > 0) {
-                    Tasks.addTask(rmName, 
+                    this.addTask(rmName, 
                     {   type: "energy",
                         subtype: "withdraw",
                         structure: "link",
@@ -499,11 +501,11 @@ let Tasks = {
             }
         }
 
-        let towers = room.find(FIND_MY_STRUCTURES, { filter: (s) => {
+        let towers = room.find(FIND_MY_STRUCTURES, { filter: s => {
             return s.structureType == STRUCTURE_TOWER; }});
         for (let i in towers) {
             if (towers[i].energy < towers[i].energyCapacity * 0.4) {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                 {   type: "carry",
                     subtype: "deposit",                    
                     resource: "energy",
@@ -515,7 +517,7 @@ let Tasks = {
                     priority: 1 
                 });
             } else if (towers[i].energy < towers[i].energyCapacity) {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                 {   type: "carry",
                     subtype: "deposit",
                     resource: "energy",
@@ -529,11 +531,11 @@ let Tasks = {
             }
         }
 
-        structures = room.find(FIND_MY_STRUCTURES, { filter: (s) => {
+        structures = room.find(FIND_MY_STRUCTURES, { filter: s => {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
         for (let i in structures) {
-                Tasks.addTask(rmName, 
+                this.addTask(rmName, 
                 {   type: "carry",
                     subtype: "deposit",
                     resource: "energy",
@@ -565,5 +567,3 @@ let Tasks = {
 		}  
 	}
 }
-
-module.exports = Tasks;
