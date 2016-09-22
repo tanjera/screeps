@@ -440,7 +440,7 @@ module.exports = {
                         pos: storages[i].pos,
                         timer: 10,
                         creeps: Math.ceil(storages[i].store["energy"] / 1000),
-                        priority: 3s
+                        priority: 3
                     });
             }
             if (_.sum(storages[i].store) < storages[i].storeCapacity) {
