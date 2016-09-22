@@ -62,11 +62,11 @@ let Hive = {
 		_Console.Init();
     },    
 
-    initTasks: function() {		
-        let Tasks = require("tasks");
+    initTasks: function() {		        
         if (Hive.isPulse()) {			
 			_CPU.Start("Hive", "initTasks");
 			
+			let Tasks = require("tasks");
             for (let r in Game["rooms"]) {            
                 Memory["rooms"][r]["tasks"] = {};
                 Tasks.compileTasks(r);
@@ -171,6 +171,8 @@ let Hive = {
 		if (!Hive.isPulse())
 			return;
 		
+		_CPU.Start("Hive", "sellExcessResources");
+		
 		let resources = new Object();		
 				
 		for (let res in overflow) {			
@@ -212,11 +214,15 @@ let Hive = {
 					_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: id, amount: excess, from: room, priority: 4 });				
 			}			
 		}
+		
+		_CPU.End("Hive", "sellExcessResources");
 	},
 	
 	moveExcessEnergy: function(limit) {
 		if (!Hive.isPulse())
 			return;
+		
+		_CPU.Start("Hive", "moveExcessEnergy");
 		
 		let energy = new Object();		
 					
@@ -246,7 +252,9 @@ let Hive = {
 					_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: room, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
 			}
 		}
-	}
+		
+		_CPU.End("Hive", "moveExcessEnergy");
+	}	
 };
 
 module.exports = Hive;

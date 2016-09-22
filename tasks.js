@@ -430,7 +430,7 @@ module.exports = {
             return (s.structureType == STRUCTURE_STORAGE)
                 || (s.structureType == STRUCTURE_CONTAINER); }});
         for (let i in storages) {            
-            if (storages[i].store[RESOURCE_ENERGY] > 0) {
+            if (storages[i].store["energy"] > 0) {
                 this.addTask(rmName, 
                     {   type: "energy",
                         subtype: "withdraw",
@@ -439,8 +439,8 @@ module.exports = {
                         id: storages[i].id,
                         pos: storages[i].pos,
                         timer: 10,
-                        creeps: 10,
-                        priority: (storages[i].structureType == "container" ? 2 : 3)
+                        creeps: Math.ceil(storages[i].store["energy"] / 1000),
+                        priority: 3s
                     });
             }
             if (_.sum(storages[i].store) < storages[i].storeCapacity) {

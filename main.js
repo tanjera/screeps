@@ -29,7 +29,7 @@ module.exports.loop = function () {
 		L: { limit: 150000, price: 1.0 },
 		Z: { limit: 150000, price: 1.0 },
 		K: { limit: 150000, price: 1.0 } });
-	Hive.moveExcessEnergy(200000);
+	Hive.moveExcessEnergy(150000);
 		
 	/* COLONY DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -47,7 +47,7 @@ module.exports.loop = function () {
 			  extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W18S43", 2,
             { courier:   {level: 5, amount: 1} },
-			[ { action: "boost", mineral: "XGH2O", lab: "57d9e3f2ee1822544d1a22fb", role: "worker", subrole: null },
+			[ { action: "boost", mineral: "XGH2O", lab: "57d9e3f2ee1822544d1a22fb", role: "worker", subrole: null },				
 			  { action: "reaction", amount: 10000,
 				reactor: {mineral: "G", lab: "57d97c52cfda43d45247083e"}, 
 				supply1: {mineral: "UL", lab: "57da4f4df77673f57f674b8e"}, 
@@ -90,7 +90,7 @@ module.exports.loop = function () {
 
     /* Colony #3, W15S41 */
     Sites.Colony("W15S41", 2,
-            { worker:   {level: 7, amount: 1, scale_level: false},
+            { worker:   {level: 7, amount: 1, scale_level: false },
               repairer: {level: 4, amount: 1} },
             [ {id: "57d8799179f192fc71374cf1", role: "send"},
 			  {id: "57abe33f4a8b4b5a2f1a2b85", role: "receive"},
@@ -129,9 +129,8 @@ module.exports.loop = function () {
 				
     /* Colony #4, W15S43 */
     Sites.Colony("W15S43", 2,
-            { worker:   {level: 7, amount: 1},
-              repairer: {level: 4, amount: 1},
-              upgrader: {level: 7, amount: 2} },
+            { worker:   {level: 7, amount: 1, scale_level: false },
+              repairer: {level: 4, amount: 1} },
             [ {id: "57dc9ffd9754877f17a191c5", role: "send"},
               {id: "57dca2fcf52af188391d0a20", role: "receive"} ]);
     Sites.Mining("W15S43", "W15S43", 2, false,
@@ -140,7 +139,7 @@ module.exports.loop = function () {
 			  extractor: {level: 6, amount: 2} } );
 	Sites.Industry("W15S43", 2,
             { courier:   {level: 4, amount: 1} },			
-            [ { action: "boost", mineral: "XGH2O", lab: "57d904f43638e72938ab1a07", role: "worker", subrole: "upgrader" },
+            [ { action: "boost", mineral: "XGH2O", lab: "57d904f43638e72938ab1a07", role: "worker", subrole: null },
 			  { action: "reaction", amount: 10000,
 				reactor: {mineral: "OH", lab: "57c8cb46e9b21a95363affa3"}, 
 				supply1: {mineral: "O", lab: "57c8dc805e86b05c1d5892e3"}, 
@@ -228,6 +227,14 @@ module.exports.loop = function () {
             { courier:   {level: 5, amount: 1} },
 			[ { action: "boost", mineral: "XGH2O", lab: "57dbee7782321a415409788a", role: "worker", subrole: "upgrader" } ]);
 	        
+	/* Colony #8, W18S41 */
+    Sites.Colony("W18S41", 3,
+            { worker:   {level: 4, amount: 1},
+              repairer: {level: 2, amount: 1},
+              upgrader: {level: 4, amount: 1} } );
+	Sites.Mining("W18S41", "W18S41", 3, false,
+            { burrower:  {level: 4, amount: 1},
+			  carrier:   {level: 4, amount: 1} } );
 			
 	/* REMOTE MINING DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -256,14 +263,8 @@ module.exports.loop = function () {
             { burrower:  {level: 6, amount: 1},
               carrier:   {level: 6, amount: 3},
               multirole: {level: 5, amount: 1},
-              reserver:  {level: 5, amount: 1} } );    
-    Sites.Mining("W15S41", "W16S42", 3, false,
-            { burrower:  {level: 6, amount: 1},
-              carrier:   {level: 6, amount: 3},
-              multirole: {level: 5, amount: 1},
-              reserver:  {level: 5, amount: 1} },
-            ["W15S41", "W16S41", "W16S42"]);
-    
+              reserver:  {level: 5, amount: 1} } );        
+	
     /* Remote mining operations for Colony #4, W15S43 */
     Sites.Mining("W15S43", "W15S45", 0, false,
             { burrower:  {level: 5, amount: 3},
