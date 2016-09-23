@@ -65,7 +65,10 @@ module.exports = {
                 let pos = new RoomPosition(creep.memory.task["pos"].x, creep.memory.task["pos"].y, creep.memory.task["pos"].roomName);                
 				let result = creep.harvest(obj);
                 if (result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(pos, {reusePath: Hive.moveReusePath()});
+					if (_.filter(pos.look(), n => n.type == "creep").length == 0)
+						creep.moveTo(pos, {reusePath: Hive.moveReusePath()});
+					else
+						creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
 					return;
                 } else if (result == OK) {
 					if (!creep.pos.isEqualTo(pos))
@@ -252,6 +255,7 @@ module.exports = {
             case "multirole": return this.getBody_Multirole(level);
             case "worker": return this.getBody_Worker(level);
             case "burrower": return this.getBody_Burrower(level);
+			case "extractor": return this.getBody_Extractor(level);
             case "courier":
             case "carrier": return this.getBody_Carrier(level);
             case "carrier_at": return this.getBody_Carrier_AT(level);
@@ -569,7 +573,53 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
         }},
-
+		
+	getBody_Extractor: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Extractor, ${level} is not a proper number!`);
+				return;
+            case 1:
+                return [ // 300 energy, 1x WORK, 2x CARRY, 2x MOVE
+                        WORK,
+                        CARRY, CARRY,
+                        MOVE, MOVE];
+            case 2:
+                return [ // 450 energy, 2x WORK, 2x CARRY, 3x MOVE
+                        WORK, WORK,
+                        CARRY, CARRY,
+                        MOVE, MOVE, MOVE];
+            case 3:
+                return [ // 700 energy, 3x WORK, 4x CARRY, 4x MOVE
+                        WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE,];
+            case 4:
+                return [ // 1100 energy, 5x WORK, 6x CARRY, 6x MOVE
+                        WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 5:
+                return [ // 1600 energy, 8x WORK, 8x CARRY, 8x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 6:
+                return [ // 2000 energy, 14x WORK, 4x CARRY, 8x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+						WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 7:
+			case 8:
+                return [ // 4000 energy, 30x WORK, 10x CARRY, 10x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+						WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE ];            
+        }},		
+		
     getBody_Carrier: function(level) {
         switch (level) {
 			default:

@@ -1,13 +1,16 @@
-* TEST:
-	moveExcessEnergy!!!!!
-	
-* Overload Game.room?
-	- room.resource(resource) return terminal + storage if has resource?
-	
+
+* Optimization
+	- Task system
+		- Instead of iterating all tasks (for) and iterating all creep (for) to count task.creeps...
+		... maybe store creeps on that task in the actual target object
+		... and when running the task, check to see it the creeps in that object's memory > task.creeps
+		... and if so, delete the task from the stack?
+
+
 - CPU Profiler
 	- room_cycles always equals cycles in Math.max(room_cycles, cycles)
+
+- code in safe mode activation??	
 	
-* Tasks
-	- add dismantle tasks
-	- utilCreep: add resource types to all tasks? e.g. "withdraw"			
-    
+- Overload Game.room?
+	- room.resource(resource) return terminal + storage if has resource?

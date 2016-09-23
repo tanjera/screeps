@@ -96,7 +96,7 @@ module.exports = {
                     && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0) {            
 			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["extractor"]["level"], 
-					body: "worker", name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
+					body: "extractor", name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
         }
 	},
 	

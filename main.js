@@ -34,6 +34,11 @@ module.exports.loop = function () {
 	/* COLONY DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 	
+	Sites.Occupation("W18S41", "W19S41", 3, 
+		{ soldier:   {level: 8, amount: 2} },
+		["57811a99742f4757195996d9", "578118c589257aaa52b4f061",
+		 "57811a9ca8ae877d722d309e", "5781183a1d1c8d9858f63566"]);
+	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
             { worker:   {level: 7, amount: 1, scale_level: false},
