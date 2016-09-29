@@ -34,6 +34,14 @@ module.exports.loop = function () {
 	/* COLONY DEFINITIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 	
+	Sites.Invasion("W15S43", "W13S45", 2, 
+		{ soldier: {level: 8, amount: 1},
+			healer:  {level: 8, amount: 1} },
+		["57c6818c7a3bdeff20d11450",
+		 "57c6818f0224b16f78c15527"],
+		new RoomPosition(32, 6, "W13S46"), 
+		["W14S43", "W15S43", "W15S44", "W15S45", "W14S45", "W14S46", "W13S46"] );
+	
     /* Colony #1, W18S43 */
     Sites.Colony("W18S43", 2,
             { worker:   {level: 7, amount: 1, scale_level: false},

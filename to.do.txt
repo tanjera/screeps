@@ -1,4 +1,7 @@
 
+* Sites.Invasion
+	- needs memory reset when complete...
+
 * Optimization
 	- Task system
 		- Instead of iterating all tasks (for) and iterating all creep (for) to count task.creeps...

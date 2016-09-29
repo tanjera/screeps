@@ -18,13 +18,18 @@ module.exports = {
 	
 	runPopulation: function(rmColony, rmInvade, spawnDistance, listArmy) {
 		if (Memory["rooms"][rmColony][`invasion_${rmInvade}`] == null)
-			Memory["rooms"][rmColony][`invasion_${rmInvade}`] = { state: "spawning" };
+			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
 		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];		
         
 		if (memory.state == "spawning") {
 			let lSoldier  = _.filter(Game.creeps, c => c.memory.role == "soldier" && c.memory.room == rmInvade && c.memory.colony == rmColony);
 			let lArcher  = _.filter(Game.creeps, c => c.memory.role == "archer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
 			let lHealer  = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmInvade && c.memory.colony == rmColony);
+			
+			if (Game.time % 30 == 0) {
+				console.log(`<font color=\"#FFA100\">[Invading]</font> ${rmInvade}: Spawning troops, `					
+				+ `${lSoldier.length + lArcher.length + lHealer.length} spawned`);
+			}
 			
 			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {				
 				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["soldier"]["level"], 
@@ -44,11 +49,11 @@ module.exports = {
 	runCreeps: function(rmColony, rmInvade, listTargets, posRally, listRoute) {
 		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];
 		let creeps = _.filter(Game.creeps, c => c.memory.room == rmInvade && c.memory.colony == rmColony);
-		let rallyRange = 3;
+		let rallyRange = 5;
 		
 		switch (memory.state) {
 			default:
-				break;
+				return;
 				
 			case "rallying":
 			case "spawning":
@@ -59,16 +64,31 @@ module.exports = {
 					
 					if (creep.room.name != posRally.roomName)
 						_Creep.moveToRoom(creep, posRally.roomName, true);
-					else if (creep.room.name == posRally.roomName && !posRally.inRangeTo(creep.pos, rallyRange))
-						creep.moveTo(posRally);
+					else if (creep.room.name == posRally.roomName) {
+						if (!posRally.inRangeTo(creep.pos, rallyRange))
+							creep.moveTo(posRally);
+						else if (Game.time % 15 == 0)
+							creep.moveTo(posRally);
+					}
+						
+				}
+				
+				if (memory.state == "rallying" && Game.time % 30 == 0) {
+					console.log(`<font color=\"#FFA100\">[Invading]</font> ${rmInvade}: Rallying troops, `					
+					+ `${_.filter(creeps, c => c.room.name == posRally.roomName && posRally.inRangeTo(c.pos, rallyRange)).length} `
+					+ `of ${creeps.length} at rally point.`);
 				}
 				
 				if (Game.time % 5 == 0) {
 					memory.state = (_.filter(creeps, 
 						c => c.room.name == posRally.roomName && posRally.inRangeTo(c.pos, rallyRange)).length == creeps.length)
 						? "attacking" : memory.state;
-				}			
-				break;			
+						
+					if (memory.state == "attacking")
+						console.log(`<font color=\"#FFA100\">[Invading]</font> ${rmInvade}: Launching attack!!!!`);
+				}
+				
+				return;
 			
 			case "attacking":
 				for (let c in creeps) {
@@ -85,7 +105,13 @@ module.exports = {
 				if (creeps.length == 0)
 					memory.state = "complete";
 				
-				break;
+				return;
+				
+			case "complete":
+				if (Game.time == null || Game.time - memory.time > 2000)
+					delete memory;
+					
+				return;
 		}		
 	}
 };
