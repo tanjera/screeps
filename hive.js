@@ -54,8 +54,7 @@ let Hive = {
         }
 		
 		Memory["spawn_requests"] = new Array();
-		
-		if (Memory["request"] == null) Memory["request"] = {};		
+				
 		if (Memory["options"] == null) Memory["options"] = { console: "on" };
 		
 		let _Console = require("util.console");
@@ -205,13 +204,13 @@ let Hive = {
 		for (let res in resources) {
 			let excess = _.sum(resources[res]) - overflow[res]["limit"];
 			if (excess > 0) {
-				let room = _.head(_.sortBy(Object.keys(resources[res]), r => { return -resources[res][r]; }));
-				let id = _.head(_.sortBy(Game.market.getAllOrders(
+				let room = _.head(_.sortBy(Object.keys(resources[res]), r => { return -resources[res][r]; }));				
+				let order = _.head(_.sortBy(Game.market.getAllOrders(
 					o => { return o.type == "buy" && o.resourceType == res && o.price == overflow[res]["price"]; }),
-					o => { return Game.map.getRoomLinearDistance(o.roomName, room); })).id;
+					o => { return Game.map.getRoomLinearDistance(o.roomName, room); }));
 				
-				if (id != null)
-					_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: id, amount: excess, from: room, priority: 4 });				
+				if (order != null)
+					_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: order.id, amount: excess, from: room, priority: 4 });				
 			}			
 		}
 		

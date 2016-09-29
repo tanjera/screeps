@@ -310,8 +310,8 @@ module.exports = {
     compileTasks: function (rmName) {
         var structures;
         let __Colony = require("util.colony");
-        let room = Game.rooms[rmName];
-
+        let room = Game.rooms[rmName];		
+		
         /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
         if (room.controller != null && room.controller.level > 0) {
             if (room.controller.ticksToDowngrade < 3500) {
@@ -320,7 +320,7 @@ module.exports = {
                         subtype: "upgrade",
                         id: room.controller.id,
                         pos: room.controller.pos,
-                        timer: 20,
+		                timer: 20,
                         creeps: 15,
                         priority: 1
                     });
@@ -330,7 +330,7 @@ module.exports = {
                         subtype: "upgrade",
                         id: room.controller.id,
                         pos: room.controller.pos,
-                        timer: 20,
+		                timer: 20,
                         creeps: 20,
                         priority: 5
                     });
@@ -418,7 +418,7 @@ module.exports = {
                             resource: "mineral",
                             id: minerals[i].id,
                             pos: minerals[i].pos,
-                            timer: 20,
+                            timer: 60,
                             creeps: 2,
                             priority: 2
                         }); 
@@ -443,7 +443,7 @@ module.exports = {
                         priority: 3
                     });
             }
-            if (_.sum(storages[i].store) < storages[i].storeCapacity) {
+            if (storages[i].structureType == "storage" && _.sum(storages[i].store) < storages[i].storeCapacity) {
                 this.addTask(rmName, 
                     {   type: "carry",
                         subtype: "deposit",
@@ -453,7 +453,7 @@ module.exports = {
                         pos: storages[i].pos,
                         timer: 20,
                         creeps: 10,
-                        priority: (storages[i].structureType == "container" ? 9 : 8)
+                        priority: 9
                     });
                 this.addTask(rmName, 
                     {   type: "carry",
@@ -464,7 +464,7 @@ module.exports = {
                         pos: storages[i].pos,
                         timer: 20,
                         creeps: 10,
-                        priority: (storages[i].structureType == "container" ? 9 : 8)
+                        priority: 9
                     });     
             }
         } 

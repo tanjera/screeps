@@ -5,7 +5,7 @@ module.exports = {
 	
     Worker: function(creep, hasKeepers) {
         let hostile = (hasKeepers == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
+			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter:
 				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			
@@ -191,55 +191,96 @@ module.exports = {
 	},
 		
     Soldier: function(creep, destroyStructures, listTargets) {
-		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            _Creep.moveToRoom(creep, creep.memory.room);
-        }
-        else {
-            let target;
-			
+		if (creep.memory.room != null) {
+			if (creep.room.name != creep.memory.room){
+				_Creep.moveToRoom(creep, creep.memory.room);
+			}else {
+				let target;
+
+				for (let t in listTargets) {
+					target = Game.getObjectById(listTargets[t]);
+					if (target != null) {
+						if (creep.attack(target) == ERR_NOT_IN_RANGE)
+							creep.moveTo(target);
+						creep.heal(creep);
+						return;
+					}
+				}
+
+				if (target == null) {
+					target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: 
+						(c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }});
+				}
+
+				if (target != null) {
+					if (creep.attack(target) == ERR_NOT_IN_RANGE) {
+						creep.moveTo(target);
+						creep.heal(creep);
+					}
+					return;
+				}
+
+				creep.heal(creep);
+
+				if (destroyStructures != null && destroyStructures == true) {
+					target = _.head(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
+							s => { return s.hits != null && s.hits > 0
+						&& (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
+					s => { return s.hits; } ));	// Sort by hits to prevent attacking massive ramparts/walls forever
+					if (target != null) {
+						if (creep.attack(target) == ERR_NOT_IN_RANGE) {
+							creep.moveTo(target);
+						}
+						return;
+					}
+				}
+			}}else {
+			let target;
+
 			for (let t in listTargets) {
 				target = Game.getObjectById(listTargets[t]);
 				if (target != null) {
 					if (creep.attack(target) == ERR_NOT_IN_RANGE)
 						creep.moveTo(target);
-					creep.heal(creep);				
-					return;					
+					creep.heal(creep);
+					return;
 				}
 			}
-			
+
 			if (target == null) {
-				target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: (c) => { 
-					return Memory["allies"].indexOf(c.owner.username) < 0; }});
+				target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: 
+					(c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }});
 			}
-			
-            if (target != null) {
-                if (creep.attack(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
+
+			if (target == null) {
+			} else {
+				if (creep.attack(target) == ERR_NOT_IN_RANGE) {
+					creep.moveTo(target);
 					creep.heal(creep);
-                }
+				}
 				return;
-            }
-						
+			}
+
 			creep.heal(creep);
-			
+
 			if (destroyStructures != null && destroyStructures == true) {
-				target = _.head(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter: 
-					s => { return s.hits != null && s.hits > 0 
-							&& (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
-					s => { return s.hits; } ));	// Sort by hits to prevent attacking massive ramparts/walls forever
+				target = _.head(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
+						s => { return s.hits != null && s.hits > 0
+					&& (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
+				s => { return s.hits; }));	// Sort by hits to prevent attacking massive ramparts/walls forever
 				if (target != null) {
 					if (creep.attack(target) == ERR_NOT_IN_RANGE) {
-						creep.moveTo(target);					
+						creep.moveTo(target);
 					}
 					return;
 				}
 			}
-        } 
+		}
 	},
 
-    Archer: function(creep, destroyStructures, listTargets) {
+	Archer: function(creep, destroyStructures, listTargets) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            _Creep.moveToRoom(creep, creep.memory.room);
+			_Creep.moveToRoom(creep, creep.memory.room);
         }
         else {
 			for (let t in listTargets) {

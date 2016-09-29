@@ -5,6 +5,10 @@
 		... maybe store creeps on that task in the actual target object
 		... and when running the task, check to see it the creeps in that object's memory > task.creeps
 		... and if so, delete the task from the stack?
+		^^ each task have a "memory" parameter, an array that holds the creeps on the task
+			- when taking the task, add the creep name to the array of the memory parameter
+			- when done the task, remove it
+			- creeps (#) parameter = # - memory.length
 
 
 - CPU Profiler

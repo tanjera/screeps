@@ -18,7 +18,7 @@ module.exports = {
             return 5;
         else if (room.energyCapacityAvailable < 5600)     // lvl 6, 2300 energy
             return 6;
-        else if (room.energyCapacityAvailable < 12300)    // lvl 7, 5600 energy
+        else if (room.energyCapacityAvailable < 12900)    // lvl 7, 5600 energy
             return 7;
         else if (room.energyCapacityAvailable == 12900)   // lvl 8, 12900 energy
             return 8;

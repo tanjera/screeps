@@ -70,7 +70,7 @@ module.exports = {
 					else
 						creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
 					return;
-                } else if (result == OK) {
+                } else if (result == OK || result == ERR_TIRED) {
 					if (!creep.pos.isEqualTo(pos))
 						creep.moveTo(pos, {reusePath: Hive.moveReusePath()});                    
                     return;
