@@ -48,7 +48,7 @@ let Hive = {
             if (!Game.creeps[n]) {
 				if (Memory.creeps[n]["task"] != null) {
 					let task = Memory.creeps[n]["task"];
-					if (Memory["rooms"][task.room]["tasks_running"] != null && Memory["rooms"][task.room]["tasks_running"][task.key] != null)
+					if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
 						delete Memory["rooms"][task.room]["tasks_running"][task.key][n];
 				}
 

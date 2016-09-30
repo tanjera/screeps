@@ -1,21 +1,19 @@
-let Roles = require("roles");
+let _CPU = require("util.cpu");
 let Hive = require("hive");
-
 
 module.exports = {
 	
 	Run: function(rmColony, rmReserve, spawnDistance, listPopulation, listRoute) {
         
-		
 		if (Hive.isPulse_Spawn()) {
-			_CPU.Start(rmColony, `Occupy-${rmReserve}-runPopulation`);
+			_CPU.Start(rmColony, `Reserve-${rmReserve}-runPopulation`);
 			this.runPopulation(rmColony, rmReserve, spawnDistance, listPopulation);
-			_CPU.End(rmColony, `Occupy-${rmReserve}-runPopulation`);
+			_CPU.End(rmColony, `Reserve-${rmReserve}-runPopulation`);
 		}
 		
-		_CPU.Start(rmColony, `Occupy-${rmReserve}-runCreeps`);
-		this.runCreeps(rmColony, rmReserve, listTargets, listRoute);
-		_CPU.End(rmColony, `Occupy-${rmReserve}-runCreeps`);        
+		_CPU.Start(rmColony, `Reserve-${rmReserve}-runCreeps`);
+		this.runCreeps(rmColony, rmReserve, listRoute);
+		_CPU.End(rmColony, `Reserve-${rmReserve}-runCreeps`);        
 	},
 	
 	runPopulation: function(rmColony, rmReserve, spawnDistance, listPopulation) {
@@ -31,7 +29,9 @@ module.exports = {
 		}
 	},
 	
-	runCreeps: function(rmColony, rmReserve, listTargets, listRoute) {
+	runCreeps: function(rmColony, rmReserve, listRoute) {
+		let Roles = require("roles");
+		
 		for (let n in Game.creeps) {
             let creep = Game.creeps[n];
             if (creep.memory.room != null && creep.memory.colony != null 

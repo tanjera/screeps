@@ -5,14 +5,14 @@ module.exports = {
 
 	finishedTask: function(creep) {
 		let task = creep.memory.task;
-		if (Memory["rooms"][task.room]["tasks_running"] != null && Memory["rooms"][task.room]["tasks_running"][task.key])
+		if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
 			delete Memory["rooms"][task.room]["tasks_running"][task.key][creep.name];
 		delete creep.memory.task;
 	},
 	
 	returnTask: function(creep) {
 		let task = creep.memory.task;
-		if (Memory["rooms"][task.room]["tasks_running"] != null && Memory["rooms"][task.room]["tasks_running"][task.key])
+		if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
 			delete Memory["rooms"][task.room]["tasks_running"][task.key][creep.name];
 		task.creeps += 1;
 		delete creep.memory.task;

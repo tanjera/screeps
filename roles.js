@@ -5,7 +5,7 @@ module.exports = {
 	
     Worker: function(creep, hasKeepers) {
         let hostile = (hasKeepers == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter:
+			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
 				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			
@@ -52,7 +52,7 @@ module.exports = {
 
     Mining: function(creep, hasKeepers) {
 		let hostile = (hasKeepers == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
+			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter: 
 				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			
@@ -131,7 +131,7 @@ module.exports = {
 
     Extracter: function(creep, hasKeepers) {
 		let hostile = (hasKeepers == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, { filter: 
+			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter: 
 				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
 			: null;
 			

@@ -1,4 +1,10 @@
 
+** Build roads
+	- Remote mining: W12S42, W17S41, W16S41
+	- Access to wall: W15S41 SE corner
+	
+** Debug/Test
+	- Mineral extraction in source keeper rooms?
 
 * Optimization
 	- Task system
