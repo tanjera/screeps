@@ -3,6 +3,21 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 
+	finishedTask: function(creep) {
+		let task = creep.memory.task;
+		if (Memory["rooms"][task.room]["tasks_running"] != null && Memory["rooms"][task.room]["tasks_running"][task.key])
+			delete Memory["rooms"][task.room]["tasks_running"][task.key][creep.name];
+		delete creep.memory.task;
+	},
+	
+	returnTask: function(creep) {
+		let task = creep.memory.task;
+		if (Memory["rooms"][task.room]["tasks_running"] != null && Memory["rooms"][task.room]["tasks_running"][task.key])
+			delete Memory["rooms"][task.room]["tasks_running"][task.key][creep.name];
+		task.creeps += 1;
+		delete creep.memory.task;
+	},
+
     runTaskTimer: function(creep) {
         if (creep.memory.task == null) {
             return false;
@@ -10,10 +25,8 @@ module.exports = {
         else if (creep.memory.task["timer"] != null) {
             // Process the task timer
             creep.memory.task["timer"] = creep.memory.task["timer"] - 1;
-            if (creep.memory.task["timer"] <= 0) {
-                let Tasks = require("tasks");
-                Tasks.returnTask(creep, creep.memory.task);
-                delete creep.memory.task;
+            if (creep.memory.task["timer"] <= 0) {                
+				this.returnTask(creep);				
                 return false;
             }
         }
@@ -42,7 +55,7 @@ module.exports = {
                     creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
 					return;
                 } else {    // Action takes one tick... task complete... delete task...
-                    delete creep.memory.task;
+                    this.finishedTask(creep);
                     return;
                 }
             }
@@ -55,7 +68,7 @@ module.exports = {
                     creep.moveTo(obj, {reusePath: Hive.moveReusePath()});
                     return;
                 } else {    // Action takes one tick... task complete... delete task...
-                    delete creep.memory.task;
+                    this.finishedTask(creep);
                     return;
                 }
             }
@@ -75,7 +88,7 @@ module.exports = {
 						creep.moveTo(pos, {reusePath: Hive.moveReusePath()});                    
                     return;
                 } else { 
-					delete creep.memory.task;
+					this.finishedTask(creep);
 					return; 
 				}
             }
@@ -87,7 +100,7 @@ module.exports = {
                     creep.moveTo(controller, {reusePath: Hive.moveReusePath()});
                     return;
                 } else if (result != OK) {
-                    delete creep.memory.task;
+                    this.finishedTask(creep);
                     return;
                 } else { return; }
             }
@@ -99,7 +112,7 @@ module.exports = {
                     creep.moveTo(structure, {reusePath: Hive.moveReusePath()});
 					return;
                 } else if (result != OK || structure.hits == structure.hitsMax) {
-                    delete creep.memory.task;
+                    this.finishedTask(creep);
                     return;
                 } else { return; }
             }
@@ -111,31 +124,21 @@ module.exports = {
                     creep.moveTo(structure, {reusePath: Hive.moveReusePath()});
 					return;
                 } else if (result != OK) {
-                    delete creep.memory.task;
+                    this.finishedTask(creep);
                     return;
                 } else { return; }
             }
 
-            case "deposit": {
-                // Make sure the target hasn"t filled up...
-                let target = Game.getObjectById(creep.memory.task["id"]);
-                if ((target.structureType == STRUCTURE_SPAWN && target.energy == target.energyCapacity)
-				|| (target.structureType == STRUCTURE_EXTENSION && target.energy == target.energyCapacity)
-				|| (target.structureType == STRUCTURE_LINK && target.energy == target.energyCapacity)
-				|| (target.structureType == STRUCTURE_TOWER && target.energy == target.energyCapacity)
-				|| (target.structureType == STRUCTURE_STORAGE && _.sum(target.store) == target.storeCapacity)
-				|| (target.structureType == STRUCTURE_CONTAINER && _.sum(target.store) == target.storeCapacity)) {
-                    let Tasks = require("tasks");
-                    Tasks.assignTask(creep, false);
-                }
+            case "deposit": {                
                 // Cycle through all resources and deposit, starting with minerals
+				let target = Game.getObjectById(creep.memory.task["id"]);
                 for (let r = Object.keys(creep.carry).length; r > 0; r--) {
                     let resourceType = Object.keys(creep.carry)[r - 1];
                     if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target, {reusePath: Hive.moveReusePath()});
 						return;
                     } else {
-                        delete creep.memory.task;
+                        this.finishedTask(creep);
                         return;
                     }
                 }

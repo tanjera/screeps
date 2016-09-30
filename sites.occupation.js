@@ -6,9 +6,11 @@ let _CPU = require("util.cpu");
 module.exports = {
 	
 	Run: function(rmColony, rmOccupy, spawnDistance, listPopulation, listTargets, listRoute) {
-		_CPU.Start(rmColony, `Occupy-${rmOccupy}-runPopulation`);
-		this.runPopulation(rmColony, rmOccupy, spawnDistance, listPopulation);
-		_CPU.End(rmColony, `Occupy-${rmOccupy}-runPopulation`);
+		if (Hive.isPulse_Spawn()) {
+			_CPU.Start(rmColony, `Occupy-${rmOccupy}-runPopulation`);
+			this.runPopulation(rmColony, rmOccupy, spawnDistance, listPopulation);
+			_CPU.End(rmColony, `Occupy-${rmOccupy}-runPopulation`);
+		}
 		
 		_CPU.Start(rmColony, `Occupy-${rmOccupy}-runCreeps`);
 		this.runCreeps(rmColony, rmOccupy, listTargets, listRoute);

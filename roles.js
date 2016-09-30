@@ -16,7 +16,7 @@ module.exports = {
 			else if (creep.memory.state == "refueling") {
 				if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
 					creep.memory.state = "working";
-					Tasks.returnTask(creep, creep.memory.task);
+					Tasks.returnTask(creep);
 					return;
 				}
 				
@@ -29,7 +29,7 @@ module.exports = {
 			} else if (creep.memory.state == "working") {            
 				if (creep.carry[RESOURCE_ENERGY] == 0) {
 						creep.memory.state = "refueling";
-						Tasks.returnTask(creep, creep.memory.task);
+						Tasks.returnTask(creep);
 						return;
 					}
 				
@@ -60,7 +60,7 @@ module.exports = {
 			if (creep.memory.state == "refueling") {
 				if (creep.carryCapacity > 0 && _.sum(creep.carry) >= creep.carryCapacity * 0.85) {
 					creep.memory.state = "delivering";
-					Tasks.returnTask(creep, creep.memory.task);
+					Tasks.returnTask(creep);
 					return;
 				}
 				
@@ -73,7 +73,7 @@ module.exports = {
 			} else if (creep.memory.state == "delivering") {            
 				if (creep.carryCapacity == 0 || _.sum(creep.carry) == 0) {
 					creep.memory.state = "refueling";
-					Tasks.returnTask(creep, creep.memory.task);
+					Tasks.returnTask(creep);
 					return;
 				}
 
@@ -101,7 +101,7 @@ module.exports = {
         else if (creep.memory.state == "loading") {
             if (_.sum(creep.carry) > 0) {
                 creep.memory.state = "delivering";
-                Tasks.returnTask(creep, creep.memory.task);
+                Tasks.returnTask(creep);
                 return;
             }
             
@@ -114,7 +114,7 @@ module.exports = {
         } else if (creep.memory.state == "delivering") {            
             if (_.sum(creep.carry) == 0) {
                     creep.memory.state = "loading";
-                    Tasks.returnTask(creep, creep.memory.task);
+                    Tasks.returnTask(creep);
                     return;
                 }
             

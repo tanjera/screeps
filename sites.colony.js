@@ -1,12 +1,15 @@
 let _CPU = require("util.cpu");
+let Hive = require("hive");
 
 module.exports = {
 	
 	Run: function(rmColony, spawnDistance, listPopulation, listLinks) {
 		
-		_CPU.Start(rmColony, "Colony-runPopulation");
-		this.runPopulation(rmColony, spawnDistance, listPopulation);
-        _CPU.End(rmColony, "Colony-runPopulation");
+		if (Hive.isPulse_Spawn()) {
+			_CPU.Start(rmColony, "Colony-runPopulation");
+			this.runPopulation(rmColony, spawnDistance, listPopulation);
+			_CPU.End(rmColony, "Colony-runPopulation");
+		}
 		
 		_CPU.Start(rmColony, "Colony-runCreeps");
 		this.runCreeps(rmColony);
@@ -22,9 +25,7 @@ module.exports = {
 	},
 	
 	
-	runPopulation: function(rmColony, spawnDistance, listPopulation) {
-		let Hive = require("hive");
-
+	runPopulation: function(rmColony, spawnDistance, listPopulation) {		
 		let lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == null && creep.memory.room == rmColony);
         let lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "repairer" && creep.memory.room == rmColony);
         let lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "upgrader" && creep.memory.room == rmColony);

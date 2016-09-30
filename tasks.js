@@ -22,28 +22,37 @@ module.exports = {
             creeps:     maximum # of creeps to run this task
          */
 
+		if (incTask.key == null)
+			console.log(`<font color=\"#FF0000">[Error]</font> Task missing key: ${incTask.room} ${incTask.type} ${incTask.subtype}`);
 		 
-        let index = incTask["type"] + "-" + incTask["subtype"] + "-" 
-            + "xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-            let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
-            return v.toString(16);
-            });
-		
-        Memory["rooms"][rmName]["tasks"][index] = incTask;
+		if (Memory["rooms"][rmName]["tasks_running"] != null
+				&& Memory["rooms"][rmName]["tasks_running"][incTask.key] != null)
+			incTask.creeps = Math.max(0, incTask.creeps - Object.keys(Memory["rooms"][rmName]["tasks_running"][incTask.key]).length);
+ 		
+        Memory["rooms"][rmName]["tasks"][incTask.key] = incTask;
 	},
 
 	giveTask: function(creep, task) {        
         creep.memory.task = task;
+		
+		_.set(Memory, ["rooms", task.room, "tasks_running", task.key, creep.name], true);
 		
 		if (task["creeps"] != null)
             task["creeps"] -= 1;
 		
 		return;        
 	},
-
-    returnTask: function(creep, task) {
-		if (task != null && task.creeps != null)
-			task.creeps += 1;
+	
+	returnTask: function(creep) {
+		let task = creep.memory.task;
+		
+		if (task == null)
+		    return;
+		
+		if (Memory["rooms"][task.room]["tasks_running"] != null && Memory["rooms"][task.room]["tasks_running"][task.key])
+			delete Memory["rooms"][task.room]["tasks_running"][task.key][creep.name];
+		task.creeps += 1;
+		delete creep.memory.task;
 	},
 
     assignTask: function(creep, isRefueling) {
@@ -310,66 +319,76 @@ module.exports = {
     compileTasks: function (rmName) {
         var structures;
         let __Colony = require("util.colony");
-        let room = Game.rooms[rmName];		
-		
+        let room = Game.rooms[rmName];
+				
         /* Worker-based tasks (upgrading controllers, building and maintaining structures) */
         if (room.controller != null && room.controller.level > 0) {
             if (room.controller.ticksToDowngrade < 3500) {
                 this.addTask(rmName, 
-                    {   type: "work",
+                    {   room: rmName,
+						type: "work",
                         subtype: "upgrade",
                         id: room.controller.id,
                         pos: room.controller.pos,
-		                timer: 20,
+						key: `work:upgrade-${room.controller.id}`,
+                        timer: 20,
                         creeps: 15,
                         priority: 1
                     });
             } else {
                 this.addTask(rmName, 
-                    {   type: "work",
+                    {   room: rmName,
+						type: "work",
                         subtype: "upgrade",
                         id: room.controller.id,
                         pos: room.controller.pos,
-		                timer: 20,
+						key: `work:upgrade-${room.controller.id}`,
+                        timer: 20,
                         creeps: 20,
                         priority: 5
                     });
             }
         }
         
-        structures = __Colony.findByNeed_RepairCritical(room);
+        structures = __Colony.findByNeed_RepairMaintenance(room);
         for (let i in structures) {
             this.addTask(rmName, 
-                {   type: "work",
+                {   room: rmName,
+					type: "work",
                     subtype: "repair",
                     id: structures[i].id,
                     pos: structures[i].pos,
+					key: `work:repair-${structures[i].id}`,
+                    timer: 20,
+                    creeps: 2,
+                    priority: 6
+                });
+        }
+		
+		structures = __Colony.findByNeed_RepairCritical(room);
+        for (let i in structures) {
+            this.addTask(rmName, 
+                {   room: rmName,
+					type: "work",
+                    subtype: "repair",
+                    id: structures[i].id,
+                    pos: structures[i].pos,
+					key: `work:repair-${structures[i].id}`,
                     timer: 20,
                     creeps: 2,
                     priority: 2
                 });                
         }
         
-        structures = __Colony.findByNeed_RepairMaintenance(room);
-        for (let i in structures) {
-            this.addTask(rmName, 
-                {   type: "work",
-                    subtype: "repair",
-                    id: structures[i].id,
-                    pos: structures[i].pos,
-                    timer: 20,
-                    creeps: 2,
-                    priority: 6
-                });
-        }
-        
         structures = room.find(FIND_CONSTRUCTION_SITES);
         for (let i in structures) {
             this.addTask(rmName, 
-                {   type: "work",
+                {   room: rmName,
+					type: "work",
                     subtype: "build",
                     id: structures[i].id,
                     pos: structures[i].pos,
+					key: `work:build-${structures[i].id}`,
                     timer: 30,
                     creeps: 3,
                     priority: 3
@@ -380,11 +399,13 @@ module.exports = {
         let piles = room.find(FIND_DROPPED_ENERGY);
         for (let i in piles) {			
             this.addTask(rmName, 
-                {   type: "carry",
+                {   room: rmName,
+					type: "carry",
                     subtype: "pickup",
                     resource: piles[i].resourceType == "energy" ? "energy" : "mineral",
                     id: piles[i].id,
                     pos: piles[i].pos,
+					key: `carry:pickup-${piles[i].id}`,
                     timer: 15, 
                     creeps: Math.ceil(piles[i].amount / 1000),
                     priority: 1
@@ -396,11 +417,13 @@ module.exports = {
 			let container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:  
 				s => { return s.structureType == "container"; } }));
             this.addTask(rmName, 
-                {   type: "mine",
+                {   room: rmName,
+					type: "mine",
                     subtype: "harvest",
                     resource: "energy",
                     id: sources[i].id,
                     pos: (container != null ? container.pos : sources[i].pos),
+					key: `mine:harvest-${sources[i].id}`,
                     timer: 15,
                     creeps: 2,
                     priority: 1
@@ -413,12 +436,14 @@ module.exports = {
             for (let l = 0; l < look.length; l++) {
                 if (look[l].structure != null && look[l].structure.structureType == "extractor") {
                     this.addTask(rmName, 
-                        {   type: "mine",
+                        {   room: rmName,
+							type: "mine",
                             subtype: "harvest",
                             resource: "mineral",
                             id: minerals[i].id,
                             pos: minerals[i].pos,
-                            timer: 60,
+							key: `mine:harvest-${minerals[i].id}`,
+                            timer: 20,
                             creeps: 2,
                             priority: 2
                         }); 
@@ -432,40 +457,48 @@ module.exports = {
         for (let i in storages) {            
             if (storages[i].store["energy"] > 0) {
                 this.addTask(rmName, 
-                    {   type: "energy",
+                    {   room: rmName,
+						type: "energy",
                         subtype: "withdraw",
                         structure: storages[i].structureType,
                         resource: "energy",
                         id: storages[i].id,
                         pos: storages[i].pos,
+						key: `energy:withdraw-energy-${storages[i].id}`,
                         timer: 10,
                         creeps: Math.ceil(storages[i].store["energy"] / 1000),
                         priority: 3
                     });
             }
-            if (storages[i].structureType == "storage" && _.sum(storages[i].store) < storages[i].storeCapacity) {
+            if (_.sum(storages[i].store) < storages[i].storeCapacity) {
                 this.addTask(rmName, 
-                    {   type: "carry",
+                    {   room: rmName,
+						type: "carry",
                         subtype: "deposit",
                         structure: storages[i].structureType,
                         resource: "energy",
                         id: storages[i].id,
                         pos: storages[i].pos,
+						key: `carry:deposit-energy-${storages[i].id}`,
                         timer: 20,
                         creeps: 10,
-                        priority: 9
+                        priority: (storages[i].structureType == "storage" ? 8 : 9)
                     });
-                this.addTask(rmName, 
-                    {   type: "carry",
-                        subtype: "deposit",
-                        structure: storages[i].structureType,
-                        resource: "mineral",
-                        id: storages[i].id,
-                        pos: storages[i].pos,
-                        timer: 20,
-                        creeps: 10,
-                        priority: 9
-                    });     
+				if (storages[i].structureType == "storage") {
+					this.addTask(rmName, 
+						{   room: rmName,
+							type: "carry",
+							subtype: "deposit",
+							structure: storages[i].structureType,
+							resource: "mineral",
+							id: storages[i].id,
+							pos: storages[i].pos,
+							key: `carry:deposit-mineral-${storages[i].id}`,
+							timer: 20,
+							creeps: 10,
+							priority: 9
+						});
+				}
             }
         } 
 
@@ -475,24 +508,28 @@ module.exports = {
                 let link = Game.getObjectById(links[l]["id"]);
                 if (links[l]["role"] == "send" && link != null && link.energy < link.energyCapacity * 0.9) {
                     this.addTask(rmName, 
-                    {   type: "carry",
+                    {   room: rmName,
+						type: "carry",
                         subtype: "deposit",
                         structure: "link",
                         resource: "energy",
                         id: links[l]["id"],
                         pos: link.pos,
+						key: `carry:deposit-${links[l]["id"]}`,
                         timer: 20,
                         creeps: 1,
                         priority: 3
                      });
                 } else if (links[l]["role"] == "receive" && link != null && link.energy > 0) {
                     this.addTask(rmName, 
-                    {   type: "energy",
+                    {   room: rmName,
+						type: "energy",
                         subtype: "withdraw",
                         structure: "link",
                         resource: "energy",
                         id: links[l]["id"],
                         pos: link.pos,
+						key: `energy:withdraw-${links[l]["id"]}`,
                         timer: 5,
                         creeps: 2,
                         priority: 3
@@ -506,24 +543,28 @@ module.exports = {
         for (let i in towers) {
             if (towers[i].energy < towers[i].energyCapacity * 0.4) {
                 this.addTask(rmName, 
-                {   type: "carry",
+                {   room: rmName,
+					type: "carry",
                     subtype: "deposit",                    
-                    resource: "energy",
-                    id: towers[i].id,
-                    pos: towers[i].pos,
-                    structure: towers[i].structureType,
+                    structure: "tower",
+					resource: "energy",                    
+					id: towers[i].id,
+                    pos: towers[i].pos,                    
+					key: `carry:deposit-${towers[i].id}`,
                     timer: 30,
                     creeps: 1,
                     priority: 1 
                 });
             } else if (towers[i].energy < towers[i].energyCapacity) {
                 this.addTask(rmName, 
-                {   type: "carry",
+                {   room: rmName,
+					type: "carry",
                     subtype: "deposit",
-                    resource: "energy",
-                    id: towers[i].id,
-                    pos: towers[i].pos,
-                    structure: towers[i].structureType,
+                    structure: "tower",
+					resource: "energy",                    
+					id: towers[i].id,
+                    pos: towers[i].pos,                    
+					key: `carry:deposit-${towers[i].id}`,
                     timer: 30,
                     creeps: 1,
                     priority: 5
@@ -535,35 +576,19 @@ module.exports = {
             return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
                 || (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
         for (let i in structures) {
-                this.addTask(rmName, 
-                {   type: "carry",
-                    subtype: "deposit",
-                    resource: "energy",
-                    id: structures[i].id,
-                    pos: structures[i].pos,
-                    structure: structures[i].structureType,
-                    timer: 20,
-                    creeps: 1,
-                    priority: 2 
-                });
+			this.addTask(rmName, 
+			{   room: rmName,
+				type: "carry",
+				subtype: "deposit",
+				structure: structures[i].structureType,
+				resource: "energy",
+				id: structures[i].id,
+				pos: structures[i].pos,
+				key: `carry:deposit-${structures[i].id}`,
+				timer: 20,
+				creeps: 1,
+				priority: 2 
+			});
         }
-
-        /* Cycle through tasks and creeps in the room- iterate task["creeps"] downwards if taken! */
-		for (let t in Memory["rooms"][rmName]["tasks"]) {
-			let task = Memory["rooms"][rmName]["tasks"][t];
-			if (task["creeps"] != null) {
-				for (let c in Game.creeps) {
-					if (Game.creeps[c].room.name == rmName) {
-						let creep = Game.creeps[c];
-						if (creep.memory.task != null
-								&& creep.memory.task.type == task.type && creep.memory.task.subtype == task.subtype
-								&& creep.memory.task.id == task.id && creep.memory.task.structure == task.structure
-								&& creep.memory.task.resource == task.resource) {
-							task["creeps"] -= 1;
-						}
-					}
-				}				
-			}
-		}  
 	}
 }

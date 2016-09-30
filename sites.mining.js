@@ -1,12 +1,15 @@
 let _CPU = require("util.cpu");
+let Hive = require("hive");
 
 module.exports = {
 	
 	Run: function(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation, listRoute) {
 
-		_CPU.Start(rmColony, `Mining-${rmHarvest}-runPopulation`);
-		this.runPopulation(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation);
-		_CPU.End(rmColony, `Mining-${rmHarvest}-runPopulation`);
+		if (Hive.isPulse_Spawn()) {
+			_CPU.Start(rmColony, `Mining-${rmHarvest}-runPopulation`);
+			this.runPopulation(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation);
+			_CPU.End(rmColony, `Mining-${rmHarvest}-runPopulation`);
+		}
 	
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-runCreeps`);
 		this.runCreeps(rmColony, rmHarvest, hasKeepers, listRoute);
@@ -14,9 +17,7 @@ module.exports = {
 	},
 	
 	
-	runPopulation: function(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation) {
-		let Hive = require("hive");
-		
+	runPopulation: function(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation) {		
 		let lPaladin = _.filter(Game.creeps, c => c.memory.role == "paladin" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 200));
 		let lHealer = _.filter(Game.creeps, c => c.memory.role == "healer" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 100));		
 		let lBurrower = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));

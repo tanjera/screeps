@@ -2,6 +2,11 @@ module.exports = {
 	Init: function() {
 		let command_list = new Array();
 		
+		command_list.push("profiler.run(cycles)");
+		command_list.push("profiler.stop()");
+		command_list.push("");
+		
+		
 		command_list.push("log_resources()");
 		log_resources = function() {
 			let resources = new Object();
