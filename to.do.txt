@@ -1,11 +1,27 @@
 
-** Build roads
-	- Remote mining: W12S42, W17S41, W16S41
-	- Access to wall: W15S41 SE corner
+** To Build
+	- Wall at W15S41 SE corner
+	- Roads for remote mining: W17S41
+	
+- W18S41 -> XGH2O @ RCL 7!
+	
+- _.groupBy for runPopulations
+- moveTo optimization?
+	if(creep.moveTo(StartRoomFlag, {reusePath: Number.MAX_SAFE_INTEGER}) != OK) {
+        creep.moveTo(StartRoomFlag,{reusePath:0, ignoreCreeps:true})
+    }
+
+
 	
 ** Debug/Test
 	- Mineral extraction in source keeper rooms?
 
+- Auto build?
+	- Every ~500 or ~1500 ticks check if all flags (coded for structureType) are sitting on appropriate structure?
+		- If not, then set construction site.
+		- If at max construction sites, return;
+	- Console commands to set all flags to current layout (including construction sites).
+	
 * Optimization
 	- Task system
 		... done? new ideas?

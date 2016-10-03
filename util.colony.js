@@ -25,28 +25,28 @@ module.exports = {
 		},
         
     repairWalls_Critical: function(level) {
-        let t = [0, 
-                    1000,
+        let t = [ 0, 
                     2500,
-                    5000,
+                    10000,
                     10000,
                     15000,
+                    20000,
                     30000,
-                    60000,
-                    100000 ];
+                    75000,
+                    250000 ];
         return t[level];
 		},
 
     repairWalls_Maintenance: function(level) {
-        let t = [0, 
+        let t = [ 0, 
                     10000,
                     25000,
                     35000,
                     50000,
                     75000,
-                    100000,
-                    200000,
-                    500000 ];
+                    125000,
+                    250000,
+                    1000000 ];
         return t[level];
 		},
 

@@ -2,11 +2,30 @@ let _CPU = require("util.cpu");
 
 let Hive = {
 
-	isPulse_Spawn: function() {      
-		if (Game.cpu.bucket > 7000) {
-            return Game.time % 5 == 0;
-        } else {
+	isPulse_Spawn: function() {
+		
+		/*
+		let min_ticks = 10, max_ticks = 20;
+		
+		if (Memory.last_pulse == null) {
+			Memory.last_pulse = Game.time;
+			return true;
+		}
+			
+		
+		if (Game.time - Memory.last_pulse > (min_ticks + Math.floor(1 - ((Game.cpu.bucket / 10000) * max_ticks)))) {		
+			Memory.last_pulse = Game.time;
+			return true;
+		} else {
+			return false;
+		}
+		
+		*/
+		
+		if (Game.cpu.bucket > 5000) {
             return Game.time % 10 == 0;
+        } else {
+            return Game.time % 20 == 0;
 		}
     },
 
