@@ -35,10 +35,14 @@ module.exports.loop = function () {
 	let Population__Colony_RCL8 = 
 			{ worker:   {level: 7, amount: 1, scale_level: false},
               repairer: {level: 5, amount: 1} };
-	let Population__Colony_Grow = 
+	let Population__Colony_RCL5_7 = 
             { worker:   {level: 7, amount: 1},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 7, amount: 2} };
+	let Population__Colony_RCL1_3 = 
+            { worker:   {level: 3, amount: 2},
+              repairer: {level: 3, amount: 1},
+              upgrader: {level: 3, amount: 2} };
 			  
 	let Population__Mining_1S_Colony =
 			{ burrower:  {level: 5, amount: 1},
@@ -128,7 +132,7 @@ module.exports.loop = function () {
     Sites.Colony("W15S43", 2, Population__Colony_RCL8,
             [ {id: "57dc9ffd9754877f17a191c5", role: "send"},
               {id: "57dca2fcf52af188391d0a20", role: "receive"} ]);
-    Sites.Mining("W15S43", "W15S43", 0, false, Population__Mining_1S_Colony);
+    Sites.Mining("W15S43", "W15S43", 2, false, Population__Mining_1S_Colony);
 	Sites.Industry("W15S43", 2, Population__Industry,
             [ { action: "reaction", amount: 10000,
 				reactor: {mineral: "OH", lab: "57c8cb46e9b21a95363affa3"},
@@ -165,7 +169,7 @@ module.exports.loop = function () {
 				supply2: {mineral: "L", lab: "57d974c8c6030b8452419739"} } ]);
 
     /* Colony #6, W11S44 */
-    Sites.Colony("W11S44", 1, Population__Colony_Grow,
+    Sites.Colony("W11S44", 1, Population__Colony_RCL5_7,
 		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
 			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
               {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
@@ -187,7 +191,7 @@ module.exports.loop = function () {
 			  ]);
 
 	/* Colony #7, W11S45 */
-    Sites.Colony("W11S45", 1, Population__Colony_Grow,
+    Sites.Colony("W11S45", 1, Population__Colony_RCL5_7,
 			[ {id: "57d61ddf2ff0d3ea25976f78", role: "send"},
 			  {id: "57ddb7390a699fdb6cc87b58", role: "receive"},
               {id: "57d65b3a157ae32c0ec94734", role: "receive"} ]);
@@ -196,11 +200,17 @@ module.exports.loop = function () {
 			[ { action: "boost", mineral: "GH2O", lab: "57dbee7782321a415409788a", role: "worker", subrole: "upgrader" } ]);
 
 	/* Colony #8, W18S41 */
-    Sites.Colony("W18S41", 1, Population__Colony_Grow);
+    Sites.Colony("W18S41", 1, Population__Colony_RCL5_7,
+		    [ {id: "57f1c74616fb8a5a6b0bb386", role: "send"},
+              {id: "57f1f63bab48a7a015c15ccd", role: "receive"} ]);
 	Sites.Mining("W18S41", "W18S41", 0, false, Population__Mining_1S_Colony);
 	Sites.Industry("W18S41", 1, Population__Industry,
 			[ { action: "boost", mineral: "GH2O", lab: "57ec7be65dff746643b687dd", role: "worker", subrole: "upgrader" } ] );
 
+	/* Colony #9, W13S45 */
+    Sites.Colony("W13S45", 1, Population__Colony_RCL1_3);		
+	Sites.Mining("W13S45", "W13S45", 1, false, Population__Mining_1S_Colony);
+			
 			
 			
     /* Remote mining operations for Colony #1, W18S43 */
@@ -215,18 +225,18 @@ module.exports.loop = function () {
     Sites.Mining("W15S41", "W14S42", 1, false, Population__Mining_2S_Remote);
 	Sites.Mining("W15S41", "W16S42", 1, false, Population__Mining_2S_Remote, ["W15S41", "W15S42", "W16S42"]);
 	Sites.Mining("W15S41", "W17S41", 1, false, Population__Mining_2S_Remote, ["W15S41", "W16S41", "W17S41"]);
-	Sites.Mining("W15S41", "W16S41", 1, false, { multirole: {level: 6, amount: 1} } );
+	Sites.Mining("W15S41", "W16S41", 1, false, Population__Mining_1S_Remote);
 
     /* Remote mining operations for Colony #4, W15S43 */
     Sites.Mining("W15S43", "W15S45", 0, false,
-            { burrower:  {level: 6, amount: 3},
-              carrier:   {level: 7, amount: 8},
+            { burrower:  {level: 6, amount: 2},
+              carrier:   {level: 7, amount: 7},
               multirole: {level: 6, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", 0, true,
 			{ paladin: 	 {level: 8, amount: 1, scale_level: false},
 			  healer:	 {level: 5, amount: 1},
-			  burrower:	 {level: 6, amount: 3},
-			  carrier:   {level: 7, amount: 8},
+			  burrower:	 {level: 6, amount: 2},
+			  carrier:   {level: 7, amount: 7},
               multirole: {level: 6, amount: 1} } );
 
     /* Remote mining operations for Colony #5, W13S41 */

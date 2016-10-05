@@ -238,15 +238,24 @@ module.exports = {
 				creep.memory.target = target.id;
 		}
 		
-		if (creep.memory.target != null) {			
-			creep.heal(creep);
+		if (creep.memory.target != null) {						
 			target = Game.getObjectById(creep.memory.target);
-			if (creep.attack(target) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(target);				
+			let result = creep.attack(target);
+			if (result == ERR_NOT_IN_RANGE) {
+				creep.heal(creep);
+				creep.moveTo(target);
+				return;
+			} else if (result == OK) {
+				return;
+			} else {
+				creep.heal(creep);
+				return;
 			}
 		}
-		else
+		else {
 			creep.heal(creep);
+			return;
+		}
 	},
 
 	Archer: function(creep, destroyStructures, listTargets) {
@@ -298,19 +307,27 @@ module.exports = {
 				creep.memory.target = target.id;
 		}
 		
-		if (creep.memory.target != null) {			
-			creep.heal(creep);
+		if (creep.memory.target != null) {						
 			target = Game.getObjectById(creep.memory.target);
 			let result = creep.rangedAttack(target);			
 			if (result == ERR_NOT_IN_RANGE) {
-				creep.moveTo(target);				
+				creep.heal(creep);
+				creep.moveTo(target);
+				return;
 			} else if (result == OK && creep.pos.getRangeTo(target < 3)) {
 				let _Creep = require("util.creep");
 				_Creep.moveFrom(creep, target);
+				return;
+			} else if (result == OK) {
+				return;
+			} else {
+				creep.heal(creep);	
 			}
 		}
-		else
+		else {
 			creep.heal(creep);
+			return;
+		}
 	},
 
     Healer: function(creep) {

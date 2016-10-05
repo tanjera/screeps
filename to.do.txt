@@ -1,9 +1,9 @@
 
-** To Build
-	- Wall at W15S41 SE corner
-	- Roads for remote mining: W17S41
-	
 - W18S41 -> XGH2O @ RCL 7!
+
+- low lvl spawn code weak
+
+- implement safe modes...
 	
 - _.groupBy for runPopulations
 - moveTo optimization?
@@ -16,11 +16,14 @@
 ** Debug/Test
 	- Mineral extraction in source keeper rooms?
 
-- Auto build?
+- Blueprints
 	- Every ~500 or ~1500 ticks check if all flags (coded for structureType) are sitting on appropriate structure?
 		- If not, then set construction site.
 		- If at max construction sites, return;
 	- Console commands to set all flags to current layout (including construction sites).
+	
+- Attack Optimizations
+	- Towers to target flank/outside creeps, possibly creeps not near healers?
 	
 * Optimization
 	- Task system

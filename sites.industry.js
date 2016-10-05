@@ -2,6 +2,7 @@ let Roles = require("roles");
 let Hive = require("hive");
 let Tasks = require("tasks");
 
+let _Creep = require("util.creep");
 let _CPU = require("util.cpu");
 
 module.exports = {
@@ -64,7 +65,7 @@ module.exports = {
 				supply1: {mineral: "", lab: ""}, 
 				supply2: {mineral: "", lab: ""} }
 			{ action: "empty", lab: "" }			
-		*/		
+		*/				
 		
         for (let l in listLabs) {
             let listing = listLabs[l];
@@ -73,7 +74,7 @@ module.exports = {
                     break;
 					
 				case "boost":
-					let _Creep = require("util.creep");
+					
 					let lab = Game.getObjectById(listing["lab"]);
 					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, 
 						{ filter: (c) => { return c.memory.role == listing["role"] 

@@ -6,7 +6,9 @@ module.exports = {
 			room = Game["rooms"][room];
 		}
 		
-        if (room.energyCapacityAvailable < 550)           // lvl 1, 300 energy
+        if (room.energyCapacityAvailable == 0)
+			return 0;
+		else if (room.energyCapacityAvailable < 550)      // lvl 1, 300 energy
             return 1;
         else if (room.energyCapacityAvailable < 800)      // lvl 2, 550 energy
             return 2;
@@ -52,32 +54,40 @@ module.exports = {
 
     findByNeed_RepairCritical: function(room) {
         return room.find(FIND_STRUCTURES, {
-                            filter: (s) => {
-                                return (s.structureType == STRUCTURE_RAMPART && s.hits < this.repairWalls_Critical(this.getRoom_Level(room)))
-                                    || (s.structureType == STRUCTURE_WALL && s.hits < this.repairWalls_Critical(this.getRoom_Level(room)))
-                                    || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.2)
-                                    || (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.2);
-                            }}).sort((a, b) => {return a.hits - b.hits});    
+			filter: (s) => {
+				return (s.structureType == "rampart" && s.hits < this.repairWalls_Critical(this.getRoom_Level(room)))
+					|| (s.structureType == "constructedWall" && s.hits < this.repairWalls_Critical(this.getRoom_Level(room)))
+					|| (s.structureType == "container" && s.hits < s.hitsMax * 0.2)
+					|| (s.structureType == "road" && s.hits < s.hitsMax * 0.2);
+			}}).sort((a, b) => {return a.hits - b.hits});    
     },
     
     findByNeed_RepairMaintenance: function(room) {
         return room.find(FIND_STRUCTURES, {
-                            filter: (s) => {
-                                return (s.structureType == STRUCTURE_RAMPART && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(room)))
-                                    || (s.structureType == STRUCTURE_WALL && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(room)))
-                                    || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.8)
-                                    || (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8);
-                            }}).sort((a, b) => {return a.hits - b.hits});        
+			filter: (s) => {
+				return (s.structureType == "rampart" && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(room)))
+					|| (s.structureType == "constructedWall" && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(room)))
+					|| (s.structureType == "container" && s.hits < s.hitsMax * 0.8)
+					|| (s.structureType == "road" && s.hits < s.hitsMax * 0.8)
+					|| ((s.structureType == "spawn" || s.structureType == "extension" || s.structureType == "link" || s.structureType == "storage" 
+						|| s.structureType == "tower" || s.structureType == "observer" || s.structureType == "extractor" || s.structureType == "lab" 
+						|| s.structureType == "terminal" || s.structureType == "nuker" || s.structureType == "powerSpawn") 
+						&& s.hits < s.hitsMax);
+			}}).sort((a, b) => {return a.hits - b.hits});        
     },
 
     findByRange_RepairMaintenance: function(creep) {
         return creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                                filter: (s) => {
-                                    return (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8)
-                                        || (s.structureType == STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.8)
-                                        || (s.structureType == STRUCTURE_RAMPART && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(creep.room)))
-                                        || (s.structureType == STRUCTURE_WALL && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(creep.room)));
-                                } 
-                        });
+			filter: (s) => {
+				return (s.structureType == "road" && s.hits < s.hitsMax * 0.8)
+					|| (s.structureType == "container" && s.hits < s.hitsMax * 0.8)
+					|| (s.structureType == "rampart" && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(creep.room)))
+					|| (s.structureType == "constructedWall" && s.hits < this.repairWalls_Maintenance(this.getRoom_Level(creep.room)))
+					|| ((s.structureType == "spawn" || s.structureType == "extension" || s.structureType == "link" || s.structureType == "storage" 
+						|| s.structureType == "tower" || s.structureType == "observer" || s.structureType == "extractor" || s.structureType == "lab" 
+						|| s.structureType == "terminal" || s.structureType == "nuker" || s.structureType == "powerSpawn") 
+						&& s.hits < s.hitsMax);
+					} 
+			});
     }
 };
