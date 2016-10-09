@@ -62,7 +62,7 @@ module.exports = {
 
 		// Assign a boost if needed and available
 		let __creep = require("util.creep");
-		if (creep.ticksToLive > 1100 && !__creep.isBoosted(creep)) {
+		if (creep.ticksToLive > 1100 && !creep.isBoosted()) {
 			let task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 				t => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; }));
 			if (task != null) {
@@ -429,8 +429,8 @@ module.exports = {
                     id: sources[i].id,
                     pos: (container != null ? container.pos : sources[i].pos),
 					key: `mine:harvest-${sources[i].id}`,
-                    timer: 15,
-                    creeps: 2,
+                    timer: 60,
+                    creeps: sources[i].pos.getAccessAmount(),
                     priority: 1
                 });
         }
@@ -597,5 +597,5 @@ module.exports = {
 				});
 			}
 		}
-	}
+	},	
 }

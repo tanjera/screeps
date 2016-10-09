@@ -238,16 +238,7 @@ module.exports = {
 			moveDir = Math.floor(Math.random() * 8) + 1;
 
         return creep.move(moveDir);
-    },
-
-    isBoosted: function(creep) {
-        for (let b in creep.body) {
-            if (creep.body[b].boost) {
-                return true;
-            }
-        }
-        return false;
-    },
+    },    
 
     getBody: function(type, level) {
         switch (type) {

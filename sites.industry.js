@@ -73,13 +73,12 @@ module.exports = {
                 default:
                     break;
 					
-				case "boost":
-					
+				case "boost":					
 					let lab = Game.getObjectById(listing["lab"]);
 					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, 
 						{ filter: (c) => { return c.memory.role == listing["role"] 
 							&& c.memory.subrole == listing["subrole"]
-							&& c.ticksToLive > 1100 && !_Creep.isBoosted(c) }});
+							&& c.ticksToLive > 1100 && !c.isBoosted() }});
 					if (creeps.length > 0) {						
 						lab.boostCreep(creeps[0]);						
 					}
@@ -142,7 +141,7 @@ module.exports = {
 							key: `industry:withdraw-${lab.mineralType}-${lab.id}`,
 							type: "industry", subtype: "withdraw", resource: lab.mineralType,
 							id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 2 });
-					} else if (lab.energy < lab.energyCapacity * 0.75 && Object.keys(storage.store).includes("energy")) {
+					} else if (lab.energy < lab.energyCapacity * 0.75 && storage.store["energy"] > 0) {
 						Tasks.addTask(rmColony, {   
 							key: `industry:withdraw-energy-${storage.id}`,
 							type: "industry", subtype: "withdraw", resource: "energy", 

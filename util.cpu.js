@@ -78,7 +78,7 @@ module.exports = {
 				}
 				
 				console.log(`<font color=\"#D3FFA3">CPU report for ${r}</font> :: `
-					+ `(${parseFloat(room_used).toFixed(2)} / ${parseInt(room_cycles)}) : `
+					+ `${parseFloat(room_used).toFixed(2)} : `
 					+ `<font color=\"#D3FFA3">${parseFloat(room_used / room_cycles).toFixed(2)}</font> ${output}`);
 			}			
 			

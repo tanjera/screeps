@@ -1,7 +1,8 @@
 
 - W18S41 -> XGH2O @ RCL 7!
 
-- low lvl spawn code weak
+- set # of creeps on harvest task to amount of available spaces next to source!!!!
+- add creep level to spawn memory args
 
 - implement safe modes...
 	

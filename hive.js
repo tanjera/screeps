@@ -170,7 +170,7 @@ let Hive = {
             let spawn = Game["spawns"][listSpawns[s]];
             let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
             for (let c in creeps) {
-                if (!_Creep.isBoosted(creeps[c])) {
+                if (!creeps[c].isBoosted()) {
                     if (spawn.renewCreep(creeps[c]) == OK) {
                         break;
                     }

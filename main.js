@@ -1,3 +1,6 @@
+require("overload.creep");
+require("overload.roomposition");
+
 let Sites = require("sites");
 let Hive = require("hive");
 let _CPU = require("util.cpu");
@@ -32,18 +35,22 @@ module.exports.loop = function () {
 
 	
 	/* Generic population definitions */
-	let Population__Colony_RCL8 = 
-			{ worker:   {level: 7, amount: 1, scale_level: false},
-              repairer: {level: 5, amount: 1} };
-	let Population__Colony_RCL5_7 = 
+	
+	let Population__Colony_RCL_Low = 
+            { worker:   {level: 3, amount: 3},
+              repairer: {level: 3, amount: 1},
+              upgrader: {level: 3, amount: 1} };
+	let Population__Colony_RCL_Mid = 
             { worker:   {level: 7, amount: 1},
               repairer: {level: 5, amount: 1},
               upgrader: {level: 7, amount: 2} };
-	let Population__Colony_RCL1_3 = 
-            { worker:   {level: 3, amount: 2},
-              repairer: {level: 3, amount: 1},
-              upgrader: {level: 3, amount: 2} };
-			  
+	let Population__Colony_RCL8 = 
+			{ worker:   {level: 7, amount: 1, scale_level: false},
+              repairer: {level: 5, amount: 1} };	
+	
+	let Population__Mining_RCL_Low =
+			{ burrower:  {level: 5, amount: 1},
+              carrier:   {level: 5, amount: 2} };
 	let Population__Mining_1S_Colony =
 			{ burrower:  {level: 5, amount: 1},
               carrier:   {level: 6, amount: 2},
@@ -169,14 +176,13 @@ module.exports.loop = function () {
 				supply2: {mineral: "L", lab: "57d974c8c6030b8452419739"} } ]);
 
     /* Colony #6, W11S44 */
-    Sites.Colony("W11S44", 1, Population__Colony_RCL5_7,
+    Sites.Colony("W11S44", 1, Population__Colony_RCL8,
 		    [ {id: "57c8c4ae926658ea75161a21", role: "send"},
 			  {id: "57c8ca7749e338931cf1fa66", role: "receive"},
               {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
     Sites.Mining("W11S44", "W11S44", 0, false, Population__Mining_2S_Colony);
 	Sites.Industry("W11S44", 1, Population__Industry,
-			[ { action: "boost", mineral: "GH2O", lab: "57cdbb01297293a13858f822", role: "worker", subrole: "upgrader" },
-			  { action: "reaction", amount: 10000,
+			[ { action: "reaction", amount: 10000,
 				reactor: {mineral: "GH2O", lab: "57db4c0f79dacb1478e2b3d9"},
 				supply1: {mineral: "GH", lab: "57db5e885cccb19c0906bd50"},
 				supply2: {mineral: "OH", lab: "57d92ba61555c2084275c953"} },
@@ -191,25 +197,23 @@ module.exports.loop = function () {
 			  ]);
 
 	/* Colony #7, W11S45 */
-    Sites.Colony("W11S45", 1, Population__Colony_RCL5_7,
+    Sites.Colony("W11S45", 1, Population__Colony_RCL8,
 			[ {id: "57d61ddf2ff0d3ea25976f78", role: "send"},
-			  {id: "57ddb7390a699fdb6cc87b58", role: "receive"},
-              {id: "57d65b3a157ae32c0ec94734", role: "receive"} ]);
+			  {id: "57ddb7390a699fdb6cc87b58", role: "receive"} ]);
     Sites.Mining("W11S45", "W11S45", 0, false, Population__Mining_2S_Colony);
-	Sites.Industry("W11S45", 1, Population__Industry,
-			[ { action: "boost", mineral: "GH2O", lab: "57dbee7782321a415409788a", role: "worker", subrole: "upgrader" } ]);
+	Sites.Industry("W11S45", 1, Population__Industry);
 
 	/* Colony #8, W18S41 */
-    Sites.Colony("W18S41", 1, Population__Colony_RCL5_7,
+    Sites.Colony("W18S41", 0, Population__Colony_RCL_Mid,
 		    [ {id: "57f1c74616fb8a5a6b0bb386", role: "send"},
               {id: "57f1f63bab48a7a015c15ccd", role: "receive"} ]);
 	Sites.Mining("W18S41", "W18S41", 0, false, Population__Mining_1S_Colony);
-	Sites.Industry("W18S41", 1, Population__Industry,
+	Sites.Industry("W18S41", 0, Population__Industry,
 			[ { action: "boost", mineral: "GH2O", lab: "57ec7be65dff746643b687dd", role: "worker", subrole: "upgrader" } ] );
 
 	/* Colony #9, W13S45 */
-    Sites.Colony("W13S45", 1, Population__Colony_RCL1_3);		
-	Sites.Mining("W13S45", "W13S45", 1, false, Population__Mining_1S_Colony);
+    Sites.Colony("W13S45", 1, Population__Colony_RCL_Low);		
+	Sites.Mining("W13S45", "W13S45", 1, false, Population__Mining_RCL_Low);
 			
 			
 			
