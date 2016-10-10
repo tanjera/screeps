@@ -1,8 +1,7 @@
 
 - W18S41 -> XGH2O @ RCL 7!
 
-- set # of creeps on harvest task to amount of available spaces next to source!!!!
-- add creep level to spawn memory args
+- bug... Memory.rooms.undefined.tasks_running.undefined keeps getting set??!?
 
 - implement safe modes...
 	

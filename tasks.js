@@ -35,6 +35,9 @@ module.exports = {
 	giveTask: function(creep, task) {
         creep.memory.task = task;
 
+		task.room = task.room || creep.room.name;
+		task.key = task.key || this.randomName();
+		
 		_.set(Memory, ["rooms", task.room, "tasks_running", task.key, creep.name], true);
 
 		if (task["creeps"] != null)
@@ -181,7 +184,7 @@ module.exports = {
             // If stuck without a task... drop off energy/minerals in storage... or wait...
             if (Object.keys(creep.carry).includes("energy")) {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.type == "carry" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }),
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 				if (task != null) {
                     this.giveTask(creep, task);
@@ -189,7 +192,7 @@ module.exports = {
 				}
 			} else if (Object.keys(creep.carry).length > 0) {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 				if (task != null) {
                     this.giveTask(creep, task);
@@ -306,7 +309,7 @@ module.exports = {
             }
 
             task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-				t => { return t.type == "carry" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
+				t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
 				t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 				"priority"));
             if (task != null) {
@@ -419,8 +422,20 @@ module.exports = {
 
         let sources = room.find(FIND_SOURCES, { filter: s => { return s.energy > 0; }});
         for (let i in sources) {
-			let container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:
-				s => { return s.structureType == "container"; } }));
+			let container = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "container"]);			
+			container = (container == null) ? null : Game.getObjectById(container);
+			if (container == null) {
+				container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:
+					s => { return s.structureType == "container"; } }));
+				_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "container"], container == null ? null : container.id);
+			}
+			
+			let access_tiles = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"]);
+			if (access_tiles == null) {				
+				access_tiles = sources[i].pos.getAccessAmount();				
+				_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"], access_tiles);
+			}
+			
             this.addTask(rmName,
                 {   room: rmName,
 					type: "mine",
@@ -430,7 +445,7 @@ module.exports = {
                     pos: (container != null ? container.pos : sources[i].pos),
 					key: `mine:harvest-${sources[i].id}`,
                     timer: 60,
-                    creeps: sources[i].pos.getAccessAmount(),
+                    creeps: access_tiles,
                     priority: 1
                 });
         }

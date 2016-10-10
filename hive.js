@@ -134,6 +134,7 @@ let Hive = {
                         let level = (request.scale_level != null && request.scale_level == false) ? request.level
 								: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
 									_Colony.getRoom_Level(spawn.room)));
+						request.args["level"] = level;
 						let body = _Creep.getBody(request.body, level);
 						let name = request.name != null ? request.name 
 							: request.args["role"].substring(0, 4)
