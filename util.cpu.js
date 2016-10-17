@@ -1,4 +1,5 @@
 module.exports = {
+	
 	Init: function() {
 		profiler = new Object();
 		profiler.run = function(cycles) {

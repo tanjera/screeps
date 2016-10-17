@@ -253,6 +253,12 @@ module.exports = {
 			}
 		}
 		else {
+			let lair = _.head(_.sortBy(
+				creep.room.find(FIND_STRUCTURES, { filter: s => { return s.structureType == "keeperLair"; }}),
+				s => { return s.ticksToSpawn; } ));
+			if (lair != null)
+				creep.moveTo(lair);
+			
 			creep.heal(creep);
 			return;
 		}

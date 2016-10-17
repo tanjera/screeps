@@ -3,14 +3,15 @@ require("overload.roomposition");
 
 let Sites = require("sites");
 let Hive = require("hive");
+let Blueprint = require("blueprint");
 let _CPU = require("util.cpu");
 
 module.exports.loop = function () {
 
-	/* Prepare CPU profiler */
+	/* Init functions */
 	_CPU.Init();
-
-    /* Prepare memory for this tick */
+	Blueprint.Init();
+    
     Hive.clearDeadMemory();
     Hive.initMemory();
     Hive.initTasks();
@@ -20,7 +21,8 @@ module.exports.loop = function () {
 	/* Ally list <3 */
 	Memory["allies"] = [
 		"Pantek59", "king_lispi", "Atavus", "BlackLotus",
-		"Moria", "Atlan", "Ashburnie", "seancl", "Finndibaen" ];
+		"Moria", "Atlan", "Ashburnie", "seancl", "Finndibaen",
+		"Klapaucius", "Hachima" ];
 
 	/* Auto-sell excess stockpile */
 	Hive.sellExcessResources({
@@ -167,12 +169,12 @@ module.exports.loop = function () {
 	Sites.Industry("W11S45", 1, Population__Industry);
 
 	/* Colony #8, W18S41 */
-    Sites.Colony("W18S41", 0, Population__Colony_RCL_Mid,
+    Sites.Colony("W18S41", 0, Population__Colony_RCL8,
 		    [ {id: "57f1c74616fb8a5a6b0bb386", role: "send"},
               {id: "57f1f63bab48a7a015c15ccd", role: "receive"} ]);
 	Sites.Mining("W18S41", "W18S41", 0, false, Population__Mining_1S_Colony);
 	Sites.Industry("W18S41", 0, Population__Industry,
-			[ { action: "boost", mineral: "XGH2O", lab: "57ec7be65dff746643b687dd", role: "worker", subrole: "upgrader" },
+			[ { action: "boost", mineral: "XGH2O", lab: "57ec7be65dff746643b687dd", role: "worker", subrole: null },
 			  { action: "reaction", mineral: "XGH2O", amount: -1,
 				reactor: "57f1dc282328a5430803d75f", supply1: "57f1f4076a19548340f790c1", supply2: "57f6e31a8538cb68487ef987" },
 			  { action: "reaction", mineral: "XGH2O", amount: -1,
@@ -181,8 +183,10 @@ module.exports.loop = function () {
 				reactor: "57f6e183bd1ef5dc2c7fd9a7", supply1: "57f1f4076a19548340f790c1", supply2: "57f6e31a8538cb68487ef987"} ]);
 
 	/* Colony #9, W13S45 */
-    Sites.Colony("W13S45", 1, Population__Colony_RCL_Low);
-	Sites.Mining("W13S45", "W13S45", 1, false, Population__Mining_RCL_Low);
+    Sites.Colony("W13S45", 1, Population__Colony_RCL_Mid,
+		    [ {id: "57ffd190ae1eb44865a1fbdd", role: "send"},
+              {id: "580006db3af5ae2646979f6b", role: "receive"} ]);
+	Sites.Mining("W13S45", "W13S45", 1, false, Population__Mining_1S_Colony);
 
 
 
@@ -204,12 +208,14 @@ module.exports.loop = function () {
     Sites.Mining("W15S43", "W15S45", 0, false,
             { burrower:  {level: 6, amount: 2},
               carrier:   {level: 7, amount: 7},
+			  extractor: {level: 8, amount: 1, body: "extractor_rem"},
               multirole: {level: 6, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", 0, true,
 			{ paladin: 	 {level: 8, amount: 1, scale_level: false},
 			  healer:	 {level: 5, amount: 1},
 			  burrower:	 {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 7},
+			  extractor: {level: 8, amount: 1, body: "extractor_rem"},
               multirole: {level: 6, amount: 1} } );
 
     /* Remote mining operations for Colony #5, W13S41 */

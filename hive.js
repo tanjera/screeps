@@ -31,6 +31,21 @@ let Hive = {
 			return false;
 		}		
     },
+	
+	isPulse_Blueprint: function() {				
+		let minTicks = 500, maxTicks = 2000;
+		let range = maxTicks - minTicks;
+		let lastTick = _.get(Memory, ["pulses", "blueprint"]);
+		
+		if (lastTick == null
+				|| Game.time == lastTick 
+				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
+			_.set(Memory, ["pulses", "blueprint"], Game.time);
+			return true;
+		} else {
+			return false;
+		}		
+    },
 
     moveReusePath: function() {		
 		let minTicks = 10, maxTicks = 60;
@@ -76,10 +91,10 @@ let Hive = {
         if (Hive.isPulse_Main()) {			
 			_CPU.Start("Hive", "initTasks");
 			
-			let Tasks = require("tasks");
+			let _Compile = require("tasks.compile");
             for (let r in Game["rooms"]) {            
                 Memory["rooms"][r]["tasks"] = {};
-                Tasks.compileTasks(r);
+                _Compile.compileTasks(r);
 				Memory["rooms"][r]["tasks_running"] = {};
             }
 			
@@ -242,31 +257,18 @@ let Hive = {
 		
 		let energy = new Object();		
 					
-		for (let r in Game.rooms) {
-			let room = Game.rooms[r];
-			
-			if (room.terminal != null && room.terminal.my) {
-				if (room.storage != null && room.storage.store["energy"] != null) {
-					energy[r] = room.storage.store["energy"];				
-				}
-				
-				if (room.terminal.store["energy"] != null && room.terminal.store["energy"] > 0) {					
-					if (energy[r] == null)
-						energy[r] = room.terminal.store["energy"];
-					else
-						energy[r] += room.terminal.store["energy"];			
-				}
-			}
-		}
+		_.forEach(_.filter(Game.rooms, 
+			r => { return r.terminal != null && r.terminal.my; } ),
+			r => { energy[r.name] = _.get(r, ["storage", "store", "energy"], 0) + _.get(r, ["terminal", "store", "energy"], 0); } );
 	
 		let tgtRoom = _.head(_.sortBy(_.filter(Object.keys(energy), 
-			n => { return energy[n] < limit; } ),
+			n => { return energy[n] < (limit * 0.95); } ),
 			n => { return energy[n]; }));
 	
 		if (tgtRoom != null) {
 			_.forEach(_.filter(Object.keys(energy), 
 				r => { return energy[r] > limit; } ),
-				r => { _.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 }); } );			
+				r => { _.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 }); } );
 		}
 		
 		_CPU.End("Hive", "moveExcessEnergy");

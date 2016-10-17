@@ -2,11 +2,25 @@ module.exports = {
 	Init: function() {
 		let command_list = new Array();
 		
+		command_list.push("blueprint.set(rmName)");
+		command_list.push("blueprint.set_all()");
+		command_list.push("blueprint.construct(rmName)");
+		command_list.push("blueprint.construct_all()");
+		command_list.push("");
+		
 		command_list.push("profiler.run(cycles)");
 		command_list.push("profiler.stop()");
 		command_list.push("");
 		
 		
+		command_list.push("list_rooms__all()");
+		list_rooms__all = function() {
+			return `["${String(Object.keys(Game.rooms)).replace(/[,]/g, "\", \"")}"]`;			
+		};
+		
+		
+		
+		command_list.push("");
 		command_list.push("log_resources()");
 		log_resources = function() {
 			let resources = new Object();
@@ -112,6 +126,8 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		}
 		
+		
+		
 		command_list.push("");
 		command_list.push("stockpile(rmName, resource, amount)");
 		stockpile = function (rmName, resource, amount) {
@@ -153,6 +169,8 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> All Memory.rooms.[r].stockpile reset!";					
 		}
 
+		
+		
 		commands = function() {
 			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Command list complete";

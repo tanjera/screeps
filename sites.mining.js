@@ -75,13 +75,9 @@ module.exports = {
             }
         }
         else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"]) {
-            if (listPopulation["carrier"]["body"] == null) {                
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["carrier"]["level"], 
-					body: "carrier", name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
-            } else if (listPopulation["carrier"]["body"] == "all-terrain") {                
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["carrier"]["level"], 
-					body: "carrier_at", name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
-            }
+			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["carrier"]["level"], 
+				body: (listPopulation["carrier"]["body"] || "carrier"), 
+				name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["multirole"] != null && lMultirole.length < listPopulation["multirole"]["amount"]) {
             Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 2, level: listPopulation["multirole"]["level"], 
@@ -97,7 +93,8 @@ module.exports = {
                     && Object.keys(Game.rooms).includes(rmHarvest)
                     && Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0) {            
 			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["extractor"]["level"], 
-					body: "extractor", name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
+					body: (listPopulation["extractor"]["body"] || "extractor"), 
+					name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
         }
 	},
 	
@@ -146,7 +143,7 @@ module.exports = {
 					} else if (creep.memory.role == "soldier" || creep.memory.role == "paladin") {
 						Roles.Soldier(creep, false);
 					} else if (creep.memory.role == "healer") {
-							Roles.Healer(creep);
+						Roles.Healer(creep);
 					}
 				}
             }
