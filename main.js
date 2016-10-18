@@ -26,12 +26,9 @@ module.exports.loop = function () {
 
 	/* Auto-sell excess stockpile */
 	Hive.sellExcessResources({
-		O: { limit: 250000 },
-		H: { limit: 250000 },
-		U: { limit: 150000 },
-		L: { limit: 150000 },
-		Z: { limit: 150000 },
-		K: { limit: 150000 } });
+		energy: 1750000,
+		O: 250000, H: 250000,
+		U: 150000, L: 150000, Z: 150000, K: 150000 });
 
 	Hive.moveExcessEnergy(200000);
 
@@ -110,7 +107,8 @@ module.exports.loop = function () {
               {id: "57af99d528986c413c0a8f4c", role: "receive"} ] );
     Sites.Mining("W15S41", "W15S41", 0, false, Population__Mining_2S_Colony);
 	Sites.Industry("W15S41", 2, Population__Industry,
-            [ { action: "reaction", mineral: "GH", amount: 25000,
+            [ { action: "boost", mineral: "XGH2O", lab: "57d8a65bab861d4e5a9d1c0b", role: "worker", subrole: null },
+			  { action: "reaction", mineral: "GH", amount: 25000,
 				supply1: "57d89720dce50fae29ef2a2f", supply2: "57d9447dd2ca5f470498bb39",
 				reactors: [ "57d881c1379deeae5258a079", "57d88d54f20b92b65d7ab82f", "57d89f2ad4e23b6a2c92e17d", "57d8e3a2ea2796d33b4a5010",
 							"57d96dfcaf7c4a4c5fb94601", "57d997a069779881436dbca0", "57d91ca57fcc818072da4b27" ] } ]);
@@ -156,7 +154,11 @@ module.exports.loop = function () {
 			[ {id: "57d61ddf2ff0d3ea25976f78", role: "send"},
 			  {id: "57ddb7390a699fdb6cc87b58", role: "receive"} ]);
     Sites.Mining("W11S45", "W11S45", 0, false, Population__Mining_2S_Colony);
-	Sites.Industry("W11S45", 1, Population__Industry);
+	Sites.Industry("W11S45", 1, Population__Industry,
+			[ { action: "reaction", mineral: "XLH2O", amount: 30000,
+				supply1: "57f9ebcf5d7c30cc0eb043e5", supply2: "57e58a8acd1d692952ebaec4",
+				reactors: [ "57e57acd048966501158027f", "57f9dfe96cbbb2191b7db18b", "57f9fd3172c0b182287be052", "57fa0cc850a06e900aa39c5b",
+							"57e53dbad5d257c904a5e937", "57e5a076dfd026e14083e949", "57e570eb1af0150a5a1d0c68" ] } ]);
 
 	/* Colony #8, W18S41 */
     Sites.Colony("W18S41", 0, Population__Colony_RCL8,

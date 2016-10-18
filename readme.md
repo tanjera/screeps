@@ -72,13 +72,13 @@ Once you have a terminal built and have a Sites.Industry() in your main.js for t
 
 into your main.js, and any rooms with more energy than the limit (in this example: 200,000) will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your rooms. Terminals in a room with a Sites.Industry() also process terminal orders, which can be manually entered as such:
 
-* For internal transfers (among your own rooms): *
+* For internal transfers (among your own rooms):
 
 ```
 Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: "", priority: 1};
 ```
 	
-* For market trading (fulfilling existing orders from other players): *
+* For market trading (fulfilling existing orders from other players):
 
 ```
 Memory["terminal_orders"][""] = { market_id: "", amount: , from: "", priority: 4};
@@ -93,9 +93,19 @@ and Sites.Industry() will automatically create tasks for the courier to load/unl
 
 Don't forget to define your allies in main.js, but be careful who you add! Your list of allies is a group of players whose creeps will be able to move through your rooms and interact with your creeps and structures without setting off your defenses.
 
-#### Auto-defend
+#### Active Defenses
 
 There are several basic automatic defenses built into the code. Towers will choose an enemy creep that enters your rooms and fire on them, so long as they are supplied with energy! When enemy creeps invade your rooms, including your remote mining rooms, soldiers are spawned and sent after the enemy until they are destroyed. All of these basic defenses function automatically.
+
+#### Passive Defenses
+
+Passive defenses (walls and ramparts) are also an integral part of your room's defenses. When you construct a wall or rampart and have a worker or repairer available with energy, it is automatically set to build and repair your walls to a minimum "critical" hitpoint level, and then- as available- repair them to a target "maintenance" hitpoint level. The amount of hitpoints that the code will automatically aim for scales depending on your room's controller level (RCL), from 10K hitpoints at RCL1 to 1M hitpoints at RCL8. 
+
+You can also specify the target hitpoint goal for a specific tile or wall or rampart by adding a value to its memory setting at `Memory.rooms[rmName].structures[${s.structureType}-${s.id}].targetHits`. An example of a quick way to set a room's walls (e.g. W18S43, all walls and ramparts along x == 2) to a custom target hitpoint goal (e.g. 5M)- all via the console- would be:
+
+```
+_.each(Game.rooms.W18S43.find(FIND_STRUCTURES, { filter: (s) => { return s.pos.x == 2 && (s.structureType == "constructedWall" || s.structureType == "rampart"); } }), s => { _.set(Memory, ["rooms", s.pos.roomName, "structures", `${s.structureType}-${s.id}`, "targetHits"], 5000000); });
+```
 
 #### Invading a Room
 

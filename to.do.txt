@@ -1,26 +1,48 @@
 
-- W18S41 -> XGH2O @ RCL 7!
-
-- bug... Memory.rooms.undefined.tasks_running.undefined keeps getting set??!?
-
-- implement safe modes...
+** To do **
 	
-- _.groupBy for runPopulations
-- moveTo optimization?
-	if(creep.moveTo(StartRoomFlag, {reusePath: Number.MAX_SAFE_INTEGER}) != OK) {
-        creep.moveTo(StartRoomFlag,{reusePath:0, ignoreCreeps:true})
-    }
+- Overloads 
+	- room.resource(resource) return terminal + storage if has resource?
+
+- Implement:
+	- Safe Mode
+	- Observer
+	- Nuker
+	- Power spawn?
+
+- Optimization
+
+	- _.groupBy for runPopulations
+	- moveTo optimization?
+		if(creep.moveTo(StartRoomFlag, {reusePath: Number.MAX_SAFE_INTEGER}) != OK) {
+			creep.moveTo(StartRoomFlag,{reusePath:0, ignoreCreeps:true})
+		}
+
+
+		
+	
+	
+** Fixed? Needs Testing? **
+
+	- Memory.rooms.undefined.tasks_running.undefined keeps getting set??!?
 
 
 	
-** Debug/Test
-	- Mineral extraction in source keeper rooms?
+	
+	
+	
+	
+** Bugs **
 
-- Blueprints
-	- Every ~500 or ~1500 ticks check if all flags (coded for structureType) are sitting on appropriate structure?
-		- If not, then set construction site.
-		- If at max construction sites, return;
-	- Console commands to set all flags to current layout (including construction sites).
+- CPU Profiler
+	- room_cycles always equals cycles in Math.max(room_cycles, cycles)
+	
+
+	
+	
+	
+	
+** Ideas **
 	
 - Attack Optimizations
 	- Towers to target flank/outside creeps, possibly creeps not near healers?
@@ -28,11 +50,3 @@
 * Optimization
 	- Task system
 		... done? new ideas?
-
-- CPU Profiler
-	- room_cycles always equals cycles in Math.max(room_cycles, cycles)
-
-- code in safe mode activation??	
-	
-- Overload Game.room?
-	- room.resource(resource) return terminal + storage if has resource?
