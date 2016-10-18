@@ -141,6 +141,7 @@ module.exports = {
 			}
 		});
 		
-		console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${rmName}: ${result} sites created.`);
+		if (result > 0)
+			console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${rmName}: ${result} sites created.`);
 	}
 };
