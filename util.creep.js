@@ -250,13 +250,16 @@ module.exports = {
             case "healer": return _Body.getBody_Healer(level);
             case "multirole": return _Body.getBody_Multirole(level);
             case "worker": return _Body.getBody_Worker(level);
+			case "worker_at": return _Body.getBody_Worker_AT(level);
             case "burrower": return _Body.getBody_Burrower(level);
+			case "burrower_at": return _Body.getBody_Burrower_AT(level);
 			case "extractor": return _Body.getBody_Extractor(level);
 			case "extractor_rem": return _Body.getBody_Extractor_REM(level);
             case "courier":
             case "carrier": return _Body.getBody_Carrier(level);
             case "carrier_at": return _Body.getBody_Carrier_AT(level);
             case "reserver": return _Body.getBody_Reserver(level);
+			case "reserver_at": return _Body.getBody_Reserver_AT(level);
         }
 	},
 };

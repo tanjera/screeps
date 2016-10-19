@@ -228,7 +228,7 @@ let Hive = {
 
 				if (order != null) {
 					_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: order.id, amount: excess, from: room, priority: 4 });
-					console.log(`<font color=\"##DBA3FF\">[Hive]</font> Selling overflow resource to market: ${excess} of ${res} from ${room}`);
+					console.log(`<font color=\"#F7FF00\">[Hive]</font> Selling overflow resource to market: ${excess} of ${res} from ${room}`);
 				}
 			}
 		}
@@ -253,9 +253,11 @@ let Hive = {
 			n => { return energy[n]; }));
 
 		if (tgtRoom != null) {
-			_.forEach(_.filter(Object.keys(energy), r => { return energy[r] > limit; } ), r => {
+			_.forEach(_.filter(Object.keys(energy), 
+					r => { return !_.has(Memory, ["terminal_orders", `overflow_energy_${r}`]) && energy[r] - limit > 100; } ), 
+					r => {	// Terminal transfers: minimum quantity of 100.
 				_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
-				console.log(`<font color=\"#DBA3FF\">[Hive]</font> Moving overflow energy: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);
+				console.log(`<font color=\"#F7FF00\">[Hive]</font> Creating overflow energy transfer: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);				
 			});
 		}
 

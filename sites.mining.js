@@ -40,7 +40,7 @@ module.exports = {
         Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["paladin"] != null && lPaladin.length < listPopulation["paladin"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, level: listPopulation["paladin"]["level"], 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["paladin"]["level"], 
 				scale_level: listPopulation["paladin"]["scale_level"],
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
 		} else if (hasKeepers == false && Object.keys(Game.rooms).includes(rmHarvest) && Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
@@ -48,7 +48,7 @@ module.exports = {
             let lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmHarvest);
             if (lSoldier.length + lMultirole.length < Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, 
                         {filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length) {
-				Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 0, level: 8, 
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: 8, 
 					body: "soldier", name: null, args: {role: "soldier", room: rmHarvest, colony: rmColony} });				
             }
         }
@@ -58,7 +58,7 @@ module.exports = {
         }
         else if (listPopulation["miner"] != null && lMiner.length < listPopulation["miner"]["amount"]) {
             if (lMiner.length == 0) { // Possibly colony wiped? Need restart?                
-				Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, level: 1, 
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1, 
 					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });			
 			} else {            				
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["miner"]["level"], 
@@ -67,11 +67,12 @@ module.exports = {
         }
         else if (listPopulation["burrower"] != null && lBurrower.length < listPopulation["burrower"]["amount"]) {
             if (lCarrier.length == 0 && listPopulation["carrier"] != null && lMiner.length == 0) {// Possibly colony wiped? Need restart?                
-				Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, level: 1, 
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1, 
 					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });			
             } else {                
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["burrower"]["level"], 
-					body: "burrower", name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
+					body: (listPopulation["burrower"]["body"] || "burrower"),
+					name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
             }
         }
         else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"]) {
@@ -86,8 +87,9 @@ module.exports = {
         else if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"] 
                     && Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
                     && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {                    
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 2, level: listPopulation["reserver"]["level"], 
-				body: "reserver", name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["reserver"]["level"], 
+				body: (listPopulation["reserver"]["body"] || "reserver"), 
+				name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] 
                     && Object.keys(Game.rooms).includes(rmHarvest)

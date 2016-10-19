@@ -188,6 +188,7 @@ module.exports = {
 						priority: (storages[i].structureType == "storage" ? 8 : 9)
 					});
 				if (storages[i].structureType == "storage") {
+					// Storages receive all minerals... industry tasks work from storage!
 					_Tasks.addTask(rmName,
 						{   room: rmName,
 							type: "carry",
@@ -201,6 +202,23 @@ module.exports = {
 							creeps: 10,
 							priority: 9
 						});
+				} else if (storages[i].structureType == "container") {
+					// Empty stray minerals from containers! type: "energy" for carriers (not an industry task!)
+					_.each(_.filter(Object.keys(storages[i].store), res => { return res != "energy"; }), res => {
+						_Tasks.addTask(rmName,
+							{   room: rmName,
+								type: "energy",
+								subtype: "withdraw",
+								structure: storages[i].structureType,
+								resource: res,
+								id: storages[i].id,
+								pos: storages[i].pos,
+								key: `energy:withdraw-energy-${storages[i].id}`,
+								timer: 10,
+								creeps: Math.ceil(storages[i].store[res] / 1000),
+								priority: 2
+							});
+					});
 				}
 			}
 		}

@@ -1,8 +1,8 @@
 module.exports = {
     
-	Colony: function(rmColony, listSpawnRooms, listPopulation, listLinks) {
+	Colony: function(rmColony, listSpawnRooms, listPopulation, listLinks, listRoute) {
 		let Colony = require("sites.colony");
-		Colony.Run(rmColony, listSpawnRooms, listPopulation, listLinks)
+		Colony.Run(rmColony, listSpawnRooms, listPopulation, listLinks, listRoute)
 	},
 	
 	Mining: function(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listRoute) {
@@ -15,9 +15,9 @@ module.exports = {
 		Industry.Run(rmColony, listSpawnRooms, listPopulation, listLabs);
 	},
 	
-	Reservation: function(rmColony, rmHarvest, listSpawnRooms, listPopulation, listRoute) {
+	Reservation: function(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute) {
 		let Reservation = require("sites.reservation");
-		Reservation.Run(rmColony, rmHarvest, listSpawnRooms, listPopulation, listRoute)
+		Reservation.Run(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute)
 	},
     
 	Occupation: function(rmColony, rmOccupy, listSpawnRooms, listPopulation, listTargets, listRoute) {

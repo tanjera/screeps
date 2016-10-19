@@ -242,7 +242,7 @@ module.exports = {
 							id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 2 });
 					}
 					else if (Object.keys(storage.store).includes(supply1_mineral)
-							&& lab.mineralAmount < lab.mineralCapacity * 0.2) {
+							&& lab.mineralAmount < lab.mineralCapacity * 0.25) {
 						Tasks.addTask(rmColony, {
 							key: `industry:withdraw-${supply1_mineral}-${storage.id}`, room: rmColony,
 							type: "industry", subtype: "withdraw", resource: supply1_mineral,
@@ -261,7 +261,7 @@ module.exports = {
 							id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 2 });
 					}
 					else if (Object.keys(storage.store).includes(supply2_mineral)
-							&& lab.mineralAmount < lab.mineralCapacity * 0.2) {
+							&& lab.mineralAmount < lab.mineralCapacity * 0.25) {
 						Tasks.addTask(rmColony, {
 							key: `industry:withdraw-${supply2_mineral}-${storage.id}`, room: rmColony,
 							type: "industry", subtype: "withdraw", resource: supply2_mineral,
@@ -279,7 +279,7 @@ module.exports = {
 								key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
 								type: "industry", subtype: "withdraw", resource: lab.mineralType,
 								id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 2 });
-						} else if (lab.mineralAmount > lab.mineralCapacity * 0.8) {
+						} else if (lab.mineralAmount > lab.mineralCapacity * 0.2) {
 							Tasks.addTask(rmColony, {
 								key: `industry:withdraw-${listing["mineral"]}-${lab.id}`, room: rmColony,
 								type: "industry", subtype: "withdraw", resource: listing["mineral"],
@@ -420,7 +420,7 @@ module.exports = {
 		let res = order["resource"];
 
 		if (!Object.keys(shortage).includes(res) || shortage[res] < -2000) {
-			if (terminal.store[res] != null && ((res != "energy" && terminal.store[res] > 100) || (res == "energy" && terminal.store[res] > 200))) {
+			if (terminal.store[res] != null && ((res != "energy" && terminal.store[res] >= 100) || (res == "energy" && terminal.store[res] > 200))) {
 				filling.push(res);
 				filling.push("energy");
 

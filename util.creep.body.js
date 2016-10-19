@@ -269,6 +269,55 @@ module.exports = {
         }
 	},
 
+    getBody_Worker_AT: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Worker_AT, ${level} is not a proper number!`);
+				return;
+            case 1:
+                return [ // 250 energy, 1x WORK, 1x CARRY, 2x MOVE
+                        WORK,
+                        CARRY,
+                        MOVE, MOVE];
+            case 2:
+                return [ // 400 energy, 2x WORK, 1x CARRY, 3x MOVE
+                        WORK, WORK,
+                        CARRY,
+                        MOVE, MOVE, MOVE];
+            case 3:
+                return [ // 700 energy, 3x WORK, 3x CARRY, 6x MOVE
+                        WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 4:
+                return [ // 1150 energy, 5x WORK, 4x CARRY, 9x MOVE
+                        WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 5:
+                return [ // 1650 energy, 7x WORK, 6x CARRY, 13x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE];
+            case 6:
+                return [ // 2200 energy, 10x WORK, 7x CARRY, 17x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 7:
+			case 8:
+                return [ // 3100 energy, 14x WORK, 9x CARRY, 25x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+						WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE];            
+        }
+	},
+
     getBody_Burrower: function(level) {
         switch (level) {
             default:
@@ -312,6 +361,54 @@ module.exports = {
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        }
+	},
+
+    getBody_Burrower_AT: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Burrower_AT, ${level} is not a proper number!`);
+				return;
+            case 1:
+                return [ // 300 energy, 2x WORK, 2x MOVE
+                        WORK, MOVE, WORK, MOVE];
+            case 2:
+                return [ // 450 energy, 3x WORK, 3x MOVE
+                        WORK, MOVE, WORK, MOVE, WORK, MOVE];
+            case 3:
+                return [ // 600 energy, 4x WORK, 4x MOVE
+                        WORK, WORK, WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE];
+            case 4:
+                return [ // 1200 energy, 8x WORK, 8x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 5:
+                return [ // 1650 energy, 11x WORK, 11x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE];
+            case 6:
+                return [ // 2100 energy, 14x WORK, 14x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE];
+            case 7:
+                return [ // 3000 energy, 20x WORK, 20x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 8:
+                return [ // 3750 energy, 25x WORK, 25x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE];
         }
 	},
 
@@ -515,6 +612,30 @@ module.exports = {
             case 8:
                 return [ // 1300 energy, 2x CLAIM, 2x MOVE
                         CLAIM, CLAIM, MOVE, MOVE];
+        }
+    },
+
+    getBody_Reserver_AT: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Reserver_AT, ${level} is not a proper number!`);
+				return;
+            case 1:
+            case 2:
+                return null;
+            case 3:
+				return [ // 750 energy, 1x CLAIM, 3x MOVE
+                        CLAIM, MOVE, MOVE, MOVE];
+            case 4:
+                return [ // 850 energy, 1x CLAIM, 5x MOVE
+                        CLAIM, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                return [ // 1700 energy, 2x CLAIM, 10x MOVE
+                        CLAIM, CLAIM, 
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
         }
     },
 };

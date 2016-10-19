@@ -33,7 +33,7 @@ module.exports = {
 
 				_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {
 					let amount = _.get(r, ["storage", "store", res], 0) + _.get(r, ["terminal", "store", res], 0);
-					if (amount > limit)
+					if (amount >= limit)
 						output += `${r.name}: ${amount} <br>`;
 				});
 
