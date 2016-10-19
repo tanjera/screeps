@@ -5,10 +5,10 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 	
-	Run: function(rmColony, rmInvade, spawnDistance, listArmy, listTargets, posRally, listRoute) {
+	Run: function(rmColony, rmInvade, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Invade-${rmInvade}-runPopulation`);
-			this.runPopulation(rmColony, rmInvade, spawnDistance, listArmy);
+			this.runPopulation(rmColony, rmInvade, listSpawnRooms, listArmy);
 			_CPU.End(rmColony, `Invade-${rmInvade}-runPopulation`);
 		}
 		
@@ -18,7 +18,7 @@ module.exports = {
 	},
 	
 	
-	runPopulation: function(rmColony, rmInvade, spawnDistance, listArmy) {
+	runPopulation: function(rmColony, rmInvade, listSpawnRooms, listArmy) {
 		if (Memory["rooms"][rmColony][`invasion_${rmInvade}`] == null)
 			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
 		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];		
@@ -34,13 +34,13 @@ module.exports = {
 			}
 			
 			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {				
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["soldier"]["level"], 
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["soldier"]["level"], 
 					body: "soldier", name: null, args: {role: "soldier", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {				
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["archer"]["level"], 
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["archer"]["level"], 
 					body: "archer", name: null, args: {role: "archer", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["healer"] != null && lHealer.length < listArmy["healer"]["amount"]) {
-				Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 0, level: listArmy["healer"]["level"], 
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["healer"]["level"], 
 					body: "healer", name: null, args: {role: "healer", room: rmInvade, colony: rmColony} });
 			} else if (memory.state == "spawning") {
 				memory.state = "rallying";

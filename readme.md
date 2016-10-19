@@ -7,7 +7,7 @@ My code for my Screeps account- feel free to use, copy, etc. No guarantee that t
 I wrote the codebase so that the *only* editing that needs to be done is in main.js. You can define your colonies, mining sites, terminal and lab setups, rooms that you want reserved, rooms that you want a military presence in- all of that is defined in main.js using a Sites.Colony(), defined as `function(rmColony, spawnDistance, listPopulation, listLinks)`. For example:
 
 ```
-Sites.Colony("W18S43", 2,
+Sites.Colony("W18S43", ["W19S42"],
 	{ worker:   {level: 7, amount: 1},
 	  repairer: {level: 5, amount: 1} },
 	[ {id: "57a2465268244ab107a96d5e", role: "send"},
@@ -16,23 +16,23 @@ Sites.Colony("W18S43", 2,
 	  {id: "57a25c61958cffd536325056", role: "receive"} ] );
 ```
 
-This example shows the definition of a colony at room W18S43 that will spawn its creeps from up to 2 rooms away, with a goal population of a worker and a repairer of different levels (body levels are defined in util.creep.js), and with 4 links (2 of which send energy, and 2 of which receive).
+This example shows the definition of a colony at room W18S43 that will spawn its creeps at either W18S43 (the colony) or W19S42 (its neighbor), with a goal population of a worker and a repairer of different levels (body levels are defined in util.creep.js), and with 4 links (2 of which send energy, and 2 of which receive).
 
 Each colony needs to mine, so then there is a source mining site which, depending on the arguments, can be an in-colony mining site, a remote mining site, mineral extraction, or mining of rooms with source keepers. This uses Sites.Mining() defined as `function(rmColony, rmHarvest, spawnDistance, hasKeepers, listPopulation, listRoute)`:
 
 ```
-Sites.Mining("W13S41", "W12S41", 1, false,
+Sites.Mining("W13S41", "W12S41", null, false,
 	{ burrower:  {level: 4, amount: 1},
 	  carrier:   {level: 4, amount: 3},
 	  multirole: {level: 4, amount: 1},
 	  reserver:  {level: 4, amount: 1} } );
 ```
 			  
-This example shows a remote mining site one room away from its base colony, which will spawn creeps from spawns up to 1 room away, whose workers don't keep any lookout for source keepers (saving CPU, but non-responsive to invaders!). The goal population is a burrower (literally burrows a pile of energy onto the ground), a carrier (which carries the energy from the pile to the colony), a multi-role creep (builds structures, repairs roads, and attacks invaders!), and a reserver (because a reserved room controller increases the maximum amount of energy in a source!).
+This example shows a remote mining site one room away from its base colony, which will only spawn workers from the colony (since listSpawnRooms is null), whose workers don't keep any lookout for source keepers (saving CPU, but non-responsive to invaders!). The goal population is a burrower (literally burrows a pile of energy onto the ground), a carrier (which carries the energy from the pile to the colony), a multi-role creep (builds structures, repairs roads, and attacks invaders!), and a reserver (because a reserved room controller increases the maximum amount of energy in a source!).
 
 ### Spawning and Creep "Levels"
 
-Using the spawnDistance argument, the codebase iterates through each spawn and attempts to spawn creeps in order of priority, and within range (spawnDistance) of their future colony. This allows a brand new colony to have its creeps spawned from an existing colony several rooms away, or allows multiple established colonies to share the burden of spawning if one colony lacks the energy.
+Using the listSpawnRooms argument, the codebase iterates through each spawn and attempts to spawn creeps in order of priority, and within either the colony or any rooms on listSpawnRooms. This allows a brand new colony to have its creeps spawned from an existing colony several rooms away, or allows multiple established colonies to share the burden of spawning if one colony lacks the energy.
 
 For resource management- to save energy and spawn time- I equated a room's control level ("RCL") with creep "levels" to make sense of spawning. A room may be RCL 6 but only need a level 4 repairer to keep up with the work of repairing structures. If every creep, miner, and remote miner for an RCL 6 room (with 1 spawn) were to be at creep level 6, the spawn may not be able to keep up with the population demand!
 

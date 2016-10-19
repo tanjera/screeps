@@ -3,11 +3,11 @@ let Hive = require("hive");
 
 module.exports = {
 	
-	Run: function(rmColony, spawnDistance, listPopulation, listLinks) {
+	Run: function(rmColony, listSpawnRooms, listPopulation, listLinks) {
 		
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Colony-runPopulation");
-			this.runPopulation(rmColony, spawnDistance, listPopulation);
+			this.runPopulation(rmColony, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, "Colony-runPopulation");
 		}
 		
@@ -25,7 +25,7 @@ module.exports = {
 	},
 	
 	
-	runPopulation: function(rmColony, spawnDistance, listPopulation) {		
+	runPopulation: function(rmColony, listSpawnRooms, listPopulation) {		
 		let lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == null && creep.memory.room == rmColony);
         let lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "repairer" && creep.memory.room == rmColony);
         let lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "upgrader" && creep.memory.room == rmColony);
@@ -42,17 +42,17 @@ module.exports = {
         if ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) 
             || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) { 
                         return Memory["allies"].indexOf(c.owner.username) < 0; }}).length)) {                        
-			Memory["spawn_requests"].push({ room: rmColony, distance: 0, priority: 0, 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 0, 
 				level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]), 
 				body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
         } else if (listPopulation["worker"] != null && lWorker.length < listPopulation["worker"]["amount"]) {            
-			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 3, level: listPopulation["worker"]["level"], 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, level: listPopulation["worker"]["level"], 
 				body: "worker", name: null, args: {role: "worker", room: rmColony} });
         } else if (listPopulation["repairer"] != null && lRepairer.length < listPopulation["repairer"]["amount"]) {            
-			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 4, level: listPopulation["repairer"]["level"], 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["repairer"]["level"], 
 				body: "worker", name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
         } else if (listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {            
-			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 4, level: listPopulation["upgrader"]["level"], 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["upgrader"]["level"], 
 				scale_level: listPopulation["upgrader"]["scale_level"],
 				body: "worker", name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
         }

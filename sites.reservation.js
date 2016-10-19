@@ -3,11 +3,11 @@ let Hive = require("hive");
 
 module.exports = {
 	
-	Run: function(rmColony, rmReserve, spawnDistance, listPopulation, listRoute) {
+	Run: function(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute) {
         
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Reserve-${rmReserve}-runPopulation`);
-			this.runPopulation(rmColony, rmReserve, spawnDistance, listPopulation);
+			this.runPopulation(rmColony, rmReserve, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, `Reserve-${rmReserve}-runPopulation`);
 		}
 		
@@ -16,7 +16,7 @@ module.exports = {
 		_CPU.End(rmColony, `Reserve-${rmReserve}-runCreeps`);        
 	},
 	
-	runPopulation: function(rmColony, rmReserve, spawnDistance, listPopulation) {
+	runPopulation: function(rmColony, rmReserve, listSpawnRooms, listPopulation) {
 		let lReserver  = _.filter(Game.creeps, (c) => c.memory.role == "reserver" && c.memory.room == rmReserve && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
 		let popTarget = (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"]);
@@ -24,7 +24,7 @@ module.exports = {
 		Hive.populationTally(rmColony, popTarget, popActual);
 
 		if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]) {            
-			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 1, level: listPopulation["reserver"]["level"], 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["reserver"]["level"], 
 				body: "reserver", name: null, args: {role: "reserver", room: rmReserve, colony: rmColony} });
 		}
 	},

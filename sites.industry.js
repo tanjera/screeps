@@ -7,7 +7,7 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 
-	Run: function(rmColony, spawnDistance, listPopulation, listLabs) {
+	Run: function(rmColony, listSpawnRooms, listPopulation, listLabs) {
 
 		/* Terminal order format (from: is optional!)
 		 * For internal transfers:
@@ -19,7 +19,7 @@ module.exports = {
 
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Industry-runPopulation");
-			this.runPopulation(rmColony, spawnDistance, listPopulation);
+			this.runPopulation(rmColony, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, "Industry-runPopulation");
 		}
 
@@ -47,7 +47,7 @@ module.exports = {
 	},
 
 
-	runPopulation: function(rmColony, spawnDistance, listPopulation) {
+	runPopulation: function(rmColony, listSpawnRooms, listPopulation) {
 		let lCourier  = _.filter(Game.creeps, (c) => c.memory.role == "courier" && c.memory.room == rmColony && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
         let popTarget = (listPopulation["courier"] == null ? 0 : listPopulation["courier"]["amount"]);
@@ -55,7 +55,7 @@ module.exports = {
         Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, distance: spawnDistance, priority: 4, level: listPopulation["courier"]["level"],
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["courier"]["level"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
 	},
@@ -67,7 +67,7 @@ module.exports = {
 		if (nuker == null || storage == null)
 			return;
 
-		if (nuker.energy < nuker.energyCapacity) {
+		if (nuker.energy < nuker.energyCapacity && _.get(storage, ["store", "energy"], 0) > 0) {
 			Tasks.addTask(rmColony, {
 				key: `industry:withdraw-energy-${storage.id}`, room: rmColony,
 				type: "industry", subtype: "withdraw", resource: "energy",
@@ -76,18 +76,22 @@ module.exports = {
 				key: `industry:deposit-energy-${nuker.id}`, room: rmColony,
 				type: "industry", subtype: "deposit", resource: "energy",
 				id: nuker.id, pos: nuker.pos, timer: 10, creeps: 8, priority: 5 });
-		} else if (nuker.ghodium < nuker.ghodiumCapacity) {
+		} 
+		
+		if (nuker.ghodium < nuker.ghodiumCapacity) {
 			if (_.get(Memory, ["rooms", rmColony, "stockpile", "G"]) == null)
 				_.set(Memory, ["rooms", rmColony, "stockpile", "G"], 500)
 
-			Tasks.addTask(rmColony, {
-				key: `industry:withdraw-G-${storage.id}`, room: rmColony,
-				type: "industry", subtype: "withdraw", resource: "G",
-				id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
-			Tasks.addTask(rmColony, {
-				key: `industry:deposit-G-${nuker.id}`, room: rmColony,
-				type: "industry", subtype: "deposit", resource: "G",
-				id: nuker.id, pos: nuker.pos, timer: 10, creeps: 8, priority: 5 });
+			if (_.get(storage, ["store", "G"], 0) > 0) {
+				Tasks.addTask(rmColony, {
+					key: `industry:withdraw-G-${storage.id}`, room: rmColony,
+					type: "industry", subtype: "withdraw", resource: "G",
+					id: storage.id, pos: storage.pos, timer: 10, creeps: 8, priority: 5 });
+				Tasks.addTask(rmColony, {
+					key: `industry:deposit-G-${nuker.id}`, room: rmColony,
+					type: "industry", subtype: "deposit", resource: "G",
+					id: nuker.id, pos: nuker.pos, timer: 10, creeps: 8, priority: 5 });
+			}
 		}
 	},
 
@@ -97,7 +101,7 @@ module.exports = {
 			{ action: "reaction", amount: -1, mineral: "",
 			  supply1: "", supply2: "",
 			  reactors: ["", "", ...] }
-			{ action: "empty", lab: "" }
+			{ action: "empty", labs: ["", "", ...] }
 		*/
 
         for (let l in listLabs) {
@@ -206,19 +210,15 @@ module.exports = {
 					break;
 
 				case "empty":
-					lab = Game.getObjectById(listing["lab"]);
-					if (lab.mineralAmount > 0) {
-						Tasks.addTask(rmColony, {
-							key: `industry:withdraw-${lab.mineralType}-${listing["lab"]}`, room: rmColony,
-							type: "industry", subtype: "withdraw", resource: lab.mineralType,
-							id: listing["lab"], pos: lab.pos, timer: 10, creeps: 8, priority: 2 });
-					}
-					if (lab.energy > 0) {
-						Tasks.addTask(rmColony, {
-							key: `industry:withdraw-energy-${listing["lab"]}`, room: rmColony,
-							type: "industry", subtype: "withdraw", resource: "energy",
-							id: listing["lab"], pos: lab.pos, timer: 10, creeps: 8, priority: 3 });
-					}
+					_.forEach(listing["labs"], l => {
+						lab = Game.getObjectById(l);
+						if (lab.mineralAmount > 0) {
+							Tasks.addTask(rmColony, {
+								key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
+								type: "industry", subtype: "withdraw", resource: lab.mineralType,
+								id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 2 });
+						}
+					});
 					break;
 
 				case "reaction":

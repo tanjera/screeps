@@ -2,8 +2,8 @@ let _CPU = require("util.cpu");
 
 let Hive = {
 
-    isPulse_Main: function() {
-        let minTicks = 5, maxTicks = 60;
+	isPulse_Main: function() {
+		let minTicks = 5, maxTicks = 60;
 		let range = maxTicks - minTicks;
 		let lastTick = _.get(Memory, ["pulses", "main"]);
 
@@ -15,7 +15,7 @@ let Hive = {
 		} else {
 			return false;
 		}
-    },
+	},
 
 	isPulse_Spawn: function() {
 		let minTicks = 10, maxTicks = 20;
@@ -30,7 +30,7 @@ let Hive = {
 		} else {
 			return false;
 		}
-    },
+	},
 
 	isPulse_Blueprint: function() {
 		let minTicks = 500, maxTicks = 2000;
@@ -45,39 +45,39 @@ let Hive = {
 		} else {
 			return false;
 		}
-    },
+	},
 
-    moveReusePath: function() {
+	moveReusePath: function() {
 		let minTicks = 10, maxTicks = 60;
 		let range = maxTicks - minTicks;
 
 		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
-    },
+	},
 
-    clearDeadMemory: function() {
-        // Clear dead creeps from Memory
-        for (let n in Memory.creeps) {
-            if (!Game.creeps[n]) {
+	clearDeadMemory: function() {
+		// Clear dead creeps from Memory
+		for (let n in Memory.creeps) {
+			if (!Game.creeps[n]) {
 				if (Memory.creeps[n]["task"] != null) {
 					let task = Memory.creeps[n]["task"];
 					if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
 						delete Memory["rooms"][task.room]["tasks_running"][task.key][n];
 				}
 
-                delete Memory.creeps[n];
-            }
-        }
-    },
+				delete Memory.creeps[n];
+			}
+		}
+	},
 
-    initMemory: function() {
-        if (Memory["rooms"] == null) Memory["rooms"] = {};
+	initMemory: function() {
+		if (Memory["rooms"] == null) Memory["rooms"] = {};
 
-        for (let r in Game["rooms"]) {
-            if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};
-            if (Memory["rooms"][r]["tasks"] == null) Memory["rooms"][r]["tasks"] = {};
+		for (let r in Game["rooms"]) {
+			if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};
+			if (Memory["rooms"][r]["tasks"] == null) Memory["rooms"][r]["tasks"] = {};
 			Memory["rooms"][r]["population_balance"] = null;
 
-        }
+		}
 
 		Memory["spawn_requests"] = new Array();		
 
@@ -86,44 +86,40 @@ let Hive = {
 
 		let _Console = require("util.console");
 		_Console.Init();
-    },
+	},
 
-    initTasks: function() {
-        if (Hive.isPulse_Main()) {
+	initTasks: function() {
+		if (Hive.isPulse_Main()) {
 			_CPU.Start("Hive", "initTasks");
 
 			let _Compile = require("tasks.compile");
-            for (let r in Game["rooms"]) {
-                Memory["rooms"][r]["tasks"] = {};
-                _Compile.compileTasks(r);
+			for (let r in Game["rooms"]) {
+				Memory["rooms"][r]["tasks"] = {};
+				_Compile.compileTasks(r);
 				Memory["rooms"][r]["tasks_running"] = {};
-            }
+			}
 
 			_CPU.End("Hive", "initTasks");
-        }
-    },
+		}
+	},
 
-    populationTally: function(rmName, popTarget, popActual) {
-        // Tallies the target population for a colony, to be used for spawn load balancing
-        if (Memory["rooms"][rmName]["population_balance"] == null) {
-            Memory["rooms"][rmName]["population_balance"] = {target: popTarget, actual: popActual, total: null};
-        } else {
-            Memory["rooms"][rmName]["population_balance"]["target"] += popTarget;
-            Memory["rooms"][rmName]["population_balance"]["actual"] += popActual;
-        }
-    },
+	populationTally: function(rmName, popTarget, popActual) {
+		// Tallies the target population for a colony, to be used for spawn load balancing
+		_.set(Memory, ["rooms", rmName, "population_balance", "target"], _.get(Memory, ["rooms", rmName, "population_balance", "target"], 0) + popTarget);
+		_.set(Memory, ["rooms", rmName, "population_balance", "actual"], _.get(Memory, ["rooms", rmName, "population_balance", "actual"], 0) + popActual);                    
+	},
 
-    processSpawnRequests: function() {
+	processSpawnRequests: function() {
 		/*  lvlPriority is an integer rating priority, e.g.:
-                0: Defense (active, imminent danger)
-                1: Mining operations (critical)
-                2: Mining operations (regular)
-                3: Colony operation (critical)
-                4: Colony operation (regular)
-                5: ... ? scouting? passive defense?
+				0: Defense (active, imminent danger)
+				1: Mining operations (critical)
+				2: Mining operations (regular)
+				3: Colony operation (critical)
+				4: Colony operation (regular)
+				5: ... ? scouting? passive defense?
 
-            tgtLevel is the target level of the creep"s body (per util.creep)
-            spawnDistance is linear map distance from which a room (of equal or higher level) can spawn for this request
+			tgtLevel is the target level of the creep's body (per util.creep)
+			listRooms is an array of room names that would be acceptable to spawn the request (user defined)
 		*/
 
 		if (!this.isPulse_Spawn())
@@ -131,26 +127,33 @@ let Hive = {
 
 		_CPU.Start("Hive", "processSpawnRequests");
 
-        let listRequests = Object.keys(Memory["spawn_requests"]).sort((a, b) => {
-            return Memory["spawn_requests"][a]["priority"] - Memory["spawn_requests"][b]["priority"]; } );
-        let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
-        let _Creep = require("util.creep");
-
-		for (let s in listSpawns) {
-			for (let r in listRequests) {
-                if (listSpawns[s] != null && listRequests[r] != null) {
+		let listRequests = Object.keys(Memory["spawn_requests"]).sort((a, b) => {
+			return Memory["spawn_requests"][a]["priority"] - Memory["spawn_requests"][b]["priority"]; } );
+		let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
+		let _Creep = require("util.creep");
+		
+		_.each(listRequests, r => {
+			let request = Memory["spawn_requests"][listRequests[r]];
+			
+			_.each(_.sortBy(Object.keys(listSpawns), 
+					s => { return request != null && _.get(Game, ["spawns", listSpawns[s], "room", "name"]) == _.get(request, ["room"]); }), 
+					s => {
+						
+				if (listSpawns[s] != null && listRequests[r] != null) {
 					let spawn = Game["spawns"][listSpawns[s]];
-                    let request = Memory["spawn_requests"][listRequests[r]];
-                    if (Game.map.getRoomLinearDistance(spawn.room.name, request.room) <= request.distance) {
+					
+					if (spawn.room.name == request.room || (request.listRooms != null && _.find(request.listRooms, r => { return r == spawn.room.name; }) != null)) {
 
-						Memory["rooms"][request.room]["population_balance"]["total"] =
-							Memory["rooms"][request.room]["population_balance"]["actual"] / Memory["rooms"][request.room]["population_balance"]["target"];
+						_.set(Memory, ["rooms", request.room, "population_balance", "total"],
+							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
 
 						let _Colony = require("util.colony");
-                        let level = (request.scale_level != null && request.scale_level == false) ? request.level
-								: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
-									_Colony.getRoom_Level(spawn.room)));
+						let level = (request.scale_level != null && request.scale_level == false) 
+							? request.level
+							: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
+								_Colony.getRoom_Level(spawn.room)));								
 						request.args["level"] = level;
+						
 						let body = _Creep.getBody(request.body, level);
 						let name = request.name != null ? request.name
 							: request.args["role"].substring(0, 4)
@@ -158,44 +161,45 @@ let Hive = {
 								+ ":xxxx".replace(/[xy]/g, (c) => {
 										let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
 										return v.toString(16); });
-                        let result = spawn.createCreep(body, name, request.args);
+										
+						let result = spawn.createCreep(body, name, request.args);
 
-                        if (_.isString(result)) {							
+						if (_.isString(result)) {							
 							console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning lvl ${level} / ${request.level} ${request.body}, `
-								+ `${spawn.room.name} -> ${request.room}, `
+								+ (spawn.room.name == request.room ? `${request.room}, ` : `${spawn.room.name} -> ${request.room}, `)
 								+ `${result} (${request.args["role"]}`
 								+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]})`);
 
-                            listSpawns[s] = null;
-                            listRequests[r] = null;
-                        }
-                    }
-                }
-            }
-        }
+							listSpawns[s] = null;
+							listRequests[r] = null;
+						}
+					}
+				}
+			});
+		});
 
 		_CPU.End("Hive", "processSpawnRequests");
 	},
 
-    processSpawnRenewing: function() {
+	processSpawnRenewing: function() {
 		_CPU.Start("Hive", "processSpawnRenewing");
 
-        let _Creep = require("util.creep");
-        let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
-        for (let s in listSpawns) {
-            let spawn = Game["spawns"][listSpawns[s]];
-            let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
-            for (let c in creeps) {
-                if (!creeps[c].isBoosted()) {
-                    if (spawn.renewCreep(creeps[c]) == OK) {
-                        break;
-                    }
-                }
-            }
-        }
+		let _Creep = require("util.creep");
+		let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
+		for (let s in listSpawns) {
+			let spawn = Game["spawns"][listSpawns[s]];
+			let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
+			for (let c in creeps) {
+				if (!creeps[c].isBoosted()) {
+					if (spawn.renewCreep(creeps[c]) == OK) {
+						break;
+					}
+				}
+			}
+		}
 
 		_CPU.End("Hive", "processSpawnRenewing");
-    },
+	},
 
 	sellExcessResources: function(overflow) {
 		if (!Hive.isPulse_Main())

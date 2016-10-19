@@ -1,13 +1,21 @@
 
+** My rooms...
+
+- Load balance W13S41 -> W11S42 once able
+
+
+
+
+
+
 ** To do **
 	
 - Overloads 
 	- room.resource(resource) return terminal + storage if has resource?
 
 - Implement:
-	- Safe Mode
+	- Safe Mode... argh
 	- Observer
-	- Nuker
 	- Power spawn?
 
 - Optimization

@@ -1,7 +1,7 @@
 _Tasks = require("tasks");
 
 module.exports = {
-	
+
 	compileTasks: function (rmName) {
 		var structures;
 		let __Colony = require("util.colony");
@@ -83,7 +83,7 @@ module.exports = {
 					timer: 30,
 					creeps: 3,
 					priority: 3
-				});			
+				});
 		}
 
 		/* Carrier-based tasks & energy supply for workers) */
@@ -105,20 +105,20 @@ module.exports = {
 
 		let sources = room.find(FIND_SOURCES, { filter: s => { return s.energy > 0; }});
 		for (let i in sources) {
-			let container = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "container"]);			
+			let container = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "container"]);
 			container = (container == null) ? null : Game.getObjectById(container);
 			if (container == null) {
 				container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:
 					s => { return s.structureType == "container"; } }));
 				_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "container"], container == null ? null : container.id);
 			}
-			
+
 			let access_tiles = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"]);
-			if (access_tiles == null) {				
-				access_tiles = sources[i].pos.getAccessAmount();				
+			if (access_tiles == null) {
+				access_tiles = sources[i].pos.getAccessAmount();
 				_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"], access_tiles);
 			}
-			
+
 			_Tasks.addTask(rmName,
 				{   room: rmName,
 					type: "mine",
@@ -241,7 +241,7 @@ module.exports = {
 					}
 				}
 			}
-			
+
 			let towers = room.find(FIND_MY_STRUCTURES, { filter: s => {
 				return s.structureType == STRUCTURE_TOWER; }});
 			for (let i in towers) {
@@ -275,7 +275,7 @@ module.exports = {
 					});
 				}
 			}
-			
+
 			structures = room.find(FIND_MY_STRUCTURES, { filter: s => {
 				return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
 					|| (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
