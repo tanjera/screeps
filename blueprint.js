@@ -23,46 +23,46 @@ module.exports = {
 
 	Init: function() {
 		let _Hive = require("hive");
-		
+
 		if (_Hive.isPulse_Blueprint()) {
 			this.constructAll();
 		} else if (_.get(Memory, ["blueprint"]) != null) {
 			this.setRooms_Iterate();
 		}
-		
-		
+
+
 		blueprint = new Object();
 
 		blueprint.set = function(rmName) {
 			let _BP = require("blueprint");
-			_BP.setRoom(rmName);			
+			_BP.setRoom(rmName);
 			return true;
 		};
-		
+
 		blueprint.set_all = function() {
-			Memory.blueprint = {				
+			Memory.blueprint = {
 				index: 0,
 				final: Object.keys(Game.rooms).length,
-				rooms: Object.keys(Game.rooms)	
+				rooms: Object.keys(Game.rooms)
 			};
-			
+
 			console.log(`<font color=\"#6065FF\">[Blueprint]</font> Memory set- Will set 1 room per tick until complete!`);
 			return true;
 		}
 
 		blueprint.construct = function(rmName) {
 			let _BP = require("blueprint");
-			_BP.constructRoom(rmName);			
+			_BP.constructRoom(rmName);
 			return true;
 		};
-		
+
 		blueprint.construct_all = function(rmName) {
 			let _BP = require("blueprint");
-			_BP.constructAll();			
+			_BP.constructAll();
 			return true;
 		};
 	},
-	
+
 	setRoom: function(rmName) {
 		if (Game.rooms[rmName] == null)
 			return `<font color=\"#6065FF\">[Blueprint]</font> Blueprint.set() failed: ${rmName} == null`;
@@ -83,9 +83,9 @@ module.exports = {
 				_.forEach(structures[type], s => {
 					let flags = s.pos.lookFor("flag");
 					let key = _.find(Blueprint_Keys, k => { return k.structure == type; });
-					
+
 					for (let f in flags) {
-						let flag = flags[f];						
+						let flag = flags[f];
 						if (flag.color == key["color"] && flag.secondaryColor == key["secondaryColor"]) {
 							results["existed"] = _.get(results, ["existed"], 0) + 1;
 							return;
@@ -106,13 +106,13 @@ module.exports = {
 			+ `Name_Exists: ${results[ERR_NAME_EXISTS] || 0};  Invalid_Args ${results[ERR_INVALID_ARGS] || 0}`);
 		return true;
 	},
-	
-	setRooms_Iterate: function() {		
+
+	setRooms_Iterate: function() {
 		this.setRoom(Memory.blueprint.rooms[Memory.blueprint.index]);
 		Memory.blueprint.index += 1;
 		if (Memory.blueprint.index == Memory.blueprint.final) {
 			delete Memory.blueprint;
-		}			
+		}
 	},
 
 	constructAll: function() {
@@ -120,27 +120,28 @@ module.exports = {
 			this.constructRoom(room);
 		}
 	},
-	
+
 	constructRoom: function(rmName) {
 		if (Game.rooms[rmName] == null)
-			return `<font color=\"#6065FF\">[Blueprint]</font> constructRoom() failed: ${rmName} == null`;		
+			return `<font color=\"#6065FF\">[Blueprint]</font> constructRoom() failed: ${rmName} == null`;
 		if (Object.keys(Game.constructionSites).length >= 100)
 			return `<font color=\"#6065FF\">[Blueprint]</font> constructRoom() failed: Game.constructionSites at maximum!`;
-		
+
 		let result = 0;
 		let room = Game.rooms[rmName];
 		let flags = room.find(FIND_FLAGS, { filter: (f) => { return Blueprint_Colors.some(c => { return c == f.color; }); }});
-		
+
 		_.forEach(flags, f => {
 			if (Object.keys(Game.constructionSites).length >= 100)
 				return;
-			
+
 			if (Object.keys(f.pos.lookFor("structure")).length == 0) {
-				let type = _.find(Blueprint_Keys, k => { return k["color"] == f.color && k["secondaryColor"] == f.secondaryColor; })["structure"];				
-				result += (f.pos.createConstructionSite(type) == OK ? 1 : 0);				 
+				let key = _.find(Blueprint_Keys, k => { return k["color"] == f.color && k["secondaryColor"] == f.secondaryColor; })
+				if (key != null)
+					result += (f.pos.createConstructionSite(key["structure"]) == OK ? 1 : 0);
 			}
 		});
-		
+
 		if (result > 0)
 			console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${rmName}: ${result} sites created.`);
 	}

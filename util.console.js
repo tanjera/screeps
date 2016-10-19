@@ -162,9 +162,7 @@ module.exports = {
 		command_list.push("reset_stockpiles()");
 		reset_stockpiles = function() {
 			Memory["terminal_orders"] = new Object();
-			for (var r in Memory["rooms"]) {
-				Memory["rooms"][r]["stockpile"] = new Object();
-			}
+			_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 			
 			return "<font color=\"#D3FFA3\">[Console]</font> All Memory.rooms.[r].stockpile reset!";					
 		}

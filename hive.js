@@ -79,9 +79,10 @@ let Hive = {
 
         }
 
-		Memory["spawn_requests"] = new Array();
+		Memory["spawn_requests"] = new Array();		
 
-		if (Memory["options"] == null) Memory["options"] = { console: "on" };
+		if (Game.time % 1500 == 0)	// Periodically reset stockpile (removes old needs)
+			_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 
 		let _Console = require("util.console");
 		_Console.Init();
@@ -159,12 +160,11 @@ let Hive = {
 										return v.toString(16); });
                         let result = spawn.createCreep(body, name, request.args);
 
-                        if (_.isString(result)) {
-							if (Memory["options"]["console"] == "on")
-								console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning lvl ${level} / ${request.level} ${request.body}, `
-									+ `${spawn.room.name} -> ${request.room}, `
-									+ `${result} (${request.args["role"]}`
-									+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]})`);
+                        if (_.isString(result)) {							
+							console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning lvl ${level} / ${request.level} ${request.body}, `
+								+ `${spawn.room.name} -> ${request.room}, `
+								+ `${result} (${request.args["role"]}`
+								+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]})`);
 
                             listSpawns[s] = null;
                             listRequests[r] = null;
@@ -210,7 +210,7 @@ let Hive = {
 				let amount = _.get(r, ["storage", "store", res], 0) + _.get(r, ["terminal", "store", res], 0);
 				if (amount > 0)
 					_.set(resources, [res, r.name], amount);
-			});			
+			});
 		});
 
 		for (let res in resources) {
@@ -249,7 +249,7 @@ let Hive = {
 			n => { return energy[n]; }));
 
 		if (tgtRoom != null) {
-			_.forEach(_.filter(Object.keys(energy), r => { return energy[r] > limit; } ), r => { 
+			_.forEach(_.filter(Object.keys(energy), r => { return energy[r] > limit; } ), r => {
 				_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
 				console.log(`<font color=\"#DBA3FF\">[Hive]</font> Moving overflow energy: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);
 			});
