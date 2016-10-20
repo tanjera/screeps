@@ -76,7 +76,7 @@ module.exports.loop = function () {
 
 	/* Forward Operating Base W6S49 */
 	Sites.Colony("W6S49", ["W11S44"], 
-			{ worker:   {level: 5, amount: 1, body: "worker_at"},
+			{ worker:   {level: 5, amount: 2, body: "worker_at"},
 			  repairer: {level: 4, amount: 1, body: "worker_at"},
 			  upgrader: {level: 5, amount: 2, body: "worker_at"} }, 
 		null, 
@@ -235,10 +235,10 @@ module.exports.loop = function () {
 			{ paladin: 	 {level: 8, amount: 1, scale_level: false},
 			  healer:	 {level: 5, amount: 1},
 			  //extractor: {level: 8, amount: 1, body: "extractor_rem"},
-			  multirole: {level: 6, amount: 1} } );
-	/*Sites.Mining("W16S43", "W16S44", ["W15S43", "W18S43"], true,
-			{ burrower:	 {level: 6, amount: 2},
-			  carrier:   {level: 7, amount: 7} } ); */
+			  multirole: {level: 7, amount: 2, body: "worker_at"} } );
+	Sites.Mining("W16S43", "W16S44", ["W15S43", "W18S43"], true,
+			{ burrower:	 {level: 6, amount: 1},
+			  carrier:   {level: 7, amount: 2} } );
 
 
 

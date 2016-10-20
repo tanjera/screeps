@@ -130,16 +130,17 @@ module.exports = {
 		let result = 0;
 		let room = Game.rooms[rmName];
 		let flags = room.find(FIND_FLAGS, { filter: (f) => { return Blueprint_Colors.some(c => { return c == f.color; }); }});
-
+		let sites = room.find(FIND_CONSTRUCTION_SITES);
+		
 		_.forEach(flags, f => {
-			if (Object.keys(Game.constructionSites).length >= 100)
-				return;
+			if (Object.keys(Game.constructionSites).length >= 100 || Object.keys(sites).length + result >= 10)
+				return;			
 
 			if (Object.keys(f.pos.lookFor("structure")).length == 0) {
 				let key = _.find(Blueprint_Keys, k => { return k["color"] == f.color && k["secondaryColor"] == f.secondaryColor; })
 				if (key != null)
 					result += (f.pos.createConstructionSite(key["structure"]) == OK ? 1 : 0);
-			}
+			}			
 		});
 
 		if (result > 0)

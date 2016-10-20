@@ -55,18 +55,23 @@ let Hive = {
 	},
 
 	clearDeadMemory: function() {
-		// Clear dead creeps from Memory
-		for (let n in Memory.creeps) {
-			if (!Game.creeps[n]) {
-				if (Memory.creeps[n]["task"] != null) {
-					let task = Memory.creeps[n]["task"];
-					if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
-						delete Memory["rooms"][task.room]["tasks_running"][task.key][n];
-				}
+		if (!this.isPulse_Main())
+			return;
 
-				delete Memory.creeps[n];
-			}
-		}
+		_.each(_.filter(Object.keys(Memory.creeps),
+			c => { return !_.has(Game, ["creeps", c]); }),
+			c => {
+				if (Memory.creeps[c]["task"] != null) {
+					let task = Memory.creeps[c]["task"];
+					if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
+						delete Memory["rooms"][task.room]["tasks_running"][task.key][c];
+				}
+				delete Memory.creeps[c];
+			});
+
+		_.each(_.filter(Object.keys(Memory.rooms),
+			r => { return !_.has(Game, ["rooms", r]); }),
+			r => { delete Memory.rooms[r]; });
 	},
 
 	initMemory: function() {
@@ -79,7 +84,7 @@ let Hive = {
 
 		}
 
-		Memory["spawn_requests"] = new Array();		
+		Memory["spawn_requests"] = new Array();
 
 		if (Game.time % 1500 == 0)	// Periodically reset stockpile (removes old needs)
 			_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
@@ -106,7 +111,7 @@ let Hive = {
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing
 		_.set(Memory, ["rooms", rmName, "population_balance", "target"], _.get(Memory, ["rooms", rmName, "population_balance", "target"], 0) + popTarget);
-		_.set(Memory, ["rooms", rmName, "population_balance", "actual"], _.get(Memory, ["rooms", rmName, "population_balance", "actual"], 0) + popActual);                    
+		_.set(Memory, ["rooms", rmName, "population_balance", "actual"], _.get(Memory, ["rooms", rmName, "population_balance", "actual"], 0) + popActual);
 	},
 
 	processSpawnRequests: function() {
@@ -131,29 +136,29 @@ let Hive = {
 			return Memory["spawn_requests"][a]["priority"] - Memory["spawn_requests"][b]["priority"]; } );
 		let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
 		let _Creep = require("util.creep");
-		
+
 		_.each(listRequests, r => {
 			let request = Memory["spawn_requests"][listRequests[r]];
-			
-			_.each(_.sortBy(Object.keys(listSpawns), 
-					s => { return request != null && _.get(Game, ["spawns", listSpawns[s], "room", "name"]) == _.get(request, ["room"]); }), 
+
+			_.each(_.sortBy(Object.keys(listSpawns),
+					s => { return request != null && _.get(Game, ["spawns", listSpawns[s], "room", "name"]) == _.get(request, ["room"]); }),
 					s => {
-						
+
 				if (listSpawns[s] != null && listRequests[r] != null) {
 					let spawn = Game["spawns"][listSpawns[s]];
-					
+
 					if (spawn.room.name == request.room || (request.listRooms != null && _.find(request.listRooms, r => { return r == spawn.room.name; }) != null)) {
 
 						_.set(Memory, ["rooms", request.room, "population_balance", "total"],
 							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
 
 						let _Colony = require("util.colony");
-						let level = (request.scale_level != null && request.scale_level == false) 
+						let level = (request.scale_level != null && request.scale_level == false)
 							? request.level
-							: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level), 
-								_Colony.getRoom_Level(spawn.room)));								
+							: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
+								_Colony.getRoom_Level(spawn.room)));
 						request.args["level"] = level;
-						
+
 						let body = _Creep.getBody(request.body, level);
 						let name = request.name != null ? request.name
 							: request.args["role"].substring(0, 4)
@@ -161,10 +166,10 @@ let Hive = {
 								+ ":xxxx".replace(/[xy]/g, (c) => {
 										let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
 										return v.toString(16); });
-										
+
 						let result = spawn.createCreep(body, name, request.args);
 
-						if (_.isString(result)) {							
+						if (_.isString(result)) {
 							console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning lvl ${level} / ${request.level} ${request.body}, `
 								+ (spawn.room.name == request.room ? `${request.room}, ` : `${spawn.room.name} -> ${request.room}, `)
 								+ `${result} (${request.args["role"]}`
@@ -253,11 +258,11 @@ let Hive = {
 			n => { return energy[n]; }));
 
 		if (tgtRoom != null) {
-			_.forEach(_.filter(Object.keys(energy), 
-					r => { return !_.has(Memory, ["terminal_orders", `overflow_energy_${r}`]) && energy[r] - limit > 100; } ), 
+			_.forEach(_.filter(Object.keys(energy),
+					r => { return !_.has(Memory, ["terminal_orders", `overflow_energy_${r}`]) && energy[r] - limit > 100; } ),
 					r => {	// Terminal transfers: minimum quantity of 100.
 				_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
-				console.log(`<font color=\"#F7FF00\">[Hive]</font> Creating overflow energy transfer: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);				
+				console.log(`<font color=\"#F7FF00\">[Hive]</font> Creating overflow energy transfer: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);
 			});
 		}
 

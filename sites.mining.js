@@ -82,7 +82,8 @@ module.exports = {
         }
         else if (listPopulation["multirole"] != null && lMultirole.length < listPopulation["multirole"]["amount"]) {
             Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["multirole"]["level"], 
-				body: (hasKeepers == false ? "multirole" : "worker"), name: null, args: {role: "multirole", room: rmHarvest, colony: rmColony} });
+				body: (listPopulation["multirole"]["body"] || (hasKeepers == false ? "multirole" : "worker")), 
+				name: null, args: {role: "multirole", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"] 
                     && Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
