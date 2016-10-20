@@ -10,10 +10,7 @@ module.exports = {
 			: null;
 			
 		if (hostile == null) {
-			if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-				_Creep.moveToRoom(creep, creep.memory.room);
-			}
-			else if (creep.memory.state == "refueling") {
+			if (creep.memory.state == "refueling") {
 				if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
 					creep.memory.state = "working";
 					Tasks.returnTask(creep);

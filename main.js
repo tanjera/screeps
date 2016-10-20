@@ -76,14 +76,14 @@ module.exports.loop = function () {
 
 	/* Forward Operating Base W6S49 */
 	Sites.Colony("W6S49", ["W11S44"], 
-			{ worker:   {level: 7, amount: 1, body: "worker_at"},
-			  repairer: {level: 5, amount: 1, body: "worker_at"},
-			  upgrader: {level: 7, amount: 2, body: "worker_at"} }, 
+			{ worker:   {level: 5, amount: 1, body: "worker_at"},
+			  repairer: {level: 4, amount: 1, body: "worker_at"},
+			  upgrader: {level: 5, amount: 2, body: "worker_at"} }, 
 		null, 
 		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W9S50", "W8S50", "W7S50", "W6S50", "W6S49"]);
 	Sites.Mining("W6S49", "W6S49", ["W11S44"], false, 
 			{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
-			  carrier:   {level: 6, amount: 2, body: "carrier_at"} },
+			  carrier:   {level: 3, amount: 2, body: "carrier_at"} },
 		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W9S50", "W8S50", "W7S50", "W6S50", "W6S49"]);
 
 

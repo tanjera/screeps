@@ -104,6 +104,12 @@ module.exports = {
 		let task;
 
 		if (isRefueling) {
+			if (creep.room.name != creep.memory.room) {
+				let _Creep = require("util.creep");
+				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+				return;
+			}
+			
 			task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 					t => { return t.type == "energy" && (t.creeps == null || t.creeps > 0); }),
 					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
@@ -128,6 +134,12 @@ module.exports = {
 				return;
 			}
 		} else {
+			if (creep.room.name != creep.memory.room) {
+				let _Creep = require("util.creep");
+				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+				return;
+			}
+			
 			if (creep.memory.subrole == "repairer") {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 						t => { return t.type == "work" && t.subtype == "repair" && (t.creeps == null || t.creeps > 0); }),
