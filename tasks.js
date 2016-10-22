@@ -274,11 +274,18 @@ module.exports = {
 				_Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
 				return;
 			}
-
-			task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-					t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }),
-					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
-					"priority"));
+			
+			if (_.get(creep, ["carry", "energy"], 0) > 0) {
+				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }),
+						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+						"priority"));
+			} else if (_.sum(creep.carry) > 0 && _.get(creep, ["carry", "energy"], 0) == 0) {
+				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
+						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
+						"priority"));
+			}
 			if (task != null) {
 				this.giveTask(creep, task);
 				return;

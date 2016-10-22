@@ -1,17 +1,30 @@
 
 ** My rooms...
 
-- Load balance W13S41 -> W11S42 once able
-
-
-
 
 
 
 ** To do **
+
+- Combat code:
+	1) Problem: soldiers rushing into room, get out of range of healers, die.
+		- Option for soldiers and healers to pair off, only move together- ratio 1:2?
+	2) Problem: tower attacking when insufficient to damage through healers (wasting energy)
+		- Tower code assess all enemies in room for heal parts, calculate efficacy before attacking
+	3) Defensive soldiers being spawned through load-balancing spawn code (spawning in other rooms!)
+		- Duplicate spawn_request for defensive soldier in home room with load-balancing disabled
+			- Note: cannot entirely disable load-balancing, or else low-RCL rooms (or new room without spawn) will not spawn defense
+	4) In-room energy distribution (tower filling, spawn filling) mediocre under siege
+		- Towers wasting energy! Add spawn_request for additional carriers (ideally load-balanced)
+
+- Storage targets: Minimum targets for mineral storage should be 25k XGHO2, XKHO2, XLHO2, XZHO2, XUH2O per room
+		
+- Option for colony to *only* spawn remotely (string flag in array listSpawnRooms?)
 	
 - Overloads 
 	- room.resource(resource) return terminal + storage if has resource?
+	- room.nuker
+	- room.observer
 
 - Implement:
 	- Safe Mode... argh

@@ -34,7 +34,8 @@ module.exports = {
 				_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {
 					let amount = _.get(r, ["storage", "store", res], 0) + _.get(r, ["terminal", "store", res], 0);
 					if (amount >= limit)
-						output += `${r.name}: ${amount} <br>`;
+						output += `<font color=\"#${_.has(Game, ["rooms", r.name, "terminal"]) ? "47FF3E" : "FF3E3E"}\">${r.name}</font>: `
+							+ `<font color=\"#FFFFFF">${amount}</font> <br>`;
 				});
 
 				if (output != "")

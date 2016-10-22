@@ -83,8 +83,12 @@ module.exports.loop = function () {
 		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W9S50", "W8S50", "W7S50", "W6S50", "W6S49"]);
 	Sites.Mining("W6S49", "W6S49", ["W11S44"], false, 
 			{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
-			  carrier:   {level: 3, amount: 2, body: "carrier_at"} },
+			  carrier:   {level: 4, amount: 2, body: "carrier_at"} },
 		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W9S50", "W8S50", "W7S50", "W6S50", "W6S49"]);
+	Sites.Mining("W6S49", "W5S49", null, false, 
+			{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
+			  carrier:   {level: 7, amount: 2, body: "carrier_at"},
+			  reserver:  {level: 4, amount: 1} });
 
 
 
@@ -108,8 +112,7 @@ module.exports.loop = function () {
 			  {id: "57a6a9d62d673fac4f21a62a", role: "receive"}]);
 	Sites.Mining("W19S42", "W19S42", ["W18S43"], false, Population__Mining_2S_Colony);
 	Sites.Industry("W19S42", ["W18S43"], Population__Industry,
-			[ { action: "boost", mineral: "XGH2O", lab: "57d9125375eff1b40a1c65e1", role: "worker", subrole: null },
-			  { action: "reaction", mineral: "ZK", amount: 25000,
+			[ { action: "reaction", mineral: "ZK", amount: 25000,
 				supply1: "57d8e078691ae2dd20b05905", supply2: "57d9de60bce03e1b1a1f193a",
 				reactors: [ "57d88a475797bae8438c0b79", "57d8b4aa3fc139b87f530540", "57d90f6bebd811df3152e8a1", "57d9667d968026fa32f224f2",
 							"57d9ac42712b129b6c3515b3", "57d9b60063dc7662328df345", "57d87d22751a3e375ab487e8" ] } ]);
@@ -121,8 +124,7 @@ module.exports.loop = function () {
 			  {id: "57af99d528986c413c0a8f4c", role: "receive"} ] );
 	Sites.Mining("W15S41", "W15S41", ["W13S41"], false, Population__Mining_2S_Colony);
 	Sites.Industry("W15S41", ["W13S41"], Population__Industry,
-			[ { action: "boost", mineral: "XGH2O", lab: "57d8a65bab861d4e5a9d1c0b", role: "worker", subrole: null },
-			  { action: "reaction", mineral: "GH", amount: 25000,
+			[ { action: "reaction", mineral: "GH", amount: 25000,
 				supply1: "57d89720dce50fae29ef2a2f", supply2: "57d9447dd2ca5f470498bb39",
 				reactors: [ "57d881c1379deeae5258a079", "57d88d54f20b92b65d7ab82f", "57d89f2ad4e23b6a2c92e17d", "57d8e3a2ea2796d33b4a5010",
 							"57d96dfcaf7c4a4c5fb94601", "57d997a069779881436dbca0", "57d91ca57fcc818072da4b27" ] } ]);
@@ -176,8 +178,7 @@ module.exports.loop = function () {
 			  {id: "57f1f63bab48a7a015c15ccd", role: "receive"} ]);
 	Sites.Mining("W18S41", "W18S41", null, false, Population__Mining_1S_Colony);
 	Sites.Industry("W18S41", null, Population__Industry,
-			[ { action: "boost", mineral: "XGH2O", lab: "57ec7be65dff746643b687dd", role: "worker", subrole: null },
-			  { action: "reaction", mineral: "XGH2O", amount: -1,
+			[ { action: "reaction", mineral: "XGH2O", amount: -1,
 				supply1: "57f1f4076a19548340f790c1", supply2: "580505c9e898605430de7c62",
 				reactors: [ "57f1dc282328a5430803d75f", "57f6e31a8538cb68487ef987", "57f7a053df6f91e9697fd46c", "57f6e183bd1ef5dc2c7fd9a7",
 							"5805317d877d581814f857e1", "58051875453185982dd5332a", "5804ee71702bae5a7d5276cd" ] } ]);
@@ -234,11 +235,11 @@ module.exports.loop = function () {
 	Sites.Mining("W15S43", "W16S44", null, true,	// Zookeeping by W15S43
 			{ paladin: 	 {level: 8, amount: 1, scale_level: false},
 			  healer:	 {level: 5, amount: 1},
-			  //extractor: {level: 8, amount: 1, body: "extractor_rem"},
 			  multirole: {level: 7, amount: 2, body: "worker_at"} } );
 	Sites.Mining("W16S43", "W16S44", ["W15S43", "W18S43"], true,
-			{ burrower:	 {level: 6, amount: 1},
-			  carrier:   {level: 7, amount: 2} } );
+			{ burrower:	 {level: 6, amount: 2},
+			  carrier:   {level: 7, amount: 7},
+			  extractor: {level: 8, amount: 1, body: "extractor_rem"} } );
 
 
 

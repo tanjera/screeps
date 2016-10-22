@@ -23,9 +23,16 @@ module.exports = {
             return false;
         }
         else if (creep.memory.task["timer"] != null) {
-            // Process the task timer
-            creep.memory.task["timer"] = creep.memory.task["timer"] - 1;
-            if (creep.memory.task["timer"] <= 0) {
+			let task = creep.memory.task;
+            task["timer"] = task["timer"] - 1;
+            if (task["timer"] <= 0) {
+
+				// Prevent burrower from losing task on task refresh, getting blocked by workers
+				if (creep.memory.role == "burrower" && task.subtype == "harvest" && task.resource == "energy"
+						&& Game.getObjectById(task.id).energy > 0) {
+					return true;
+				}
+
 				this.returnTask(creep);
                 return false;
             }
@@ -130,18 +137,35 @@ module.exports = {
             }
 
             case "deposit": {
-                // Cycle through all resources and deposit, starting with minerals
 				let target = Game.getObjectById(creep.memory.task["id"]);
-                for (let r = Object.keys(creep.carry).length; r > 0; r--) {
-                    let resourceType = Object.keys(creep.carry)[r - 1];
-                    if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target, {reusePath: Hive.moveReusePath()});
+				switch (creep.memory.task["resource"]) {
+
+					default:
+					case "energy":
+						if (target != null && creep.transfer(target, creep.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
+							creep.moveTo(target, {reusePath: Hive.moveReusePath()});
+							return;
+						} else {
+							this.finishedTask(creep);
+							return;
+						}
 						return;
-                    } else {
-                        this.finishedTask(creep);
-                        return;
-                    }
-                }
+
+					case "mineral":		// All except energy
+						for (let r = Object.keys(creep.carry).length; r > 0; r--) {
+							let resourceType = Object.keys(creep.carry)[r - 1];
+							if (resourceType == "energy") {
+								continue;
+							} else if (target != null && creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+								creep.moveTo(target, {reusePath: Hive.moveReusePath()});
+								return;
+							} else {
+								this.finishedTask(creep);
+								return;
+							}
+						}
+						return;
+				}
             }
         }
     },
@@ -242,7 +266,7 @@ module.exports = {
 
     getBody: function(type, level) {
 		_Body = require("util.creep.body");
-		
+
         switch (type) {
             case "soldier": return _Body.getBody_Soldier(level);
 			case "paladin": return _Body.getBody_Paladin(level);
