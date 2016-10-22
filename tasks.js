@@ -194,7 +194,7 @@ module.exports = {
 			}
 
 			// If stuck without a task... drop off energy/minerals in storage... or wait...
-			if (Object.keys(creep.carry).includes("energy")) {
+			if (_.get(creep, ["carry", "energy"], 0) > 0) {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
@@ -202,7 +202,7 @@ module.exports = {
 					this.giveTask(creep, task);
 					return;
 				}
-			} else if (Object.keys(creep.carry).length > 0) {
+			} else if (_.sum(creep.carry) > 0 && _.get(creep, ["carry", "energy"], 0) == 0) {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
