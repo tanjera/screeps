@@ -1,10 +1,12 @@
 
 ** My rooms...
 
-
+- Need G reaction room
 
 
 ** To do **
+
+- Multirole_AT
 
 - Combat code:
 	1) Problem: soldiers rushing into room, get out of range of healers, die.

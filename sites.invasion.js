@@ -6,6 +6,9 @@ let _CPU = require("util.cpu");
 module.exports = {
 	
 	Run: function(rmColony, rmInvade, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
+		if (!_.has(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]))
+			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
+		
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Invade-${rmInvade}-runPopulation`);
 			this.runPopulation(rmColony, rmInvade, listSpawnRooms, listArmy);
@@ -18,10 +21,8 @@ module.exports = {
 	},
 	
 	
-	runPopulation: function(rmColony, rmInvade, listSpawnRooms, listArmy) {
-		if (Memory["rooms"][rmColony][`invasion_${rmInvade}`] == null)
-			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
-		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];		
+	runPopulation: function(rmColony, rmInvade, listSpawnRooms, listArmy) {		
+		let memory = _.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]);
         
 		if (memory.state == "spawning") {
 			let lSoldier  = _.filter(Game.creeps, c => c.memory.role == "soldier" && c.memory.room == rmInvade && c.memory.colony == rmColony);
@@ -49,7 +50,7 @@ module.exports = {
 	},
 	
 	runCreeps: function(rmColony, rmInvade, listTargets, posRally, listRoute) {
-		let memory = Memory["rooms"][rmColony][`invasion_${rmInvade}`];
+		let memory = _.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]);
 		let creeps = _.filter(Game.creeps, c => c.memory.room == rmInvade && c.memory.colony == rmColony);
 		let rallyRange = 5;
 		
@@ -81,7 +82,7 @@ module.exports = {
 					+ `of ${creeps.length} at rally point.`);
 				}
 				
-				if (Game.time % 5 == 0) {
+				if (Game.time % 5 == 0 && creeps.length > 0) {
 					memory.state = (_.filter(creeps, 
 						c => c.room.name == posRally.roomName && posRally.inRangeTo(c.pos, rallyRange)).length == creeps.length)
 						? "attacking" : memory.state;

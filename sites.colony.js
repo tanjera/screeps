@@ -55,7 +55,7 @@ module.exports = {
 				name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
         } else if (listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {            
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["upgrader"]["level"], 
-				scale_level: listPopulation["upgrader"]["scale_level"],
+				scale_level: listPopulation["upgrader"]["scale_level"] || "true",
 				body: (listPopulation["upgrader"]["body"] || "worker"),
 				name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
         }

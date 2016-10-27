@@ -153,7 +153,7 @@ let Hive = {
 							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
 
 						let _Colony = require("util.colony");
-						let level = (request.scale_level != null && request.scale_level == false)
+						let level = (_.get(request, ["scale_level"]) == false)
 							? request.level
 							: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
 								_Colony.getRoom_Level(spawn.room)));

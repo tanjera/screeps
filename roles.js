@@ -192,53 +192,16 @@ module.exports = {
 			return;
 		} 
 		
-		let target;
-		
-		if (creep.memory.target != null) {
-			target = Game.getObjectById(creep.memory.target);
-			if (target == null)
-				delete creep.memory.target;
-		}
-		
-		if (creep.memory.target == null) {
-			for (let t in listTargets) {
-				target = Game.getObjectById(listTargets[t]);
-				if (target != null) {
-					creep.memory.target = target.id;
-					break;
-				}
-			}
-		}
-		
-		if (creep.memory.target == null) {
-			target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: 
-				(c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }});
-			if (target != null)
-				creep.memory.target = target.id;
-		}
-
-		if (creep.memory.target == null && destroyStructures != null && destroyStructures == true) {			
-			target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
-				s => { return s.hits != null && s.hits > 0
-					&& (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
-				s => { return creep.pos.getRangeTo(s.pos); } ),
-				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
-				s => { 	if (s.structureType == "tower")
-							return 0;
-						else if (s.structureType == "spawn")
-							return 1;
-						else
-							return 2;
-				} ));
-				
-			if (target != null)
-				creep.memory.target = target.id;
-		}
+		let _Combat = require("roles.combat");
+		_Combat.checkTarget_Existing(creep);
+		_Combat.acquireTarget_ListTarget(creep, listTargets);
+		_Combat.acquireTarget_Creep(creep);
+		_Combat.acquireTarget_Structure(creep, destroyStructures);
 		
 		if (creep.memory.target != null) {						
-			target = Game.getObjectById(creep.memory.target);
+			let target = Game.getObjectById(creep.memory.target);
 			let result = creep.attack(target);
-			if (result == ERR_NOT_IN_RANGE) {
+			if (result == ERR_NOT_IN_RANGE || (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true)) {
 				creep.heal(creep);
 				creep.moveTo(target);
 				return;
@@ -250,12 +213,7 @@ module.exports = {
 			}
 		}
 		else {
-			let lair = _.head(_.sortBy(
-				creep.room.find(FIND_STRUCTURES, { filter: s => { return s.structureType == "keeperLair"; }}),
-				s => { return s.ticksToSpawn; } ));
-			if (lair != null)
-				creep.moveTo(lair);
-			
+			_Combat.moveTo_SourceKeeperLair(creep);			
 			creep.heal(creep);
 			return;
 		}
