@@ -34,7 +34,7 @@ module.exports.loop = function () {
 
 	Hive.moveExcessEnergy(200000);
 
-	
+
 
 	/* Colony W19S42 */
 	Sites.Colony("W19S42", null, Population__Colony_RCL8,
@@ -43,7 +43,8 @@ module.exports.loop = function () {
 			  {id: "57a6a9d62d673fac4f21a62a", role: "receive"}]);
 	Sites.Mining("W19S42", "W19S42", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W19S42", null, Population__Industry,
-			[ { action: "reaction", mineral: "ZK", amount: 25000,
+			[ { action: "boost", mineral: "XGH2O", lab: "57d9125375eff1b40a1c65e1", role: "worker", subrole: null },
+			  { action: "reaction", mineral: "ZK", amount: 25000,
 				supply1: "57d8e078691ae2dd20b05905", supply2: "57d9de60bce03e1b1a1f193a",
 				reactors: [ "57d88a475797bae8438c0b79", "57d8b4aa3fc139b87f530540", "57d90f6bebd811df3152e8a1", "57d9667d968026fa32f224f2",
 							"57d9ac42712b129b6c3515b3", "57d9b60063dc7662328df345", "57d87d22751a3e375ab487e8" ] } ]);
@@ -55,16 +56,17 @@ module.exports.loop = function () {
 			  {id: "57af99d528986c413c0a8f4c", role: "receive"} ] );
 	Sites.Mining("W15S41", "W15S41", ["W13S41"], false, Population__Mining_2S_Colony);
 	Sites.Industry("W15S41", ["W13S41"], Population__Industry,
-			[ { action: "reaction", mineral: "GH", amount: 25000,
+			[ { action: "boost", mineral: "XGH2O", lab: "57d8a65bab861d4e5a9d1c0b", role: "worker", subrole: null },
+			  { action: "reaction", mineral: "GH", amount: 25000,
 				supply1: "57d89720dce50fae29ef2a2f", supply2: "57d9447dd2ca5f470498bb39",
 				reactors: [ "57d881c1379deeae5258a079", "57d88d54f20b92b65d7ab82f", "57d89f2ad4e23b6a2c92e17d", "57d8e3a2ea2796d33b4a5010",
 							"57d96dfcaf7c4a4c5fb94601", "57d997a069779881436dbca0", "57d91ca57fcc818072da4b27" ] } ]);
 
 	/* Colony W15S43 */
-	Sites.Colony("W15S43", null, Population__Colony_RCL8,
+	Sites.Colony("W15S43", ["W16S43"], Population__Colony_RCL8,
 			[ {id: "57dc9ffd9754877f17a191c5", role: "send"},
 			  {id: "57dca2fcf52af188391d0a20", role: "receive"} ]);
-	Sites.Mining("W15S43", "W15S43", null, false, Population__Mining_1S_Colony);
+	Sites.Mining("W15S43", "W15S43", ["W16S43"], false, Population__Mining_1S_Colony);
 	Sites.Industry("W15S43", null, Population__Industry,
 			[ { action: "reaction", mineral: "OH", amount: 25000,
 				supply1: "57c3fdcc823703630339213d", supply2: "57e3ca388826ba8b794e669c",
@@ -79,7 +81,8 @@ module.exports.loop = function () {
 			  {id: "57c3eabdc480f8a72a2cdb75", role: "receive"} ] );
 	Sites.Mining("W13S41", "W13S41", ["W15S41"], false, Population__Mining_2S_Colony);
 	Sites.Industry("W13S41", ["W15S41"], Population__Industry,
-			[ { action: "reaction", mineral: "UL", amount: 25000,
+			[ { action: "boost", mineral: "XGH2O", lab: "57cb2bb486c97a0557028d65", role: "worker", subrole: null },
+			  { action: "reaction", mineral: "UL", amount: 25000,
 				supply1: "57c5ab258a3658822748cc62", supply2: "57d974c8c6030b8452419739",
 				reactors: [ "57d91151b7f80d630f82986c", "57c3ef8850ba39ec2725c182", "57e6acdbbeb0889921785212", "57e6cf4e6473741e42c27141",
 							"57e8d0f4f1dd30b4337b8e03", "57e75953a0a3cd623e574cd5", "57cb34e3d80e43e128862a09" ] } ]);
@@ -91,7 +94,7 @@ module.exports.loop = function () {
 			  {id: "57cda809a5db4ace37cb2672", role: "receive"} ]);
 	Sites.Mining("W11S44", "W11S44", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W11S44", null, Population__Industry,
-			[ { action: "boost", mineral: "XGH2O", lab: "57cdbb01297293a13858f822", role: "worker", subrole: "upgrader" },
+			[ { action: "boost", mineral: "XGH2O", lab: "57cdbb01297293a13858f822", role: "worker", subrole: null },
 			  { action: "reaction", mineral: "GH2O", amount: 25000,
 				supply1: "57db5e885cccb19c0906bd50", supply2: "57d92ba61555c2084275c953",
 				reactors: [ "57db4c0f79dacb1478e2b3d9", "57fa00ba718e16f73f4a60e5", "57fa0dc2e961e13a70707225", "57db9d4c2c1ea9eb535f24ec",
@@ -114,42 +117,39 @@ module.exports.loop = function () {
 			  {id: "580be42203c90cae576a89d8", role: "receive"} ]);
 	Sites.Mining("W16S43", "W16S43", ["W15S43"], false, Population__Mining_1S_Colony);
 	Sites.Industry("W16S43", null, Population__Industry,
-			[ { action: "boost", mineral: "XGH2O", lab: "580cfff2f38d0ac552f76ec7", role: "worker", subrole: "upgrader" } ]);
+			[ { action: "boost", mineral: "XGH2O", lab: "580cfff2f38d0ac552f76ec7", role: "worker", subrole: "upgrader" },
+			  { action: "reaction", mineral: "G", amount: 25000,
+				supply1: "5811ce681182c40167698316", supply2: "5812c2b46bc0c4700c8e545b",
+				reactors: [ "5811e32d8ece24fd369be058", "5811a238b1ebf1a374d8af5b", "5811f6520f5ad34c77fcf783" ] } ]);
 
 	/* Colony W11S51 */
-	Sites.Colony("W11S51", null, Population__Colony_RCL_Low);
-	Sites.Mining("W11S51", "W11S51", null, false,
-	        { worker:   {level: 3, amount: 2},
-			  repairer: {level: 3, amount: 1},
-			  upgrader: {level: 3, amount: 3} });
+	Sites.Colony("W11S51", ["W11S44"], Population__Colony_RCL_Mid, null,
+		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W10S51", "W11S51"]);
+	Sites.Mining("W11S51", "W11S51", ["W11S44"], false, Population__Mining_RCL_Low,
+		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W10S51", "W11S51"]);
+
+	/* Colony W4S49 */
+	Sites.Colony("W4S49", null, Population__Colony_RCL_Mid);
+	Sites.Mining("W4S49", "W4S49", null, false, Population__Mining_RCL_Low);
+
+	/* Colony W13S54 */
+	Sites.Colony("W13S54", ["W11S51"], Population__Colony_RCL_Mid, null,
+		["W11S51", "W12S51", "W12S52", "W12S53", "W12S54", "W13S54"]);
+	Sites.Mining("W13S54", "W13S54", ["W11S51"], false, Population__Mining_RCL_Low,
+		["W11S51", "W12S51", "W12S52", "W12S53", "W12S54", "W13S54"]);
 
 
-
-	/* Forward Operating Base W6S49 */
-	Sites.Colony("W6S49", null,
-			{ worker:   {level: 5, amount: 2, body: "worker_at"},
-			  repairer: {level: 4, amount: 1, body: "worker_at"},
-			  upgrader: {level: 5, amount: 2, body: "worker_at"} });
-	Sites.Mining("W6S49", "W6S49", null, false,
-			{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
-			  carrier:   {level: 4, amount: 2, body: "carrier_at"} });
-	Sites.Mining("W6S49", "W5S49", null, false,
-			{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
-			  carrier:   {level: 7, amount: 2, body: "carrier_at"},
-			  reserver:  {level: 4, amount: 1} });
-
-	
 
 	/* Remote mining operations for W19S42 */
 	Sites.Mining("W19S42", "W18S42", null, false, Population__Mining_2S_Remote);
-	Sites.Mining("W19S42", "W19S43", null, false, Population__Mining_1S_Remote);
 
 	/* Remote mining operations for W15S41 */
 	Sites.Mining("W15S41", "W15S42", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W15S41", "W14S42", ["W15S43", "W13S41"], false, Population__Mining_2S_Remote);
 	Sites.Mining("W15S41", "W16S42", ["W15S43"], false, Population__Mining_2S_Remote, ["W15S41", "W15S42", "W16S42"]);
 	Sites.Mining("W15S41", "W17S41", ["W18S41"], false, Population__Mining_2S_Remote, ["W15S41", "W16S41", "W17S41"]);
-	Sites.Mining("W15S41", "W16S41", null, false, Population__Mining_1S_Remote);
+	Sites.Mining("W15S41", "W16S41", null, false, Population__Maintenance);
+	Sites.Mining("W15S41", "W15S39", null, false, Population__Mining_2S_Remote_AT);
 
 	/* Remote mining operations for W15S43 */
 	Sites.Mining("W15S43", "W14S43", null, false, Population__Mining_1S_Remote);
@@ -157,44 +157,52 @@ module.exports.loop = function () {
 			{ burrower:  {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 7},
 			  extractor: {level: 8, amount: 1, body: "extractor_rem"},
-			  multirole: {level: 7, amount: 1} } );
+			  multirole: {level: 8, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", null, true,
 			{ paladin: 	 {level: 8, amount: 2, scale_level: false},
 			  healer:	 {level: 5, amount: 1},
 			  burrower:	 {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 7},
 			  extractor: {level: 8, amount: 1, body: "extractor_rem"},
-			  multirole: {level: 6, amount: 1} } );
+			  multirole: {level: 5, amount: 1} } );
 
 	/* Remote mining operations for W13S41 */
 	Sites.Mining("W13S41", "W12S41", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W13S41", "W13S42", null, false, Population__Mining_2S_Remote);
-	Sites.Mining("W13S41", "W12S42", null, false, Population__Mining_2S_Remote, ["W13S41", "W13S42", "W12S42"] );
+	Sites.Mining("W13S41", "W12S42", null, false, Population__Mining_2S_Remote,
+		["W13S41", "W13S42", "W12S42"] );	
+	Sites.Mining("W13S41", "W14S39", null, false, Population__Mining_2S_Remote_AT,
+		["W13S41", "W13S40", "W14S40", "W14S39"]);
 
 	/* Remote mining operations for W11S44 */
 	Sites.Mining("W11S44", "W12S44", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W11S44", "W11S45", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W11S44", "W11S46", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W11S44", "W9S44", null, false, Population__Mining_2S_Remote_AT);
-	Sites.Mining("W11S44", "W9S45", null, false, Population__Mining_2S_Remote_AT);
-	
+
 	/* Remote mining operations for W18S41 */
 	Sites.Mining("W18S41", "W19S41", null, false, Population__Mining_2S_Remote);
 
 	/* Remote mining operations for W16S43 */
 	Sites.Mining("W16S43", "W17S43", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W16S43", "W18S43", null, false, Population__Mining_2S_Remote);
-	Sites.Mining("W15S43", "W16S44", null, true,	// Zookeeping by W15S43
-			{ paladin: 	 {level: 8, amount: 2, scale_level: false},
-			  healer:	 {level: 5, amount: 1},
-			  multirole: {level: 7, amount: 2, body: "worker_at"} } );
-	Sites.Mining("W16S43", "W16S44", ["W15S43"], true,
+	Sites.Mining("W15S43", "W16S44", null, true,
+			{ paladin: 	 {level: 8, amount: 2, scale_level: false} } );
+	Sites.Mining("W16S43", "W16S44", null, true,
 			{ burrower:	 {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 7},
-			  extractor: {level: 8, amount: 1, body: "extractor_rem"} } );
+			  extractor: {level: 8, amount: 1, body: "extractor_rem"},
+			  healer:	 {level: 5, amount: 1},
+			  multirole: {level: 7, amount: 2, body: "worker_at"} } );
 
 	/* Remote mining operations for W11S51 */
 	Sites.Mining("W11S51", "W12S51", null, false, Population__Mining_2S_Remote);
+	//Sites.Mining("W11S51", "W11S52", null, false, Population__Mining_2S_Remote_AT, 
+	//	["W11S51", "W10S51", "W10S52", "W11S52"]);
+
+	/* Remote mining operations for W4S49 */
+	Sites.Mining("W4S49", "W3S49", null, false, Population__Mining_2S_Remote);
+
 
 
 	/* Run end-tick Hive functions */

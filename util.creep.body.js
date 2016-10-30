@@ -20,29 +20,27 @@ module.exports = {
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
 						MOVE, ATTACK];
             case 5:
-                return [ // 1560 energy, 12x ATTACK, 12x MOVE
+                return [ // 1700 energy, 10x ATTACK, 12x MOVE, 2x RANGED_ATTACK
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
 						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK];
+						MOVE, MOVE, 
+						RANGED_ATTACK, RANGED_ATTACK];
             case 6:
-                return [ // 1950 energy, 15x ATTACK, 15x MOVE
+                return [ // 2160 energy, 12x ATTACK, 15x MOVE, 3x RANGED_ATTACK
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
 						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
-            case 7:
-                return [ // 3250 energy, 25x MOVE, 25x ATTACK
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+						MOVE, ATTACK, MOVE, ATTACK, 
+						MOVE, MOVE, MOVE,
+						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+            case 7:                
             case 8:
-                return [ // 3250 energy, 25x MOVE, 25x ATTACK
+                return [ // 3600 energy, 25x MOVE, 20x ATTACK, 5x RANGED_ATTACK
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,                        
+						MOVE, MOVE, MOVE, MOVE, MOVE, 
+						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
         }
 	},
 
@@ -61,12 +59,13 @@ module.exports = {
 
             case 7:
             case 8:
-                return [ // 4100 energy, 25x MOVE, 20x ATTACK, 5x HEAL
+                return [ // 4450 energy, 25x MOVE, 5x RANGED_ATTACK, 15x ATTACK, 5x HEAL
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
 						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
 						MOVE, MOVE, MOVE, MOVE, MOVE,
+						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
 						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,						
 						HEAL, HEAL, HEAL, HEAL, HEAL];
         }
 	},
@@ -183,35 +182,31 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         ATTACK, ATTACK];
             case 5:
-                return [ // 1620 energy, 4x WORK, 6x CARRY, 12x MOVE, 4x ATTACK
+                return [ // 1690 energy, 4x WORK, 6x CARRY, 12x MOVE, 1x RANGED_ATTACK, 3x ATTACK
                         WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE,
-                        ATTACK, ATTACK, ATTACK, ATTACK];
+						RANGED_ATTACK, 
+                        ATTACK, ATTACK, ATTACK];
             case 6:
-                return [ // 2020 energy, 6x WORK, 8x CARRY, 14x MOVE, 4x ATTACK
+                return [ // 2160 energy, 6x WORK, 8x CARRY, 14x MOVE, 2x RANGED_ATTACK, 2x ATTACK
                         WORK, WORK, WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE,
-                        ATTACK, ATTACK, ATTACK, ATTACK];
-            case 7:
-                return [ // 3100 energy, 6x WORK, 10x CARRY, 24x MOVE, 10x ATTACK
-                        WORK, WORK, WORK, WORK, WORK, WORK,
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE,
-                        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
+                        RANGED_ATTACK, RANGED_ATTACK, 
+						ATTACK, ATTACK];
+            case 7:                
             case 8:
-                return [ // 3100 energy, 6x WORK, 10x CARRY, 24x MOVE, 10x ATTACK
+                return [ // 3380 energy, 6x WORK, 10x CARRY, 24x MOVE, 4x RANGED_ATTACK, 6x ATTACK
                         WORK, WORK, WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE,
-                        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
+						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
+                        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
         }
 	},
 

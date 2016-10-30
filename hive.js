@@ -75,6 +75,8 @@ let Hive = {
 	},
 
 	initMemory: function() {
+		_CPU.Start("Hive", "initMemory");
+		
 		if (Memory["rooms"] == null) Memory["rooms"] = {};
 
 		for (let r in Game["rooms"]) {
@@ -91,6 +93,8 @@ let Hive = {
 
 		let _Console = require("util.console");
 		_Console.Init();
+		
+		_CPU.End("Hive", "initMemory");
 	},
 
 	initTasks: function() {
@@ -132,9 +136,8 @@ let Hive = {
 
 		_CPU.Start("Hive", "processSpawnRequests");
 
-		let listRequests = Object.keys(Memory["spawn_requests"]).sort((a, b) => {
-			return Memory["spawn_requests"][a]["priority"] - Memory["spawn_requests"][b]["priority"]; } );
-		let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
+		let listRequests = _.sortBy(Object.keys(Memory["spawn_requests"]), r => { return Memory["spawn_requests"][r]["priority"]; } );
+		let listSpawns = _.filter(Object.keys(Game["spawns"]), s => { return Game["spawns"][s].spawning == null; });
 		let _Creep = require("util.creep");
 
 		_.each(listRequests, r => {

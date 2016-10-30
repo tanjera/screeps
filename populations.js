@@ -5,7 +5,7 @@ Population__Colony_RCL_Low =
 Population__Colony_RCL_Mid =
 	{ worker:   {level: 7, amount: 1},
 	  repairer: {level: 5, amount: 1},
-	  upgrader: {level: 7, amount: 2} };
+	  upgrader: {level: 7, amount: 3} };
 Population__Colony_RCL8 =
 	{ worker:   {level: 7, amount: 1, scale_level: false},
 	  repairer: {level: 6, amount: 1} };
@@ -36,6 +36,9 @@ Population__Mining_2S_Remote_AT =
 	  carrier:   {level: 7, amount: 3, body: "carrier_at"},
 	  multirole: {level: 6, amount: 1},
 	  reserver:  {level: 6, amount: 1, body: "reserver_at"} };
+	  
+Population__Maintenance =
+	{ multirole: {level: 6, amount: 1} };
 
 Population__Industry =
 	{ courier:   {level: 5, amount: 1} };

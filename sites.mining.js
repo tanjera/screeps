@@ -23,7 +23,7 @@ module.exports = {
 		let lBurrower = _.filter(Game.creeps, c => c.memory.role == "burrower" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lCarrier = _.filter(Game.creeps, c => c.memory.role == "carrier" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lMiner = _.filter(Game.creeps, c => c.memory.role == "miner" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        let lMultirole = _.filter(Game.creeps, c => c.memory.role == "multirole" && c.memory.room == rmHarvest);
+        let lMultirole = _.filter(Game.creeps, c => c.memory.role == "multirole" && c.memory.room == rmHarvest && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lReserver = _.filter(Game.creeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
         let lExtractor = _.filter(Game.creeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
 

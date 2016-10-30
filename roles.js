@@ -200,7 +200,10 @@ module.exports = {
 		
 		if (creep.memory.target != null) {						
 			let target = Game.getObjectById(creep.memory.target);
+			
+			creep.rangedAttack(target);
 			let result = creep.attack(target);
+			
 			if (result == ERR_NOT_IN_RANGE || (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true)) {
 				creep.heal(creep);
 				creep.moveTo(target);
