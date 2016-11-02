@@ -27,6 +27,9 @@ module.exports = {
         let lReserver = _.filter(Game.creeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
         let lExtractor = _.filter(Game.creeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
 
+		let hasMinerals = (_.keys(Game.rooms).includes(rmHarvest)
+			&& Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0);
+		
         let popTarget =
               (listPopulation["paladin"] == null ? 0 : listPopulation["paladin"]["amount"])
 			+ (listPopulation["healer"] == null ? 0 : listPopulation["healer"]["amount"])
@@ -35,7 +38,7 @@ module.exports = {
             + (listPopulation["miner"] == null ? 0 : listPopulation["miner"]["amount"])
             + (listPopulation["multirole"] == null ? 0 : listPopulation["multirole"]["amount"])
             + (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"])
-            + (listPopulation["extractor"] == null ? 0 : listPopulation["extractor"]["amount"]);
+            + (listPopulation["extractor"] == null || !hasMinerals ? 0 : listPopulation["extractor"]["amount"]);
         let popActual = lPaladin.length + lHealer.length + lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
@@ -92,9 +95,7 @@ module.exports = {
 				body: (listPopulation["reserver"]["body"] || "reserver"), 
 				name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
         }
-        else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] 
-                    && Object.keys(Game.rooms).includes(rmHarvest)
-                    && Game["rooms"][rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0) {            
+        else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] && hasMinerals) {            
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["extractor"]["level"], 
 					body: (listPopulation["extractor"]["body"] || "extractor"), 
 					name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
@@ -105,7 +106,7 @@ module.exports = {
 	runCreeps: function(rmColony, rmHarvest, hasKeepers, listRoute) {
 		let Roles = require("roles");
 		
-		let isSafe = !Object.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
+		let isSafe = !_.keys(Game.rooms).includes(rmHarvest) || rmColony == rmHarvest 
 					|| Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => 
 						{ return Memory["allies"].indexOf(c.owner.username) < 0; }}).length == 0;
 		

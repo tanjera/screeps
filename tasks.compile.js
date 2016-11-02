@@ -6,6 +6,7 @@ module.exports = {
 		var structures;
 		let __Colony = require("util.colony");
 		let room = Game.rooms[rmName];
+		let roomLvl = (room.controller == null || room.controller.level == 0) ? 8 : room.controller.level;
 		let amOwner = (room.controller == null || room.controller.level == 0) ? false : room.controller.my;
 
 		/* Worker-based tasks (upgrading controllers, building and maintaining structures) */
@@ -97,7 +98,7 @@ module.exports = {
 					id: piles[i].id,
 					pos: piles[i].pos,
 					key: `carry:pickup-${piles[i].id}`,
-					timer: 15,
+					timer: 20,
 					creeps: Math.ceil(piles[i].amount / 1000),
 					priority: piles[i].resourceType == "energy" ? 2 : 1,
 				});
@@ -168,8 +169,8 @@ module.exports = {
 						id: storages[i].id,
 						pos: storages[i].pos,
 						key: `energy:withdraw-energy-${storages[i].id}`,
-						timer: 10,
-						creeps: Math.ceil(storages[i].store["energy"] / 1000),
+						timer: 20,
+						creeps: Math.ceil(storages[i].store["energy"] / (roomLvl * 200)),
 						priority: 3
 					});
 			}
@@ -214,8 +215,8 @@ module.exports = {
 								id: storages[i].id,
 								pos: storages[i].pos,
 								key: `energy:withdraw-energy-${storages[i].id}`,
-								timer: 10,
-								creeps: Math.ceil(storages[i].store[res] / 1000),
+								timer: 20,
+								creeps: Math.ceil(storages[i].store[res] / (roomLvl * 200)),
 								priority: 2
 							});
 					});
@@ -225,39 +226,40 @@ module.exports = {
 
 		if (amOwner) {
 			if (Memory["rooms"][rmName]["links"] != null) {
-				let links = Memory["rooms"][rmName]["links"];
-				for (let l in links) {
-					let link = Game.getObjectById(links[l]["id"]);
-					if (links[l]["role"] == "send" && link != null && link.energy < link.energyCapacity * 0.9) {
+				_.each(Memory["rooms"][rmName]["links"], l => {
+					let link = Game.getObjectById(l["id"]);
+					if (l["dir"] == "send" && link != null && link.energy < link.energyCapacity * 0.9) {
 						_Tasks.addTask(rmName,
 						{   room: rmName,
 							type: "carry",
 							subtype: "deposit",
 							structure: "link",
 							resource: "energy",
-							id: links[l]["id"],
+							role: l["role"],
+							id: l["id"],
 							pos: link.pos,
-							key: `carry:deposit-${links[l]["id"]}`,
+							key: `carry:deposit-link:${l["role"]}-${l["id"]}`,
 							timer: 20,
 							creeps: 1,
-							priority: 3
+							priority: (l["role"] == "miner" ? 2 : 3)
 						 });
-					} else if (links[l]["role"] == "receive" && link != null && link.energy > 0) {
+					} else if (l["dir"] == "receive" && link != null && link.energy > 0) {
 						_Tasks.addTask(rmName,
 						{   room: rmName,
 							type: "energy",
 							subtype: "withdraw",
 							structure: "link",
 							resource: "energy",
-							id: links[l]["id"],
+							role: l["role"],
+							id: l["id"],
 							pos: link.pos,
-							key: `energy:withdraw-${links[l]["id"]}`,
-							timer: 5,
-							creeps: 2,
-							priority: 3
+							key: `energy:withdraw-link:${l["role"]}-${l["id"]}`,
+							timer: 20,
+							creeps: (roomLvl > 6 ? 1 : 2),
+							priority: (l["role"] == "miner" ? 2 : 3)
 						});
 					}
-				}
+				});
 			}
 
 			let towers = room.find(FIND_MY_STRUCTURES, { filter: s => {

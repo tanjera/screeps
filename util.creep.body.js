@@ -445,12 +445,13 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 7:
 			case 8:
-                return [ // 4000 energy, 30x WORK, 10x CARRY, 10x MOVE
+                return [ // 3850 energy, 27x WORK, 8x CARRY, 15x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-						WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE ];
+						WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE];
         }
 	},
 

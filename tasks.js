@@ -109,9 +109,11 @@ module.exports = {
 				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
 				return;
 			}
-			
+
 			task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-					t => { return t.type == "energy" && (t.creeps == null || t.creeps > 0); }),
+					t => { return t.type == "energy"
+						&& (t.structure != "link" || t.role == "worker")
+						&& (t.creeps == null || t.creeps > 0); }),
 					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 			if (task != null) {
 				this.giveTask(creep, task);
@@ -139,7 +141,7 @@ module.exports = {
 				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
 				return;
 			}
-			
+
 			if (creep.memory.subrole == "repairer") {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 						t => { return t.type == "work" && t.subtype == "repair" && (t.creeps == null || t.creeps > 0); }),
@@ -175,17 +177,23 @@ module.exports = {
 					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 					"priority"));
 			if (task != null) {
-					this.giveTask(creep, task);
+				this.giveTask(creep, task);
+				return;
+			}
+			
+			task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"],	// Help keep the mining links clear for the carriers
+					t => { return t.type == "energy" && t.structure == "link" && t.role == "miner" && (t.creeps == null || t.creeps > 0); }));
+			if (task != null) {
+				this.giveTask(creep, task);
 				return;
 			} else {    // If no tasks, then wait
 				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 				return;
 			}
 		} else {
-			let resources = _.sortBy(Object.keys(creep.carry), (c) => { return -creep.carry[c]; });
-			resources = Object.keys(resources).length > 0 ? resources[0] : "energy";
+			let res = _.head(_.sortBy(Object.keys(creep.carry), (c) => { return -creep.carry[c]; }));
 			task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-					t => { return t.type == "industry" && t.subtype == "deposit" && t.resource == resources && (t.creeps == null || t.creeps > 0); }),
+					t => { return t.type == "industry" && t.subtype == "deposit" && t.resource == res && (t.creeps == null || t.creeps > 0); }),
 					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 					"priority"));
 			if (task != null) {
@@ -238,7 +246,8 @@ module.exports = {
 			}
 			else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return (t.subtype == "pickup" || (t.type == "energy" && t.structure != "link"))
+						t => { return t.subtype == "pickup" || t.type == "energy"
+							&& (t.structure != "link" || t.role == "miner")
 							&& (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 						"priority"));
@@ -274,10 +283,12 @@ module.exports = {
 				_Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
 				return;
 			}
-			
+
 			if (_.get(creep, ["carry", "energy"], 0) > 0) {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && (t.creeps == null || t.creeps > 0); }),
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"
+							&& (t.structure != "link" || (t.role == "miner" && creep.pos.getRangeTo(t.pos.x, t.pos.y) <= 6))
+							&& (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 						"priority"));
 			} else if (_.sum(creep.carry) > 0 && _.get(creep, ["carry", "energy"], 0) == 0) {
