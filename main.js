@@ -148,21 +148,17 @@ module.exports.loop = function () {
 
 	/* Colony W4S49 */
 	Sites.Colony("W4S49", null, Population__Colony_RCL_Mid);
-	Sites.Mining("W4S49", "W4S49", null, false, Population__Mining_RCL_Low);
+	Sites.Mining("W4S49", "W4S49", null, false, Population__Mining_2S_Colony);
 
 	/* Colony W11S51 */
-	Sites.Colony("W11S51", ["W11S44"], Population__Colony_RCL_Mid,
+	Sites.Colony("W11S51", null, Population__Colony_RCL_Mid,
 		    [ {id: "581715b2221c895e12dc8c56", role: "worker", dir: "send"},
-			  {id: "581747ec106fbc836af982de", role: "worker", dir: "receive"} ],
-		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W10S51", "W11S51"]);
-	Sites.Mining("W11S51", "W11S51", ["W11S44"], false, Population__Mining_RCL_Low__Distant,
-		["W11S44", "W10S44", "W10S45", "W10S46", "W10S47", "W10S48", "W10S49", "W10S50", "W10S51", "W11S51"]);
+			  {id: "581747ec106fbc836af982de", role: "worker", dir: "receive"} ]);
+	Sites.Mining("W11S51", "W11S51", null, false, Population__Mining_2S_Colony);
 
 	/* Colony W6S37 */
-	Sites.Colony("W6S37", ["W13S41"], Population__Colony_RCL_Mid, null,
-		["W13S41", "W12S41", "W12S40", "W11S40", "W10S40", "W9S40", "W8S40", "W8S39", "W7S39", "W7S38", "W7S37", "W7S36", "W6S36", "W6S37"]);
-	Sites.Mining("W6S37", "W6S37", ["W13S41"], false, Population__Mining_RCL_Low__Distant,
-		["W13S41", "W12S41", "W12S40", "W11S40", "W10S40", "W9S40", "W8S40", "W8S39", "W7S39", "W7S38", "W7S37", "W7S36", "W6S36", "W6S37"]);
+	Sites.Colony("W6S37", null, Population__Colony_RCL_Mid);
+	Sites.Mining("W6S37", "W6S37", null, false, Population__Mining_2S_Colony);
 
 
 
@@ -175,7 +171,6 @@ module.exports.loop = function () {
 	Sites.Mining("W15S41", "W16S42", ["W15S43"], false, Population__Mining_2S_Remote, ["W15S41", "W15S42", "W16S42"]);
 	Sites.Mining("W15S41", "W17S41", null, false, Population__Mining_2S_Remote, ["W15S41", "W16S41", "W17S41"]);
 	Sites.Mining("W15S41", "W16S41", null, false, Population__Maintenance);
-	Sites.Mining("W15S41", "W15S39", null, false, Population__Mining_2S_Remote_AT);
 
 	/* Remote mining operations for W15S43 */
 	Sites.Mining("W15S43", "W14S43", null, false, Population__Mining_1S_Remote);
@@ -197,14 +192,11 @@ module.exports.loop = function () {
 	Sites.Mining("W13S41", "W13S42", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W13S41", "W12S42", null, false, Population__Mining_2S_Remote,
 		["W13S41", "W13S42", "W12S42"] );
-	Sites.Mining("W13S41", "W14S39", null, false, Population__Mining_2S_Remote_AT,
-		["W13S41", "W13S40", "W14S40", "W14S39"]);
 
 	/* Remote mining operations for W11S44 */
 	Sites.Mining("W11S44", "W12S44", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W11S44", "W11S45", null, false, Population__Mining_2S_Remote);
 	Sites.Mining("W11S44", "W11S46", null, false, Population__Mining_2S_Remote);
-	Sites.Mining("W11S44", "W9S44", null, false, Population__Mining_2S_Remote_AT);
 
 	/* Remote mining operations for W18S41 */
 	Sites.Mining("W18S41", "W19S41", null, false, Population__Mining_2S_Remote);
@@ -226,9 +218,11 @@ module.exports.loop = function () {
 
 	/* Remote mining operations for W11S51 */
 	Sites.Mining("W11S51", "W12S51", null, false, Population__Mining_2S_Remote);
+	Sites.Mining("W11S51", "W12S52", null, false, Population__Mining_2S_Remote,
+		["W11S51", "W12S51", "W12S52"]);
 
 	/* Remote mining operations for W6S37 */
-	Sites.Mining("W6S37", "W6S38", null, false, Population__Maintenance);
+	Sites.Mining("W6S37", "W6S38", null, false, Population__Mining_2S_Remote);
 
 
 	/* Run end-tick Hive functions */

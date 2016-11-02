@@ -17,9 +17,13 @@ module.exports = {
 				Memory["terminal_orders"][""] = { market_id: "", amount: , to: "", priority: 4};
 		*/
 
+		_CPU.Start(rmColony, "Industry-listCreeps");
+		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
+		_CPU.End(rmColony, "Industry-listCreeps");
+		
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Industry-runPopulation");
-			this.runPopulation(rmColony, listSpawnRooms, listPopulation);
+			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, "Industry-runPopulation");
 		}
 
@@ -42,13 +46,13 @@ module.exports = {
 		}
 
 		_CPU.Start(rmColony, "Industry-runCreeps");
-		this.runCreeps(rmColony);
+		this.runCreeps(rmColony, listCreeps);
 		_CPU.End(rmColony, "Industry-runCreeps");
 	},
 
 
-	runPopulation: function(rmColony, listSpawnRooms, listPopulation) {
-		let lCourier  = _.filter(Game.creeps, (c) => c.memory.role == "courier" && c.memory.room == rmColony && (c.ticksToLive == undefined || c.ticksToLive > 80));
+	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
+		let lCourier  = _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
         let popTarget = (listPopulation["courier"] == null ? 0 : listPopulation["courier"]["amount"]);
         let popActual = lCourier.length;
@@ -560,14 +564,11 @@ module.exports = {
 		}
 	},
 
-	runCreeps: function (rmColony) {
-        for (let n in Game.creeps) {
-            let creep = Game.creeps[n];
-            if (creep.memory.room != null && creep.memory.room == rmColony) {
-                if (creep.memory.role == "courier") {
-                    Roles.Courier(creep);
-                }
-            }
-        }
+	runCreeps: function (rmColony, listCreeps) {
+        _.each(listCreeps, creep => {       
+			if (creep.memory.role == "courier") {
+				Roles.Courier(creep);
+			}
+        });
 	}
 };

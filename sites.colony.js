@@ -5,14 +5,18 @@ module.exports = {
 
 	Run: function(rmColony, listSpawnRooms, listPopulation, listLinks, listRoute) {
 
+		_CPU.Start(rmColony, "Colony-listCreeps");
+		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
+		_CPU.End(rmColony, "Colony-listCreeps");
+
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Colony-runPopulation");
-			this.runPopulation(rmColony, listSpawnRooms, listPopulation);
+			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, "Colony-runPopulation");
 		}
 
 		_CPU.Start(rmColony, "Colony-runCreeps");
-		this.runCreeps(rmColony, listRoute);
+		this.runCreeps(rmColony, listCreeps, listRoute);
         _CPU.End(rmColony, "Colony-runCreeps");
 
 		_CPU.Start(rmColony, "Colony-runTowers");
@@ -25,11 +29,11 @@ module.exports = {
 	},
 
 
-	runPopulation: function(rmColony, listSpawnRooms, listPopulation) {
-		let lWorker = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == null && creep.memory.room == rmColony);
-        let lRepairer = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "repairer" && creep.memory.room == rmColony);
-        let lUpgrader = _.filter(Game.creeps, (creep) => creep.memory.role == "worker" && creep.memory.subrole == "upgrader" && creep.memory.room == rmColony);
-        let lSoldier = _.filter(Game.creeps, (creep) => creep.memory.role == "soldier" && creep.memory.room == rmColony);
+	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
+		let lWorker = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == null);
+        let lRepairer = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "repairer");
+        let lUpgrader = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader");
+        let lSoldier = _.filter(listCreeps, c => c.memory.role == "soldier");
 
         let popTarget =
             (listPopulation["worker"] == null ? 0 : listPopulation["worker"]["amount"])
@@ -62,23 +66,19 @@ module.exports = {
 	},
 
 
-	runCreeps: function (rmColony, listRoute) {
+	runCreeps: function (rmColony, listCreeps, listRoute) {
 		let Roles = require("roles");
 
-		for (let n in Game.creeps) {
-            let creep = Game.creeps[n];
-            if (creep.memory.room != null && creep.memory.room == rmColony) {
+		_.each(listCreeps, creep => {
+			creep.memory.listRoute = listRoute;
 
-				creep.memory.listRoute = listRoute;
-
-                if (creep.memory.role == "worker") {
-                    Roles.Worker(creep);
-                }
-                else if (creep.memory.role == "soldier") {
-                    Roles.Soldier(creep);
-                }
-            }
-        }
+			if (creep.memory.role == "worker") {
+				Roles.Worker(creep);
+			}
+			else if (creep.memory.role == "soldier") {
+				Roles.Soldier(creep);
+			}
+        });
 	},
 
 
