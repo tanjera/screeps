@@ -19,7 +19,7 @@ module.exports = {
 						id: room.controller.id,
 						pos: room.controller.pos,
 						key: `work:upgrade-${room.controller.id}`,
-						timer: 20,
+						timer: 30,
 						creeps: 15,
 						priority: 1
 					});
@@ -31,7 +31,7 @@ module.exports = {
 						id: room.controller.id,
 						pos: room.controller.pos,
 						key: `work:upgrade-${room.controller.id}`,
-						timer: 20,
+						timer: 30,
 						creeps: 20,
 						priority: 5
 					});

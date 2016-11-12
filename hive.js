@@ -193,7 +193,8 @@ let Hive = {
 		_CPU.Start("Hive", "processSpawnRenewing");
 
 		let _Creep = require("util.creep");
-		let listSpawns = Object.keys(Game["spawns"]).filter((a) => { return Game["spawns"][a].spawning == null; });
+		let listSpawns = Object.keys(Game["spawns"]).filter((a) => 
+			{ return Game.spawns[a].spawning == null && Game.spawns[a].room.energyAvailable > 300; });
 		for (let s in listSpawns) {
 			let spawn = Game["spawns"][listSpawns[s]];
 			let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);

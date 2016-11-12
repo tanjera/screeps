@@ -63,8 +63,7 @@ module.exports = {
 			return;
 		}
 
-		// Assign a boost if needed and available
-		let __creep = require("util.creep");
+		// Assign a boost if needed and available		
 		if (creep.ticksToLive > 1100 && !creep.isBoosted()) {
 			let task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 				t => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; }));
@@ -111,7 +110,7 @@ module.exports = {
 			}
 
 			task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-					t => { return t.type == "energy"
+					t => { return t.type == "energy" && t.resource == "energy"
 						&& (t.structure != "link" || t.role == "worker")
 						&& (t.creeps == null || t.creeps > 0); }),
 					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
@@ -287,7 +286,7 @@ module.exports = {
 			if (_.get(creep, ["carry", "energy"], 0) > 0) {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"
-							&& (t.structure != "link" || (t.role == "miner" && creep.pos.getRangeTo(t.pos.x, t.pos.y) <= 6))
+							&& (t.structure != "link" || (t.role != "miner" || creep.pos.getRangeTo(t.pos.x, t.pos.y) <= 6))
 							&& (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 						"priority"));

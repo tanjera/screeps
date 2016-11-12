@@ -6,6 +6,10 @@ Population__Colony_RCL_Mid =
 	{ worker:   {level: 7, amount: 2},
 	  repairer: {level: 5, amount: 1},
 	  upgrader: {level: 7, amount: 2} };
+Population__Colony_RCL_Mid__Boost =
+	{ worker:   {level: 7, amount: 1},
+	  repairer: {level: 5, amount: 1},
+	  upgrader: {level: 7, amount: 3} };
 Population__Colony_RCL8 =
 	{ worker:   {level: 7, amount: 1, scale_level: false},
 	  repairer: {level: 6, amount: 1} };

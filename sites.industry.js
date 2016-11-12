@@ -11,6 +11,7 @@ module.exports = {
 
 		/* Terminal order format (from: is optional!)
 		 * For internal transfers:
+				Memory["terminal_orders"][""] = { room: "", resource: "energy", amount: , priority: 1};
 				Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: "", priority: 1};
 		 * For market trading:
 				Memory["terminal_orders"][""] = { market_id: "", amount: , from: "", priority: 4};
@@ -60,6 +61,7 @@ module.exports = {
 
         if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["courier"]["level"],
+				scale_level: listPopulation["courier"] == null ? true : listPopulation["courier"]["scale_level"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
 	},
@@ -239,7 +241,11 @@ module.exports = {
 						_.set(Memory, ["rooms", rmColony, "stockpile", supply2_mineral], 5000)
 
 					lab = Game.getObjectById(listing["supply1"]);
-					if (lab.mineralType != null && lab.mineralType != supply1_mineral) {
+					if (lab == null) {
+						console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${listing["supply1"]}) is null.`);
+						return;
+					}
+					else if (lab.mineralType != null && lab.mineralType != supply1_mineral) {
 						Tasks.addTask(rmColony, {
 							key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
 							type: "industry", subtype: "withdraw", resource: lab.mineralType,
@@ -258,7 +264,11 @@ module.exports = {
 					}
 
 					lab = Game.getObjectById(listing["supply2"]);
-					if (lab.mineralType != null && lab.mineralType != supply2_mineral) {
+					if (lab == null) {
+						console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${listing["supply2"]}) is null.`);
+						return;
+					}
+					else if (lab.mineralType != null && lab.mineralType != supply2_mineral) {
 						Tasks.addTask(rmColony, {
 							key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
 							type: "industry", subtype: "withdraw", resource: lab.mineralType,
@@ -278,7 +288,11 @@ module.exports = {
 
 					_.forEach(listing["reactors"], r => {
 						lab = Game.getObjectById(r);
-						if (lab.mineralType != null && lab.mineralType != listing["mineral"]) {
+							if (lab == null) {
+							console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${r}) is null.`);
+							return;
+						}
+						else if (lab.mineralType != null && lab.mineralType != listing["mineral"]) {
 							Tasks.addTask(rmColony, {
 								key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
 								type: "industry", subtype: "withdraw", resource: lab.mineralType,
@@ -315,16 +329,12 @@ module.exports = {
 				Memory["rooms"][rmColony]["stockpile"] = new Object();
 
 			let shortage = {};
+			let room = Game.rooms[rmColony];
 			let storage = Game.rooms[rmColony].storage;
 			let terminal = Game.rooms[rmColony].terminal;
 
 			for (let res in Memory["rooms"][rmColony]["stockpile"]) {
-				shortage[res] = Memory["rooms"][rmColony]["stockpile"][res];
-
-				if (terminal.store[res] != null)
-					shortage[res] -= terminal.store[res];
-				if (storage != null && storage.store[res] != null)
-					shortage[res] -= storage.store[res];
+				shortage[res] = Memory["rooms"][rmColony]["stockpile"][res] - room.store(res);
 
 				if (shortage[res] > 0) {
 					Memory["terminal_orders"][`${rmColony}-${res}`] = { room: rmColony, resource: res, amount: shortage[res], priority: 2 };
@@ -422,14 +432,15 @@ module.exports = {
 
 		let o = order["name"];
 		let res = order["resource"];
+		let room = Game.rooms[rmColony];
 
-		if (!Object.keys(shortage).includes(res) || shortage[res] < -2000) {
+		if (_.get(shortage, res, 0) < -2000 || (!_.keys(shortage).includes(res) && room.store(res) > 100)) {
 			if (terminal.store[res] != null && ((res != "energy" && terminal.store[res] >= 100) || (res == "energy" && terminal.store[res] > 200))) {
 				filling.push(res);
 				filling.push("energy");
 
-				let amount = Math.ceil((res == "energy")
-					? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.65, 100)
+				let amount = Math.floor((res == "energy")
+					? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.3, 100)
 					: Math.max(Math.min(order["amount"], terminal.store[res]), 100));
 				let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 

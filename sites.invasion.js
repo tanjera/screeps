@@ -6,7 +6,7 @@ let _CPU = require("util.cpu");
 module.exports = {
 	
 	Run: function(rmColony, rmInvade, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
-		if (!_.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]) == null)
+		if (_.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]) == null)
 			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
 		
 		_CPU.Start(rmColony, `Invade-${rmInvade}-listCreeps`);
@@ -40,12 +40,15 @@ module.exports = {
 			
 			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {				
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["soldier"]["level"], 
+					scale_level: listArmy["soldier"] == null ? true : listArmy["soldier"]["scale_level"],
 					body: "soldier", name: null, args: {role: "soldier", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {				
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["archer"]["level"], 
+					scale_level: listArmy["archer"] == null ? true : listArmy["archer"]["scale_level"],
 					body: "archer", name: null, args: {role: "archer", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["healer"] != null && lHealer.length < listArmy["healer"]["amount"]) {
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["healer"]["level"], 
+					scale_level: listArmy["healer"] == null ? true : listArmy["healer"]["scale_level"],
 					body: "healer", name: null, args: {role: "healer", room: rmInvade, colony: rmColony} });
 			} else if (memory.state == "spawning") {
 				memory.state = "rallying";
@@ -64,16 +67,33 @@ module.exports = {
 			case "rallying":
 			case "spawning":
 				let _Creep = require("util.creep");
+				let _Combat = require("roles.combat");
                 _.each(listCreeps, creep => {
 					creep.memory.listRoute = listRoute;
+					
+					if (creep.memory.boost == null && !creep.isBoosted()) {
+						if (_Combat.seekBoost(creep))
+							return;
+					} else if (creep.memory.boost != null && !creep.isBoosted()) {
+						creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+						return;
+					}
 					
 					if (creep.room.name != posRally.roomName)
 						_Creep.moveToRoom(creep, posRally.roomName, true);
 					else if (creep.room.name == posRally.roomName) {
 						if (!posRally.inRangeTo(creep.pos, rallyRange))
 							creep.moveTo(posRally);
-						else if (Game.time % 15 == 0)
-							creep.moveTo(posRally);
+						else {
+							let hostile = _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, 
+								{ filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}));
+							if (hostile != null) {
+								creep.rangedAttack(hostile);
+								creep.attack(hostile);								
+							}
+							if (Game.time % 15 == 0)
+								creep.moveTo(posRally);
+						}
 					}
 						
 				});
@@ -98,7 +118,7 @@ module.exports = {
 			case "attacking":
 				_.each(listCreeps, creep => {
 					if (creep.memory.role == "soldier") {
-						Roles.Soldier(creep, true, listTargets);
+						Roles.Soldier(creep, true, true, listTargets);
 					} else if (creep.memory.role == "archer") {
 						Roles.Archer(creep, true, listTargets);
 					} else if (creep.memory.role == "healer") {

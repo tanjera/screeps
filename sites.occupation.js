@@ -36,12 +36,15 @@ module.exports = {
 
         if (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["soldier"]["level"],
+				scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],
 				body: "soldier", name: null, args: {role: "soldier", room: rmOccupy, colony: rmColony} });
         } else if (listPopulation["archer"] != null && lArcher.length < listPopulation["archer"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["archer"]["level"],
+				scale_level: listPopulation["archer"] == null ? true : listPopulation["archer"]["scale_level"],
 				body: "archer", name: null, args: {role: "archer", room: rmOccupy, colony: rmColony} });
         } else if (listPopulation["healer"] != null && lHealer.length < listPopulation["healer"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["healer"]["level"],
+				scale_level: listPopulation["healer"] == null ? true : listPopulation["healer"]["scale_level"],
 				body: "healer", name: null, args: {role: "healer", room: rmOccupy, colony: rmColony} });
         }
 	},
@@ -55,7 +58,7 @@ module.exports = {
 				_Creep.moveToRoom(creep, rmOccupy, true);
 			else {
 				if (creep.memory.role == "soldier") {
-					Roles.Soldier(creep, true, listTargets);
+					Roles.Soldier(creep, true, true, listTargets);
 				} else if (creep.memory.role == "archer") {
 					Roles.Archer(creep, true, listTargets);
 				} else if (creep.memory.role == "healer") {

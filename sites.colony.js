@@ -48,18 +48,21 @@ module.exports = {
                         return Memory["allies"].indexOf(c.owner.username) < 0; }}).length)) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 				level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]),
+				scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],
 				body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
         } else if (listPopulation["worker"] != null && lWorker.length < listPopulation["worker"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, level: listPopulation["worker"]["level"],
-				body: (listPopulation["worker"]["body"] || "worker"),
+				scale_level: listPopulation["worker"] == null ? true : listPopulation["worker"]["scale_level"],
+				body: (listPopulation["worker"]["body"] || "worker"),				
 				name: null, args: {role: "worker", room: rmColony} });
         } else if (listPopulation["repairer"] != null && lRepairer.length < listPopulation["repairer"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["repairer"]["level"],
+				scale_level: listPopulation["repairer"] == null ? true : listPopulation["repairer"]["scale_level"],
 				body: (listPopulation["repairer"]["body"] || "worker"),
 				name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
         } else if (listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["upgrader"]["level"],
-				scale_level: listPopulation["upgrader"]["scale_level"] || "true",
+				scale_level: listPopulation["upgrader"] == null ? true : listPopulation["upgrader"]["scale_level"],
 				body: (listPopulation["upgrader"]["body"] || "worker"),
 				name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
         }

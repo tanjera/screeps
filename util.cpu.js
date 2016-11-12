@@ -70,7 +70,7 @@ module.exports = {
 					let used = 0;
 					let cycles = Object.keys(Memory["profiler"]["current"][r][n]).length;					
 					_.forEach(Memory["profiler"]["current"][r][n], c => { used += c["used"]; } );
-					output += `<br>(${parseFloat(used).toFixed(2)} / ${cycles}) : \t ${parseFloat(used / cycles).toFixed(2)} \t ${n}`;
+					output += `<tr><td>(${parseFloat(used).toFixed(2)} / ${cycles})</td><td>${parseFloat(used / cycles).toFixed(2)}</td><td>${n}</td></tr>`;
 					
 					room_used += used;
 					if (typeof(room_cycles) != Number)
@@ -80,7 +80,9 @@ module.exports = {
 				
 				console.log(`<font color=\"#D3FFA3">CPU report for ${r}</font> :: `
 					+ `${parseFloat(room_used).toFixed(2)} : `
-					+ `<font color=\"#D3FFA3">${parseFloat(room_used / room_cycles).toFixed(2)}</font> ${output}`);
+					+ `<font color=\"#D3FFA3">${parseFloat(room_used / room_cycles).toFixed(2)}</font> `
+					+ `<table><tr><th>Total / Cycles\t  </th><th>Mean\t  </th><th>Function</th></tr>`
+					+ `${output}</table>`);
 			}			
 			
 			Memory["profiler"]["status"] = "off";			

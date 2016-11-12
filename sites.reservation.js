@@ -29,6 +29,7 @@ module.exports = {
 
 		if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["reserver"]["level"],
+				scale_level: listPopulation["reserver"] == null ? true : listPopulation["reserver"]["scale_level"],
 				body: (listPopulation["reserver"]["body"] || "reserver"),
 				name: null, args: {role: "reserver", room: rmReserve, colony: rmColony} });
 		}
