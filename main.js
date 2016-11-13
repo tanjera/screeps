@@ -1,3 +1,4 @@
+require("overload");
 require("overload.creep");
 require("overload.room");
 require("overload.roomposition");
@@ -65,7 +66,7 @@ module.exports.loop = function () {
 			  {id: "581904495a628395614bcd2b", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W19S42", "W19S42", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W19S42", null, Population__Industry,
-			[ { action: "boost", mineral: "XLH2O", lab: "58275cb3a63f68ae50000f6f", role: "worker", subrole: null }
+			[ //{ action: "boost", mineral: "XLH2O", lab: "58275cb3a63f68ae50000f6f", role: "worker", subrole: null }
 			/*{ action: "reaction", mineral: "LO", amount: 25000,
 				supply1: "57d8e078691ae2dd20b05905", supply2: "57d9de60bce03e1b1a1f193a",
 				reactors: [ "57d88a475797bae8438c0b79", "57d8b4aa3fc139b87f530540", "57d90f6bebd811df3152e8a1", "57d9667d968026fa32f224f2",

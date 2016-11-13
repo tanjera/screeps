@@ -11,7 +11,7 @@ module.exports = {
 
 		/* For setting lab targets:
 				Memory.labs.targets[""] = { mineral: "", amount: , priority: };
-		
+
 		 * For internal transfers:
 				Memory["terminal_orders"][""] = { room: "", resource: "energy", amount: , priority: 1};
 				Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: "", priority: 1};
@@ -23,7 +23,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Industry-listCreeps");
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Industry-listCreeps");
-		
+
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Industry-runPopulation");
 			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
@@ -84,8 +84,8 @@ module.exports = {
 				key: `industry:deposit-energy-${nuker.id}`, room: rmColony,
 				type: "industry", subtype: "deposit", resource: "energy",
 				id: nuker.id, pos: nuker.pos, timer: 10, creeps: 8, priority: 5 });
-		} 
-		
+		}
+
 		if (nuker.ghodium < nuker.ghodiumCapacity) {
 			if (_.get(Memory, ["rooms", rmColony, "stockpile", "G"]) == null)
 				_.set(Memory, ["rooms", rmColony, "stockpile", "G"], 500)
@@ -104,35 +104,33 @@ module.exports = {
 	},
 
 	assignLabs: function(rmColony) {
-		let target = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["labs", "targets"]), 
+		let target = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["labs", "targets"]),
 			t => {
 				if (_.filter(_.get(Memory, ["labs", "reactions"]), r => { return _.get(r, "mineral") == _.get(t, "mineral"); }).length > 0)
 					return false;
-				
-				if (_.get(t, "needs_reagant") == true)
-					return false;
-				
+
 				if (_.get(t, "amount") < 0)
 					return true;
-				
-				let amount = 0;
-				_.each(_.filter(Game.rooms, 
-					r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); }), 
-					r => { amount += r.store(_.get(t, "mineral")); });
-				return amount < _.get(t, "amount");				
+
+				let amount = 0, r1_amount = 0, r2_amount = 0;
+				let reagents = getReagents(_.get(t, "mineral"));
+				_.each(_.filter(Game.rooms,
+					r => { return r.controller != null && r.controller.my && r.terminal; }),
+					r => { 
+						amount += r.store(_.get(t, "mineral"));
+						r1_amount += r.store(reagents[0]);
+						r2_amount += r.store(reagents[1]);
+					});
+				return amount < _.get(t, "amount") && r1_amount > 1000 && r2_amount > 1000;
 			}),
 			t => _.get(t, "priority")),
-			t => _.get(t, "is_reagant")));
-		
-			
-		if (target.needs_reagant)
-			this.assignLabs(rmColony);
-		else {
-			_.set(Memory, ["labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
-			console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
-		}	
+			t => _.get(t, "is_reagent")));
+
+		_.set(Memory, ["labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
+		console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
+
 	},
-	
+
 	runLabs: function(rmColony, listLabs) {
 		/* Arguments for listLabs:
 			{ action: "boost", mineral: "", lab: "", role: "", subrole: "" }
@@ -161,31 +159,31 @@ module.exports = {
 
 					break;
 
-                case "reaction":				
+                case "reaction":
 					if (Hive.isPulse_Labs()) {
 						this.assignLabs(rmColony);
 					}
-				
+
                     let labSupply1 = Game.getObjectById(listing["supply1"]);
                     let labSupply2 = Game.getObjectById(listing["supply2"]);
 
 					if (labSupply1 == null && labSupply2 == null)
 						break;
 
-					let mineral = _.get(Memory, ["labs", "reactions", rmColony, "mineral"]);					
-					if (mineral == null) 
-						return;			
+					let mineral = _.get(Memory, ["labs", "reactions", rmColony, "mineral"]);
+					if (mineral == null)
+						return;
 
 					let amount = _.get(Memory, ["labs", "reactions", rmColony, "amount"], -1);
 					if (amount > 0 && Game.rooms[rmColony].store(mineral) >= amount) {
-						if (_.get(Memory, ["labs", "targets", mineral, "is_reagant"])) 
-							delete Memory.labs.targets[mineral];							
+						if (_.get(Memory, ["labs", "targets", mineral, "is_reagent"]))
+							delete Memory.labs.targets[mineral];
 						delete Memory.labs.reactions[rmColony];
 						console.log(`<font color=\"#A17BFF\">[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
-						
+
 						if (Hive.isPulse_Main())
-							this.assignLabs(rmColony);						
-						return;							
+							this.assignLabs(rmColony);
+						return;
 					}
 
 					_.forEach(listing["reactors"], r => {
@@ -277,14 +275,14 @@ module.exports = {
 					let mineral = _.get(Memory, ["labs", "reactions", rmColony, "mineral"]);
 					if (mineral == null)
 						return;
-					
-					let reagants = this.getReagents(mineral);
-					let supply1_mineral = reagants[0];
-					let supply2_mineral = reagants[1];					
-					_.set(Memory, ["rooms", rmColony, "stockpile", supply1_mineral], 5000)					
+
+					let reagents = getReagents(mineral);
+					let supply1_mineral = reagents[0];
+					let supply2_mineral = reagents[1];
+					_.set(Memory, ["rooms", rmColony, "stockpile", supply1_mineral], 5000)
 					_.set(Memory, ["rooms", rmColony, "stockpile", supply2_mineral], 5000)
 
-					
+
 					lab = Game.getObjectById(listing["supply1"]);
 					if (lab == null) {
 						console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${listing["supply1"]}) is null.`);
@@ -351,16 +349,6 @@ module.exports = {
 					});
 
 					break;
-			}
-		}
-	},
-
-	getReagents: function (mineral) {
-		for (let r1 in REACTIONS) {
-			for (let r2 in REACTIONS[r1]) {
-				if (REACTIONS[r1][r2] == mineral) {
-					return [r1, r2];
-				}
 			}
 		}
 	},
@@ -621,7 +609,7 @@ module.exports = {
 	},
 
 	runCreeps: function (rmColony, listCreeps) {
-        _.each(listCreeps, creep => {       
+        _.each(listCreeps, creep => {
 			if (creep.memory.role == "courier") {
 				Roles.Courier(creep);
 			}

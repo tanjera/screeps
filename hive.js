@@ -33,7 +33,7 @@ let Hive = {
 	},
 	
 	isPulse_Labs: function() {
-		let ticks = 500;		
+		let ticks = 2000;		
 		let lastTick = _.get(Memory, ["pulses", "lab"]);
 
 		if (lastTick == null
@@ -102,9 +102,6 @@ let Hive = {
 		}
 
 		Memory["spawn_requests"] = new Array();
-
-		if (Game.time % 1500 == 0)	// Periodically reset stockpile (removes old needs)
-			_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 
 		let _Console = require("util.console");
 		_Console.Init();
@@ -294,6 +291,9 @@ let Hive = {
 	initLabs: function() {
 		if (!this.isPulse_Labs())
 			return;
+
+		// Reset stockpiles...
+		_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 		
 		let targets = _.filter(_.get(Memory, ["labs", "targets"]), 
 			t => {
@@ -307,34 +307,25 @@ let Hive = {
 				return amount < _.get(t, "amount");				
 			});
 			
-		_.each(targets, target => this.createReagantTargets(target));
+		_.each(targets, target => this.createReagentTargets(target));
 	},
 	
-	createReagantTargets: function(target) {		
-		_.each(this.getReagents(target.mineral), 
-			reagant => {
+	createReagentTargets: function(target) {		
+		_.each(getReagents(target.mineral), 
+			reagent => {
 				let amount = 0;
 				_.each(_.filter(Game.rooms, 
 					r => { return r.controller != null && r.controller.my && r.terminal; }), 
-					r => { amount += r.store(reagant); });
-				if (amount == 0 && !_.has(Memory, ["labs", "targets", reagant])) {
-					console.log(`<font color=\"#A17BFF\">[Labs]</font> Reagant ${reagant} missing for ${target.mineral}, creating target goal.`);
-					Memory.labs.targets[reagant] = { amount: target.amount, priority: target.priority, mineral: reagant, is_reagant: true };
-					target.needs_reagant = true;
-					this.createReagantTargets(Memory.labs.targets[reagant]);
-				} else
-					delete target.needs_reagant;
+					r => { amount += r.store(reagent); });
+				if (amount < 1000 && !_.has(Memory, ["labs", "targets", reagent])) {
+					if (getReagents(reagent) != null) {
+						console.log(`<font color=\"#A17BFF\">[Labs]</font> reagent ${reagent} missing for ${target.mineral}, creating target goal.`);
+						Memory.labs.targets[reagent] = { amount: target.amount, priority: target.priority, mineral: reagent, is_reagent: true };
+					}
+					
+					this.createReagentTargets(Memory.labs.targets[reagent]);
+				} 
 			});		
-	},
-	
-	getReagents: function (mineral) {
-		for (let r1 in REACTIONS) {
-			for (let r2 in REACTIONS[r1]) {
-				if (REACTIONS[r1][r2] == mineral) {
-					return [r1, r2];
-				}
-			}
-		}
 	},
 };
 

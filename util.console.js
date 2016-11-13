@@ -16,6 +16,38 @@ module.exports = {
 
 		log = new Object();
 
+		command_list.push("log.labs()");
+		
+		log.labs = function() {
+			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
+				+ "<table><tr><th>Room \t</th><th>Mineral \t</th><th>Amount \t</th><th>Target Amount \t</th><th>Reagent #1 \t</th><th>Reagent #2</th></tr>";
+			
+			_.each(_.keys(_.get(Memory, ["labs", "reactions"])), r => {
+				let rxn = Memory.labs.reactions[r];
+				
+				let amount = 0;
+				_.each(_.filter(Game.rooms, 
+					r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); }), 
+					r => { amount += r.store(_.get(rxn, "mineral")); });
+				
+				let reagents = "";
+				_.each(getReagents(_.get(rxn, "mineral")), 
+					reagent => { 
+					
+					let r_amount = 0;
+					_.each(_.filter(Game.rooms, 
+						r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); }), 
+						r => { r_amount += r.store(reagent); });					
+					reagents += `<td>${reagent}: \t${r_amount}</td>` ;
+				});
+				
+				output += `<tr><td>${r}</td><td>${_.get(rxn, "mineral")}</td><td>${amount}</td><td>(${_.get(rxn, "amount")})${reagents}</tr>`
+			});
+			
+			console.log(`${output}</table>`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		};
+		
 		command_list.push("log.resources()");
 		
 		log.resources = function(resource = null, limit = 1) {
