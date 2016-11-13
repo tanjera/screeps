@@ -317,12 +317,9 @@ let Hive = {
 				_.each(_.filter(Game.rooms, 
 					r => { return r.controller != null && r.controller.my && r.terminal; }), 
 					r => { amount += r.store(reagent); });
-				if (amount < 1000 && !_.has(Memory, ["labs", "targets", reagent])) {
-					if (getReagents(reagent) != null) {
-						console.log(`<font color=\"#A17BFF\">[Labs]</font> reagent ${reagent} missing for ${target.mineral}, creating target goal.`);
-						Memory.labs.targets[reagent] = { amount: target.amount, priority: target.priority, mineral: reagent, is_reagent: true };
-					}
-					
+				if (amount < 1000 && !_.has(Memory, ["labs", "targets", reagent]) && getReagents(reagent) != null) {					
+					console.log(`<font color=\"#A17BFF\">[Labs]</font> reagent ${reagent} missing for ${target.mineral}, creating target goal.`);
+					Memory.labs.targets[reagent] = { amount: target.amount, priority: target.priority, mineral: reagent, is_reagent: true };
 					this.createReagentTargets(Memory.labs.targets[reagent]);
 				} 
 			});		

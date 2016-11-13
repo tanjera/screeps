@@ -103,12 +103,9 @@ module.exports = {
 		}
 	},
 
-	assignLabs: function(rmColony) {
-		let target = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["labs", "targets"]),
+	assignReaction: function(rmColony) {
+		let target = _.head(_.sortBy(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["labs", "targets"]),
 			t => {
-				if (_.filter(_.get(Memory, ["labs", "reactions"]), r => { return _.get(r, "mineral") == _.get(t, "mineral"); }).length > 0)
-					return false;
-
 				if (_.get(t, "amount") < 0)
 					return true;
 
@@ -121,13 +118,19 @@ module.exports = {
 						r1_amount += r.store(reagents[0]);
 						r2_amount += r.store(reagents[1]);
 					});
-				return amount < _.get(t, "amount") && r1_amount > 1000 && r2_amount > 1000;
+				return amount < _.get(t, "amount") && r1_amount > 1000 && r2_amount > 1000;				
 			}),
 			t => _.get(t, "priority")),
-			t => _.get(t, "is_reagent")));
+			t => _.get(t, "is_reagent")),
+			t => _.filter(_.get(Memory, ["labs", "reactions"]), r => { return _.get(r, "mineral") == _.get(t, "mineral"); }).length));
 
-		_.set(Memory, ["labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
-		console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
+		if (target != null) {
+			_.set(Memory, ["labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
+			console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
+		} else {
+			_.set(Memory, ["labs", "reactions", rmColony], { mineral: null, amount: null });
+			console.log(`<font color=\"#A17BFF\">[Labs]</font> No reaction to assign to ${rmColony}, idling.`);
+		}
 
 	},
 
@@ -161,7 +164,7 @@ module.exports = {
 
                 case "reaction":
 					if (Hive.isPulse_Labs()) {
-						this.assignLabs(rmColony);
+						this.assignReaction(rmColony);
 					}
 
                     let labSupply1 = Game.getObjectById(listing["supply1"]);
@@ -182,7 +185,7 @@ module.exports = {
 						console.log(`<font color=\"#A17BFF\">[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
 
 						if (Hive.isPulse_Main())
-							this.assignLabs(rmColony);
+							this.assignReaction(rmColony);
 						return;
 					}
 

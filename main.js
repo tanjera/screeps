@@ -40,6 +40,9 @@ module.exports.loop = function () {
 
 	Hive.moveExcessEnergy(200000);
 
+	Sites.Reservation("E3S49", "E9S47", null, 
+	listPopulation, 
+	["E3S49", "E3S50", "E4S50", "E5S50", "E6S50", "E7S50", "E8S50", "E8S49", "E8S48", "E9S48", "E9S47"])
 	
 	
 	/* Forward Operating Base W4S49 */
@@ -66,11 +69,9 @@ module.exports.loop = function () {
 			  {id: "581904495a628395614bcd2b", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W19S42", "W19S42", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W19S42", null, Population__Industry,
-			[ //{ action: "boost", mineral: "XLH2O", lab: "58275cb3a63f68ae50000f6f", role: "worker", subrole: null }
-			/*{ action: "reaction", mineral: "LO", amount: 25000,
-				supply1: "57d8e078691ae2dd20b05905", supply2: "57d9de60bce03e1b1a1f193a",
-				reactors: [ "57d88a475797bae8438c0b79", "57d8b4aa3fc139b87f530540", "57d90f6bebd811df3152e8a1", "57d9667d968026fa32f224f2",
-							"57d9ac42712b129b6c3515b3", "57d9b60063dc7662328df345", "57d87d22751a3e375ab487e8" ] }*/ ]);
+			[ { action: "reaction", supply1: "5827cdeb16de9e4869377e4a", supply2: "5827f4b3a0ed8e9f6bf5ae3c",
+				reactors: [ "5827988a4f975a7d696dba90", "5828280b74d604b04955e2f6", "58283338cc371cf674426315", "5827fcc4d448f67249f48185",
+							"582825566948cb7d61593ab9", "58271f0e740746b259c029e9", "5827e49f0177f1ea2582a419" ] } ]);
 
 	/* Colony W15S41 */
 	Sites.Colony("W15S41", ["W13S41"], Population__Colony_RCL8,
@@ -137,10 +138,9 @@ module.exports.loop = function () {
 			  {id: "58190d13cbe177ac76d7849b", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W18S41", "W18S41", null, false, Population__Mining_1S_Colony);
 	Sites.Industry("W18S41", null, Population__Industry,
-			[ /*{ action: "reaction", mineral: "", amount: 25000,
-				supply1: "57f1f4076a19548340f790c1", supply2: "580505c9e898605430de7c62",
-				reactors: [ "57f1dc282328a5430803d75f", "57f6e31a8538cb68487ef987", "57f7a053df6f91e9697fd46c", "57f6e183bd1ef5dc2c7fd9a7",
-							"5805317d877d581814f857e1", "58051875453185982dd5332a", "5804ee71702bae5a7d5276cd" ] }*/ ]);
+			[ /*{ action: "reaction", supply1: "", supply2: "",
+				reactors: [ "", "", "", "",
+							"", "", "" ] }*/ ]);
 
 	/* Colony W16S43 */
 	Sites.Colony("W16S43", ["W15S43"], Population__Colony_RCL8,
@@ -184,14 +184,14 @@ module.exports.loop = function () {
 	Sites.Mining("W15S41", "W15S39", null, false, Population__Mining_2S_Remote_AT);
 
 	/* Remote mining operations for W15S43 */
-	Sites.Mining("W15S43", "W14S43", null, false, Population__Mining_1S_Remote);
-	Sites.Mining("W15S43", "W15S45", null, true,
+	Sites.Mining("W15S43", "W14S43", ["W16S43"], false, Population__Mining_1S_Remote);
+	Sites.Mining("W15S43", "W15S45", ["W16S43"], true,
 			{ soldier:	 {level: 8, amount: 1},
 			  burrower:  {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 6},
 			  extractor: {level: 8, amount: 2, body: "extractor_rem"},
 			  multirole: {level: 7, amount: 1} } );
-	Sites.Mining("W15S43", "W15S44", null, true,
+	Sites.Mining("W15S43", "W15S44", ["W16S43"], true,
 			{ paladin: 	 {level: 8, amount: 2, scale_level: false},
 			  healer:	 {level: 5, amount: 1},
 			  burrower:	 {level: 6, amount: 2},
@@ -221,15 +221,14 @@ module.exports.loop = function () {
 	Sites.Mining("W18S41", "W19S41", null, false, Population__Mining_2S_Remote);
 
 	/* Remote mining operations for W16S43 */
-	Sites.Mining("W16S43", "W17S43", null, false, Population__Mining_2S_Remote);
-	Sites.Mining("W16S43", "W18S43", null, false, Population__Mining_2S_Remote);
-	Sites.Mining("W15S43", "W16S44", null, true,
-			{ paladin: 	 {level: 8, amount: 2, scale_level: false} } );
-	Sites.Mining("W16S43", "W16S44", null, true,
-			{ burrower:	 {level: 6, amount: 2},
+	Sites.Mining("W16S43", "W17S43", ["W15S43"], false, Population__Mining_2S_Remote);
+	Sites.Mining("W16S43", "W18S43", ["W15S43"], false, Population__Mining_2S_Remote);	
+	Sites.Mining("W16S43", "W16S44", ["W15S43"], true,
+			{ paladin: 	 {level: 8, amount: 2, scale_level: false},
+			  healer:	 {level: 5, amount: 1},
+			  burrower:	 {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 6},
 			  extractor: {level: 8, amount: 2, body: "extractor_rem"},
-			  healer:	 {level: 5, amount: 1},
 			  multirole: {level: 7, amount: 1} } );
 
 	/* Remote mining operations for W11S51 */
