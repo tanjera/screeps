@@ -147,7 +147,7 @@ module.exports = {
 							id: minerals[i].id,
 							pos: minerals[i].pos,
 							key: `mine:harvest-${minerals[i].id}`,
-							timer: 20,
+							timer: 30,
 							creeps: 2,
 							priority: 2
 						});

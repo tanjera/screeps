@@ -11,7 +11,7 @@ module.exports = {
 
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-surveyRoom`);
 		this.surveyRoom(rmColony, rmHarvest);
-		_CPU.End(rmColony, `Mining-${rmHarvest}-surveyRoom`);		
+		_CPU.End(rmColony, `Mining-${rmHarvest}-surveyRoom`);
 
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Mining-${rmHarvest}-runPopulation`);
@@ -30,7 +30,7 @@ module.exports = {
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "has_minerals"],
 			visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
-		let amountHostiles = visible 
+		let amountHostiles = visible
 			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length
 			: 0;
 		let isSafe = !visible || rmColony == rmHarvest || amountHostiles == 0;
@@ -68,16 +68,16 @@ module.exports = {
 
         if (listPopulation["paladin"] != null && lPaladin.length < listPopulation["paladin"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listPopulation["paladin"]["level"],
-				scale_level: listPopulation["paladin"] == null ? true : listPopulation["paladin"]["scale_level"],				
+				scale_level: listPopulation["paladin"] == null ? true : listPopulation["paladin"]["scale_level"],
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
-		} 
+		}
 		else if ((!hasKeepers && !isSafe && amountHostiles > lSoldier.length + lMultirole.length)
 				|| (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, 
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 				level: listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"],
 				scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],
 				body: "soldier", name: null, args: {role: "soldier", room: rmHarvest, colony: rmColony} });
-		} 		
+		}
 		else if (listPopulation["healer"] != null && lHealer.length < listPopulation["healer"]["amount"]) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["healer"]["level"],
 					scale_level: listPopulation["healer"] == null ? true : listPopulation["healer"]["scale_level"],
@@ -132,7 +132,6 @@ module.exports = {
         }
 	},
 
-
 	runCreeps: function(rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {
 		let Roles = require("roles");
 
@@ -141,38 +140,21 @@ module.exports = {
         _.each(listCreeps, creep => {
 			creep.memory.listRoute = listRoute;
 
-			if (hasKeepers == false) {
-				if (isSafe == true) {
-					if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
-						Roles.Mining(creep);
-					} else if (creep.memory.role == "multirole") {
-						Roles.Worker(creep);
-					} else if (creep.memory.role == "reserver") {
-						Roles.Reserver(creep);
-					} else if (creep.memory.role == "extractor") {
-						Roles.Extracter(creep);
-					} else if (creep.memory.role == "healer") {
-						Roles.Healer(creep);
-					}
-				} else {
-					if (creep.memory.role == "soldier" || creep.memory.role == "multirole") {
-						Roles.Soldier(creep);
-					} else if (creep.memory.role == "healer") {
-						Roles.Healer(creep);
-					}
-				}
-			} else if (hasKeepers == true) {
-				if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
-					Roles.Mining(creep, true);
-				} else if (creep.memory.role == "multirole") {
-					Roles.Worker(creep, true);
-				} else if (creep.memory.role == "extractor") {
-					Roles.Extracter(creep, true);
-				} else if (creep.memory.role == "soldier" || creep.memory.role == "paladin") {
-					Roles.Soldier(creep, false);
-				} else if (creep.memory.role == "healer") {
-					Roles.Healer(creep);
-				}
+			if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
+				Roles.Mining(creep, isSafe);
+			} else if (creep.memory.role == "extractor") {
+				Roles.Extracter(creep, isSafe);
+			} else if (creep.memory.role == "reserver") {
+				Roles.Reserver(creep);
+			} else if (creep.memory.role == "soldier" || creep.memory.role == "paladin") {
+				Roles.Soldier(creep, false, true);
+			} else if (creep.memory.role == "healer") {
+				Roles.Healer(creep);
+			} else if (creep.memory.role == "multirole") {
+				if (hasKeepers || isSafe)
+					Roles.Worker(creep, isSafe);
+				else
+					Roles.Soldier(creep, false, true);
 			}
         });
 	}

@@ -12,31 +12,37 @@ module.exports = {
 		command_list.push("profiler.stop()");
 		command_list.push("");
 
-
-
-		command_list.push("log.resources()");
+		
 
 		log = new Object();
 
-		log.resources = function(resource = null, limit = 100) {
+		command_list.push("log.resources()");
+		
+		log.resources = function(resource = null, limit = 1) {
 			let resource_list = resource != null ? [ resource ] : RESOURCES_ALL;
-
-			_.each(resource_list, res => {
-				let output = "";
-
-				_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {
-					let amount = _.get(r, ["storage", "store", res], 0) + _.get(r, ["terminal", "store", res], 0);
-					if (amount >= limit)
-						output += `<font color=\"#${_.has(Game, ["rooms", r.name, "terminal"]) ? "47FF3E" : "FF3E3E"}\">${r.name}</font>: `
-							+ `<font color=\"#FFFFFF">${amount}</font> <br>`;
+			let room_list = _.filter(Game.rooms, r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); });
+			
+			let output = `<font color=\"#FFF"><tr><th>Resource\t</th><th>Total \t\t</th>`;
+			_.each(room_list, r => { output += `<th><font color=\"#${r.terminal ? "5DB65B" : "B65B5B"}\">${r.name}</font> \t</th>`; });
+			
+			_.each(resource_list, res => {				
+				let amount = 0;
+				let output_rooms = "";
+				
+				_.each(room_list, r => {
+					let a = r.store(res);
+					amount += a;
+					output_rooms += `<td>${a}</td>`
 				});
 
-				if (output != "")
-					console.log(`<font color=\"#D3FFA3">log-resources: ${res}</font><br>` + output);
+				if (amount >= limit)
+					output += `<tr><td>${res}</td><td>${amount}</td> ${output_rooms} </tr>`;									
 			});
+			
+			console.log(`<font color=\"#D3FFA3">log.resources</font> <table>${output}</table>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
-
+		
 		command_list.push("log.room_list()");
 
 		log.room_list = function() {

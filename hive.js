@@ -31,9 +31,23 @@ let Hive = {
 			return false;
 		}
 	},
+	
+	isPulse_Labs: function() {
+		let ticks = 500;		
+		let lastTick = _.get(Memory, ["pulses", "lab"]);
+
+		if (lastTick == null
+				|| Game.time == lastTick
+				|| Game.time - lastTick >= ticks) {
+			_.set(Memory, ["pulses", "lab"], Game.time);
+			return true;
+		} else {
+			return false;
+		}
+	},
 
 	isPulse_Blueprint: function() {
-		let minTicks = 500, maxTicks = 2000;
+		let minTicks = 500, maxTicks = 1000;
 		let range = maxTicks - minTicks;
 		let lastTick = _.get(Memory, ["pulses", "blueprint"]);
 
@@ -54,6 +68,7 @@ let Hive = {
 		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 	},
 
+	
 	clearDeadMemory: function() {
 		if (!this.isPulse_Main())
 			return;
@@ -112,6 +127,7 @@ let Hive = {
 		}
 	},
 
+	
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing
 		_.set(Memory, ["rooms", rmName, "population_balance", "target"], _.get(Memory, ["rooms", rmName, "population_balance", "target"], 0) + popTarget);
@@ -210,6 +226,7 @@ let Hive = {
 		_CPU.End("Hive", "processSpawnRenewing");
 	},
 
+	
 	sellExcessResources: function(overflow) {
 		if (!Hive.isPulse_Main())
 			return;
@@ -271,7 +288,54 @@ let Hive = {
 		}
 
 		_CPU.End("Hive", "moveExcessEnergy");
-	}
+	},
+	
+	
+	initLabs: function() {
+		if (!this.isPulse_Labs())
+			return;
+		
+		let targets = _.filter(_.get(Memory, ["labs", "targets"]), 
+			t => {
+				if (_.get(t, "amount") < 0)
+					return true;
+				
+				let amount = 0;
+				_.each(_.filter(Game.rooms, 
+					r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); }), 
+					r => { amount += r.store(_.get(t, "mineral")); });
+				return amount < _.get(t, "amount");				
+			});
+			
+		_.each(targets, target => this.createReagantTargets(target));
+	},
+	
+	createReagantTargets: function(target) {		
+		_.each(this.getReagents(target.mineral), 
+			reagant => {
+				let amount = 0;
+				_.each(_.filter(Game.rooms, 
+					r => { return r.controller != null && r.controller.my && r.terminal; }), 
+					r => { amount += r.store(reagant); });
+				if (amount == 0 && !_.has(Memory, ["labs", "targets", reagant])) {
+					console.log(`<font color=\"#A17BFF\">[Labs]</font> Reagant ${reagant} missing for ${target.mineral}, creating target goal.`);
+					Memory.labs.targets[reagant] = { amount: target.amount, priority: target.priority, mineral: reagant, is_reagant: true };
+					target.needs_reagant = true;
+					this.createReagantTargets(Memory.labs.targets[reagant]);
+				} else
+					delete target.needs_reagant;
+			});		
+	},
+	
+	getReagents: function (mineral) {
+		for (let r1 in REACTIONS) {
+			for (let r2 in REACTIONS[r1]) {
+				if (REACTIONS[r1][r2] == mineral) {
+					return [r1, r2];
+				}
+			}
+		}
+	},
 };
 
 module.exports = Hive;

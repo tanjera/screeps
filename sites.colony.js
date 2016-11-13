@@ -79,7 +79,7 @@ module.exports = {
 				Roles.Worker(creep);
 			}
 			else if (creep.memory.role == "soldier") {
-				Roles.Soldier(creep);
+				Roles.Soldier(creep, false, true);
 			}
         });
 	},

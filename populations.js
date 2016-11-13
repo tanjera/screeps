@@ -49,3 +49,6 @@ Population__Maintenance =
 
 Population__Industry =
 	{ courier:   {level: 5, amount: 1} };
+	
+Population_Reservation = 
+	{ reserver:  {level: 6, amount: 1, body: "reserver_at"} };
