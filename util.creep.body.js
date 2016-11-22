@@ -34,13 +34,14 @@ module.exports = {
 						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
             case 7:                
             case 8:
-                return [ // 3600 energy, 25x MOVE, 20x ATTACK, 5x RANGED_ATTACK
+                return [ // 3700 energy, 25x MOVE, 20x ATTACK, 4x RANGED_ATTACK, 1x HEAL
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,                        
 						MOVE, MOVE, MOVE, MOVE, MOVE, 
-						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+						HEAL];
         }
 	},
 
@@ -147,8 +148,10 @@ module.exports = {
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
                         HEAL, HEAL, HEAL, HEAL, HEAL];
             case 8:
-                return [ // 6000 energy, 20x HEAL, 20x MOVE
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                return [ // 6300 energy, 20x HEAL, 5x TOUGH, 25x MOVE
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+						MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL];
@@ -445,13 +448,13 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 7:
 			case 8:
-                return [ // 3850 energy, 27x WORK, 8x CARRY, 15x MOVE
+                return [ // 3750 energy, 25x WORK, 8x CARRY, 17x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-						WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+						WORK, WORK, WORK, WORK, WORK, 
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-						MOVE, MOVE, MOVE, MOVE, MOVE];
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
         }
 	},
 

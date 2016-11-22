@@ -138,6 +138,8 @@ module.exports = {
 				case "get_minerals":
 					if (_.sum(creep.carry) == creep.carryCapacity) {
 						creep.memory.state = "deliver";
+						Tasks.returnTask(creep);
+						return;
 					}
 
 					Tasks.assignTask(creep, true);
@@ -149,6 +151,8 @@ module.exports = {
 				case "deliver":
 					if (_.sum(creep.carry) == 0) {
 						creep.memory.state = "get_minerals";
+						Tasks.returnTask(creep);
+						return;
 					}
 
 					Tasks.assignTask(creep, false);
@@ -187,15 +191,27 @@ module.exports = {
 	},
 
     Soldier: function(creep, targetStructures, targetCreeps, listTargets) {
+		let _Combat = require("roles.combat");
+		
+		if (creep.room.name == creep.memory.colony) {
+			if (creep.memory.boost == null && !creep.isBoosted()) {
+				if (_Combat.seekBoost(creep))
+					return;
+			} else if (creep.memory.boost != null && !creep.isBoosted()) {
+				creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+				return;
+			}
+		}
+
 		if (creep.memory.room != null && creep.room.name != creep.memory.room
 				&& creep.memory.target == null) {	// Prevent room edge fighting from breaking logic...
 			_Creep.moveToRoom(creep, creep.memory.room);
 			return;
 		}
-
-		let _Combat = require("roles.combat");
+		
 		_Combat.checkTarget_Existing(creep);
-		_Combat.acquireTarget_ListTarget(creep, listTargets);		
+		_Combat.acquireTarget_ListTarget(creep, listTargets);
+		
 		if (targetCreeps)
 			_Combat.acquireTarget_Creep(creep);		
 		if (targetStructures) 

@@ -26,11 +26,10 @@ module.exports.loop = function () {
 	/* Ally list <3 */
 	Memory["allies"] = [
 		/* SUN */
-		"Pantek59", "king_lispi", "Atavus", "BlackLotus",
-		"Moria", "Atlan", "Ashburnie", "seancl", "Finndibaen",
-		"Klapaucius", "Hachima", "ChaosDMG", "Calame",
-		/* E5S55 Coalition */
-		"Maxion", "Kenshi", "Plasticbag", "Trepidimous", "Nisou", "Remco"];
+		"Pantek59", "king_lispi", "Atavus", "BlackLotus", "Moria",
+		"Atlan", "Ashburnie", "seancl", "Finndibaen", "Klapaucius",
+		"Hachima", "ChaosDMG", "Calame", "Maxion", "Trepidimous",
+		"Kenshi", "Plasticbag"];
 
 	/* Auto-sell excess stockpile */
 	Hive.sellExcessResources({
@@ -40,33 +39,31 @@ module.exports.loop = function () {
 
 	Hive.moveExcessEnergy(200000);
 
-	Sites.Reservation("E3S49", "E9S47", null, 
-	listPopulation, 
-	["E3S49", "E3S50", "E4S50", "E5S50", "E6S50", "E7S50", "E8S50", "E8S49", "E8S48", "E9S48", "E9S47"])
-	
-	
-	/* Forward Operating Base W4S49 */
-	Sites.Colony("W4S49", null, Population__Colony_RCL_Mid__Boost);
-	Sites.Mining("W4S49", "W4S49", null, false, Population__Mining_2S_Colony);
-	Sites.Industry("W4S49", null, Population__Industry);	
-	Sites.Mining("W4S49", "W3S49", null, false, Population__Mining_2S_Remote);
-	
-	/* Forward Operating Base E3S49 */
-	Sites.Colony("E3S49", ["W4S49"], Population__Colony_RCL_Mid, null,
-		["W4S49", "W4S50", "W3S50", "W2S50", "W1S50", "W0S50", "E0S50", "E1S50", "E2S50", "E3S50"]);
-	Sites.Mining("E3S49", "E3S49", ["W4S49"], false, Population__Mining_RCL_Low__Distant,
-		["W4S49", "W4S50", "W3S50", "W2S50", "W1S50", "W0S50", "E0S50", "E1S50", "E2S50", "E3S50"]);
+		
+		
+	Sites.Invasion("W18S41", "W21S22", null, 
+		{ soldier:	 {level: 8, amount: 3, scale_level: false},
+			healer:	 {level: 8, amount: 2, scale_level: false} }, 
+		["579a8297de4759b36aabcbe3", // rampart
+			"5831f06f94f6c94e59eb03b4", "5831f2ecd33fb4361f29655d", "5831e2f1d597afb8326570d5", // towers
+			"5831dedce16286677eccf79a", "58326d7728c02a5040a4dc65", "5831eefe5292df2071304bb1",	// towers
+			"57aecb379a0c38767be44055", "5793cbcd2f92338c34ba219e", "57cc3ee0f598cc6728c79639"	//spawns
+			], 
+		new RoomPosition(18, 5, "W21S23"), 
+		["W18S41", "W18S40", "W19S40", "W20S40", "W20S39", "W20S38", "W20S37", 
+			"W20S36", "W20S35", "W20S34", "W20S33", "W20S32", "W20S31", "W20S30", 
+			"W20S29", "W20S28", "W20S27", "W20S26", "W20S25", "W20S24", "W20S23", "W21S23" ])
+		
+		
 
-		
-		
 	/* Colony W19S42 */
 	Sites.Colony("W19S42", null, Population__Colony_RCL8,
 			[ {id: "57a23067cf975f59293d8a28", role: "worker", dir: "send"},
-			  {id: "57a23201113c59e97f7e364e", role: "worker", dir: "receive"},
-			  {id: "58190bce172c6fb25ecfd584", role: "miner", dir: "send"},
-			  {id: "5818ff8a5cf2637c068925e2", role: "miner", dir: "send"},
-			  {id: "58190238ca6a63d506ae8597", role: "miner", dir: "receive"},
-			  {id: "581904495a628395614bcd2b", role: "miner", dir: "receive"} ]);
+			  {id: "5828408703623e8c6493d9e9", role: "worker", dir: "receive"},
+			  {id: "58284ff45492887455d5536d", role: "miner", dir: "send"},
+			  {id: "5828487db8fec9bc7739223d", role: "miner", dir: "send"},
+			  {id: "582825f67465d1e12b1caca3", role: "miner", dir: "receive"},
+			  {id: "58283362f63a601e13869abd", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W19S42", "W19S42", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W19S42", null, Population__Industry,
 			[ { action: "reaction", supply1: "5827cdeb16de9e4869377e4a", supply2: "5827f4b3a0ed8e9f6bf5ae3c",
@@ -97,7 +94,8 @@ module.exports.loop = function () {
 			  {id: "58191134481a976449a2b7c3", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W15S43", "W15S43", ["W16S43"], false, Population__Mining_1S_Colony);
 	Sites.Industry("W15S43", null, Population__Industry,
-			[ { action: "reaction", supply1: "57c3fdcc823703630339213d", supply2: "57e3ca388826ba8b794e669c",
+			[ //{ action: "boost", mineral: "UH2O", lab: "57c8cb46e9b21a95363affa3", role: "soldier", dest: "W15S45" },
+			  { action: "reaction", supply1: "57c3fdcc823703630339213d", supply2: "57e3ca388826ba8b794e669c",
 				reactors: [ "57d904f43638e72938ab1a07", "57e3c25752f8ca0e2ab1bdd1", "57e3d8c34d38ad60307ea948", "57e3e76f43bae8a77e035d7a",
 							"57d934dd5b1ce747079af503", "57c4a633e06148377d95b97d", "57c8dc805e86b05c1d5892e3" ] } ]);
 
@@ -131,16 +129,18 @@ module.exports.loop = function () {
 
 	/* Colony W18S41 */
 	Sites.Colony("W18S41", null, Population__Colony_RCL8,
-		    [ {id: "57f1c74616fb8a5a6b0bb386", role: "worker", dir: "send"},
+		    [ {id: "5828c54dc772ff61447e6733", role: "worker", dir: "send"},
 			  {id: "57f1f63bab48a7a015c15ccd", role: "worker", dir: "receive"},
-			  {id: "581917b21e938c4e127c7f0a", role: "miner", dir: "send"},
 			  {id: "581984520b035f755541ed49", role: "miner", dir: "send"},
+			  {id: "581917b21e938c4e127c7f0a", role: "miner", dir: "send"},
 			  {id: "58190d13cbe177ac76d7849b", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W18S41", "W18S41", null, false, Population__Mining_1S_Colony);
 	Sites.Industry("W18S41", null, Population__Industry,
-			[ /*{ action: "reaction", supply1: "", supply2: "",
-				reactors: [ "", "", "", "",
-							"", "", "" ] }*/ ]);
+			[ { action: "boost", mineral: "XUH2O", lab: "5827778b5192a0250c0856d6", role: "soldier", dest: "W21S22" },
+			  { action: "boost", mineral: "XLHO2", lab: "5828d3510435d62a75a101c1", role: "healer", dest: "W21S22" }			
+			/*{ action: "reaction", supply1: "5828e06fe94fc4e20b1b7a96", supply2: "5829168122d14b350cf588ec",
+				reactors: [ "5827c4287906916957fe5d4e", "582902fb140901c84e508f68", "58291c28d4e8b2ae78430458", "58292fe9078393012ebce678",
+							"5829247f6bb19ab26526cd7b", "5828f3131a73036237ee4727", "5828d3510435d62a75a101c1" ] }*/ ]);
 
 	/* Colony W16S43 */
 	Sites.Colony("W16S43", ["W15S43"], Population__Colony_RCL8,
@@ -158,18 +158,30 @@ module.exports.loop = function () {
 	/* Colony W11S51 */
 	Sites.Colony("W11S51", null, Population__Colony_RCL_Mid,
 		    [ {id: "581715b2221c895e12dc8c56", role: "worker", dir: "send"},
-			  {id: "581747ec106fbc836af982de", role: "worker", dir: "receive"} ]);
+			  {id: "581747ec106fbc836af982de", role: "worker", dir: "receive"},
+			  {id: "582c0aef40e22df3062e3002", role: "miner", dir: "send"},
+			  {id: "581d137128b6a987553442ce", role: "miner", dir: "receive"} ]);
 	Sites.Mining("W11S51", "W11S51", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W11S51", null, Population__Industry,
-		[ { action: "boost", mineral: "XGH2O", lab: "581e0fed63bbb3937a878657", role: "worker", subrole: "upgrader" } ]);
+		[ { action: "boost", mineral: "GH2O", lab: "581e0fed63bbb3937a878657", role: "worker", subrole: "upgrader" } ]);
 
 	/* Colony W6S37 */
-	Sites.Colony("W6S37", null, Population__Colony_RCL_Mid);
+	Sites.Colony("W6S37", null, Population__Colony_RCL_Mid,
+		    [ {id: "581b325b9caefc6c0a88cae5", role: "worker", dir: "send"},
+			  {id: "581b225def41da5416ef82ba", role: "worker", dir: "receive"} ]);
 	Sites.Mining("W6S37", "W6S37", null, false, Population__Mining_2S_Colony);
 	Sites.Industry("W6S37", null, Population__Industry,
-		[ { action: "boost", mineral: "XGH2O", lab: "5826f1df9a6706607faffe35", role: "worker", subrole: "upgrader" } ]);
+		[ { action: "boost", mineral: "GH2O", lab: "5826f1df9a6706607faffe35", role: "worker", subrole: "upgrader" } ]);
 
+	/* Colony E9S42 */
+	Sites.Colony("E9S42", null, Population__Colony_Founding);
+	Sites.Mining("E9S42", "E9S42", null, false, Population__Mining_RCL_Low);
+	
+	/* Colony W11S42 */
+	Sites.Colony("W11S42", ["W13S41"], Population__Colony_RCL_Mid, null);
+	Sites.Mining("W11S42", "W11S42", ["W13S41"], false, Population__Mining_RCL_Low);
 
+	
 
 	/* Remote mining operations for W19S42 */
 	Sites.Mining("W19S42", "W18S42", null, false, Population__Mining_2S_Remote);
@@ -185,15 +197,20 @@ module.exports.loop = function () {
 
 	/* Remote mining operations for W15S43 */
 	Sites.Mining("W15S43", "W14S43", ["W16S43"], false, Population__Mining_1S_Remote);
-	Sites.Mining("W15S43", "W15S45", ["W16S43"], true,
-			{ soldier:	 {level: 8, amount: 1},
+	Sites.Mining("W15S43", "W13S43", ["W16S43"], false, Population__Mining_1S_Remote,
+		["W15S43", "W14S43", "W13S43"] );
+	Sites.Mining("W15S43", "W12S43", ["W16S43"], false, Population__Mining_2S_Remote,
+		["W15S43", "W14S43", "W13S43", "W12S43"] );
+	Sites.Mining("W15S43", "W15S45", null, true,
+			{ soldier:	 {level: 8, amount: 2, scale_level: false},
+			  healer:	 {level: 5, amount: 1, scale_level: false},
 			  burrower:  {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 6},
 			  extractor: {level: 8, amount: 2, body: "extractor_rem"},
 			  multirole: {level: 7, amount: 1} } );
 	Sites.Mining("W15S43", "W15S44", ["W16S43"], true,
 			{ paladin: 	 {level: 8, amount: 2, scale_level: false},
-			  healer:	 {level: 5, amount: 1},
+			  healer:	 {level: 5, amount: 1, scale_level: false},
 			  burrower:	 {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 6},
 			  extractor: {level: 8, amount: 2, body: "extractor_rem"},
@@ -222,10 +239,10 @@ module.exports.loop = function () {
 
 	/* Remote mining operations for W16S43 */
 	Sites.Mining("W16S43", "W17S43", ["W15S43"], false, Population__Mining_2S_Remote);
-	Sites.Mining("W16S43", "W18S43", ["W15S43"], false, Population__Mining_2S_Remote);	
+	Sites.Mining("W16S43", "W18S43", ["W15S43"], false, Population__Mining_2S_Remote);
 	Sites.Mining("W16S43", "W16S44", ["W15S43"], true,
 			{ paladin: 	 {level: 8, amount: 2, scale_level: false},
-			  healer:	 {level: 5, amount: 1},
+			  healer:	 {level: 5, amount: 1, scale_level: false},
 			  burrower:	 {level: 6, amount: 2},
 			  carrier:   {level: 7, amount: 6},
 			  extractor: {level: 8, amount: 2, body: "extractor_rem"},
@@ -239,6 +256,9 @@ module.exports.loop = function () {
 	/* Remote mining operations for W6S37 */
 	Sites.Mining("W6S37", "W6S38", null, false, Population__Mining_2S_Remote);
 
+	/* Remote mining operations for W11S42 */
+	Sites.Mining("W11S42", "W11S41", ["W13S41"], false, Population__Maintenance);
+	Sites.Mining("W11S42", "W11S43", ["W13S41"], false, Population__Mining_1S_Remote);
 
 	/* Run end-tick Hive functions */
 	Hive.processSpawnRequests();

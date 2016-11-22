@@ -10,7 +10,8 @@ module.exports = {
 		_CPU.End(rmColony, `Mining-${rmHarvest}-listCreeps`);
 
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-surveyRoom`);
-		this.surveyRoom(rmColony, rmHarvest);
+		if (Game.time % 3 == 0)
+			this.surveyRoom(rmColony, rmHarvest);
 		_CPU.End(rmColony, `Mining-${rmHarvest}-surveyRoom`);
 
 		if (Hive.isPulse_Spawn()) {
@@ -31,8 +32,7 @@ module.exports = {
 			visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
 		let amountHostiles = visible
-			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length
-			: 0;
+			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length : 0;
 		let isSafe = !visible || rmColony == rmHarvest || amountHostiles == 0;
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"], isSafe);
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "amount_hostiles"], amountHostiles);

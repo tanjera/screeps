@@ -9,6 +9,11 @@ module.exports = {
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Colony-listCreeps");
 
+		_CPU.Start(rmColony, "Colony-surveyRoom");
+		if (Game.time % 3 == 0)
+			this.surveyRoom(rmColony);
+		_CPU.End(rmColony, "Colony-surveyRoom");
+		
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Colony-runPopulation");
 			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
@@ -27,7 +32,18 @@ module.exports = {
 		this.runLinks(rmColony, listLinks);
         _CPU.End(rmColony, "Colony-runLinks");
 	},
+		
+	surveyRoom: function(rmColony) {
+		let visible = _.keys(Game.rooms).includes(rmColony);
+		_.set(Memory, ["rooms", rmColony, "has_minerals"],
+			visible ? Game.rooms[rmColony].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
+		let amountHostiles = visible
+			? Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length : 0;
+		let isSafe = !visible || amountHostiles == 0;
+		_.set(Memory, ["rooms", rmColony, "is_safe"], isSafe);
+		_.set(Memory, ["rooms", rmColony, "amount_hostiles"], amountHostiles);
+	},
 
 	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
 		let lWorker = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == null);
@@ -44,8 +60,7 @@ module.exports = {
         Hive.populationTally(rmColony, popTarget, popActual);
 
         if ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])
-            || (lSoldier.length < Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) {
-                        return Memory["allies"].indexOf(c.owner.username) < 0; }}).length)) {
+            || (lSoldier.length < _.get(Memory, ["rooms", rmColony, "amount_hostiles"]))) {
 			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 				level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]),
 				scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],
@@ -87,7 +102,7 @@ module.exports = {
 
 	runTowers: function (rmColony) {
 		if (_.get(Memory, ["rooms", rmColony, "towers", "target_attack"]) == null) {
-			if (Game.time % 2 == 0) {
+			if (_.get(Memory, ["rooms", rmColony, "is_safe"]) == false) {
 				let hostile = _.head(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) {
 					return Memory["allies"].indexOf(c.owner.username) < 0; }}));
 				if (hostile != null)
@@ -95,7 +110,7 @@ module.exports = {
 			}
 		} else {
 			let hostile = Game.getObjectById(_.get(Memory, ["rooms", rmColony, "towers", "target_attack"]));
-			if (hostile == null) {
+			if (hostile == null || Game.time % 10 == 0) {	// Refresh target every 10 ticks
 				_.set(Memory, ["rooms", rmColony, "towers", "target_attack"], null);
 			} else {
 				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }}),
@@ -105,7 +120,7 @@ module.exports = {
 		}
 
 		if (_.get(Memory, ["rooms", rmColony, "towers", "target_heal"]) == null) {
-			if (Game.time % 2 == 0) {
+			if (Game.time % 3 == 0) {
 				let injured = _.head(Game.rooms[rmColony].find(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }}));
 				if (injured != null)
 					_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], injured.id);
@@ -115,7 +130,8 @@ module.exports = {
 			if (injured == null) {
 				_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], null);
 			} else {
-				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }}),
+				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { 
+					return s.structureType == STRUCTURE_TOWER && s.energy > s.energyCapacity * 0.5; }}),
 					t => { t.heal(injured) });
 				return;
 			}

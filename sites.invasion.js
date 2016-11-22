@@ -69,15 +69,17 @@ module.exports = {
 				let _Creep = require("util.creep");
 				let _Combat = require("roles.combat");
                 _.each(listCreeps, creep => {
-					creep.memory.listRoute = listRoute;
+					creep.memory.listRoute = listRoute;					
 					
-					if (creep.memory.boost == null && !creep.isBoosted()) {
-						if (_Combat.seekBoost(creep))
+					if (creep.room.name == rmColony) {						
+						if (creep.memory.boost == null && !creep.isBoosted()) {
+							if (_Combat.seekBoost(creep))
+								return;
+						} else if (creep.memory.boost != null && !creep.isBoosted()) {
+							creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
 							return;
-					} else if (creep.memory.boost != null && !creep.isBoosted()) {
-						creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
-						return;
-					}
+						}					
+					} 
 					
 					if (creep.room.name != posRally.roomName)
 						_Creep.moveToRoom(creep, posRally.roomName, true);

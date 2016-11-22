@@ -113,12 +113,12 @@ module.exports = {
 				let reagents = getReagents(_.get(t, "mineral"));
 				_.each(_.filter(Game.rooms,
 					r => { return r.controller != null && r.controller.my && r.terminal; }),
-					r => { 
+					r => {
 						amount += r.store(_.get(t, "mineral"));
 						r1_amount += r.store(reagents[0]);
 						r2_amount += r.store(reagents[1]);
 					});
-				return amount < _.get(t, "amount") && r1_amount > 1000 && r2_amount > 1000;				
+				return amount < _.get(t, "amount") && r1_amount > 1000 && r2_amount > 1000;
 			}),
 			t => _.get(t, "priority")),
 			t => _.get(t, "is_reagent")),
@@ -151,9 +151,10 @@ module.exports = {
 
 				case "boost":
 					let lab = Game.getObjectById(listing["lab"]);
-					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1,
-						{ filter: (c) => { return c.memory.role == listing["role"]
+					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, { filter: (c) => { 
+						return c.memory.role == listing["role"]
 							&& c.memory.subrole == listing["subrole"]
+							&& (listing["dest"] == null ? true : c.memory.room == listing["dest"])
 							&& c.ticksToLive > 1100 && !c.isBoosted() }});
 
 					if (creeps.length > 0) {
@@ -175,6 +176,9 @@ module.exports = {
 
 					let mineral = _.get(Memory, ["labs", "reactions", rmColony, "mineral"]);
 					if (mineral == null)
+						return;
+					
+					if (_.get(REACTIONS, [labSupply1.mineralType, labSupply2.mineralType]) != mineral)
 						return;
 
 					let amount = _.get(Memory, ["labs", "reactions", rmColony, "amount"], -1);
@@ -225,7 +229,7 @@ module.exports = {
 					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
 					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
 						Tasks.addTask(rmColony, {
-							key: `boost:boost-${listing["mineral"]}-${lab.id}`, room: rmColony,
+							key: `boost:boost-${listing["mineral"]}-${lab.id}`, room: rmColony, dest: listing["dest"],
 							type: "boost", subtype: "boost", role: listing["role"], subrole: listing["subrole"],
 							resource: listing["mineral"], id: lab.id, pos: lab.pos, timer: 10, creeps: 8, priority: 1 });
 					}
@@ -282,8 +286,8 @@ module.exports = {
 					let reagents = getReagents(mineral);
 					let supply1_mineral = reagents[0];
 					let supply2_mineral = reagents[1];
-					_.set(Memory, ["rooms", rmColony, "stockpile", supply1_mineral], 5000)
-					_.set(Memory, ["rooms", rmColony, "stockpile", supply2_mineral], 5000)
+					_.set(Memory, ["rooms", rmColony, "stockpile", supply1_mineral], 1000)
+					_.set(Memory, ["rooms", rmColony, "stockpile", supply2_mineral], 1000)
 
 
 					lab = Game.getObjectById(listing["supply1"]);
@@ -475,9 +479,16 @@ module.exports = {
 				filling.push(res);
 				filling.push("energy");
 
-				let amount = Math.floor((res == "energy")
-					? Math.max(Math.min(order["amount"], terminal.store[res]) * 0.3, 100)
-					: Math.max(Math.min(order["amount"], terminal.store[res]), 100));
+				let amount;
+				if (res == "energy") {
+					let calc_transfer = Game.market.calcTransactionCost(10000, rmColony, order["room"]);
+					let calc_total = calc_transfer + 10000;
+					let calc_coeff = (1 - calc_transfer / calc_total) * 0.95;
+					amount = Math.floor(Math.clamp(terminal.store[res] * calc_coeff, 100, order["amount"]));
+				} else {
+					amount = Math.floor(Math.clamp(terminal.store[res], 100, order["amount"]));
+				}
+
 				let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 
 				if ((res != "energy" && terminal.store["energy"] >= cost)

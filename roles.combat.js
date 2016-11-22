@@ -8,7 +8,12 @@ module.exports = {
 			return false;
 		else {
 			let task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-				t => { return t.type == "boost" && t.role == creep.memory.role && t.subrole == creep.memory.subrole; }));
+				t => { 
+				return t.type == "boost" 
+					&& t.role == creep.memory.role 
+					&& t.subrole == creep.memory.subrole
+					&& t.dest == null ? true : t.dest == creep.memory.room; }));
+				
 			if (task != null) {
 				creep.memory.boost = task;
 				return true;
@@ -29,7 +34,7 @@ module.exports = {
 		if (creep.memory.target == null) {
 			for (let t in listTargets) {
 				let target = Game.getObjectById(listTargets[t]);
-				if (target != null) {
+				if (target != null && creep.moveTo(target) != ERR_NO_PATH) {
 					creep.memory.target = target.id;
 					return;
 				}

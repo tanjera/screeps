@@ -1,3 +1,6 @@
+Population__Colony_Founding =
+	{ worker:   {level: 4, amount: 4},
+	  repairer: {level: 2, amount: 1} };
 Population__Colony_RCL_Low =
 	{ worker:   {level: 3, amount: 2},
 	  repairer: {level: 3, amount: 1},
@@ -33,6 +36,11 @@ Population__Mining_1S_Remote =
 	  carrier:   {level: 7, amount: 2},
 	  multirole: {level: 6, amount: 1},
 	  reserver:  {level: 6, amount: 1} };
+Population__Mining_1S_Remote_AT =
+	{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
+	  carrier:   {level: 7, amount: 2, body: "carrier_at"},
+	  multirole: {level: 6, amount: 1},
+	  reserver:  {level: 6, amount: 1, body: "reserver_at"} };
 Population__Mining_2S_Remote =
 	{ burrower:  {level: 6, amount: 1},
 	  carrier:   {level: 7, amount: 3},
@@ -48,7 +56,7 @@ Population__Maintenance =
 	{ multirole: {level: 6, amount: 1} };
 
 Population__Industry =
-	{ courier:   {level: 5, amount: 1} };
+	{ courier:   {level: 6, amount: 1} };
 	
 Population_Reservation = 
 	{ reserver:  {level: 6, amount: 1, body: "reserver_at"} };
