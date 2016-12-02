@@ -106,9 +106,6 @@ module.exports = {
 	assignReaction: function(rmColony) {
 		let target = _.head(_.sortBy(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["labs", "targets"]),
 			t => {
-				if (_.get(t, "amount") < 0)
-					return true;
-
 				let amount = 0, r1_amount = 0, r2_amount = 0;
 				let reagents = getReagents(_.get(t, "mineral"));
 				_.each(_.filter(Game.rooms,
@@ -118,7 +115,7 @@ module.exports = {
 						r1_amount += r.store(reagents[0]);
 						r2_amount += r.store(reagents[1]);
 					});
-				return amount < _.get(t, "amount") && r1_amount > 1000 && r2_amount > 1000;
+				return (_.get(t, "amount") < 0 || amount < _.get(t, "amount")) && r1_amount >= 1000 && r2_amount >= 1000;
 			}),
 			t => _.get(t, "priority")),
 			t => _.get(t, "is_reagent")),

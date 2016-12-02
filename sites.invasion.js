@@ -41,7 +41,8 @@ module.exports = {
 			if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {				
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["soldier"]["level"], 
 					scale_level: listArmy["soldier"] == null ? true : listArmy["soldier"]["scale_level"],
-					body: "soldier", name: null, args: {role: "soldier", room: rmInvade, colony: rmColony} });
+					body: (listArmy["soldier"]["body"] || "soldier"), 
+					name: null, args: {role: "soldier", room: rmInvade, colony: rmColony} });
 			} else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {				
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listArmy["archer"]["level"], 
 					scale_level: listArmy["archer"] == null ? true : listArmy["archer"]["scale_level"],

@@ -44,6 +44,39 @@ module.exports = {
 						HEAL];
         }
 	},
+	
+	getBody_Brawler: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Brawler, ${level} is not a proper number!`);
+				return;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                return null
+            case 5:
+                return [ // 1700 energy, 11x ATTACK, 15x MOVE, 4x TOUGH
+						TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK ];
+            case 6:
+                return [ // 2160 energy, 14x ATTACK, 19x MOVE, 5x TOUGH
+						TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK ];
+            case 7:                
+            case 8:
+                return [ // 2700 energy, 20x MOVE, 20x ATTACK, 10x TOUGH
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
+						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK ];
+        }
+	},
 
 	getBody_Paladin: function(level) {
         switch (level) {
@@ -134,15 +167,21 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE,
                         HEAL, HEAL, HEAL, HEAL];
             case 5:
-                return [ // 1500 energy, 5x HEAL, 5x MOVE
-                        MOVE, MOVE, MOVE, MOVE, MOVE,
+                return [ // 1680 energy, 5x HEAL, 8x MOVE, 3x TOUGH
+                        TOUGH, TOUGH, TOUGH,
+						MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE,
                         HEAL, HEAL, HEAL, HEAL, HEAL];
             case 6:
-                return [ // 2100 energy, 7x HEAL, 7x MOVE
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL];
+                return [ // 2100 energy, 6x HEAL, 11x MOVE, 5x TOUGH
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+						MOVE, MOVE, MOVE, MOVE, MOVE,
+						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL ];
             case 7:
-                return [ // 4500 energy, 15x HEAL, 15x MOVE
+                return [ // 4800 energy, 15x HEAL, 15x MOVE
+						TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+						MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE,
                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,

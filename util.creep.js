@@ -269,6 +269,7 @@ module.exports = {
 
         switch (type) {
             case "soldier": return _Body.getBody_Soldier(level);
+			case "brawler": return _Body.getBody_Brawler(level);
 			case "paladin": return _Body.getBody_Paladin(level);
             case "archer": return _Body.getBody_Archer(level);
             case "healer": return _Body.getBody_Healer(level);

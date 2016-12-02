@@ -12,7 +12,7 @@ module.exports = {
 				return t.type == "boost" 
 					&& t.role == creep.memory.role 
 					&& t.subrole == creep.memory.subrole
-					&& t.dest == null ? true : t.dest == creep.memory.room; }));
+					&& (t.dest == null ? true : t.dest == creep.memory.room); }));
 				
 			if (task != null) {
 				creep.memory.boost = task;
