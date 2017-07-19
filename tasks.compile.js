@@ -88,7 +88,7 @@ module.exports = {
 		}
 
 		/* Carrier-based tasks & energy supply for workers) */
-		let piles = room.find(FIND_DROPPED_ENERGY);
+		let piles = room.find(FIND_DROPPED_RESOURCES);
 		for (let i in piles) {
 			_Tasks.addTask(rmName,
 				{   room: rmName,

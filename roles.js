@@ -11,7 +11,7 @@ module.exports = {
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
-				if (_.sum(creep.carry) >= creep.carryCapacity * 0.9) {
+				if (_.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "working";
 					Tasks.returnTask(creep);
 					return;
@@ -55,7 +55,7 @@ module.exports = {
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
-				if (creep.carryCapacity > 0 && _.sum(creep.carry) >= creep.carryCapacity * 0.9) {
+				if (creep.carryCapacity > 0 && _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
 					Tasks.returnTask(creep);
 					return;
