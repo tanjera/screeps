@@ -149,18 +149,18 @@ let Hive = {
 
 		_CPU.Start("Hive", "processSpawnRequests");
 
-		let listRequests = _.sortBy(Object.keys(Memory["spawn_requests"]), r => { return Memory["spawn_requests"][r]["priority"]; } );
+		let listRequests = _.sortBy(Object.keys(Memory["spawn_requests"]), r => { return Memory["spawn_requests"][r]["priority"]; });
 		let listSpawns = _.filter(Object.keys(Game["spawns"]), s => { return Game["spawns"][s].spawning == null; });
 		let _Creep = require("util.creep");
-
-		_.each(listRequests, r => {
-			let request = Memory["spawn_requests"][listRequests[r]];
-
+		
+		for (let i = 0; i < Object.keys(listRequests).length; i++) {
+			let request = Memory["spawn_requests"][listRequests[i]];
+			
 			_.each(_.sortBy(Object.keys(listSpawns),
 					s => { return request != null && _.get(Game, ["spawns", listSpawns[s], "room", "name"]) == _.get(request, ["room"]); }),
 					s => {
 
-				if (listSpawns[s] != null && listRequests[r] != null) {
+				if (listSpawns[s] != null && listRequests[i] != null) {
 					let spawn = Game["spawns"][listSpawns[s]];
 
 					if (spawn.room.name == request.room || (request.listRooms != null && _.find(request.listRooms, r => { return r == spawn.room.name; }) != null)) {
@@ -192,12 +192,12 @@ let Hive = {
 								+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]})`);
 
 							listSpawns[s] = null;
-							listRequests[r] = null;
+							listRequests[i] = null;
 						}
 					}
 				}
 			});
-		});
+		}
 
 		_CPU.End("Hive", "processSpawnRequests");
 	},

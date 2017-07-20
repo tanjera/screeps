@@ -40,12 +40,12 @@ module.exports.loop = function () {
 	
 	/* Colony W7N4 */
 	Sites.Colony("W7N4", null, 
-		{ worker:   {level: 3, amount: 3},
-//		  repairer: {level: 3, amount: 1},
-		  upgrader: {level: 3, amount: 3} });
-	Sites.Mining("W7N4", "W7N4", null, false, 
-		{ burrower:  {level: 3, amount: 1},
-		  carrier:   {level: 3, amount: 2} });
+		{ worker:   {level: 4, amount: 2},
+		  repairer: {level: 4, amount: 1},
+		  upgrader: {level: 4, amount: 2} },
+		[ {id: "8ebcd126a19cc8e", role: "worker", dir: "send"},
+		  {id: "d6c1d15f1e215f0", role: "worker", dir: "receive"} ]);
+	Sites.Mining("W7N4", "W7N4", null, false, Population__Mining_RCL_Low);
 
 	
 
