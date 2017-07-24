@@ -1,3 +1,5 @@
+require("populations");
+
 let Roles = require("roles");
 let Hive = require("hive");
 let Tasks = require("tasks");
@@ -56,6 +58,9 @@ module.exports = {
 
 	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
 		let lCourier  = _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80));
+
+		if (listPopulation == null)
+			listPopulation = Population_Industry;
 
         let popTarget = (listPopulation["courier"] == null ? 0 : listPopulation["courier"]["amount"]);
         let popActual = lCourier.length;

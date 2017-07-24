@@ -1,5 +1,3 @@
-Population_Maintenance =
-	{ multirole: {level: 6, amount: 1} };
 
 Population_Industry =
 	{ courier:   {level: 6, amount: 1} };
@@ -95,6 +93,15 @@ Population_Mining = {
 		8: {	burrower:  {level: 6, amount: 1},
 				carrier:   {level: 6, amount: 3},
 				extractor: {level: 8, amount: 2} } },
+	R0: { 
+		1: { multirole: {level: 1, amount: 1} },
+		2: { multirole: {level: 2, amount: 1} },
+		3: { multirole: {level: 3, amount: 1} },
+		4: { multirole: {level: 4, amount: 1} },
+		5: { multirole: {level: 5, amount: 1} },
+		6: { multirole: {level: 6, amount: 1} },
+		7: { multirole: {level: 6, amount: 1} },
+		8: { multirole: {level: 6, amount: 1} } },
 
 	R1: {
 		1: {	miner:	   {level: 1, amount: 1} },

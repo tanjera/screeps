@@ -1,3 +1,5 @@
+require("populations");
+
 let _CPU = require("util.cpu");
 let Hive = require("hive");
 
@@ -22,6 +24,9 @@ module.exports = {
 
 	runPopulation: function(rmColony, rmReserve, listCreeps, listSpawnRooms, listPopulation) {
 		let lReserver  = _.filter(listCreeps, c => c.memory.role == "reserver" && (c.ticksToLive == undefined || c.ticksToLive > 80));
+
+		if (listPopulation == null)
+			listPopulation = Population_Reservation;
 
 		let popTarget = (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"]);
 		let popActual = lReserver.length;
