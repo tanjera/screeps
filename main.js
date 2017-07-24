@@ -24,7 +24,12 @@ module.exports.loop = function () {
 
 
 	/* Ally list <3 */
-	Memory["allies"] = [];
+	Memory["allies"] = [
+		/* SUN */
+		"Pantek59", "king_lispi", "Atavus", "BlackLotus", "Moria",
+		"Atlan", "Ashburnie", "seancl", "Finndibaen", "Klapaucius",
+		"Hachima", "ChaosDMG", "Calame", "Maxion", "Trepidimous",
+		"Kenshi", "Plasticbag"];
 
 	/* Auto-sell excess stockpile */
 	Hive.sellExcessResources({
@@ -34,19 +39,12 @@ module.exports.loop = function () {
 
 	Hive.moveExcessEnergy(200000);
 
-	
-	/* PRIVATE SERVER */
-	
-	
-	/* Colony W7N4 */
-	Sites.Colony("W7N4", null, 
-		{ worker:   {level: 4, amount: 2},
-		  repairer: {level: 4, amount: 1},
-		  upgrader: {level: 4, amount: 2} },
-		[ {id: "8ebcd126a19cc8e", role: "worker", dir: "send"},
-		  {id: "d6c1d15f1e215f0", role: "worker", dir: "receive"} ]);
-	Sites.Mining("W7N4", "W7N4", null, false, Population__Mining_RCL_Low);
+	/* OFFICIAL SCREEPS.COM SERVER */
 
+	/* Colony W19S42 */
+	Sites.Colony("W19S42", null, null);
+	Sites.Mining("W19S42", "W19S42", null, false, null);
+	
 	
 
 	/* Run end-tick Hive functions */

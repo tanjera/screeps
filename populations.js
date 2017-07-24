@@ -1,62 +1,170 @@
-Population__Colony_Founding =
-	{ worker:   {level: 4, amount: 4},
-	  repairer: {level: 2, amount: 1} };
-Population__Colony_RCL_Low =
-	{ worker:   {level: 3, amount: 2},
-	  repairer: {level: 3, amount: 1},
-	  upgrader: {level: 3, amount: 1} };
-Population__Colony_RCL_Mid =
-	{ worker:   {level: 7, amount: 2},
-	  repairer: {level: 5, amount: 1},
-	  upgrader: {level: 7, amount: 2} };
-Population__Colony_RCL_Mid__Boost =
-	{ worker:   {level: 7, amount: 1},
-	  repairer: {level: 5, amount: 1},
-	  upgrader: {level: 7, amount: 3} };
-Population__Colony_RCL8 =
-	{ worker:   {level: 7, amount: 1, scale_level: false},
-	  repairer: {level: 6, amount: 1} };
+Population_Maintenance =
+	{ multirole: {level: 6, amount: 1} };
 
-Population__Mining_RCL_Low =
-	{ burrower:  {level: 5, amount: 1},
-	  carrier:   {level: 3, amount: 2} };
-Population__Mining_RCL_Low__Distant =
-	{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
-	  carrier:   {level: 3, amount: 2} };
-Population__Mining_1S_Colony =
-	{ burrower:  {level: 5, amount: 1},
-	  carrier:   {level: 7, amount: 2},
-	  extractor: {level: 8, amount: 2} };
-Population__Mining_2S_Colony =
-	{ burrower:  {level: 6, amount: 1},
-	  carrier:   {level: 7, amount: 3},
-	  extractor: {level: 8, amount: 2} };
-Population__Mining_1S_Remote =
-	{ burrower:  {level: 5, amount: 1},
-	  carrier:   {level: 7, amount: 2},
-	  multirole: {level: 6, amount: 1},
-	  reserver:  {level: 6, amount: 1} };
+Population_Industry =
+	{ courier:   {level: 6, amount: 1} };
+
+Population_Reservation =
+	{ reserver:  {level: 6, amount: 1, body: "reserver_at"} };
+
+
+Population_Colony = {
+	Standalone: {
+		1: {	worker:   {level: 1, amount: 4} },
+		2: { 	worker:   {level: 2, amount: 4} },
+		3: { 	worker:   {level: 3, amount: 4},
+				repairer: {level: 3, amount: 1} },
+		4: {    worker:   {level: 4, amount: 2},
+			  	repairer: {level: 4, amount: 1},
+			  	upgrader: {level: 4, amount: 2} },
+		5: {    worker:   {level: 5, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 5, amount: 2} },
+		6: {    worker:   {level: 6, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 6, amount: 2} },
+		7: {    worker:   {level: 7, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 7, amount: 2} },
+		8: {	worker:   {level: 7, amount: 1, scale_level: false},
+		  		repairer: {level: 6, amount: 1} } },
+
+	Assisted: {
+		1: {	worker:   {level: 4, amount: 4} },
+		2: { 	worker:   {level: 4, amount: 4} },
+		3: { 	worker:   {level: 5, amount: 4},
+				repairer: {level: 5, amount: 1} },
+		4: {    worker:   {level: 6, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 6, amount: 2} },
+		5: {    worker:   {level: 7, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 7, amount: 2} },
+		6: {    worker:   {level: 7, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 7, amount: 2} },
+		7: {    worker:   {level: 7, amount: 2},
+			  	repairer: {level: 5, amount: 1},
+			  	upgrader: {level: 7, amount: 2} },
+		8: {	worker:   {level: 7, amount: 1, scale_level: false},
+		  		repairer: {level: 6, amount: 1} } }
+};
+
+
+Population_Mining = {
+	S1: {
+		1: {	miner:     {level: 1, amount: 1} },
+		2: {	miner:	   {level: 2, amount: 1},
+		        burrower:  {level: 2, amount: 1},
+				carrier:   {level: 2, amount: 1} },
+		3: {	miner:	   {level: 3, amount: 1},
+		        burrower:  {level: 3, amount: 1},
+				carrier:   {level: 3, amount: 2} },
+		4: {    burrower:  {level: 4, amount: 1},
+		  		carrier:   {level: 4, amount: 2} },
+		5: {    burrower:  {level: 5, amount: 1},
+		  		carrier:   {level: 5, amount: 2} },
+		6: {	burrower:  {level: 5, amount: 1},
+			    carrier:   {level: 6, amount: 2},
+			    extractor: {level: 6, amount: 2} },
+		7: {	burrower:  {level: 5, amount: 1},
+				carrier:   {level: 7, amount: 2},
+				extractor: {level: 7, amount: 2} },
+		8: {	burrower:  {level: 5, amount: 1},
+				carrier:   {level: 7, amount: 2},
+				extractor: {level: 8, amount: 2} } },
+
+	S2: {
+		1: {	miner:	   {level: 1, amount: 1} },
+		2: {	miner:	   {level: 2, amount: 1},
+		        burrower:  {level: 2, amount: 1},
+				carrier:   {level: 2, amount: 1} },
+		3: {	miner:	   {level: 3, amount: 1},
+		        burrower:  {level: 3, amount: 1},
+				carrier:   {level: 3, amount: 2} },
+		4: {	burrower:  {level: 4, amount: 2},
+				carrier:   {level: 4, amount: 2} },
+		5: {	burrower:  {level: 5, amount: 2},
+				carrier:   {level: 5, amount: 2} },
+		6: {	burrower:  {level: 6, amount: 1},
+				carrier:   {level: 6, amount: 3},
+				extractor: {level: 6, amount: 2} },
+		7: {	burrower:  {level: 6, amount: 1},
+				carrier:   {level: 6, amount: 3},
+				extractor: {level: 6, amount: 2} },
+		8: {	burrower:  {level: 6, amount: 1},
+				carrier:   {level: 6, amount: 3},
+				extractor: {level: 8, amount: 2} } },
+
+	R1: {
+		1: {	miner:	   {level: 1, amount: 1} },
+		2: {	burrower:  {level: 2, amount: 1},
+    	        carrier:   {level: 2, amount: 2},
+    	        multirole: {level: 2, amount: 1} },
+		3: {	burrower:  {level: 3, amount: 1},
+    	        carrier:   {level: 3, amount: 2},
+    	        multirole: {level: 3, amount: 1},
+    	        reserver:  {level: 3, amount: 1} },
+		4: {	burrower:  {level: 4, amount: 1},
+    	        carrier:   {level: 4, amount: 2},
+    	        multirole: {level: 4, amount: 1},
+    	        reserver:  {level: 4, amount: 1} },
+		5: {	burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 5, amount: 2},
+    	        multirole: {level: 5, amount: 1},
+    	        reserver:  {level: 5, amount: 1} },
+		6: {	burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 6, amount: 2},
+    	        multirole: {level: 6, amount: 1},
+    	        reserver:  {level: 6, amount: 1} },
+		7: {	burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 7, amount: 2},
+    	        multirole: {level: 6, amount: 1},
+    	        reserver:  {level: 6, amount: 1} },
+		8: {    burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 7, amount: 2},
+    	        multirole: {level: 6, amount: 1},
+    	        reserver:  {level: 6, amount: 1} } },
+    	        
+    R2: {
+		1: {	miner:	   {level: 1, amount: 1} },
+		2: {	burrower:  {level: 2, amount: 1},
+    	        carrier:   {level: 2, amount: 3},
+    	        multirole: {level: 2, amount: 1} },
+		3: {	burrower:  {level: 3, amount: 1},
+    	        carrier:   {level: 3, amount: 3},
+    	        multirole: {level: 3, amount: 1},
+    	        reserver:  {level: 3, amount: 1} },
+		4: {	burrower:  {level: 4, amount: 1},
+    	        carrier:   {level: 4, amount: 3},
+    	        multirole: {level: 4, amount: 1},
+    	        reserver:  {level: 4, amount: 1} },
+		5: {	burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 5, amount: 3},
+    	        multirole: {level: 5, amount: 1},
+    	        reserver:  {level: 5, amount: 1} },
+		6: {	burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 6, amount: 3},
+    	        multirole: {level: 6, amount: 1},
+    	        reserver:  {level: 6, amount: 1} },
+		7: {	burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 7, amount: 3},
+    	        multirole: {level: 6, amount: 1},
+    	        reserver:  {level: 6, amount: 1} },
+		8: {    burrower:  {level: 5, amount: 1},
+    	        carrier:   {level: 7, amount: 3},
+    	        multirole: {level: 6, amount: 1},
+    	        reserver:  {level: 6, amount: 1} } },
+};
+
+
 Population__Mining_1S_Remote_AT =
 	{ burrower:  {level: 5, amount: 1, body: "burrower_at"},
 	  carrier:   {level: 7, amount: 2, body: "carrier_at"},
 	  multirole: {level: 6, amount: 1},
 	  reserver:  {level: 6, amount: 1, body: "reserver_at"} };
-Population__Mining_2S_Remote =
-	{ burrower:  {level: 6, amount: 1},
-	  carrier:   {level: 7, amount: 3},
-	  multirole: {level: 6, amount: 1},
-	  reserver:  {level: 6, amount: 1} };
 Population__Mining_2S_Remote_AT =
 	{ burrower:  {level: 6, amount: 1, body: "burrower_at"},
 	  carrier:   {level: 7, amount: 3, body: "carrier_at"},
 	  multirole: {level: 6, amount: 1},
 	  reserver:  {level: 6, amount: 1, body: "reserver_at"} };
-	  
-Population__Maintenance =
-	{ multirole: {level: 6, amount: 1} };
-
-Population__Industry =
-	{ courier:   {level: 6, amount: 1} };
-	
-Population_Reservation = 
-	{ reserver:  {level: 6, amount: 1, body: "reserver_at"} };

@@ -1,3 +1,5 @@
+require("populations");
+
 let _CPU = require("util.cpu");
 let Hive = require("hive");
 
@@ -41,6 +43,7 @@ module.exports = {
 	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, listPopulation) {
 		let hasMinerals = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "has_minerals"]);
 		let isSafe = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"]);
+		let isVisible = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "visible"]);
 		let amountHostiles = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "amount_hostiles"]);
 
 		let lPaladin = _.filter(listCreeps, c => c.memory.role == "paladin" && (c.ticksToLive == undefined || c.ticksToLive > 200));
@@ -52,6 +55,15 @@ module.exports = {
         let lMultirole = _.filter(listCreeps, c => c.memory.role == "multirole" && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lReserver = _.filter(listCreeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
         let lExtractor = _.filter(listCreeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
+
+		if (listPopulation == null) {
+			if (rmColony == rmHarvest)
+				listPopulation = Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level];
+			else
+			    listPopulation = isVisible
+			        ? Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level]
+			        : Population_Mining["R1"][Game.rooms[rmColony].controller.level];
+		}
 
         let popTarget =
               (listPopulation["paladin"] == null ? 0 : listPopulation["paladin"]["amount"])
