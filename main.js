@@ -39,12 +39,19 @@ module.exports.loop = function () {
 
 	Hive.moveExcessEnergy(200000);
 
-	/* OFFICIAL SCREEPS.COM SERVER */
 
-	/* Colony W19S42 */
-	Sites.Colony("W19S42", null, null);
-	Sites.Mining("W19S42", "W19S42", null, false, null);
-	
+
+	/* Run all colonies, incl.  mining and industry */
+	_.each(Game.rooms, room => {
+		if (room.controller.my) {
+			Sites.Colony(room.name);
+			Sites.Mining(room.name, room.name);
+
+			if (room.controller.level >= 6)
+				Sites.Industry(room.name);
+		}
+	});
+
 	
 
 	/* Run end-tick Hive functions */

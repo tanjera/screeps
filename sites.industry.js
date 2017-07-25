@@ -22,6 +22,15 @@ module.exports = {
 				Memory["terminal_orders"][""] = { market_id: "", amount: , to: "", priority: 4};
 		*/
 
+		_CPU.Start(rmColony, "Industry-init");
+		if (listSpawnRooms == null)
+			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_rooms"]);
+		if (listLabs == null)
+			listLabs = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
+		if (listPopulation == null)
+			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+		_CPU.End(rmColony, "Industry-init");
+
 		_CPU.Start(rmColony, "Industry-listCreeps");
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Industry-listCreeps");
