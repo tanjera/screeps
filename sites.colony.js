@@ -136,10 +136,10 @@ module.exports = {
 		}
 
 		if (_.get(Memory, ["rooms", rmColony, "towers", "target_heal"]) == null) {
-			if (Game.time % 3 == 0) {
+			if (Game.time % 3 == 0 && _.get(Game, ["rooms", rmColony]) != null) {	
 				let injured = _.head(Game.rooms[rmColony].find(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }}));
 				if (injured != null)
-					_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], injured.id);
+					_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], injured.id);			
 			}
 		} else {
 			let injured = Game.getObjectById(_.get(Memory, ["rooms", rmColony, "towers", "target_heal"]));
@@ -156,7 +156,7 @@ module.exports = {
 
 
 	runLinks: function (rmColony, listLinks) {
-		Memory["rooms"][rmColony]["links"] = listLinks;
+		_.set(Memory, ["rooms", rmColony, "links"], listLinks);
 		if (listLinks != null) {
             let linksSend = _.filter(listLinks, l => { return l["dir"] == "send"; });
             let linksReceive = _.filter(listLinks, l => { return l["dir"] == "receive"; });

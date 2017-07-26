@@ -1,3 +1,4 @@
+let Sites = require("sites");
 let _CPU = require("util.cpu");
 
 let Hive = {
@@ -124,6 +125,19 @@ let Hive = {
 		}
 	},
 
+
+	runColonies: function() {
+		_.each(Game.rooms, room => {
+			if (room.controller.my) {
+				Sites.Colony(room.name);
+				Sites.Mining(room.name, room.name);
+
+				if (room.controller.level >= 6)
+					Sites.Industry(room.name);
+			}
+		});
+	},
+
 	
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing
@@ -224,11 +238,15 @@ let Hive = {
 	},
 
 	
-	sellExcessResources: function(overflow) {
+	sellExcessResources: function() {
 		if (!Hive.isPulse_Main())
 			return;
 
 		_CPU.Start("Hive", "sellExcessResources");
+
+		overflow = _.get(Memory, ["resources", "to_market"]);
+		if (overflow == null)
+			return;
 
 		let resources = new Object();
 
@@ -259,11 +277,15 @@ let Hive = {
 		_CPU.End("Hive", "sellExcessResources");
 	},
 
-	moveExcessEnergy: function(limit) {
+	moveExcessEnergy: function() {
 		if (!Hive.isPulse_Main())
 			return;
 
 		_CPU.Start("Hive", "moveExcessEnergy");
+
+		limit = _.get(Memory, ["resources", "to_overflow"]);
+		if (limit == null)
+			return;
 
 		let energy = new Object();
 

@@ -5,7 +5,6 @@ require("overload.roomposition");
 
 require("populations");
 
-let Sites = require("sites");
 let Hive = require("hive");
 let Blueprint = require("blueprint");
 let _CPU = require("util.cpu");
@@ -22,37 +21,30 @@ module.exports.loop = function () {
 	Hive.initLabs();
 
 
-
-	/* Ally list <3 */
-	Memory["allies"] = [
-		/* SUN */
-		"Pantek59", "king_lispi", "Atavus", "BlackLotus", "Moria",
-		"Atlan", "Ashburnie", "seancl", "Finndibaen", "Klapaucius",
-		"Hachima", "ChaosDMG", "Calame", "Maxion", "Trepidimous",
-		"Kenshi", "Plasticbag"];
-
-	/* Auto-sell excess stockpile */
-	Hive.sellExcessResources({
-		energy: 1750000,
-		O: 250000, H: 250000,
-		U: 200000, L: 200000, Z: 200000, K: 200000 });
-
-	Hive.moveExcessEnergy(200000);
+	/* Auto-sell excess stockpile
+	 * Fields in Memory.resources.[to_market, to_overflow]
+	 * to_market: Object {} of resources and at what limit all colonies start overflowing stockpile to market 
+	 * 		e.g. {energy: 10000, GH: 5000}
+	 * to_overflow: Limit # of energy at which one room should start sending overflow to another room with 
+	 * 		less energy e.g. to_overflow: 100000
+	 * */
+	Hive.sellExcessResources();
+	Hive.moveExcessEnergy();
 
 
+	/* Run all colonies, incl. local mining and industry
+	 * Fields for colonies are in Memory.rooms.<roomname>.[spawn_rooms, spawn_route, custom_population, link_definitions]
+	 * spawn_rooms: List [] of rooms to assist spawning from for the specified room e.g. ["W5S5", "W4S3"]
+	 * spawn_route: List [] of rooms to try to travel through for spawn_rooms e.g. ["W5S5", "W4S5", "W4S4" "W4S3"]
+	 * custom_population: Object {} to define a custom types/level/amount of creeps to populate a room with; see 
+	 * 		populations.js for format
+	 * link_definitions: List [] to define links in the room, which send and which receive, and whether 
+	 * 		they are for workers (upgrading) or miners (moving minerals) e.g.
+	 * 		[ {id: "57d8799179f192fc71374cf1", role: "worker", dir: "send"},
+			  {id: "57abe33f4a8b4b5a2f1a2b85", role: "worker", dir: "receive"} ]
+	 * */
+	Hive.runColonies();
 
-	/* Run all colonies, incl.  mining and industry */
-	_.each(Game.rooms, room => {
-		if (room.controller.my) {
-			Sites.Colony(room.name);
-			Sites.Mining(room.name, room.name);
-
-			if (room.controller.level >= 6)
-				Sites.Industry(room.name);
-		}
-	});
-
-	
 
 	/* Run end-tick Hive functions */
 	Hive.processSpawnRequests();
