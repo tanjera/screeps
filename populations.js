@@ -5,7 +5,10 @@ Population_Industry =
 Population_Reservation =
 	{ reserver:  {level: 6, amount: 1, body: "reserver_at"} };
 
+Population_Colonization =
+	{ colonizer:  {level: 6, amount: 1, body: "reserver_at"} };
 
+	
 Population_Colony = {
 	Standalone: {
 		1: {	worker:   {level: 1, amount: 4} },

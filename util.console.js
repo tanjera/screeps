@@ -201,6 +201,15 @@ module.exports = {
 		};
 
 
+		command_list.push("");
+		command_list.push("colonize(rmFrom, rmTarget, [listRoute])");
+
+		colonize = function(rmFrom, rmTarget, listRoute) {
+			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, listRoute: listRoute });
+			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.colonization_requests.${rmTarget} ... to cancel, delete the entry.`;
+		};
+
+
 		commands = function() {
 			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Command list complete";

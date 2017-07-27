@@ -44,6 +44,7 @@ module.exports.loop = function () {
 			  {id: "57abe33f4a8b4b5a2f1a2b85", role: "worker", dir: "receive"} ]
 	 * */
 	Hive.runColonies();
+	Hive.runColonizationRequests();
 
 
 	/* Run end-tick Hive functions */

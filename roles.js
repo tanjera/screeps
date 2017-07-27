@@ -190,6 +190,28 @@ module.exports = {
 		}
 	},
 
+	Colonizer: function(creep) {
+        if (creep.memory.room != null && creep.room.name != creep.memory.room) {
+            _Creep.moveToRoom(creep, creep.memory.room, true);
+            return;
+        }
+
+		let result = creep.claimController(creep.room.controller);
+		if (result == ERR_NOT_IN_RANGE) {
+			creep.moveTo(creep.room.controller)
+			return;
+		} else {
+			let request = _.get(Memory, ["colonization_requests", creep.memory.room]);			
+			if (_.get(request, ["target"]) == creep.room.name && creep.room.controller.my) {
+				delete Memory["colonization_requests"][creep.room.name];
+				creep.suicide();
+			} else {
+				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} having difficulty reaching ${_.get(request, ["target"])}'s controller- error ${result}`);
+			}
+			return;
+		}
+	},
+
     Soldier: function(creep, targetStructures, targetCreeps, listTargets) {
 		let _Combat = require("roles.combat");
 		

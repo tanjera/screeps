@@ -17,7 +17,12 @@ module.exports = {
 	
 	Reservation: function(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute) {
 		let Reservation = require("sites.reservation");
-		Reservation.Run(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute)
+		Reservation.Run(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute);
+	},
+
+	Colonization: function(rmColony, rmTarget, listRoute) {
+		let Colonization = require("sites.colonization");
+		Colonization.Run(rmColony, rmTarget, listRoute);
 	},
     
 	Occupation: function(rmColony, rmOccupy, listSpawnRooms, listPopulation, listTargets, listRoute) {

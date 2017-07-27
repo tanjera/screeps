@@ -12,19 +12,24 @@ Rooms that you own a controller in are automatically run with a preset populatio
 #### In-Colony Mining (Local Mining)
 Just like colonies are automatically run and populated with a preset population, so is local mining. Miners will spawn and mine based on room level (RCL)... low level colonies utilize miners (all-in-one mining creeps) and mid-level and high-level rooms utilize burrowers and carriers (seperate creeps for mining the source then carrying the energy to storage).
 
-#### What You Need To Do
-Though colonies and local mining currently run independently, **construction sites need to be placed manually, including spawns**. Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn_rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn_route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
+### What You Need To Do
+
+#### Place Construction Sites
+
+Though colonies and local mining currently run independently, **construction sites need to be placed manually, including spawns**. Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link\_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
 ... Though I aim to have colonies place construction sites automatically, that is not next on my list of automation tasks, unfortunately...
 
-Currently, sending a creep with a "claim" part to claim another room as your colony is not currently automated in any way... When you are ready to expand to another room, you can place a line in main.js to spawn a "reserver" it looks like 
+#### Colonize New Rooms
 
-`Sites.Reservation("orig_room", "target_room")`
+When you are ready to expand to a new room (create a new "colony"), you can use a console command to commit a colonization request to Memory, which will automatically spawn a colonizer (as long as the sending colony has enough energy and extensions, at least RCL 4), and the colonizer will move to the room and claim the controller. If your colonizer will need to travel through 3+ rooms to get there, you may want to include a list\_route to make sure the colonizer takes the quickest route and to avoid pathfinding problems (list_route is a list of rooms in order that you want the creep to travel through, including the room\_from, room\_to, and everything in-between, e.g. ["W1N1", "W1N2", "W2N2", "W3N2"] ... but list\_route is optional). To place a colonization request:
 
-... once the reserver gets to the destination room controller, you can use the console to command the reserver to claim the room controller: 
+`colonize(room_from, room_target, [list_route])`
 
-`Game.getObjectById("creep_ID").claimController(Game.getObjectById("controller_ID"));`
+Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a standalone colony. At this point, you'll need to place a construction site for a spawn and set the colony's spawn\_rooms to a nearby colony so that it will send over workers to help build the colony's new spawn (and share the spawning burden, in the future). You can have as many spawn\_rooms as you'd like, though 1-2 should be just fine. To modify the spawn\_rooms field for a colony:
 
-... In the future, I will be simplifying this a lot... soon...
+`Memory.rooms.room\_name.spawn_rooms = ["room1"]`
+
+#### Remote Mining
 
 Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined in main.js. To do that, you need to set up a line that looks like this:
 
@@ -119,12 +124,10 @@ There is code written to launch an attack on another room- simply add a Sites.In
 
 Rarely used but useful when needed, you can keep a continuous occupation of a room by adding a Sites.Occupation() to your main.js with the proper arguments (found in sites.occupation.js). This is useful for when you want to clear out structures in a room from a previous player (before claiming it yourself!), or if you want to disrupt an enemy's supply route or remote mining operations, sieging their room in preperation for an attack!
 
+### Console Commands
 
+There are a number of commands that can be run from the console that are part of the codebase and assist in managing your Screeps empire. These range from logs to show your resource amounts, to using a "blueprint" feature that saves your room layout (using flags) and will automatically rebuild after an attack, along with a CPU profiler that can show you which functions are using the most CPU. For a full list of console commands, simply go to the console and type:
 
+`commands()`
 
-
-
-
-
-
-
+Note: As I develop the codebase to shift away from hard-coding data and move to a Memory-based setup, more and more console commands will be added to simplify colonizing new rooms, setting up links, etc!

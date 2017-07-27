@@ -138,6 +138,12 @@ let Hive = {
 		});
 	},
 
+	runColonizationRequests: function() {
+		_.each(_.get(Memory, "colonization_requests"), req => {
+			Sites.Colonization(req.from, req.target, req.listRoute);
+		});
+	},
+
 	
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing
