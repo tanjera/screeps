@@ -204,7 +204,7 @@ module.exports = {
 			let request = _.get(Memory, ["colonization_requests", creep.memory.room]);			
 			if (_.get(request, ["target"]) == creep.room.name && creep.room.controller.my) {
 				delete Memory["colonization_requests"][creep.room.name];
-				_.set(Memory, ["rooms", creep.room.name, "spawn_rooms"], _.get(request, ["from"]));
+				_.set(Memory, ["rooms", creep.room.name, "spawn_rooms"], [_.get(request, ["from"])]);
 				_.set(Memory, ["rooms", creep.room.name, "spawn_route"], _.get(request, ["listRoute"]));
 				creep.suicide();
 			} else {
