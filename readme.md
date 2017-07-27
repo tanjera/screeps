@@ -25,7 +25,7 @@ When you are ready to expand to a new room (create a new "colony"), you can use 
 
 `colonize(room_from, room_target, [list_route])`
 
-Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a standalone colony. At this point, you'll need to place a construction site for a spawn and set the colony's spawn\_rooms to a nearby colony so that it will send over workers to help build the colony's new spawn (and share the spawning burden, in the future). You can have as many spawn\_rooms as you'd like, though 1-2 should be just fine. To modify the spawn\_rooms field for a colony:
+Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. At this point, **you'll need to place a construction site for a spawn**, though the creeps sent from the assisting room will continue to upgrade the room controller. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_rooms field for a colony like this:
 
 `Memory.rooms.room\_name.spawn_rooms = ["room1"]`
 

@@ -128,7 +128,7 @@ let Hive = {
 
 	runColonies: function() {
 		_.each(Game.rooms, room => {
-			if (room.controller.my) {
+			if (room.controller != null && room.controller.my) {
 				Sites.Colony(room.name);
 				Sites.Mining(room.name, room.name);
 
