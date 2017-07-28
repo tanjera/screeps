@@ -158,6 +158,20 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
+		command_list.push("log.controllers()");
+
+		log.controllers = function() {
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
+			let output = "<table>"
+			_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {				
+				output += `<tr><td><font color=\"#D3FFA3\">${r.name}:</font>  (${r.controller.level})  </td> `
+					+ `<td>${r.controller.progress}  </td><td>  /  </td><td>${r.controller.progressTotal}    </td> `
+					+ `<td>(${(r.controller.progress / r.controller.progressTotal * 100).toFixed()} %)</td></tr>`;
+			});
+			console.log(`${output}</table>`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		};
+
 
 		command_list.push("");
 		command_list.push("stockpile.set(rmName, resource, amount)");
