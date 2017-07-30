@@ -2,12 +2,6 @@ module.exports = {
 	Init: function() {
 		let command_list = new Array();
 
-		command_list.push("blueprint.set(rmName)");
-		command_list.push("blueprint.set_all()");
-		command_list.push("blueprint.construct(rmName)");
-		command_list.push("blueprint.construct_all()");
-		command_list.push("");
-
 		command_list.push("profiler.run(cycles)");
 		command_list.push("profiler.stop()");
 		command_list.push("");

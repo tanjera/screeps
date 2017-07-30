@@ -117,33 +117,35 @@ module.exports = {
 
 
 	runTowers: function (rmColony) {
-		if (_.get(Memory, ["rooms", rmColony, "towers", "target_attack"]) == null) {
-			if (_.get(Memory, ["rooms", rmColony, "is_safe"]) == false) {
-				let hostile = _.head(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) {
-					return Memory["allies"].indexOf(c.owner.username) < 0; }}));
-				if (hostile != null)
-					_.set(Memory, ["rooms", rmColony, "towers", "target_attack"], hostile.id);
-			}
-		} else {
-			let hostile = Game.getObjectById(_.get(Memory, ["rooms", rmColony, "towers", "target_attack"]));
-			if (hostile == null || Game.time % 10 == 0) {	// Refresh target every 10 ticks
+		let is_safe = (_.get(Memory, ["rooms", rmColony, "amount_hostiles"]) == 0);
+		if (!is_safe && (_.get(Memory, ["rooms", rmColony, "towers", "target_attack"]) == null || Game.time % 10 == 0)) {
+			let hostile = _.head(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: function(c) {
+				return Memory["allies"].indexOf(c.owner.username) < 0; }}));
+			_.set(Memory, ["rooms", rmColony, "towers", "target_attack"], (hostile == null ? null : hostile.id));
+		}
+
+		let hostile_id = _.get(Memory, ["rooms", rmColony, "towers", "target_attack"]);
+		if (hostile_id != null) {
+			let hostile = Game.getObjectById(hostile_id);
+			if (hostile == null) {
 				_.set(Memory, ["rooms", rmColony, "towers", "target_attack"], null);
 			} else {
-				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => { return s.structureType == STRUCTURE_TOWER; }}),
+				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, 
+						{ filter: (s) => { return s.structureType == STRUCTURE_TOWER; }}),
 					t => { t.attack(hostile) });
 				return;
 			}
 		}
+		
+		if (Game.time % 5 == 0 && _.get(Game, ["rooms", rmColony]) != null) {
+			let injured = _.head(Game.rooms[rmColony].find(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }}));
+			_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], (injured == null ? null :injured.id));
+		}
 
-		if (_.get(Memory, ["rooms", rmColony, "towers", "target_heal"]) == null) {
-			if (Game.time % 3 == 0 && _.get(Game, ["rooms", rmColony]) != null) {	
-				let injured = _.head(Game.rooms[rmColony].find(FIND_MY_CREEPS, { filter: function(c) { return c.hits < c.hitsMax; }}));
-				if (injured != null)
-					_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], injured.id);			
-			}
-		} else {
-			let injured = Game.getObjectById(_.get(Memory, ["rooms", rmColony, "towers", "target_heal"]));
-			if (injured == null) {
+		let injured_id = _.get(Memory, ["rooms", rmColony, "towers", "target_heal"]);
+		if (injured_id != null) {
+			let injured = Game.getObjectById(injured_id);
+			if (injured == null || injured.hits == injured.hitsMax) {
 				_.set(Memory, ["rooms", rmColony, "towers", "target_heal"], null);
 			} else {
 				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => {
