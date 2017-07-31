@@ -14,20 +14,29 @@ Just like colonies are automatically run and populated with a preset population,
 
 ### What You Need To Do
 
-#### Place Construction Sites
+#### Construction Sites: Set Origin Coordinates (esp. For Colony #1)
 
-Though colonies and local mining currently run independently, **construction sites need to be placed manually, including spawns**. Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link\_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
-... Though I aim to have colonies place construction sites automatically, that is not next on my list of automation tasks, unfortunately...
+**This codebase will automate the layout and construction of your base within your colony, based on a pre-fabricated base layout that is a minimum of 12 x 14 squares (with 0,0 being the top left).** Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so:
+
+`Memory.rooms.room_name.layout_origin = {x: x_coordinate, y: y_coordinate};`
+
+_If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked, placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base.layout.pdf** and try to find adequate space if possible. If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
+
+`log.can_build()`
 
 #### Colonize New Rooms
 
 When you are ready to expand to a new room (create a new "colony"), you can use a console command to commit a colonization request to Memory, which will automatically spawn a colonizer (as long as the sending colony has enough energy and extensions, at least RCL 4), and the colonizer will move to the room and claim the controller. If your colonizer will need to travel through 3+ rooms to get there, you may want to include a list\_route to make sure the colonizer takes the quickest route and to avoid pathfinding problems (list_route is a list of rooms in order that you want the creep to travel through, including the room\_from, room\_to, and everything in-between, e.g. ["W1N1", "W1N2", "W2N2", "W3N2"] ... but list\_route is optional). To place a colonization request:
 
-`colonize(room_from, room_target, [list_route])`
+`colonize(room_from, room_target, base_layout_origin_x, base_layout_origin_y, [list_route])`
 
-Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. At this point, **you'll need to place a construction site for a spawn**, though the creeps sent from the assisting room will continue to upgrade the room controller. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_rooms field for a colony like this:
+Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_rooms field for a colony like this:
 
 `Memory.rooms.room_name.spawn_rooms = ["room1"]`
+
+#### Set Custom Room Functions
+
+Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link\_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
 
 #### Remote Mining
 
