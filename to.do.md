@@ -8,12 +8,19 @@
 # Implementing...
 
 - Automatic placement of structures
+    * Finish entering coordinates
+    * Check that construction site is not blocked; remove road if blocking.
+    * Create road paths for base <-> sources, base <-> mineral
     - Will need to set origins for each room
-    - Process extractor, links, containers
+
+- Task system: prioritize construction sites based on structureType
 
 
 
 # To Implement
+
+- Automatic placement of structures
+    - Placing links, containers
 
 - Creep ability to request another creep to move/swap spaces
 	- If burrower blocked from source, request blocking creep to swap spaces

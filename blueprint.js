@@ -45,135 +45,146 @@ module.exports = {
 		if (!_Hive.isPulse_Blueprint())
 			return;
 
-		_.each(Game.rooms, room => {
-			if (room.controller != null && room.controller.my) {
+		_.each(_.filter(Game.rooms, room => { return room.controller != null && room.controller.my; }), room => {
 
-				let level = room.controller.level;
-				let origin = _.get(Memory, ["rooms", room.name, "layout_origin"]);
-				let structures = room.find(FIND_MY_STRUCTURES);
-				let sites = room.find(FIND_MY_CONSTRUCTION_SITES).length;
-				let sites_per_room = 5;
+			let level = room.controller.level;
+			let origin = _.get(Memory, ["rooms", room.name, "layout_origin"]);
+			let structures = room.find(FIND_MY_STRUCTURES);
+			let sites = room.find(FIND_MY_CONSTRUCTION_SITES).length;
+			let sites_per_room = 5;
 
-				if (origin == null || sites >= sites_per_room)
-					return;
-				
-				let spawns = _.filter(structures, s => { return s.structureType == "spawn"; }).length;
-				for (let i = spawns; i < CONTROLLER_STRUCTURES.spawn[level] && sites < sites_per_room; i++) {
-					if (room.createConstructionSite(origin.x + Blueprint["spawn"][i].x, origin.y + Blueprint["spawn"][i].y, "spawn") == OK) {
-						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing spawn at `
-							+ `(${origin.x + Blueprint["spawn"][i].x}, ${origin.y + Blueprint["spawn"][i].y})`);
+			if (origin == null || sites >= sites_per_room)
+				return;
+			
+			let spawns = _.filter(structures, s => { return s.structureType == "spawn"; }).length;
+			for (let i = spawns; i < CONTROLLER_STRUCTURES.spawn[level] && sites < sites_per_room; i++) {
+				if (room.createConstructionSite(origin.x + Blueprint["spawn"][i].x, origin.y + Blueprint["spawn"][i].y, "spawn") == OK) {
+					console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing spawn at `
+						+ `(${origin.x + Blueprint["spawn"][i].x}, ${origin.y + Blueprint["spawn"][i].y})`);
+					sites += 1;
+				}
+			}
+			if (spawns == 0)	// Build the 1st base's spawn alone, as priority!
+				return;
+		
+			let extensions = _.filter(structures, s => { return s.structureType == "extension"; }).length;
+			for (let i = extensions; i < CONTROLLER_STRUCTURES.extension[level] && sites < sites_per_room; i++) {
+				if (room.createConstructionSite(origin.x + Blueprint["extension"][i].x, origin.y + Blueprint["extension"][i].y, "extension") == OK) {
+					console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extension at `
+						+ `(${origin.x + Blueprint["extension"][i].x}, ${origin.y + Blueprint["extension"][i].y})`);
+					sites += 1;
+				}
+			}
+
+			if (level >= 3) {
+				let towers = _.filter(structures, s => { return s.structureType == "tower"; }).length;
+				for (let i = towers; i < CONTROLLER_STRUCTURES.tower[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["tower"][i].x, origin.y + Blueprint["tower"][i].y, "tower") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing tower at `
+							+ `(${origin.x + Blueprint["tower"][i].x}, ${origin.y + Blueprint["tower"][i].y})`);
+						sites += 1;
+					}
+				}
+			}
+
+			if (level >= 4) {
+				let storages = _.filter(structures, s => { return s.structureType == "storage"; }).length;
+				for (let i = storages; i < CONTROLLER_STRUCTURES.storage[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["storage"][i].x, origin.y + Blueprint["storage"][i].y, "storage") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing storage at `
+							+ `(${origin.x + Blueprint["storage"][i].x}, ${origin.y + Blueprint["storage"][i].y})`);
+						sites += 1;
+					}
+				}
+			}
+
+			if (level >= 6) {
+				let terminals = _.filter(structures, s => { return s.structureType == "terminal"; }).length;
+				for (let i = terminals; i < CONTROLLER_STRUCTURES.terminal[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["terminal"][i].x, origin.y + Blueprint["terminal"][i].y, "terminal") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing terminal at `
+							+ `(${origin.x + Blueprint["terminal"][i].x}, ${origin.y + Blueprint["terminal"][i].y})`);
 						sites += 1;
 					}
 				}
 			
-				let extensions = _.filter(structures, s => { return s.structureType == "extension"; }).length;
-				for (let i = extensions; i < CONTROLLER_STRUCTURES.extension[level] && sites < sites_per_room; i++) {
-					if (room.createConstructionSite(origin.x + Blueprint["extension"][i].x, origin.y + Blueprint["extension"][i].y, "extension") == OK) {
-						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extension at `
-							+ `(${origin.x + Blueprint["extension"][i].x}, ${origin.y + Blueprint["extension"][i].y})`);
+				let labs = _.filter(structures, s => { return s.structureType == "lab"; }).length;
+				for (let i = labs; i < CONTROLLER_STRUCTURES.lab[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["lab"][i].x, origin.y + Blueprint["lab"][i].y, "lab") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing lab at `
+							+ `(${origin.x + Blueprint["lab"][i].x}, ${origin.y + Blueprint["lab"][i].y})`);
 						sites += 1;
 					}
 				}
 
-				if (level >= 3) {
-					let towers = _.filter(structures, s => { return s.structureType == "tower"; }).length;
-					for (let i = towers; i < CONTROLLER_STRUCTURES.tower[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["tower"][i].x, origin.y + Blueprint["tower"][i].y, "tower") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing tower at `
-								+ `(${origin.x + Blueprint["tower"][i].x}, ${origin.y + Blueprint["tower"][i].y})`);
-							sites += 1;
-						}
+
+				let extractors = _.filter(structures, s => { return s.structureType == "extractor"; }).length;
+				for (let i = extractors; i < CONTROLLER_STRUCTURES.extractor[level] && sites < sites_per_room; i++) {
+					let mineral = _.head(room.find(FIND_MINERALS));
+					if (room.createConstructionSite(mineral.pos.x, mineral.pos.y, "extractor") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extractor at `
+							+ `(${mineral.pos.x}, ${mineral.pos.y})`);
+						sites += 1;
+					}
+				}
+			}
+
+			if (level == 8) {
+				let nukers = _.filter(structures, s => { return s.structureType == "nuker"; }).length;
+				for (let i = nukers; i < CONTROLLER_STRUCTURES.nuker[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["nuker"][i].x, origin.y + Blueprint["nuker"][i].y, "nuker") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing nuker at `
+							+ `(${origin.x + Blueprint["nuker"][i].x}, ${origin.y + Blueprint["nuker"][i].y})`);
+						sites += 1;
 					}
 				}
 
-				if (level >= 4) {
-					let storages = _.filter(structures, s => { return s.structureType == "storage"; }).length;
-					for (let i = storages; i < CONTROLLER_STRUCTURES.storage[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["storage"][i].x, origin.y + Blueprint["storage"][i].y, "storage") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing storage at `
-								+ `(${origin.x + Blueprint["storage"][i].x}, ${origin.y + Blueprint["storage"][i].y})`);
-							sites += 1;
-						}
-					}
-				}
-
-				if (level >= 6) {
-					let terminals = _.filter(structures, s => { return s.structureType == "terminal"; }).length;
-					for (let i = terminals; i < CONTROLLER_STRUCTURES.terminal[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["terminal"][i].x, origin.y + Blueprint["terminal"][i].y, "terminal") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing terminal at `
-								+ `(${origin.x + Blueprint["terminal"][i].x}, ${origin.y + Blueprint["terminal"][i].y})`);
-							sites += 1;
-						}
-					}
-				
-					let labs = _.filter(structures, s => { return s.structureType == "lab"; }).length;
-					for (let i = labs; i < CONTROLLER_STRUCTURES.lab[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["lab"][i].x, origin.y + Blueprint["lab"][i].y, "lab") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing lab at `
-								+ `(${origin.x + Blueprint["lab"][i].x}, ${origin.y + Blueprint["lab"][i].y})`);
-							sites += 1;
-						}
-					}
-				}
-
-				if (level == 8) {
-					let nukers = _.filter(structures, s => { return s.structureType == "nuker"; }).length;
-					for (let i = nukers; i < CONTROLLER_STRUCTURES.nuker[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["nuker"][i].x, origin.y + Blueprint["nuker"][i].y, "nuker") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing nuker at `
-								+ `(${origin.x + Blueprint["nuker"][i].x}, ${origin.y + Blueprint["nuker"][i].y})`);
-							sites += 1;
-						}
-					}
-
-					let observers = _.filter(structures, s => { return s.structureType == "observer"; }).length;
-					for (let i = observers; i < CONTROLLER_STRUCTURES.observer[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["observer"][i].x, origin.y + Blueprint["observer"][i].y, "observer") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing observer at `
-								+ `(${origin.x + Blueprint["observer"][i].x}, ${origin.y + Blueprint["observer"][i].y})`);
-							sites += 1;
-						}
-					}
-					
-					let powerSpawns = _.filter(structures, s => { return s.structureType == "powerSpawn"; }).length;
-					for (let i = powerSpawns; i < CONTROLLER_STRUCTURES.powerSpawn[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["powerSpawn"][i].x, origin.y + Blueprint["powerSpawn"][i].y, "powerSpawn") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing power spawn at `
-								+ `(${origin.x + Blueprint["powerSpawn"][i].x}, ${origin.y + Blueprint["powerSpawn"][i].y})`);
-							sites += 1;
-						}
+				let observers = _.filter(structures, s => { return s.structureType == "observer"; }).length;
+				for (let i = observers; i < CONTROLLER_STRUCTURES.observer[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["observer"][i].x, origin.y + Blueprint["observer"][i].y, "observer") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing observer at `
+							+ `(${origin.x + Blueprint["observer"][i].x}, ${origin.y + Blueprint["observer"][i].y})`);
+						sites += 1;
 					}
 				}
 				
-				if (level >= 3) {
-					let ramparts = _.filter(structures, s => { return s.structureType == "rampart"; }).length;
-					for (let i = ramparts; i < CONTROLLER_STRUCTURES.rampart[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["rampart"][i].x, origin.y + Blueprint["rampart"][i].y, "rampart") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing rampart at `
-								+ `(${origin.x + Blueprint["rampart"][i].x}, ${origin.y + Blueprint["rampart"][i].y})`);
-							sites += 1;
-						}
+				let powerSpawns = _.filter(structures, s => { return s.structureType == "powerSpawn"; }).length;
+				for (let i = powerSpawns; i < CONTROLLER_STRUCTURES.powerSpawn[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["powerSpawn"][i].x, origin.y + Blueprint["powerSpawn"][i].y, "powerSpawn") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing power spawn at `
+							+ `(${origin.x + Blueprint["powerSpawn"][i].x}, ${origin.y + Blueprint["powerSpawn"][i].y})`);
+						sites += 1;
 					}
-
-					let walls = _.filter(structures, s => { return s.structureType == "constructedWall"; }).length;
-					for (let i = walls; i < CONTROLLER_STRUCTURES.constructedWall[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["constructedWall"][i].x, origin.y + Blueprint["constructedWall"][i].y, "constructedWall") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing wall at `
-								+ `(${origin.x + Blueprint["constructedWall"][i].x}, ${origin.y + Blueprint["constructedWall"][i].y})`);
-							sites += 1;
-						}
+				}
+			}
+			
+			if (level >= 3) {
+				let ramparts = _.filter(structures, s => { return s.structureType == "rampart"; }).length;
+				for (let i = ramparts; i < CONTROLLER_STRUCTURES.rampart[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["rampart"][i].x, origin.y + Blueprint["rampart"][i].y, "rampart") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing rampart at `
+							+ `(${origin.x + Blueprint["rampart"][i].x}, ${origin.y + Blueprint["rampart"][i].y})`);
+						sites += 1;
 					}
 				}
 
-				if (level >= 4) {
-					let roads = _.filter(structures, s => { return s.structureType == "road"; }).length;
-					for (let i = roads; i < CONTROLLER_STRUCTURES.road[level] && sites < sites_per_room; i++) {
-						if (room.createConstructionSite(origin.x + Blueprint["road"][i].x, origin.y + Blueprint["road"][i].y, "road") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing road at `
-								+ `(${origin.x + Blueprint["road"][i].x}, ${origin.y + Blueprint["road"][i].y})`);
-							sites += 1;
-						}
+				let walls = _.filter(structures, s => { return s.structureType == "constructedWall"; }).length;
+				for (let i = walls; i < CONTROLLER_STRUCTURES.constructedWall[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["constructedWall"][i].x, origin.y + Blueprint["constructedWall"][i].y, "constructedWall") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing wall at `
+							+ `(${origin.x + Blueprint["constructedWall"][i].x}, ${origin.y + Blueprint["constructedWall"][i].y})`);
+						sites += 1;
+					}
+				}
+			}
+
+			if (level >= 4) {
+				let roads = _.filter(structures, s => { return s.structureType == "road"; }).length;
+				for (let i = roads; i < CONTROLLER_STRUCTURES.road[level] && sites < sites_per_room; i++) {
+					if (room.createConstructionSite(origin.x + Blueprint["road"][i].x, origin.y + Blueprint["road"][i].y, "road") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing road at `
+							+ `(${origin.x + Blueprint["road"][i].x}, ${origin.y + Blueprint["road"][i].y})`);
+						sites += 1;
 					}
 				}
 			}

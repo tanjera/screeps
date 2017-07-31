@@ -16,11 +16,11 @@ Just like colonies are automatically run and populated with a preset population,
 
 #### Construction Sites: Set Origin Coordinates (esp. For Colony #1)
 
-**This codebase will automate the layout and construction of your base within your colony, based on a pre-fabricated base layout that is a minimum of 12 x 14 squares (with 0,0 being the top left).** Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so:
+**This codebase will automate the layout and construction of your base within your colony, based on a pre-fabricated base layout that is a minimum of 12 x 14 squares (with 0,0 being the top left).** Every 500-1000 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so:
 
 `Memory.rooms.room_name.layout_origin = {x: x_coordinate, y: y_coordinate};`
 
-_If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked, placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base.layout.pdf** and try to find adequate space if possible. If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
+If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked, placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base.layout.pdf** and try to find adequate space if possible. If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
 
 `log.can_build()`
 
