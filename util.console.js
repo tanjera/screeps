@@ -212,8 +212,8 @@ module.exports = {
 		command_list.push("");
 		command_list.push("colonize(rmFrom, rmTarget, [listRoute])");
 
-		colonize = function(rmFrom, rmTarget, listRoute) {
-			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, listRoute: listRoute });
+		colonize = function(rmFrom, rmTarget, originX, originY, listRoute) {
+			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, origin: {x: originX, y: originY}, listRoute: listRoute });
 			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.colonization_requests.${rmTarget} ... to cancel, delete the entry.`;
 		};
 

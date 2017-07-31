@@ -206,6 +206,7 @@ module.exports = {
 				delete Memory["colonization_requests"][creep.room.name];
 				_.set(Memory, ["rooms", creep.room.name, "spawn_rooms"], [_.get(request, ["from"])]);
 				_.set(Memory, ["rooms", creep.room.name, "spawn_route"], _.get(request, ["listRoute"]));
+				_.set(Memory, ["rooms", creep.room.name, "origin"], _.get(request, "origin"));
 				creep.suicide();
 			} else if (result != OK) {
 				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} having difficulty reaching ${_.get(request, ["target"])}'s controller- error ${result}`);

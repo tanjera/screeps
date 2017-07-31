@@ -27,7 +27,7 @@ When you are ready to expand to a new room (create a new "colony"), you can use 
 
 Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. At this point, **you'll need to place a construction site for a spawn**, though the creeps sent from the assisting room will continue to upgrade the room controller. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_rooms field for a colony like this:
 
-`Memory.rooms.room\_name.spawn_rooms = ["room1"]`
+`Memory.rooms.room_name.spawn_rooms = ["room1"]`
 
 #### Remote Mining
 
