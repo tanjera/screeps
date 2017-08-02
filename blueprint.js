@@ -1,41 +1,4 @@
-let Blueprint__Default_Horizontal = {
-	spawn: [	{x: 2, y: 1}, {x: 2, y: 5}, {x: 2, y: 9} ],
-	extension: [{x: 3, y: 3}, {x: 3, y: 7}, {x: 3, y: 11}, 
-				{x: 4, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}, {x: 4, y: 6}, {x: 4, y: 7}, 
-				{x: 4, y: 8}, {x: 4, y: 10}, {x: 4, y: 11}, {x: 4, y: 12}, 
-				{x: 5, y: 3}, {x: 5, y: 7}, {x: 5, y: 11}, 
-				{x: 5, y: 1}, {x: 5, y: 5}, {x: 5, y: 9}, {x: 5, y: 13},
-				{x: 6, y: 1}, {x: 6, y: 2}, {x: 6, y: 4}, {x: 6, y: 5}, {x: 6, y: 6}, 
-				{x: 6, y: 8}, {x: 6, y: 9}, {x: 6, y: 10}, {x: 6, y: 12}, {x: 6, y: 13},
-				{x: 7, y: 1}, {x: 7, y: 5}, {x: 7, y: 9}, {x: 7, y: 13},
-				{x: 7, y: 3}, {x: 7, y: 7}, {x: 7, y: 11}, 
-				{x: 8, y: 2}, {x: 8, y: 3}, {x: 8, y: 4}, {x: 8, y: 6}, {x: 8, y: 7}, 
-				{x: 8, y: 8}, {x: 8, y: 10}, {x: 8, y: 11}, {x: 8, y: 12}, 
-				{x: 9, y: 3}, {x: 9, y: 7}, {x: 9, y: 11}, 
-				{x: 9, y: 5}, {x: 9, y: 9}, {x: 9, y: 13}, 
-				{x: 10, y: 2}, {x: 10, y: 4}, {x: 10, y: 5}, {x: 10, y: 6}, {x: 10, y: 8}, 
-				{x: 10, y: 9}, {x: 10, y: 10}, {x: 10, y: 12}, {x: 10, y: 13} ],
-	storage: [	{x: 12, y: 3} ],
-	tower: [	{x: 1, y: 3}, {x: 1, y: 7}, {x: 1, y: 11}, {x: 12, y: 10}, {x: 12, y: 13},
-				{x: 14, y: 7} ],
-
-	terminal: [	{x: 12, y: 1} ],
-	lab: [		{x: 14, y: 3}, {x: 14, y: 4}, {x: 15, y: 2}, {x: 15, y: 4}, {x: 15, y: 5}, 
-				{x: 16, y: 2}, {x: 16, y: 3}, {x: 16, y: 5}, {x: 17, y: 3}, {x: 17, y: 4} ],
-
-	nuker: [	{x: 12, y: 5} ],
-	observer: [	{x: 12, y: 7} ],
-	powerSpawn: [{x: 2, y: 13} ],
-
-	road: [],
-	rampart: [	{x: -4, y: 6}, {x: -4, y: 7}, {x: -4, y: 8},
-				{x: 1, y: -4}, {x: 2, y: -4}, {x: 3, y: -4},
-				{x: 1, y: 18}, {x: 2, y: 19}, {x: 3, y: 20},
-				{x: 10, y: -4}, {x: 11, y: -4}, {x: 12, y: -4},
-				{x: 10, y: 18}, {x: 11, y: 18}, {x: 12, y: 18},
-				{x: 22, y: 2}, {x: 22, y: 3}, {x: 22, y: 4} ],
-	constructedWall: []
-};
+require("blueprint.layouts");
 
 let _Hive = require("hive");
 
@@ -57,26 +20,26 @@ let Blueprint = {
 			if (origin == null || sites >= sites_per_room)
 				return;
 			
-			Blueprint.iterateStructure(room, sites, structures, layout, "spawn");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, "spawn");
 
 			// Build the 1st base's spawn alone, as priority!
 			if (_.filter(structures, s => { return s.structureType == "spawn"; }).length == 0)
 				return;
 					
-			Blueprint.iterateStructure(room, sites, structures, layout, "extension");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, "extension");
 			
 
 			if (level >= 3) {
-				Blueprint.iterateStructure(room, sites, structures, layout, "tower");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "tower");
 			}
 
 			if (level >= 4) {
-				Blueprint.iterateStructure(room, sites, structures, layout, "storage");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "storage");
 			}
 
 			if (level >= 6) {
-				Blueprint.iterateStructure(room, sites, structures, layout, "terminal");
-				Blueprint.iterateStructure(room, sites, structures, layout, "lab");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "terminal");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "lab");
 
 				let extractors = _.filter(structures, s => { return s.structureType == "extractor"; }).length;
 				for (let i = extractors; 
@@ -92,19 +55,19 @@ let Blueprint = {
 			}
 
 			if (level == 8) {
-				Blueprint.iterateStructure(room, sites, structures, layout, "nuker");
-				Blueprint.iterateStructure(room, sites, structures, layout, "observer");
-				Blueprint.iterateStructure(room, sites, structures, layout, "powerSpawn");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "nuker");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "observer");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "powerSpawn");
 			}
 			
 			if (level >= 3) {
-				Blueprint.iterateStructure(room, sites, structures, layout, "rampart");
-				Blueprint.iterateStructure(room, sites, structures, layout, "constructedWall");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "rampart");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "constructedWall");
 				
 			}
 
 			if (level >= 4) {
-				Blueprint.iterateStructure(room, sites, structures, layout, "road");
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, "road");
 			}
 		});
 	},
@@ -124,6 +87,8 @@ let Blueprint = {
 				sites += 1;
 			}
 		}
+
+		return sites;
 	}
 };
 
