@@ -16,7 +16,7 @@ Just like colonies are automatically run and populated with a preset population,
 
 #### Construction Sites: Set Origin Coordinates (esp. For Colony #1)
 
-**This codebase will automate the layout and construction of your base within your colony, based on a pre-fabricated base layout that is a minimum of 12 x 14 squares (with 0,0 being the top left).** Every 500-1000 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal" or "default\_vertical"):
+**This codebase will automate the layout and construction of your base within your colony, based on two pre-fabricated base layouts that can be found in base.layouts.js (with origins of 0,0 being the top left, not including the defensive walls/buffer space).** Every 500-1000 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal" or "default\_vertical"):
 
 `Memory.rooms.room_name.layout = {origin: {x: x_coordinate, y: y_coordinate}, name: "default_horizontal"};`
 
