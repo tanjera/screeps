@@ -8,10 +8,8 @@
 # Implementing...
 
 - Automatic placement of structures
-    * Implement different layouts from memory
     * Check that construction site is not blocked; remove road if blocking.
     * Create road paths for base <-> sources, base <-> mineral
-    - Will need to set origins for each room
 
 - Task system: prioritize construction sites based on structureType
 
