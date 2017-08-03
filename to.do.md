@@ -1,7 +1,7 @@
 # Implemented, Needs Debugging/Testing
 
-- On colonize(), after claiming controller, _.set() spawn_room and spawn_route.
-- On colonize(), test that origin is set properly.
+- On colonize(), after claiming controller, `_.set() spawn_room` and `spawn_route`.
+- On colonize(), test that origin and is set properly.
 
 
 

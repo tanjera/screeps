@@ -24,6 +24,10 @@ If your colony cannot be automatically built in its entirety due to walls being 
 
 `log.can_build();`
 
+Setting the definitions for links currently requires manual input to Memory. There are two types of links: for "worker" and "miner"; worker links transfer energy for workers to retrieve (e.g. from storage to the controller, to upgrade, construct) and miner links assist in the flow of energy through a room to stockpile (e.g. from the source to storage). To set link definitions, follow this format:
+
+`Memory.rooms.room_name.link_definitions = [ {id: "link_id_send", role: "worker", dir: "send"}, {id: "link_id_receive", role: "worker", dir: "receive"} ]`
+
 #### Colonize New Rooms
 
 When you are ready to expand to a new room (create a new "colony"), you can use a console command to commit a colonization request to Memory, which will automatically spawn a colonizer (as long as the sending colony has enough energy and extensions, at least RCL 4), and the colonizer will move to the room and claim the controller. If your colonizer will need to travel through 3+ rooms to get there, you may want to include a list\_route to make sure the colonizer takes the quickest route and to avoid pathfinding problems (list_route is a list of rooms in order that you want the creep to travel through, including the room\_from, room\_to, and everything in-between, e.g. ["W1N1", "W1N2", "W2N2", "W3N2"] ... but list\_route is optional). To place a colonization request:

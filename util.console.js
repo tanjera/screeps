@@ -210,13 +210,31 @@ module.exports = {
 
 
 		command_list.push("");
-		command_list.push("colonize(rmFrom, rmTarget, [listRoute])");
+		command_list.push("colonize(rmFrom, rmTarget, originX, originY, layout_name, [listRoute])");
 
-		colonize = function(rmFrom, rmTarget, originX, originY, listRoute) {
-			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, origin: {x: originX, y: originY}, listRoute: listRoute });
+		colonize = function(rmFrom, rmTarget, originX, originY, layout_name, listRoute) {
+			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, layout: {origin: {x: originX, y: originY}, name: layout_name}, listRoute: listRoute });
 			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.colonization_requests.${rmTarget} ... to cancel, delete the entry.`;
 		};
 
+		
+		command_list.push("");
+		command_list.push("create_road(room_name, start_x, start_y, end_x, end_y)");
+
+		create_road = function(room_name, start_x, start_y, end_x, end_y) {
+			let room = Game.rooms[room_name];
+			if (room == null)
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${room_name} not found.`;
+			
+			let from = new RoomPosition(start_x, start_y, room_name);
+			let to = new RoomPosition(end_x, end_y, room_name);
+			let path = room.findPath(from, to, {ignoreCreeps: true});
+			for (let i = 0; i < path.length; i++)
+				room.createConstructionSite(path[i].x, path[i].y, "road");
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${room_name} for road from (${start_x}, ${start_y}) to (${end_x}, ${end_y}).`;
+		};
+		
 
 		commands = function() {
 			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}`);
