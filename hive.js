@@ -48,7 +48,7 @@ let Hive = {
 	},
 
 	isPulse_Blueprint: function() {
-		let minTicks = 500, maxTicks = 1000;
+		let minTicks = 200, maxTicks = 500;
 		let range = maxTicks - minTicks;
 		let lastTick = _.get(Memory, ["pulses", "blueprint"]);
 
