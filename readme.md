@@ -36,7 +36,7 @@ When you are ready to expand to a new room (create a new "colony"), you can use 
 
 Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_rooms field for a colony like this:
 
-`Memory.rooms.room_name.spawn_rooms = ["room1"];`
+`Memory.rooms.room_name.spawn_assist.rooms = ["room1"];`
 
 #### Set Custom Room Functions
 

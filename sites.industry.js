@@ -24,7 +24,7 @@ module.exports = {
 
 		_CPU.Start(rmColony, "Industry-init");
 		if (listSpawnRooms == null)
-			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_rooms"]);
+			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
 		if (listLabs == null)
 			listLabs = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
 		if (listPopulation == null)

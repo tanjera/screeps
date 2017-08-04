@@ -33,9 +33,9 @@ module.exports.loop = function () {
 
 
 	/* Run all colonies, incl. local mining and industry
-	 * Fields for colonies are in Memory.rooms.<roomname>.[spawn_rooms, spawn_route, custom_population, link_definitions]
-	 * spawn_rooms: List [] of rooms to assist spawning from for the specified room e.g. ["W5S5", "W4S3"]
-	 * spawn_route: List [] of rooms to try to travel through for spawn_rooms e.g. ["W5S5", "W4S5", "W4S4" "W4S3"]
+	 * Fields for colonies are in Memory.rooms.<roomname>.spawn_assist.[rooms, route] and Memory.rooms.<roomname>.[custom_population, link_definitions]
+	 * spawn_assist.rooms: List [] of rooms to assist spawning from for the specified room e.g. ["W5S5", "W4S3"]
+	 * spawn_assist.route: List [] of rooms to try to travel through for spawn_assist.rooms e.g. ["W5S5", "W4S5", "W4S4" "W4S3"]
 	 * custom_population: Object {} to define a custom types/level/amount of creeps to populate a room with; see 
 	 * 		populations.js for format
 	 * link_definitions: List [] to define links in the room, which send and which receive, and whether 

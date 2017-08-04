@@ -9,9 +9,9 @@ module.exports = {
 
 		_CPU.Start(rmColony, "Mining-init");
 		if (listSpawnRooms == null)
-			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_rooms"]);
+			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
 		if (listSpawnRoute == null)
-			listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_route"]);
+			listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
 		if (listPopulation == null)
 			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
 		if (hasKeepers == null)
