@@ -1,8 +1,8 @@
 module.exports = {
     
-	Colony: function(rmColony, listSpawnRooms, listPopulation, listLinks, listRoute) {
+	Colony: function(rmColony, listSpawnRooms, listPopulation, listRoute) {
 		let Colony = require("sites.colony");
-		Colony.Run(rmColony, listSpawnRooms, listPopulation, listLinks, listRoute)
+		Colony.Run(rmColony, listSpawnRooms, listPopulation, listRoute)
 	},
 	
 	Mining: function(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listRoute) {

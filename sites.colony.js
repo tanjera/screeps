@@ -5,7 +5,7 @@ let Hive = require("hive");
 
 module.exports = {
 
-	Run: function(rmColony, listSpawnRooms, listPopulation, listLinks, listSpawnRoute) {
+	Run: function(rmColony, listSpawnRooms, listPopulation, listSpawnRoute) {
 
 		_CPU.Start(rmColony, "Colony-init");
 		if (listSpawnRooms == null)
@@ -14,8 +14,6 @@ module.exports = {
 			listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
 		if (listPopulation == null)
 			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
-		if (listLinks == null)
-			listLinks = _.get(Memory, ["rooms", rmColony, "link_definitions"]);
 		_CPU.End(rmColony, "Colony-init");
 
 		_CPU.Start(rmColony, "Colony-listCreeps");
@@ -40,9 +38,14 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-runTowers");
 		this.runTowers(rmColony);
         _CPU.End(rmColony, "Colony-runTowers");
+		
+		_CPU.Start(rmColony, "Colony-defineLinks");
+		if (Game.time % 200 == 0)
+			this.defineLinks(rmColony);
+		_CPU.End(rmColony, "Colony-defineLinks");
 
 		_CPU.Start(rmColony, "Colony-runLinks");
-		this.runLinks(rmColony, listLinks);
+		this.runLinks(rmColony);
         _CPU.End(rmColony, "Colony-runLinks");
 	},
 
@@ -157,11 +160,32 @@ module.exports = {
 	},
 
 
-	runLinks: function (rmColony, listLinks) {
-		_.set(Memory, ["rooms", rmColony, "links"], listLinks);
-		if (listLinks != null) {
-            let linksSend = _.filter(listLinks, l => { return l["dir"] == "send"; });
-            let linksReceive = _.filter(listLinks, l => { return l["dir"] == "receive"; });
+	defineLinks: function(rmColony) {
+		let link_defs = _.get(Memory, ["rooms", rmColony, "links"]);
+		let room = Game.rooms[rmColony];
+		let links = _.filter(room.find(FIND_MY_STRUCTURES), s => { return s.structureType == "link" });
+		
+		if (link_defs == null || link_defs < links.length) {
+			link_defs = [];
+			let sources = room.find(FIND_SOURCES);
+			_.each(sources, source => { _.each(source.pos.findInRange(links, 2), link => {
+				link_defs.push({id: link.id, role: "worker", dir: "send"});
+			}); });
+
+			_.each(room.controller.pos.findInRange(links, 2), link => {
+				link_defs.push({id: link.id, role: "worker", dir: "receive"});
+			});
+		}
+
+		_.set(Memory, ["rooms", rmColony, "links"], link_defs);
+	},
+
+	runLinks: function (rmColony) {		
+		let links = _.get(Memory, ["rooms", rmColony, "links"]);
+
+		if (links != null) {
+            let linksSend = _.filter(links, l => { return l["dir"] == "send"; });
+            let linksReceive = _.filter(links, l => { return l["dir"] == "receive"; });
 
             _.each(linksReceive, r => {
 				let receive = Game.getObjectById(r["id"]);

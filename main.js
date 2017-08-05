@@ -38,10 +38,6 @@ module.exports.loop = function () {
 	 * spawn_assist.route: List [] of rooms to try to travel through for spawn_assist.rooms e.g. ["W5S5", "W4S5", "W4S4" "W4S3"]
 	 * custom_population: Object {} to define a custom types/level/amount of creeps to populate a room with; see 
 	 * 		populations.js for format
-	 * link_definitions: List [] to define links in the room, which send and which receive, and whether 
-	 * 		they are for workers (upgrading) or miners (moving minerals) e.g.
-	 * 		[ {id: "57d8799179f192fc71374cf1", role: "worker", dir: "send"},
-			  {id: "57abe33f4a8b4b5a2f1a2b85", role: "worker", dir: "receive"} ]
 	 * */
 	Hive.runColonies();
 	Hive.runColonizationRequests();

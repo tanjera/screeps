@@ -20,13 +20,13 @@ Just like colonies are automatically run and populated with a preset population,
 
 `Memory.rooms.room_name.layout = {origin: {x: x_coordinate, y: y_coordinate}, name: "default_horizontal"};`
 
-If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked (e.g. by terrain), placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base\_layouts/base\_layouts.xlsx** and try to find adequate space if possible. If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
+If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked (e.g. by terrain), placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base\_layouts/base\_layouts.xlsx** and try to find adequate space if possible. 
+
+Links will automatically be built near sources and the room controller, and will facilitate feeding energy to upgraders. Refining the placement and flow of energy across links will be revisited in the future.
+
+If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
 
 `log.can_build();`
-
-Setting the definitions for links currently requires manual input to Memory. There are two types of links: for "worker" and "miner"; worker links transfer energy for workers to retrieve (e.g. from storage to the controller, to upgrade, construct) and miner links assist in the flow of energy through a room to stockpile (e.g. from the source to storage). To set link definitions, follow this format:
-
-`Memory.rooms.room_name.link_definitions = [ {id: "link_id_send", role: "worker", dir: "send"}, {id: "link_id_receive", role: "worker", dir: "receive"} ]`
 
 #### Colonize New Rooms
 
@@ -82,7 +82,7 @@ To set reaction targets:
 
 Once you have reach RCL 6 a courier will spawn and begin to automatically do a lot of functions for you. For example, if you set up mineral reactions, the code will automatically request other rooms with terminals to load any excess minerals used for the reaction, and send it over! Also, if any rooms have an excess of energy, you can set
 
-`Memory.resources.to_overflow] = 100000;`
+`Memory.resources.to_overflow = 100000;`
 
 and any rooms with more energy than the limit (in this example: 100,000) will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your empire. 
 

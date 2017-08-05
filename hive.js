@@ -94,6 +94,7 @@ let Hive = {
 		_CPU.Start("Hive", "initMemory");
 		
 		if (Memory["rooms"] == null) Memory["rooms"] = {};
+		if (Memory["allies"] == null) Memory["allies"] = [];
 
 		for (let r in Game["rooms"]) {
 			if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};

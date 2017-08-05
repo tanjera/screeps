@@ -28,3 +28,20 @@ RoomPosition.prototype.getAccessAmount = function getAccessAmount() {
 
 	return access;
 };
+
+RoomPosition.prototype.getOpenTile_Adjacent = function getOpenTile_Adjacent() {
+	return (this.getOpenTile_Range(1));
+}
+
+RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range) {
+	for (let x = -range; x <= range; x++) {
+		for (let y = -range; y <= range; y++) {
+			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
+			if (newPos.lookFor("structure").length == 0 && newPos.lookFor("terrain") != "wall") {
+				return newPos;
+			}
+		}
+	}
+
+	return null;
+}

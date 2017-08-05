@@ -228,9 +228,11 @@ module.exports = {
 			
 			let from = new RoomPosition(start_x, start_y, room_name);
 			let to = new RoomPosition(end_x, end_y, room_name);
-			let path = room.findPath(from, to, {ignoreCreeps: true});
+			let path = room.findPath(from, to, {ignoreCreeps: true});			
 			for (let i = 0; i < path.length; i++)
 				room.createConstructionSite(path[i].x, path[i].y, "road");
+			room.createConstructionSite(start_x, start_y, "road");
+			room.createConstructionSite(end_x, end_y, "road");
 			
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${room_name} for road from (${start_x}, ${start_y}) to (${end_x}, ${end_y}).`;
 		};
