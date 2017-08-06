@@ -19,6 +19,7 @@ let Blueprint = {
 			let sites = room.find(FIND_MY_CONSTRUCTION_SITES).length;
 			let all_structures = room.find(FIND_STRUCTURES);
 			let structures = _.filter(all_structures, s => { return s.my; });
+			let ramparts = _.filter(structures, s => { return s.structureType == "rampart" });
 
 			if (origin == null || sites >= sites_per_room)
 				return;
@@ -33,49 +34,20 @@ let Blueprint = {
 					break;
 			}
 
-
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "spawn");
-
 			// Build the 1st base's spawn alone, as priority!
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "spawn");
 			if (_.filter(structures, s => { return s.structureType == "spawn"; }).length == 0)
 				return;
 					
+			// Order by priority.
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "extension");
-			
-			if (level >= 3) {
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "tower");
-			}
-
-			if (level >= 4) {
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "storage");
-			}
-
-			if (level >= 6) {
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "terminal");
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "lab");
-
-				let extractors = _.filter(structures, s => { return s.structureType == "extractor"; }).length;
-				if (extractors < CONTROLLER_STRUCTURES["extractor"][level] && sites < sites_per_room) {
-					let mineral = _.head(room.find(FIND_MINERALS));
-					if (room.createConstructionSite(mineral.pos.x, mineral.pos.y, "extractor") == OK) {
-						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extractor at `
-							+ `(${mineral.pos.x}, ${mineral.pos.y})`);
-						sites += 1;
-					}
-				}
-			}
-
-			if (level == 8) {
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "nuker");
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "observer");
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "powerSpawn");
-			}
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "tower");
 			
 			if (level >= 3) {
 				// Iterate sources, create one container adjacent to each source
 				let containers = _.filter(all_structures, s => { return s.structureType == "container"; });				
 				_.each(sources, source => {
-					if (source.pos.findInRange(containers, 1).length == 0) {
+					if (sites < sites_per_room && source.pos.findInRange(containers, 1).length == 0) {
 						let adj = source.pos.getOpenTile_Adjacent();
 						if (adj != null && adj.createConstructionSite("container") == OK) {							
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);
@@ -84,37 +56,21 @@ let Blueprint = {
 					}						
 				});			
 				
+				// Only build walls and ramparts after tower, containers
 				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "rampart");
 				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, "constructedWall");				
 			}
 
-			if (level >= 5) {
-				// Iterate sources, create one link within 2 tiles of each source and room controller
-				let links = _.filter(structures, s => { return s.structureType == "link"; });
-				
-				_.each(sources, source => {
-					if (source.pos.findInRange(links, 2).length == 0) {
-						let adj = source.pos.getOpenTile_Range(2);
-						if (adj != null && adj.createConstructionSite("link") == OK) {							
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
-							sites += 1;
-						}
-					}
-				});
-
-				if (room.controller.pos.findInRange(links, 2).length < 2) {
-					let adj = room.controller.pos.getOpenTile_Range(2);
-					if (adj != null && adj.createConstructionSite("link") == OK) {							
-						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
-						sites += 1;
-					}
-				}
-			}
+			// Ordered by priority; lower priority than defensive structures (in case high RCL rebuilding after attack)
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "storage");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "terminal");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "lab");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "nuker");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "observer");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "powerSpawn");
 
 			if (level >= 4) {
-				// Create roads leading from the base to sources, room controller, and extractor
-				let ramparts = _.filter(structures, s => { return s.structureType == "rampart" });
-				
+				// Create roads leading from the base to sources, room controller
 				let target = room.controller.pos.findClosestByPath(ramparts);
 				if (target != null)
 					sites = this.createRoad(room, sites, sites_per_room, room.controller.pos, target.pos)
@@ -125,21 +81,73 @@ let Blueprint = {
 						sites = this.createRoad(room, sites, sites_per_room, source.pos, target.pos)
 				});
 
+				// Only build roads at level 4 to allow extensions, tower, and walls to be built
+				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, "road");
+			}
+
+			if (level >= 5) {
+				// Iterate sources, create one link within 2 tiles of each source and room controller
+				let links = _.filter(structures, s => { return s.structureType == "link"; });
+				
+				_.each(sources, source => {
+					if (sites < sites_per_room && source.pos.findInRange(links, 2).length == 0) {
+						let adj = source.pos.getOpenTile_Range(2);
+						if (adj != null && adj.createConstructionSite("link") == OK) {							
+							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
+							sites += 1;
+						}
+					}
+				});
+
+				if (sites < sites_per_room && room.controller.pos.findInRange(links, 2).length < 2) {
+					let adj = room.controller.pos.getOpenTile_Range(2);
+					if (adj != null && adj.createConstructionSite("link") == OK) {							
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
+						sites += 1;
+					}
+				}
+			}
+
+			if (level >= 6) {
+				let extractors = _.filter(structures, s => { return s.structureType == "extractor"; }).length;
+				if (sites < sites_per_room && extractors < CONTROLLER_STRUCTURES["extractor"][level]) {
+					let mineral = _.head(room.find(FIND_MINERALS));
+					if (room.createConstructionSite(mineral.pos.x, mineral.pos.y, "extractor") == OK) {
+						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extractor at `
+							+ `(${mineral.pos.x}, ${mineral.pos.y})`);
+						sites += 1;
+					}
+				}
+
+				// Create roads leading from the base to extractor
 				let extractor = _.head(_.filter(structures, s => { return s.structureType == "extractor"; }));
 				if (extractor != null) {
 					let target = extractor.pos.findClosestByPath(ramparts);
 					if (target != null)
 						sites = this.createRoad(room, sites, sites_per_room, extractor.pos, target.pos)
 				}
+			}
 
-				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, "road");
+			if (level == 8) {
+				// Build ramparts over major structures
+				_.each(structures, structure => {
+					if (sites < sites_per_room && structure.structureType == "spawn" || structure.structureType == "tower"
+							|| structure.structureType == "storage" || structure.structureType == "terminal"
+							|| structure.structureType == "nuker" || structure.structureType == "powerSpawn") {
+						if (room.createConstructionSite(structure.pos.x, structure.pos.y, "rampart") == OK) {
+							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing rampart over `
+								+ `${structure.structureType} at (${structure.pos.x}, ${structure.pos.y})`);
+							sites += 1;
+						}
+					}
+				});
 			}
 		});
 	},
 
 	iterateStructure: function(room, sites, structures, layout, origin, sites_per_room, structureType) {
-		for (let i = 0; i < CONTROLLER_STRUCTURES[structureType][room.controller.level] 
-				&& i < layout[structureType].length && sites < sites_per_room; i++) {
+		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] 
+				&& i < layout[structureType].length; i++) {
 			let x = origin.x + layout[structureType][i].x;
 			let y = origin.y + layout[structureType][i].y;
 			let lookAt = _.head(room.lookForAt("structure", x, y));
@@ -170,9 +178,14 @@ let Blueprint = {
 			if (sites < sites_per_room && room.createConstructionSite(path[i].x, path[i].y, "road") == OK)
 				sites += 1;
 		}
-			
-		room.createConstructionSite(from_pos.x, from_pos.y, "road");
-		room.createConstructionSite(to_pos.x, to_pos.y, "road");		
+		
+		if ((sites + 1) < sites_per_room) {
+			room.createConstructionSite(from_pos.x, from_pos.y, "road");
+			room.createConstructionSite(to_pos.x, to_pos.y, "road");
+			sites += 2;
+		}
+
+		return sites;
 	}
 };
 
