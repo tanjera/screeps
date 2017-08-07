@@ -32,27 +32,32 @@ If you must manually build structures, you can run the following command to see 
 
 When you are ready to expand to a new room (create a new "colony"), you can use a console command to commit a colonization request to Memory, which will automatically spawn a colonizer (as long as the sending colony has enough energy and extensions, at least RCL 4), and the colonizer will move to the room and claim the controller. If your colonizer will need to travel through 3+ rooms to get there, you may want to include a list\_route to make sure the colonizer takes the quickest route and to avoid pathfinding problems (list_route is a list of rooms in order that you want the creep to travel through, including the room\_from, room\_to, and everything in-between, e.g. ["W1N1", "W1N2", "W2N2", "W3N2"] ... but list\_route is optional). To place a colonization request:
 
-`colonize(room_from, room_target, base_layout_origin_x, base_layout_origin_y, [list_route]);`
+`colonize(room_from, room_target, base_layout_origin_x, base_layout_origin_y, layout_name, [list_route]);`
 
-Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_rooms field for a colony like this:
+Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. You can either set a specific room layout via layout_name, or leave it as null to use the default horizontal layout. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_assist.rooms field for a colony like this:
 
 `Memory.rooms.room_name.spawn_assist.rooms = ["room1"];`
+`Memory.rooms.room_name.spawn_assist.route = ["room_from", "next_room1", "next_room2", "room_to"];`
 
 #### Set Custom Room Functions
 
-Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link\_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
+Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_assist.rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_assist.route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link\_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
+
+Note: If you set a custom room population (as shown in main.js' comments), you _must set the entire room's population_ including mining, industry, etc; if you only include colony workers, you won't spawn any miners to fill the spawn and extensions!
 
 #### Remote Mining
 
-Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined in main.js. To do that, you need to set up a line that looks like this:
+Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined in Memory.js. To do that, you can :
 
-`Sites.Mining("colony_room", "harvest_room");`
+`Memory.remote_mining.room_to_harvest = {colony: "room_colony"};`
 
-and it's pretty much that simple. The creep population for the remote mining is automatically chosen, but more complex operations are definitely possible and a few fields are read from Memory, including adjacent room assistance with spawning, spawning of soldiers to accompany miners in rooms that have source keepers, and custom populations for the mining operation, all set through Memory. I plan to add a how-to in the future.
+and it's pretty much that simple. The creep population for the remote mining is automatically chosen, but more complex operations are definitely possible and a few fields are read from Memory, including adjacent room assistance with spawning, spawning of soldiers to accompany miners in rooms that have source keepers, and custom populations for the mining operation, all set through Memory. For example, if you will be mining a room with source keepers and assist in spawning the creeps from an adjacent room, your command would look like this:
+
+`Memory.remote_mining.room_to_harvest = {colony: "room_colony", has_keepers: true, spawn_assist: {rooms: ["room_to_spawn"]}};`
 
 ### Spawning and Creep "Levels"
 
-Using the spawn\_rooms Memory fields that can be custom set, the codebase iterates through each spawn and attempts to spawn creeps in order of priority, and within either the colony or any rooms on spawn\_rooms list. This allows a brand new colony to have its creeps spawned from an existing colony several rooms away, or allows multiple established colonies to share the burden of spawning if one colony lacks the energy.
+Using the spawn\_assist.rooms Memory fields that can be custom set, the codebase iterates through each spawn and attempts to spawn creeps in order of priority, and within either the colony or any rooms on spawn\_assist.rooms list. This allows a brand new colony to have its creeps spawned from an existing colony several rooms away, or allows multiple established colonies to share the burden of spawning if one colony lacks the energy.
 
 For resource management- to save energy and spawn time- I equated a room's control level ("RCL") with creep "levels" to make sense of spawning. A room may be RCL 6 but only need a level 4 repairer to keep up with the work of repairing structures. If every creep, miner, and remote miner for an RCL 6 room (with 1 spawn) were to be at creep level 6, the spawn may not be able to keep up with the population demand!
 

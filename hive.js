@@ -95,6 +95,7 @@ let Hive = {
 		
 		if (Memory["rooms"] == null) Memory["rooms"] = {};
 		if (Memory["allies"] == null) Memory["allies"] = [];
+		if (Memory["remote_mining"] == null) Memory["remote_mining"] = {};
 
 		for (let r in Game["rooms"]) {
 			if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};
@@ -136,6 +137,12 @@ let Hive = {
 				if (room.controller.level >= 6)
 					Sites.Industry(room.name);
 			}
+		});
+
+		let remote_mining = _.get(Memory, "remote_mining");
+		_.each(Object.keys(remote_mining), req => {
+			if (_.get(remote_mining, [req, "colony"]) != null)
+				Sites.Mining(_.get(remote_mining, [req, "colony"]), req);
 		});
 	},
 

@@ -39,9 +39,9 @@ let Blueprint = {
 			if (_.filter(structures, s => { return s.structureType == "spawn"; }).length == 0)
 				return;
 					
-			// Order by priority.
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "extension");
+			// Order by priority; defense, then increased creep capacity
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "tower");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "extension");
 			
 			if (level >= 3) {
 				// Iterate sources, create one container adjacent to each source

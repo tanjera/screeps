@@ -8,14 +8,26 @@ module.exports = {
 	Run: function(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listSpawnRoute) {
 
 		_CPU.Start(rmColony, "Mining-init");
-		if (listSpawnRooms == null)
-			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
-		if (listSpawnRoute == null)
-			listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
-		if (listPopulation == null)
-			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
-		if (hasKeepers == null)
-			hasKeepers = _.get(Memory, ["rooms", rmColony, "has_keepers"]) == true ? true : false;
+		if (listSpawnRooms == null) {
+			listSpawnRooms = rmColony == rmHarvest
+				? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
+				: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "rooms"]);
+		}
+		if (listSpawnRoute == null) {
+			listSpawnRoute = rmColony == rmHarvest
+				? listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
+				: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "route"]);
+		}
+		if (listPopulation == null) {
+			listPopulation = rmColony == rmHarvest
+				? _.get(Memory, ["rooms", rmColony, "custom_population"])
+				: _.get(Memory, ["remote_mining", rmHarvest, "custom_population"]);
+		}
+		if (hasKeepers == null) {
+			hasKeepers = rmColony == rmHarvest 
+				? (_.get(Memory, ["rooms", rmColony, "has_keepers"]) == true ? true : false)
+				: (_.get(Memory, ["remote_mining", rmHarvest, "has_keepers"]) == true ? true : false);
+		}
 		_CPU.End(rmColony, "Mining-init");
 
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-listCreeps`);
@@ -107,7 +119,8 @@ module.exports = {
 					body: "healer", name: null, args: {role: "healer", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["miner"] != null && lMiner.length < listPopulation["miner"]["amount"]) {
-            if (lMiner.length == 0) { // Possibly colony wiped? Need restart?
+            if (lMiner.length == 0) { 
+				// Possibly colony wiped? Need restart?
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
 					scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
 			} else {
@@ -117,7 +130,8 @@ module.exports = {
             }
         }
         else if (listPopulation["burrower"] != null && lBurrower.length < listPopulation["burrower"]["amount"]) {
-            if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] && lMiner.length == 0) { // Possibly colony wiped? Need restart?
+            if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] && lMiner.length == 0) { 
+				// Possibly colony wiped? Need restart?
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
 					scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
             } else {
