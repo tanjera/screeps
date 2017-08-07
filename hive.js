@@ -74,20 +74,24 @@ let Hive = {
 		if (!this.isPulse_Main())
 			return;
 
-		_.each(_.filter(Object.keys(Memory.creeps),
-			c => { return !_.has(Game, ["creeps", c]); }),
-			c => {
-				if (Memory.creeps[c]["task"] != null) {
-					let task = Memory.creeps[c]["task"];
-					if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
-						delete Memory["rooms"][task.room]["tasks_running"][task.key][c];
-				}
-				delete Memory.creeps[c];
-			});
+		if (Memory.creeps != null) {
+			_.each(_.filter(Object.keys(Memory.creeps),
+				c => { return !_.has(Game, ["creeps", c]); }),
+				c => {
+					if (Memory.creeps[c]["task"] != null) {
+						let task = Memory.creeps[c]["task"];
+						if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
+							delete Memory["rooms"][task.room]["tasks_running"][task.key][c];
+					}
+					delete Memory.creeps[c];
+				});
+		}
 
-		_.each(_.filter(Object.keys(Memory.rooms),
-			r => { return !_.has(Game, ["rooms", r]); }),
-			r => { delete Memory.rooms[r]; });
+		if (Memory.rooms != null) {
+			_.each(_.filter(Object.keys(Memory.rooms),
+				r => { return !_.has(Game, ["rooms", r]); }),
+				r => { delete Memory.rooms[r]; });
+		}
 	},
 
 	initMemory: function() {

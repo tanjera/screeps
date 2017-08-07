@@ -209,7 +209,7 @@ module.exports = {
 				_.set(Memory, ["rooms", creep.room.name, "layout"], _.get(request, "layout"));
 				creep.suicide();
 			} else if (result != OK) {
-				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} having difficulty reaching ${_.get(request, ["target"])}'s controller- error ${result}`);
+				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);
 			}
 			return;
 		}

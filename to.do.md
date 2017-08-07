@@ -1,9 +1,5 @@
 # Implemented, Needs Debugging/Testing
-
-- On colonize(), after claiming controller, `_.set() spawn_room` and `spawn_route`.
-- On colonize(), test that origin and is set properly.
 - Remote mining to memory...
-
 
 
 # Implementing...

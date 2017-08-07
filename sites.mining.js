@@ -8,6 +8,13 @@ module.exports = {
 	Run: function(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listSpawnRoute) {
 
 		_CPU.Start(rmColony, "Mining-init");
+
+		if (rmColony == rmHarvest) {
+			let spawns = _.filter(_.get(Memory, ["spawns"]), s => { return s.room.name == rmColony; }).length;
+			if (spawns < 1)
+				return;
+		}
+
 		if (listSpawnRooms == null) {
 			listSpawnRooms = rmColony == rmHarvest
 				? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
