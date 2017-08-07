@@ -150,6 +150,10 @@ let Blueprint = {
 				&& i < layout[structureType].length; i++) {
 			let x = origin.x + layout[structureType][i].x;
 			let y = origin.y + layout[structureType][i].y;
+
+			if (x < 1 || x > 48 || y < 1 || y > 48)
+				continue;
+
 			let lookAt = _.head(room.lookForAt("structure", x, y));
 			
 			if(lookAt != null && lookAt.structureType != structureType)
