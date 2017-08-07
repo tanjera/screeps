@@ -136,11 +136,17 @@ _.each(Game.rooms.W18S43.find(FIND_STRUCTURES, { filter: (s) => { return s.pos.x
 
 #### Invading a Room
 
-There is code written to launch an attack on another room- simply add a Sites.Invasion() to your main.js with the proper arguments (found in sites.invasion.js) and the code will spawn the requested army, rally at a designated spot, move in once assembled, and attack a pre-defined list of targets or automatically attack enemy structures in order of importance! Useful for taking somebody elses' rooms...
+Invading another room is now possibly by setting an invasion request into Memory using a console command like so:
+
+`invade("room_from", "room_to_invade", occupy?_true_false, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], new RoomPosition(rally_point_x, rally_point_y, "rally_point_room_name"), ["list_route_rooms"])`
+
+After all invading creeps are killed- either by defenses or by destroying the room then timing out, the invasion will be deemed over (in the near future, I will be working on victory conditions and repeated assaults...). If "occupy" is set to true, then an occupation request will be placed using the same army as the invading force. See "Occupying a Room" for more details.
 
 #### Occupying a Room
 
-Rarely used but useful when needed, you can keep a continuous occupation of a room by adding a Sites.Occupation() to your main.js with the proper arguments (found in sites.occupation.js). This is useful for when you want to clear out structures in a room from a previous player (before claiming it yourself!), or if you want to disrupt an enemy's supply route or remote mining operations, sieging their room in preperation for an attack!
+Rarely used but useful when needed, you can keep a continuous occupation of a room by adding an occupation\_request to Memory. This is useful if you destroy a player's base and want to keep them from rebuilding, clearing out structures in a room from a previous player, or disrupting an enemy's supply route or remote mining operations, sieging their room in preperation for an attack! Occupation requests can be placed in memory with the following command:
+
+`occupy("room_from", "room_to_occupy, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], ["list_route_rooms"])"`
 
 ### Console Commands
 

@@ -100,6 +100,9 @@ let Hive = {
 		if (Memory["rooms"] == null) Memory["rooms"] = {};
 		if (Memory["allies"] == null) Memory["allies"] = [];
 		if (Memory["remote_mining"] == null) Memory["remote_mining"] = {};
+		if (Memory["colonization_requests"] == null) Memory["colonization_requests"] = {};
+		if (Memory["invasion_requests"] == null) Memory["invasion_requests"] = {};
+		if (Memory["occupation_requests"] == null) Memory["occupation_requests"] = {};
 
 		for (let r in Game["rooms"]) {
 			if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};
@@ -152,7 +155,21 @@ let Hive = {
 
 	runColonizationRequests: function() {
 		_.each(_.get(Memory, "colonization_requests"), req => {
-			Sites.Colonization(req.from, req.target, req.listRoute);
+			Sites.Colonization(_.get(req, "from"), _.get(req, "target"), _.get(req, "listRoute"));
+		});
+	},
+
+	runInvasionRequests: function() {
+		_.each(_.get(Memory, "invasion_requests"), req => {
+			Sites.Invasion(_.get(req, "from"), _.get(req, "target"), _.get(req, "occupy"), _.get(req, "spawn_assist"), 
+				_.get(req, "army"), _.get(req, "targets"), _.get(req, "rally_point"), _.get(req, "route"));
+		});
+	},
+
+	runOccupationRequests: function() {
+		_.each(_.get(Memory, "occupation_requests"), req => {
+			Sites.Occupation(_.get(req, "from"), _.get(req, "target"), _.get(req, "spawn_assist"), 
+				_.get(req, "army"), _.get(req, "targets"), _.get(req, "route"));
 		});
 	},
 

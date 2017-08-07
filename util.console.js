@@ -217,7 +217,23 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.colonization_requests.${rmTarget} ... to cancel, delete the entry.`;
 		};
 
+		command_list.push("invade(rmFrom, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute)");
+
+		invade = function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
+			_.set(Memory, ["invasion_requests", rmTarget], { from: rmColony, target: rmInvade, occupy: toOccupy, 
+				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, rally_point: posRally, route: listRoute });
+			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.invasion_requests.${rmTarget} ... to cancel, delete the entry.`;
+		};
+
+		command_list.push("occupy(rmFrom, rmInvade, listSpawnRooms, listArmy, listTargets, listRoute)");
+
+		occupy = function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
+			_.set(Memory, ["occupation_requests", rmTarget], { from: rmColony, target: rmOccupy,
+				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, route: listRoute });
+			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.invasion_requests.${rmTarget} ... to cancel, delete the entry.`;
+		};
 		
+
 		command_list.push("");
 		command_list.push("create_road(room_name, start_x, start_y, end_x, end_y)");
 

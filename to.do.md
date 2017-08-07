@@ -1,8 +1,12 @@
 # Implemented, Needs Debugging/Testing
-- Remote mining to memory...
+- invade(), occupy()
+- invasion(toOccupy) -> occupation
+
 
 
 # Implementing...
+- Victory conditions for Sites.Invasion.... 
+
 
 
 # To Implement

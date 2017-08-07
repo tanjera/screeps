@@ -5,7 +5,7 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 	
-	Run: function(rmColony, rmInvade, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
+	Run: function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
 		if (_.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]) == null)
 			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
 		
@@ -20,7 +20,7 @@ module.exports = {
 		}
 		
 		_CPU.Start(rmColony, `Invade-${rmInvade}-runCreeps`);
-		this.runCreeps(rmColony, rmInvade, listCreeps, listTargets, posRally, listRoute);
+		this.runCreeps(rmColony, rmInvade, toOccupy, listArmy, listCreeps, listTargets, posRally, listRoute);
 		_CPU.End(rmColony, `Invade-${rmInvade}-runCreeps`);
 	},
 	
@@ -57,7 +57,7 @@ module.exports = {
 		}
 	},
 	
-	runCreeps: function(rmColony, rmInvade, listCreeps, listTargets, posRally, listRoute) {
+	runCreeps: function(rmColony, rmInvade, toOccupy, listArmy, listCreeps, listTargets, posRally, listRoute) {
 		let memory = _.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]);
 		let rallyRange = 5;
 		
@@ -134,8 +134,15 @@ module.exports = {
 				
 				return;
 				
-			case "complete":				
-				_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], null);				
+			case "complete":
+				_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], null);
+				_.set(Memory, ["invasion_requests", rmInvade], null);
+
+				if (toOccupy == true) {
+					_.set(Memory, ["occupation_requests", rmTarget], { from: rmColony, target: rmInvade,
+						spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, route: listRoute });
+				}
+				
 				return;
 		}		
 	}

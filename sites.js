@@ -25,14 +25,14 @@ module.exports = {
 		Colonization.Run(rmColony, rmTarget, listRoute);
 	},
     
-	Occupation: function(rmColony, rmOccupy, listSpawnRooms, listPopulation, listTargets, listRoute) {
+	Occupation: function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
 		let Occupation = require("sites.occupation");
-		Occupation.Run(rmColony, rmOccupy, listSpawnRooms, listPopulation, listTargets, listRoute);
+		Occupation.Run(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute);
 	},
 	
-	Invasion: function(rmColony, rmInvade, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
+	Invasion: function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
 		let Invasion = require("sites.invasion");
-		Invasion.Run(rmColony, rmInvade, listSpawnRooms, listArmy, listTargets, posRally, listRoute);
+		Invasion.Run(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute);
 	}
     
 };

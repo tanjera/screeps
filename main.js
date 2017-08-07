@@ -41,6 +41,8 @@ module.exports.loop = function () {
 	 * */
 	Hive.runColonies();
 	Hive.runColonizationRequests();
+	Hive.runInvasionRequests();
+	Hive.runOccupationRequests();
 
 
 	/* Run end-tick Hive functions */
