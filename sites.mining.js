@@ -15,6 +15,11 @@ module.exports = {
 				return;
 		}
 
+		if (Game.rooms[rmColony] == null) {
+			console.log(`Attempt at remote mining failed, ${rmColony} not found in Game.rooms; colony destroyed?`);
+			return;
+		}
+
 		if (listSpawnRooms == null) {
 			listSpawnRooms = rmColony == rmHarvest
 				? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
@@ -90,7 +95,7 @@ module.exports = {
 			if (rmColony == rmHarvest)
 				listPopulation = Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level];
 			else
-			    listPopulation = isVisible
+				listPopulation = isVisible
 			        ? Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level]
 			        : Population_Mining["R1"][Game.rooms[rmColony].controller.level];
 		}
