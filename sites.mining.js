@@ -10,7 +10,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Mining-init");
 
 		if (rmColony == rmHarvest) {
-			let spawns = _.filter(_.get(Memory, ["spawns"]), s => { return s.room.name == rmColony; }).length;
+			let spawns = _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length;
 			if (spawns < 1)
 				return;
 		}
