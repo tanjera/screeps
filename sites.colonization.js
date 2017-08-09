@@ -7,6 +7,10 @@ module.exports = {
 
 	Run: function(rmColony, rmTarget, listRoute) {
 
+		controller = _.get(Game, ["rooms", rmColony, "controller"]);
+		if (controller == null || !_.get(controller, "my") || _.get(controller, "level") < 3)
+			return;
+
 		_CPU.Start(rmColony, `Colonization-${rmTarget}-listCreeps`);
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmTarget && c.memory.colony == rmColony);
 		_CPU.End(rmColony, `Colonization-${rmTarget}-listCreeps`);
@@ -32,7 +36,7 @@ module.exports = {
 		Hive.populationTally(rmColony, popTarget, popActual);
 
 		if (listPopulation["colonizer"] != null && lColonizer.length < listPopulation["colonizer"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, level: listPopulation["colonizer"]["level"],
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, level: listPopulation["colonizer"]["level"],
 				scale_level: listPopulation["colonizer"] == null ? true : listPopulation["colonizer"]["scale_level"],
 				body: (listPopulation["colonizer"]["body"] || "reserver_at"),
 				name: null, args: {role: "colonizer", room: rmTarget, colony: rmColony} });

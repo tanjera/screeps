@@ -136,7 +136,7 @@ module.exports = {
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
 					scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
 			} else {
-				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["miner"]["level"],
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["miner"]["level"],
 					scale_level: listPopulation["miner"] == null ? true : listPopulation["miner"]["scale_level"],
 					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
             }
@@ -147,14 +147,14 @@ module.exports = {
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
 					scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
             } else {
-				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["burrower"]["level"],
+				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["burrower"]["level"],
 					scale_level: listPopulation["burrower"] == null ? true : listPopulation["burrower"]["scale_level"],
 					body: (listPopulation["burrower"]["body"] || "burrower"),
 					name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
             }
         }
         else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["carrier"]["level"],
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["carrier"]["level"],
 				scale_level: listPopulation["carrier"] == null ? true : listPopulation["carrier"]["scale_level"],
 				body: (listPopulation["carrier"]["body"] || "carrier"),
 				name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
@@ -174,7 +174,7 @@ module.exports = {
 				name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] && hasMinerals) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["extractor"]["level"],
+			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["extractor"]["level"],
 				scale_level: listPopulation["extractor"] == null ? true : listPopulation["extractor"]["scale_level"],
 				body: (listPopulation["extractor"]["body"] || "extractor"),
 				name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
