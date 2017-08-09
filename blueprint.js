@@ -36,6 +36,9 @@ let Blueprint = {
 				case "default_compact":
 					layout = Blueprint__Default_Compact;
 					break;
+				case "compact_horizontal":
+					layout = Blueprint__Compact_Horizontal;
+					break;
 			}
 
 			// Build the 1st base's spawn alone, as priority!

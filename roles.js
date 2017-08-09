@@ -230,7 +230,7 @@ module.exports = {
 
 		if (creep.memory.room != null && creep.room.name != creep.memory.room
 				&& creep.memory.target == null) {	// Prevent room edge fighting from breaking logic...
-			_Creep.moveToRoom(creep, creep.memory.room);
+			_Creep.moveToRoom(creep, creep.memory.room, true);
 			return;
 		}
 		

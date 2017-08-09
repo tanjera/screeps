@@ -5,7 +5,9 @@
 
 
 # Implementing...
+- Towers only target hostiles within ? distance of structures and creeps? Or within ? distance of towers and sources?
 - Victory conditions for Sites.Invasion.... 
+- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
 
 
 
