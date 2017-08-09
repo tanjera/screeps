@@ -14,6 +14,7 @@ let Blueprint = {
 			let level = room.controller.level;
 			let origin = _.get(Memory, ["rooms", room.name, "layout", "origin"]);
 			let layout = _.get(Memory, ["rooms", room.name, "layout", "name"]);
+			let blocked_areas = _.get(Memory, ["rooms", room.name, "layout", "blocked_areas"]);
 
 			let sources = room.find(FIND_SOURCES);			
 			let sites = room.find(FIND_MY_CONSTRUCTION_SITES).length;
@@ -38,13 +39,13 @@ let Blueprint = {
 			}
 
 			// Build the 1st base's spawn alone, as priority!
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "spawn");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "spawn");
 			if (_.filter(structures, s => { return s.structureType == "spawn"; }).length == 0)
 				return;
 					
 			// Order by priority; defense, then increased creep capacity
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "tower");
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "extension");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "tower");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "extension");
 			
 			if (level >= 3) {
 				// Iterate sources, create one container adjacent to each source
@@ -60,17 +61,17 @@ let Blueprint = {
 				});			
 				
 				// Only build walls and ramparts after tower, containers
-				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "rampart");
-				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, "constructedWall");				
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "rampart");
+				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "constructedWall");				
 			}
 
 			// Ordered by priority; lower priority than defensive structures (in case high RCL rebuilding after attack)
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "storage");
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "terminal");
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "lab");
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "nuker");
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "observer");
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, "powerSpawn");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "storage");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "terminal");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "lab");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "nuker");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "observer");
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "powerSpawn");
 
 			if (level >= 4) {
 				// Create roads leading from the base to sources, room controller
@@ -85,7 +86,7 @@ let Blueprint = {
 				});
 
 				// Only build roads at level 4 to allow extensions, tower, and walls to be built
-				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, "road");
+				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "road");
 			}
 
 			if (level >= 5) {
@@ -148,7 +149,7 @@ let Blueprint = {
 		});
 	},
 
-	iterateStructure: function(room, sites, structures, layout, origin, sites_per_room, structureType) {
+	iterateStructure: function(room, sites, structures, layout, origin, sites_per_room, blocked_areas, structureType) {
 		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] 
 				&& i < layout[structureType].length; i++) {
 			let x = origin.x + layout[structureType][i].x;
@@ -156,6 +157,21 @@ let Blueprint = {
 
 			if (x < 1 || x > 48 || y < 1 || y > 48)
 				continue;
+
+			let blocked = false;
+
+			if (blocked_areas != null) {
+				for (let b = 0; b < blocked_areas.length; b++) {
+					let area = blocked_areas[b];
+					if (x >= _.get(area, ["start", "x"]) && x <= _.get(area, ["end", "x"])
+							&& y >= _.get(area, ["start", "y"]) && y <= _.get(area, ["end", "y"])) {
+						blocked = true;
+					}
+				}
+			}
+
+			if (blocked)
+				continue;		
 
 			let lookAt = _.head(room.lookForAt("structure", x, y));
 			

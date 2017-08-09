@@ -16,13 +16,17 @@ Just like colonies are automatically run and populated with a preset population,
 
 #### Construction Sites: Set Origin Coordinates (esp. For Colony #1)
 
-**This codebase will automate the layout and construction of your base within your colony, based on two pre-fabricated base layouts that can be found in base.layouts.js (with origins of 0,0 being the top left spawn, not including the defensive walls/buffer space).** Every 200-500 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal" or "default\_vertical"):
+**This codebase will automate the layout and construction of your base within your colony, based on two pre-fabricated base layouts that can be found in base.layouts.js (with origins of 0,0 being the top left spawn, not including the defensive walls/buffer space).** Every 200-500 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal", "default\_vertical", or "default\_compact"):
 
 `Memory.rooms.room_name.layout = {origin: {x: x_coordinate, y: y_coordinate}, name: "default_horizontal"};`
 
 If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked (e.g. by terrain), placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base\_layouts/base\_layouts.xlsx** and try to find adequate space if possible. 
 
 Links will automatically be built near sources and the room controller, and will facilitate feeding energy to upgraders. Refining the placement and flow of energy across links will be revisited in the future.
+
+To manually block off areas from being constructed (such as if the code is trying to build a wall up against a terrain wall, which is a useless waste of energy), you can set off blocked areas defined by start and end (x, y) coordinates. The blocked areas are defined as objects in a list, so you can add multiple blocked areas per room by adding to the list array. You can set them like this:
+
+`Memory.rooms.room_name.layout.blocked_areas = [{start: {x: start_x, y: start_y}, end: {x: end_x, y: end_y}}];`
 
 If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
 

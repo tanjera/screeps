@@ -235,6 +235,12 @@ module.exports = {
 		
 
 		command_list.push("");
+		command_list.push("blueprint()");
+		blueprint = function() {
+			delete Memory.pulses.blueprint;
+			return `<font color=\"#D3FFA3\">[Console]</font> Resetting blueprint pulse; will cycle next tick.`;
+		}
+
 		command_list.push("create_road(room_name, start_x, start_y, end_x, end_y)");
 
 		create_road = function(room_name, start_x, start_y, end_x, end_y) {
