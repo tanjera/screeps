@@ -38,11 +38,29 @@ module.exports = {
 
 		blueprint = new Object();
 		command_list.push("");
-		command_list.push("blueprint.request(room_name)");
 
-		blueprint.request = function(room) {
-			Memory["pulses"]["blueprint"]["request"] = room;
-			return `<font color=\"#D3FFA3\">[Console]</font> Setting Blueprint() request for ${room}; Blueprint() will run this request next tick.`;
+		command_list.push("blueprint.set_layout(rmName, originX, originY, layoutName)");
+
+		blueprint.set_layout = function(rmName, originX, originY, layoutName) {
+			Memory["rooms"][rmName]["layout"] = { origin: {x: originX, y: originY}, name: layoutName};
+			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint layout set for ${rmName}.`;
+		};
+
+		command_list.push("blueprint.block_area(rmName, startX, startY, endX, endY)");
+
+		blueprint.block_area = function(rmName, startX, startY, endX, endY) {
+			if (_.get(Memory, ["rooms", rmName, "layout", "blocked_areas"]) == null)
+				Memory["rooms"][rmName]["layout"]["blocked_areas"] = [];
+			Memory["rooms"][rmName]["layout"]["blocked_areas"].push({start: {x: startX, y: startY}, end: {x: endX, y: endY}});
+			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint area blocked for ${rmName} from (${startX}, ${startY}) to (${endX}, ${endY}).`;
+		};
+
+
+		command_list.push("blueprint.request(rmName)");
+
+		blueprint.request = function(rmName) {
+			Memory["pulses"]["blueprint"]["request"] = rmName;
+			return `<font color=\"#D3FFA3\">[Console]</font> Setting Blueprint() request for ${rmName}; Blueprint() will run this request next tick.`;
 		};
 
 		command_list.push("blueprint.reset()");
@@ -265,14 +283,14 @@ module.exports = {
 			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
 		};
 		
-		command_list.push("resources.to_overflow(cap_amount)");
+		command_list.push("resources.to_overflow(capAmount)");
 
 		resources.to_overflow = function(amount) {
 			if (Memory["resources"] == null) Memory["resources"] = {};
 			Memory["resources"]["to_overflow"] = amount;
 		};
 
-		command_list.push("resources.to_market(resource, cap_amount)");
+		command_list.push("resources.to_market(resource, capAmount)");
 
 		resources.to_market = function(resource, amount) {
 			if (Memory["resources"] == null) Memory["resources"] = {};
@@ -280,26 +298,26 @@ module.exports = {
 			Memory["resources"]["to_market"][resource] = amount;
 		};
 
-		command_list.push("resources.send(order_name, room_from, room_to, resource, amount)");
+		command_list.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
 
-		resources.send = function(order_name, room_from, room_to, resource, amount) {
+		resources.send = function(orderName, rmFrom, rmTo, resource, amount) {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][order_name] = { room: room_to, from: room_from, resource: resource, amount: amount, priority: 1};	
+			Memory["terminal_orders"][orderName] = { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1};	
 		};
 
-		command_list.push("resources.market_sell(order_name, market_order_id, room_from, amount)");
+		command_list.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
 
-		resources.market_sell = function(order_name, market_order_id, room_from, amount) {
+		resources.market_sell = function(orderName, marketOrderID, rmFrom, amount) {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][order_name] = { market_id: market_order_id, amount: amount, from: room_from, priority: 4};
+			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4};
 			
 		};
 
-		command_list.push("resources.market_buy(order_name, market_order_id, room_to, amount)");
+		command_list.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
 
-		resources.market_buy = function(order_name, market_order_id, room_to, amount) {
+		resources.market_buy = function(orderName, marketOrderID, rmTo, amount) {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][order_name] = { market_id: market_order_id, amount: amount, to: room_to, priority: 4};
+			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4};
 		};
 
 
@@ -341,22 +359,22 @@ module.exports = {
 		};
 		
 		command_list.push("");
-		command_list.push("create_road(room_name, start_x, start_y, end_x, end_y)");
+		command_list.push("create_road(rmName, startX, startY, endX, endY)");
 
-		create_road = function(room_name, start_x, start_y, end_x, end_y) {
-			let room = Game.rooms[room_name];
+		create_road = function(rmName, startX, startY, endX, endY) {
+			let room = Game.rooms[rmName];
 			if (room == null)
-				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${room_name} not found.`;
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${rmName} not found.`;
 			
-			let from = new RoomPosition(start_x, start_y, room_name);
-			let to = new RoomPosition(end_x, end_y, room_name);
+			let from = new RoomPosition(startX, startY, room_name);
+			let to = new RoomPosition(endX, endY, room_name);
 			let path = room.findPath(from, to, {ignoreCreeps: true});			
 			for (let i = 0; i < path.length; i++)
 				room.createConstructionSite(path[i].x, path[i].y, "road");
-			room.createConstructionSite(start_x, start_y, "road");
-			room.createConstructionSite(end_x, end_y, "road");
+			room.createConstructionSite(startX, startY, "road");
+			room.createConstructionSite(endX, endY, "road");
 			
-			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${room_name} for road from (${start_x}, ${start_y}) to (${end_x}, ${end_y}).`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${room_name} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
 		};
 		
 		command_list.push("");
