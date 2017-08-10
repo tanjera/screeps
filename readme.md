@@ -106,8 +106,10 @@ Terminals also process manually entered terminal orders, which you can use to se
 	
 * For manual market trading (fulfilling existing buy/sell orders from other players):
 
-`resources.market_sell(order_name, market_order_id, room_from, amount)`
-`resources.market_buy(order_name, market_order_id, room_to, amount)`
+```
+resources.market_sell(order_name, market_order_id, room_from, amount)
+resources.market_buy(order_name, market_order_id, room_to, amount)
+```
 
 and your courier will to load/unload the terminal, and send/receive minerals and energy to fulfill all terminal orders!
 
@@ -117,10 +119,12 @@ and your courier will to load/unload the terminal, and send/receive minerals and
 
 Don't forget to define your allies in Memory, but be careful who you add! Your list of allies is a group of players whose creeps will be able to move through your rooms and interact with your creeps and structures without setting off your defenses. Allies can be set with the following commands:
 
-`allies.add(ally)`
-`allies.add_list([ally1, ally2, ...])`
-`allies.remove(ally)`
-`allies.clear()`
+```
+allies.add(ally)
+allies.add_list([ally1, ally2, ...])
+allies.remove(ally)
+allies.clear()
+```
 
 #### Active Defenses
 

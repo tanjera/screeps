@@ -6,40 +6,105 @@ let _Hive = require("hive");
 let Blueprint = {
 
 	Init: function() {
-		_Hive.Pulse_Blueprint();
+		/* Structure and rationale:
+		 * Blueprint.Init() runs Blueprint.Pulse() which triggers between 200-1000 ticks (scales with CPU bucket). Blueprint.Init()
+		 * runs on cycles, 5 total cycles, each cycle is iterated by Blueprint.Pulse() so that only 1 cycle runs per 200-1000 ticks.
+		 * During each cycle, during successive ticks (tick_count), Blueprint.Run() is done on 1 room at a time, up to 5 rooms in a row
+		 * (CPU intensive for high RCL rooms!!), Blueprinting all rooms is done across 5 cycles, 5 rooms at a time, mixing RCLs in each
+		 * batch/cycle. This is to let the CPU bucket recover between each cycle.
+		 */
 
-		if (_.get(Memory, ["pulses", "blueprint", "room_list"]) == null 
-				|| _.get(Memory, ["pulses", "blueprint", "room_current"]) == null)
-			return;
+		// Initiates cycle structure if non-existant (between last finish and new start); activates each cycle if pulse timer is up.
+		this.Pulse();
 		
-		_CPU.Start("Hive", "Blueprint");
+		// Process special blueprint requests (from console) immediately, effectively pausing cycles/pulses by 1 tick.
+		if (_.get(Memory, ["pulses", "blueprint", "request"]) != null) {			
+			let room = Game.rooms[_.get(Memory, ["pulses", "blueprint", "request"])];
+			
+			if (room == null) {
+				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blueprint() request for ${_.get(Memory, ["pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
+			} else {
+				_CPU.Start("Hive", "Blueprint-Run");
+				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Processing requested Blueprint() for ${room.name}`);
+				this.Run(room);				
+				_CPU.End("Hive", "Blueprint-Run");
+			}
 
-		let room;
-		let room_list = _.get(Memory, ["pulses", "blueprint", "room_list"]);
-		let room_current = _.get(Memory, ["pulses", "blueprint", "room_current"]);		
-		room = Game.rooms[room_list[room_current]];
-
-		if (room == null)
-			return;
-
-		console.log(`<font color=\"#6065FF\">[Blueprint]</font> Running blueprint for ${room.name}`);
-		this.Run(room);
-
-		if (room_current < (room_list.length - 1)) {
-			_.set(Memory, ["pulses", "blueprint", "room_current"], (room_current + 1));
-		} else {
-			_.set(Memory, ["pulses", "blueprint", "room_list"], null);
-			_.set(Memory, ["pulses", "blueprint", "room_current"], null);
+			delete Memory["pulses"]["blueprint"]["request"];
+			return;			
 		}
 		
-		_CPU.End("Hive", "Blueprint");
+		// Check if there is any cycle, or if the cycles are active/inactive
+		if (_.get(Memory, ["pulses", "blueprint", "cycle"]) == null 
+				|| _.get(Memory, ["pulses", "blueprint", "cycle", "active"]) == false)
+			return;
+
+		_CPU.Start("Hive", "Blueprint-Init");		
+
+		let room_list = _.get(Memory, ["pulses", "blueprint", "cycle", "room_list"]);
+		let cycle_count = _.get(Memory, ["pulses", "blueprint", "cycle", "cycle_count"]);
+		let tick_count = _.get(Memory, ["pulses", "blueprint", "cycle", "tick_count"]);
+		let current_room = cycle_count + (tick_count * 5);
+
+		// Iteration has is through room_list, iterate cycle and check if all cycles are complete (then reset cycles)
+		if (current_room >= room_list.length) {
+			Memory["pulses"]["blueprint"]["cycle"]["tick_count"] = 0;
+			Memory["pulses"]["blueprint"]["cycle"]["cycle_count"] = cycle_count + 1;
+			Memory["pulses"]["blueprint"]["cycle"]["active"] = false;
+
+			if ((cycle_count + 1) >= 5)
+				delete Memory["pulses"]["blueprint"]["cycle"];
+
+			_CPU.End("Hive", "Blueprint-Init");
+			return;			
+		}
+
+		let room = Game.rooms[room_list[current_room]];
+
+		if (room == null) {
+			_CPU.End("Hive", "Blueprint-Init");
+			return;
+		}
+
+		_CPU.End("Hive", "Blueprint-Init");
+		_CPU.Start("Hive", "Blueprint-Run");
+
+		console.log(`<font color=\"#6065FF\">[Blueprint]</font> Cycle ${cycle_count + 1}: Running Blueprint() for ${room.name}`);
+		this.Run(room);
+		
+		_CPU.End("Hive", "Blueprint-Run");
+
+		Memory["pulses"]["blueprint"]["cycle"]["tick_count"] = tick_count + 1;
+	},
+
+	Pulse: function() {
+		let minTicks = 200, maxTicks = 1000;
+		let range = maxTicks - minTicks;
+		let lastTick = _.get(Memory, ["pulses", "blueprint", "last_tick"]);
+
+		if (Memory["pulses"]["blueprint"] == null) Memory["pulses"]["blueprint"] = {};		
+
+		if (lastTick == null
+				|| Game.time == lastTick
+				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
+			Memory["pulses"]["blueprint"]["last_tick"] = Game.time; 
+
+			if (Memory["pulses"]["blueprint"]["cycle"] == null) {
+				let rooms = _.sortBy(_.filter(Object.keys(Game.rooms), 
+					n => { return Game.rooms[n].controller != null && Game.rooms[n].controller.my; }), 
+					n => { return Game.rooms[n].controller.level; });
+				Memory["pulses"]["blueprint"]["cycle"] = {cycle_count: 0, tick_count: 0, room_list: rooms };
+			} else {
+				Memory["pulses"]["blueprint"]["cycle"]["active"] = true;
+			}
+		} 
 	},
 
 	Run: function(room) {
 		if (room.controller == null && !room.controller.my)
 			return;
 
-		let sites_per_room = 5;
+		let sites_per_room = 10;
 		let level = room.controller.level;
 		let origin = _.get(Memory, ["rooms", room.name, "layout", "origin"]);
 		let layout = _.get(Memory, ["rooms", room.name, "layout", "name"]);
@@ -216,7 +281,6 @@ let Blueprint = {
 				continue;
 
 			let blocked = false;
-
 			if (blocked_areas != null) {
 				for (let b = 0; b < blocked_areas.length; b++) {
 					let area = blocked_areas[b];
@@ -226,18 +290,18 @@ let Blueprint = {
 					}
 				}
 			}
-
 			if (blocked)
 				continue;		
-
-			let lookAt = room.lookForAt("structure", x, y);
-			if (lookAt.length > 0 && _.findIndex(lookAt, s => { return s.structureType == structureType }) < 0)
-				_.head(lookAt).destroy();
-
-			if (room.createConstructionSite(x, y, structureType) == OK) {
+			
+			let result = room.createConstructionSite(x, y, structureType);
+			if (result == OK) {
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing ${structureType} at `
 					+ `(${origin.x + layout[structureType][i].x}, ${origin.y + layout[structureType][i].y})`);
 				sites += 1;
+			} else if (result == ERR_INVALID_TARGET) {
+				let lookAt = room.lookForAt("structure", x, y);
+				if (lookAt.length > 0 && _.findIndex(lookAt, s => { return s.structureType == structureType }) < 0)
+					_.head(lookAt).destroy();
 			}
 		}
 

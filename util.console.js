@@ -36,6 +36,22 @@ module.exports = {
 		};
 
 
+		blueprint = new Object();
+		command_list.push("");
+		command_list.push("blueprint.request(room_name)");
+
+		blueprint.request = function(room) {
+			Memory["pulses"]["blueprint"]["request"] = room;
+			return `<font color=\"#D3FFA3\">[Console]</font> Setting Blueprint() request for ${room}; Blueprint() will run this request next tick.`;
+		};
+
+		command_list.push("blueprint.reset()");
+		blueprint.reset = function() {
+			delete Memory.pulses.blueprint;
+			return `<font color=\"#D3FFA3\">[Console]</font> Resetting Blueprint() cycles; Blueprint() will initiate next tick.`;
+		};
+
+
 		command_list.push("");
 		command_list.push("log.labs()");
 		
@@ -311,6 +327,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.invasion_requests.${rmTarget} ... to cancel, delete the entry.`;
 		};
 		
+		command_list.push("");
 		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");
 		spawn_assist = function(rmToAssist, listRooms, listRoute) {
 			_.set(Memory, ["rooms", rmToAssist, "spawn_assist"], { rooms: listRooms, route: listRoute });
@@ -322,15 +339,8 @@ module.exports = {
 			_.set(Memory, ["remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
-
-
+		
 		command_list.push("");
-		command_list.push("blueprint()");
-		blueprint = function() {
-			delete Memory.pulses.blueprint;
-			return `<font color=\"#D3FFA3\">[Console]</font> Deleting Memory.pulses.blueprint; Blueprint will initiate next tick.`;
-		}
-
 		command_list.push("create_road(room_name, start_x, start_y, end_x, end_y)");
 
 		create_road = function(room_name, start_x, start_y, end_x, end_y) {

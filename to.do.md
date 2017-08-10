@@ -14,9 +14,6 @@
 
 
 # To Implement
-- Blueprint
-	- Optimize at higher GCL (quantity rooms) and RCL (quantity structures).
-
 - Defense
 	- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
 	- Towers only target hostiles within ? distance of structures? Or within ? distance of towers and sources?

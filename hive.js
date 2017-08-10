@@ -47,22 +47,6 @@ let Hive = {
 		}
 	},
 
-	Pulse_Blueprint: function() {
-		let minTicks = 200, maxTicks = 500;
-		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["pulses", "blueprint", "last_tick"]);
-
-		if (lastTick == null
-				|| Game.time == lastTick
-				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			let rooms = _.filter(Object.keys(Game.rooms), n => { return Game.rooms[n].controller != null && Game.rooms[n].controller.my; });
-			Memory["pulses"]["blueprint"] = { last_tick: Game.time, room_list: rooms, room_current: 0 };
-			return true;
-		} else {
-			return false;
-		}
-	},
-
 	moveReusePath: function() {
 		let minTicks = 10, maxTicks = 60;
 		let range = maxTicks - minTicks;
