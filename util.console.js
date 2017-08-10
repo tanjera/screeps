@@ -157,7 +157,10 @@ module.exports = {
 		log.controllers = function() {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
 			let output = "<table>"
-			_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {				
+			_.each(_.sortBy(_.sortBy(_.filter(Game.rooms, 
+					r => { return r.controller != null && r.controller.my; }), 
+					r => { return -r.controller.progress; }), 
+					r => { return -r.controller.level; }), r => {
 				output += `<tr><td><font color=\"#D3FFA3\">${r.name}:</font>  (${r.controller.level})  </td> `
 					+ `<td>${r.controller.progress}  </td><td>  /  </td><td>${r.controller.progressTotal}    </td> `
 					+ `<td>(${(r.controller.progress / r.controller.progressTotal * 100).toFixed()} %)</td></tr>`;

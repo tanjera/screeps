@@ -87,12 +87,12 @@ let Blueprint = {
 					if (target != null)
 						sites = this.createRoad(room, sites, sites_per_room, source.pos, target.pos)
 				});
-
-				// Only build roads at level 4 to allow extensions, tower, and walls to be built
-				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "road");
 			}
 
 			if (level >= 5) {
+				// Only build roads at level 5 to allow extensions, tower, and walls to be built
+				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "road");
+			
 				// Iterate sources, create one link within 2 tiles of each source and room controller
 				let links = _.filter(structures, s => { return s.structureType == "link"; });
 				
