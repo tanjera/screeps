@@ -4,6 +4,7 @@ module.exports = {
 		profiler = new Object();
 		profiler.run = function(cycles) {
 			Memory["profiler"]["cycles"] = (cycles == null) ? 1 : cycles;
+			Memory["profiler"]["cycles_total"] = (cycles == null) ? 1 : cycles;
 			Memory["profiler"]["status"] = "on";
 			return "<font color=\"#D3FFA3\">[CPU]</font> Profiler started"
 		};
@@ -61,15 +62,18 @@ module.exports = {
 		if (Memory["profiler"]["status"] != "on")
 			return;		
 		
-		if (Memory["profiler"]["cycles"] <= 0) {			
+		if (Memory["profiler"]["cycles"] <= 0) {	
+			let total_cycles = Memory["profiler"]["cycles_total"];
+			
 			for (let r in Memory["profiler"]["current"]) {
 				let output = "";
-				let room_used = 0, room_cycles = 0;
+				let room_used = 0, room_cycles = 0;				
 				
 				for (let n in Memory["profiler"]["current"][r]) {					
 					let used = 0;
 					let cycles = Object.keys(Memory["profiler"]["current"][r][n]).length;					
 					_.forEach(Memory["profiler"]["current"][r][n], c => { used += c["used"]; } );
+					used = ((used > 0 == true) ? used : 0);
 					output += `<tr><td>(${parseFloat(used).toFixed(2)} / ${cycles})</td><td>${parseFloat(used / cycles).toFixed(2)}</td><td>${n}</td></tr>`;
 					
 					room_used += used;
@@ -78,9 +82,9 @@ module.exports = {
 					room_cycles = Math.max(room_cycles, cycles);
 				}
 				
-				console.log(`<font color=\"#D3FFA3">CPU report for ${r}</font> :: `
-					+ `${parseFloat(room_used).toFixed(2)} : `
-					+ `<font color=\"#D3FFA3">${parseFloat(room_used / room_cycles).toFixed(2)}</font> `
+				console.log(`<font color=\"#D3FFA3">CPU report for ${r} \n`
+					+ `Room Total: ${parseFloat(room_used).toFixed(2)} : `
+					+ `Room Mean: ${parseFloat(room_used / total_cycles).toFixed(2)}</font> `
 					+ `<table><tr><th>Total / Cycles\t  </th><th>Mean\t  </th><th>Function</th></tr>`
 					+ `${output}</table>`);
 			}			

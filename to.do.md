@@ -1,18 +1,21 @@
 # Implemented, Needs Debugging/Testing
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
-- spawn_assist() command
-- remote_mining() command
+- resources.lab_target()
+- resources.to_overflow()
+- resources.to_market()
+- resources.market_sell(order_name, market_order_id, room_from, amount)
+- resources.market_buy(order_name, market_order_id, room_to, amount)
 
 
 
 # Implementing...
-- change all "listRoute" in memory objects to "route" e.g. colonize() ... for standardization
+
 
 
 # To Implement
-- Industry
-	* Set lab targets via console command()
+- Blueprint
+	- Optimize at higher GCL (quantity rooms) and RCL (quantity structures).
 
 - Defense
 	- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
@@ -27,6 +30,9 @@
 
 - Alliance
 	- Sites.Support, help an ally build
+
+- Code Standardization
+	- Change all "listRoute" in Memory objects to "route" e.g. colonize()
 
 - Misc
 	- Set default room controller message via Memory

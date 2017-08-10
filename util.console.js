@@ -4,14 +4,42 @@ module.exports = {
 
 		command_list.push("profiler.run(cycles)");
 		command_list.push("profiler.stop()");
-		command_list.push("");
-
 		
+		
+		command_list.push("");
+		command_list.push("allies.add(ally)");
+		
+		allies = new Object()
+		allies.add = function(ally) {
+			Memory["allies"].push(ally);
+			return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} added to ally list.`
+		};
 
-		log = new Object();
+		command_list.push("allies.add_list([ally1, ally2, ...])");
 
+		allies.add_list = function(allyList) {
+			Array.prototype.push.apply(Memory["allies"], allyList);
+			return `<font color=\"#D3FFA3\">[Console]</font> Players added to ally list.`
+		};
+
+		command_list.push("allies.remove(ally)");
+		
+		allies.remove = function(ally) {
+			Memory["allies"].pop(ally);
+			return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} removed from ally list.`
+		};
+
+		command_list.push("allies.clear()");
+		allies.clear = function() {
+			Memory["allies"] = [];
+			return `<font color=\"#D3FFA3\">[Console]</font> Ally list cleared.`
+		};
+
+
+		command_list.push("");
 		command_list.push("log.labs()");
 		
+		log = new Object();
 		log.labs = function() {
 			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
 				+ "<table><tr><th>Room \t</th><th>Mineral \t</th><th>Amount \t</th><th>Target Amount \t</th><th>Reagent #1 \t</th><th>Reagent #2</th></tr>";
@@ -171,10 +199,12 @@ module.exports = {
 
 
 		command_list.push("");
-		command_list.push("stockpile.set(rmName, resource, amount)");
+		command_list.push("resources.stockpile.set(rmName, resource, amount)");
 
-		stockpile = new Object();
-		stockpile.set = function (rmName, resource, amount) {
+		resources = new Object()
+		resources.stockpile = new Object();
+
+		resources.stockpile.set = function (rmName, resource, amount) {
 			if (amount < 1) {
 				delete Memory.rooms[rmName].stockpile[resource];
 				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms[${rmName}].stockpile[${resource}] deleted`;
@@ -184,9 +214,9 @@ module.exports = {
 			}
 		};
 
-		command_list.push("stockpile.log()");
+		command_list.push("resources.stockpile.log()");
 
-		stockpile.log = function() {
+		resources.stockpile.log = function() {
 			console.log(`<font color=\"#D3FFA3">log-stockpile</font>`);
 
 			for (var r in Memory["rooms"]) {
@@ -204,16 +234,61 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("stockpile.reset()");
+		command_list.push("resources.stockpile.reset()");
 
-		stockpile.reset = function() {
+		resources.stockpile.reset = function() {
 			_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 			return "<font color=\"#D3FFA3\">[Console]</font> All Memory.rooms.[r].stockpile reset!";
 		};
 
+		command_list.push("resources.lab_target(mineral, amount, priority)");
+
+		resources.lab_target = function(mineral, amount, priority) {
+			if (Memory["labs"] == null) Memory["labs"] = {};
+			if (Memory["labs"]["targets"] == null) Memory["labs"]["targets"] = {};
+			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
+		};
+		
+		command_list.push("resources.to_overflow(cap_amount)");
+
+		resources.to_overflow = function(amount) {
+			if (Memory["resources"] == null) Memory["resources"] = {};
+			Memory["resources"]["to_overflow"] = amount;
+		};
+
+		command_list.push("resources.to_market(resource, cap_amount)");
+
+		resources.to_market = function(resource, amount) {
+			if (Memory["resources"] == null) Memory["resources"] = {};
+			if (Memory["resources"]["to_market"] == null) Memory["resources"]["to_market"] = {};
+			Memory["resources"]["to_market"][resource] = amount;
+		};
+
+		command_list.push("resources.send(order_name, room_from, room_to, resource, amount)");
+
+		resources.send = function(order_name, room_from, room_to, resource, amount) {
+			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
+			Memory["terminal_orders"][order_name] = { room: room_to, from: room_from, resource: resource, amount: amount, priority: 1};	
+		};
+
+		command_list.push("resources.market_sell(order_name, market_order_id, room_from, amount)");
+
+		resources.market_sell = function(order_name, market_order_id, room_from, amount) {
+			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
+			Memory["terminal_orders"][order_name] = { market_id: market_order_id, amount: amount, from: room_from, priority: 4};
+			
+		};
+
+		command_list.push("resources.market_buy(order_name, market_order_id, room_to, amount)");
+
+		resources.market_buy = function(order_name, market_order_id, room_to, amount) {
+			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
+			Memory["terminal_orders"][order_name] = { market_id: market_order_id, amount: amount, to: room_to, priority: 4};
+		};
+
 
 		command_list.push("");
-		command_list.push("colonize(rmFrom, rmTarget, layout, [listRoute])");
+		command_list.push("colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, [listRoute])");
 
 		colonize = function(rmFrom, rmTarget, layout, listRoute) {
 			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, layout: layout, listRoute: listRoute });
@@ -243,7 +318,7 @@ module.exports = {
 		};
 
 		command_list.push("remote_mining(rmHarvest, rmColony, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
-		remote_mining = function(rmHarvest, rmColony, hasKeepers, listRoute, listSpawnAssistRooms) {
+		remote_mining = function(rmHarvest, rmColony, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
 			_.set(Memory, ["remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
@@ -253,7 +328,7 @@ module.exports = {
 		command_list.push("blueprint()");
 		blueprint = function() {
 			delete Memory.pulses.blueprint;
-			return `<font color=\"#D3FFA3\">[Console]</font> Resetting blueprint pulse; will cycle next tick.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Deleting Memory.pulses.blueprint; Blueprint will initiate next tick.`;
 		}
 
 		command_list.push("create_road(room_name, start_x, start_y, end_x, end_y)");

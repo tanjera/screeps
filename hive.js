@@ -47,15 +47,16 @@ let Hive = {
 		}
 	},
 
-	isPulse_Blueprint: function() {
+	Pulse_Blueprint: function() {
 		let minTicks = 200, maxTicks = 500;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["pulses", "blueprint"]);
+		let lastTick = _.get(Memory, ["pulses", "blueprint", "last_tick"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["pulses", "blueprint"], Game.time);
+			let rooms = _.filter(Object.keys(Game.rooms), n => { return Game.rooms[n].controller != null && Game.rooms[n].controller.my; });
+			Memory["pulses"]["blueprint"] = { last_tick: Game.time, room_list: rooms, room_current: 0 };
 			return true;
 		} else {
 			return false;
@@ -99,6 +100,7 @@ let Hive = {
 		
 		if (Memory["rooms"] == null) Memory["rooms"] = {};
 		if (Memory["allies"] == null) Memory["allies"] = [];
+		if (Memory["pulses"] == null) Memory["pulses"] = {};
 		if (Memory["remote_mining"] == null) Memory["remote_mining"] = {};
 		if (Memory["colonization_requests"] == null) Memory["colonization_requests"] = {};
 		if (Memory["invasion_requests"] == null) Memory["invasion_requests"] = {};
@@ -108,7 +110,6 @@ let Hive = {
 			if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};
 			if (Memory["rooms"][r]["tasks"] == null) Memory["rooms"][r]["tasks"] = {};
 			Memory["rooms"][r]["population_balance"] = null;
-
 		}
 
 		Memory["spawn_requests"] = new Array();

@@ -82,32 +82,32 @@ Though the task system helps creeps stay organized as a group, iterating every r
 
 So you have some minerals and want your labs to process them? Or boost your creeps? ... well rooms of RCL 6 and above automatically will spawn a courier that will run minerals to labs and terminals for managing reactions. The codebase actually lets you specify in Memory what your goal minerals are, and it will automatically set up reactions in your labs. Note: this is an empire-wide process, _not_ specific to each room- couriers in all of your rooms will start shipping reagents via terminals to different rooms to fill labs to run reactions, automatically!! There is no need for you to manually move minerals except if you want to send them to your friends.
 
-To set reaction targets: 
+To set reaction targets, "mineral" is the mineral's abbreviation, "amount" is the amount of this mineral that you'd like to generate, and "priority" is any number for you to order your reaction priorities, with 1 being highest priority and 100 being lowest priority: 
 
-`Memory.labs.targets["custom_name"] = { mineral: "mineral_abbreviation", amount: ##, priority ##: };`
+`resources.lab_target(mineral, amount, priority);`
 
 #### Terminals
 
-Once you have reach RCL 6 a courier will spawn and begin to automatically do a lot of functions for you. For example, if you set up mineral reactions, the code will automatically request other rooms with terminals to load any excess minerals used for the reaction, and send it over! Also, if any rooms have an excess of energy, you can set
+Once you have reach RCL 6 a courier will spawn and begin to automatically do a lot of functions for you. For example, if you set up mineral reactions, the code will automatically request other rooms with terminals to load any excess minerals used for the reaction, and send it over! Also, if any rooms have an excess of energy, you can set the "cap_amount" so that when a room reaches the energy cap, it will start to overflow energy into other rooms:
 
-`Memory.resources.to_overflow = 100000;`
+`resources.to_overflow(cap_amount)`
 
-and any rooms with more energy than the limit (in this example: 100,000) will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your empire. 
+and any rooms with more energy than the limit will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your empire. 
 
-The codebase also will automatically off-load excess minerals and energy, selling them to the market to the highest bidder, but only if you enter manually into Memory the limit at which you want excess minerals to be sold. This is great for selling excess basic minerals, and you can always manually enter market trades for minerals that you don't include in automatic sales. To set up automatic market selling, you can use the following command on the console:
+The codebase also will automatically off-load excess minerals and energy, selling them to the market to the highest bidder, but only if you enter manually into Memory the limit at which you want excess minerals to be sold. This is great for selling excess basic minerals, and you can always manually enter market trades for minerals that you don't include in automatic sales. To set up automatic market selling, you can use the following command on the console, where "resource" is the mineral abbreviation (or "energy"!), and "cap_amount" is the amount at which it will start overflowing that resource onto the market:
 
-`Memory.resources.to_market = { energy: 1750000, O: 250000, H: 250000, U: 200000, L: 200000, Z: 200000, K: 200000 });`
+`resources.to_market(resource, cap_amount)`
 
 Terminals also process manually entered terminal orders, which you can use to send resources to friends, by using the following manual entries in the console:
 
 * For internal transfers (among your own rooms or to your friends or private trades):
 
-`Memory["terminal_orders"]["custom_name"] = { room: "sending_room", resource: "resource_name", amount: ##, from: "sending_room", priority: 1};`
+`resources.send(order_name, room_from, room_to, resource, amount)`
 	
 * For manual market trading (fulfilling existing buy/sell orders from other players):
 
-`Memory["terminal_orders"]["custom_name"] = { market_id: "the_id!", amount: ##, from: "selling_room", priority: 4};`
-`Memory["terminal_orders"]["custom_name"] = { market_id: "the_id!", amount: ##, to: "buying_room", priority: 4};`
+`resources.market_sell(order_name, market_order_id, room_from, amount)`
+`resources.market_buy(order_name, market_order_id, room_to, amount)`
 
 and your courier will to load/unload the terminal, and send/receive minerals and energy to fulfill all terminal orders!
 
@@ -115,9 +115,12 @@ and your courier will to load/unload the terminal, and send/receive minerals and
 
 #### Allies
 
-Don't forget to define your allies Memory, but be careful who you add! Your list of allies is a group of players whose creeps will be able to move through your rooms and interact with your creeps and structures without setting off your defenses. Allies can be set like this:
+Don't forget to define your allies in Memory, but be careful who you add! Your list of allies is a group of players whose creeps will be able to move through your rooms and interact with your creeps and structures without setting off your defenses. Allies can be set with the following commands:
 
-`Memory["allies"] = ["player_one", "player_two", "et_cetera"];`
+`allies.add(ally)`
+`allies.add_list([ally1, ally2, ...])`
+`allies.remove(ally)`
+`allies.clear()`
 
 #### Active Defenses
 
@@ -127,14 +130,12 @@ There are several basic automatic defenses built into the code. Towers will choo
 
 Passive defenses (walls and ramparts) are also an integral part of your room's defenses. When you construct a wall or rampart and have a worker or repairer available with energy, it is automatically set to build and repair your walls to a minimum "critical" hitpoint level, and then- as available- repair them to a target "maintenance" hitpoint level. The amount of hitpoints that the code will automatically aim for scales depending on your room's controller level (RCL), from 10K hitpoints at RCL1 to 1M hitpoints at RCL8. 
 
-You can also specify the target hitpoint goal for a specific tile or wall or rampart by adding a value to its memory setting at 
-
-`Memory.rooms[rmName].structures[${s.structureType}-${s.id}].targetHits`
-
-An example of a quick way to set a room's walls (e.g. W18S43, all walls and ramparts along x == 2) to a custom target hitpoint goal (e.g. 5M)- all via the console- would be:
+You can also specify the target hitpoint goal for a specific tile or wall or rampart by adding a value to its memory setting. Since this operation can get complex, there is no simple console command for it, but an example of a quick way to set a room's walls (all walls and ramparts along x == ?) to a custom target hitpoint goal- all via the console- would be by modifying Memory directly, with the fields surrounded by asterisks (*) needing to be set by you... and you can change this around to suit your needs!:
 
 ```
-_.each(Game.rooms.W18S43.find(FIND_STRUCTURES, { filter: (s) => { return s.pos.x == 2 && (s.structureType == "constructedWall" || s.structureType == "rampart"); } }), s => { _.set(Memory, ["rooms", s.pos.roomName, "structures", `${s.structureType}-${s.id}`, "targetHits"], 5000000); });
+_.each(_.filter(Game.rooms.*room_name*.find(FIND_STRUCTURES)
+    s => { return s.pos.x == *x_coordinate* && (s.structureType == "*structure_type*"; })), 
+    s => { _.set(Memory, ["rooms", s.pos.roomName, "structures", `${s.structureType}-${s.id}`, "targetHits"], *hitpoint_amount*); });
 ```
 
 #### Invading a Room
