@@ -5,7 +5,7 @@ let Hive = require("hive");
 
 module.exports = {
 
-	Run: function(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listSpawnRoute) {
+	Run: function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnRooms, listPopulation) {
 
 		_CPU.Start(rmColony, "Mining-init");
 
@@ -25,9 +25,9 @@ module.exports = {
 				? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
 				: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "rooms"]);
 		}
-		if (listSpawnRoute == null) {
-			listSpawnRoute = rmColony == rmHarvest
-				? listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
+		if (listRoute == null) {
+			listRoute = rmColony == rmHarvest
+				? listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
 				: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "route"]);
 		}
 		if (listPopulation == null) {
@@ -58,7 +58,7 @@ module.exports = {
 		}
 
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-runCreeps`);
-		this.runCreeps(rmColony, rmHarvest, listCreeps, hasKeepers, listSpawnRoute);
+		this.runCreeps(rmColony, rmHarvest, listCreeps, hasKeepers, listRoute);
 		_CPU.End(rmColony, `Mining-${rmHarvest}-runCreeps`);
 	},
 
@@ -181,13 +181,13 @@ module.exports = {
         }
 	},
 
-	runCreeps: function(rmColony, rmHarvest, listCreeps, hasKeepers, listSpawnRoute) {
+	runCreeps: function(rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {
 		let Roles = require("roles");
 
 		let isSafe = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"]);
 
         _.each(listCreeps, creep => {
-			creep.memory.listRoute = listSpawnRoute;
+			creep.memory.listRoute = listRoute;
 
 			if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
 				Roles.Mining(creep, isSafe);

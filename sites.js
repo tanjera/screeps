@@ -5,7 +5,7 @@ module.exports = {
 		Colony.Run(rmColony, listSpawnRooms, listPopulation, listRoute)
 	},
 	
-	Mining: function(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listRoute) {
+	Mining: function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnRooms, listPopulation) {
 		let Mining = require("sites.mining");
 		Mining.Run(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listRoute);
 	},	

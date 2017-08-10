@@ -40,8 +40,7 @@ When you are ready to expand to a new room (create a new "colony"), you can use 
 
 Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. You can either set a specific room layout via layout_name, or leave it as null to use the default horizontal layout. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_assist.rooms field for a colony like this:
 
-`Memory.rooms.room_name.spawn_assist.rooms = ["room1"];`
-`Memory.rooms.room_name.spawn_assist.route = ["room_from", "next_room1", "next_room2", "room_to"];`
+`spawn_assist(rmToAssist, [listRooms], [listRoute])`
 
 #### Set Custom Room Functions
 
@@ -51,13 +50,13 @@ Note: If you set a custom room population (as shown in main.js' comments), you _
 
 #### Remote Mining
 
-Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined in Memory.js. To do that, you can :
+Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined via a console command. You can do that like so:
 
-`Memory.remote_mining.room_to_harvest = {colony: "room_colony"};`
+`remote_mining(room_to_harvest, colony_room);`
 
 and it's pretty much that simple. The creep population for the remote mining is automatically chosen, but more complex operations are definitely possible and a few fields are read from Memory, including adjacent room assistance with spawning, spawning of soldiers to accompany miners in rooms that have source keepers, and custom populations for the mining operation, all set through Memory. For example, if you will be mining a room with source keepers and assist in spawning the creeps from an adjacent room, your command would look like this:
 
-`Memory.remote_mining.room_to_harvest = {colony: "room_colony", has_keepers: true, spawn_assist: {rooms: ["room_to_spawn"]}};`
+`remote_mining(rmHarvest, rmColony, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation]);`
 
 ### Spawning and Creep "Levels"
 

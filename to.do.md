@@ -1,11 +1,13 @@
 # Implemented, Needs Debugging/Testing
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
+- spawn_assist() command
+- remote_mining() command
 
 
 
 # Implementing...
-
+- change all "listRoute" in memory objects to "route" e.g. colonize() ... for standardization
 
 
 # To Implement

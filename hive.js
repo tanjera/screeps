@@ -149,7 +149,8 @@ let Hive = {
 		let remote_mining = _.get(Memory, "remote_mining");
 		_.each(Object.keys(remote_mining), req => {
 			if (_.get(remote_mining, [req, "colony"]) != null)
-				Sites.Mining(_.get(remote_mining, [req, "colony"]), req);
+				Sites.Mining(_.get(remote_mining, [req, "colony"]), req, _.get(remote_mining, [req, "has_keepers"]),
+					_.get(remote_mining, [req, "listRoute"]), _.get(remote_mining, [req, "spawn_assist"]), _.get(remote_mining, [req, "population"]));
 		});
 	},
 

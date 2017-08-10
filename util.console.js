@@ -236,6 +236,18 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.invasion_requests.${rmTarget} ... to cancel, delete the entry.`;
 		};
 		
+		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");
+		spawn_assist = function(rmToAssist, listRooms, listRoute) {
+			_.set(Memory, ["rooms", rmToAssist, "spawn_assist"], { rooms: listRooms, route: listRoute });
+			return `<font color=\"#D3FFA3\">[Console]</font> Spawn assist added to Memory.rooms.${rmToAssist}.spawn_assist ... to cancel, delete the entry.`;
+		};
+
+		command_list.push("remote_mining(rmHarvest, rmColony, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
+		remote_mining = function(rmHarvest, rmColony, hasKeepers, listRoute, listSpawnAssistRooms) {
+			_.set(Memory, ["remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
+			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
+		};
+
 
 		command_list.push("");
 		command_list.push("blueprint()");
@@ -262,6 +274,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${room_name} for road from (${start_x}, ${start_y}) to (${end_x}, ${end_y}).`;
 		};
 		
+		command_list.push("");
 
 		commands = function() {
 			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}`);
