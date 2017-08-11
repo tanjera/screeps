@@ -245,6 +245,11 @@ let Blueprint = {
 			}
 		}
 
+		if (level == 7) {
+			// Builds links near storage last (facilitate upgrading controller before filling storage...)
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "link");
+		}
+
 		if (level == 8) {
 			// Build ramparts over major structures
 			if (sites < sites_per_room) {

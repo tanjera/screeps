@@ -366,15 +366,15 @@ module.exports = {
 			if (room == null)
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${rmName} not found.`;
 			
-			let from = new RoomPosition(startX, startY, room_name);
-			let to = new RoomPosition(endX, endY, room_name);
+			let from = new RoomPosition(startX, startY, rmName);
+			let to = new RoomPosition(endX, endY, rmName);
 			let path = room.findPath(from, to, {ignoreCreeps: true});			
 			for (let i = 0; i < path.length; i++)
 				room.createConstructionSite(path[i].x, path[i].y, "road");
 			room.createConstructionSite(startX, startY, "road");
 			room.createConstructionSite(endX, endY, "road");
 			
-			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${room_name} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
 		};
 		
 		command_list.push("");

@@ -40,6 +40,7 @@
             this.txtOutput = new System.Windows.Forms.RichTextBox();
             this.numLineBreak = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.buttonClear = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numOffsetX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numOffsetY)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLineBreak)).BeginInit();
@@ -91,6 +92,7 @@
             this.numOffsetX.Name = "numOffsetX";
             this.numOffsetX.Size = new System.Drawing.Size(49, 20);
             this.numOffsetX.TabIndex = 2;
+            this.numOffsetX.Enter += new System.EventHandler(this.numOffsetX_Enter);
             // 
             // numOffsetY
             // 
@@ -103,6 +105,7 @@
             this.numOffsetY.Name = "numOffsetY";
             this.numOffsetY.Size = new System.Drawing.Size(49, 20);
             this.numOffsetY.TabIndex = 3;
+            this.numOffsetY.Enter += new System.EventHandler(this.numOffsetY_Enter);
             // 
             // label3
             // 
@@ -154,10 +157,11 @@
             this.numLineBreak.Size = new System.Drawing.Size(49, 20);
             this.numLineBreak.TabIndex = 4;
             this.numLineBreak.Value = new decimal(new int[] {
-            8,
+            7,
             0,
             0,
             0});
+            this.numLineBreak.Enter += new System.EventHandler(this.numLineBreak_Enter);
             // 
             // label4
             // 
@@ -168,12 +172,24 @@
             this.label4.TabIndex = 13;
             this.label4.Text = "Coords per Line";
             // 
+            // buttonClear
+            // 
+            this.buttonClear.BackColor = System.Drawing.Color.MistyRose;
+            this.buttonClear.Location = new System.Drawing.Point(19, 411);
+            this.buttonClear.Name = "buttonClear";
+            this.buttonClear.Size = new System.Drawing.Size(422, 21);
+            this.buttonClear.TabIndex = 6;
+            this.buttonClear.Text = "Clear All";
+            this.buttonClear.UseVisualStyleBackColor = false;
+            this.buttonClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
             // Main
             // 
-            this.ClientSize = new System.Drawing.Size(457, 416);
+            this.ClientSize = new System.Drawing.Size(457, 443);
             this.Controls.Add(this.numLineBreak);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtOutput);
+            this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.btnClipboard);
             this.Controls.Add(this.btnGenerate);
             this.Controls.Add(this.numOffsetY);
@@ -207,6 +223,7 @@
         private System.Windows.Forms.RichTextBox txtOutput;
         private System.Windows.Forms.NumericUpDown numLineBreak;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button buttonClear;
     }
 }
 

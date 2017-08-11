@@ -163,17 +163,24 @@ module.exports = {
 	defineLinks: function(rmColony) {
 		let link_defs = _.get(Memory, ["rooms", rmColony, "links"]);
 		let room = Game.rooms[rmColony];
-		let links = _.filter(room.find(FIND_MY_STRUCTURES), s => { return s.structureType == "link" });
+		let structures = room.find(FIND_MY_STRUCTURES);
+		let links = _.filter(structures, s => { return s.structureType == "link"; });
 		
 		if (link_defs == null || link_defs < links.length) {
 			link_defs = [];
 			let sources = room.find(FIND_SOURCES);
 			_.each(sources, source => { _.each(source.pos.findInRange(links, 2), link => {
-				link_defs.push({id: link.id, role: "worker", dir: "send"});
+				link_defs.push({id: link.id, dir: "send"});
 			}); });
 
+			_.each(_.filter(structures, s => { return s.structureType == "storage"; }), storage => {
+				_.each(storage.pos.findInRange(links, 3), link => {
+					link_defs.push({id: link.id, dir: "receive"});
+				});
+			});
+
 			_.each(room.controller.pos.findInRange(links, 2), link => {
-				link_defs.push({id: link.id, role: "worker", dir: "receive"});
+				link_defs.push({id: link.id, dir: "receive"});
 			});
 		}
 
@@ -190,7 +197,7 @@ module.exports = {
             _.each(linksReceive, r => {
 				let receive = Game.getObjectById(r["id"]);
                 _.each(linksSend, s => {
-					if (r["role"] == s["role"] && receive != null) {
+					if (receive != null) {
 						let send = Game.getObjectById(s["id"]);
 						if (send != null && send.energy > send.energyCapacity * 0.25 && receive.energy < receive.energyCapacity * 0.9) {
 							send.transferEnergy(receive);

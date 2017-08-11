@@ -39,6 +39,7 @@ namespace csv_to_coords
 
             List<String> spawn = new List<String>(),
                 extension = new List<String>(),
+                link = new List<String>(),
                 storage = new List<String>(),
                 tower = new List<String>(),
                 terminal = new List<String>(),
@@ -69,6 +70,10 @@ namespace csv_to_coords
                             extension.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
 
+                        case "LI":
+                            link.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
+                            break;
+                            
                         case "ST":
                             storage.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
@@ -115,6 +120,7 @@ namespace csv_to_coords
             StringBuilder output = new StringBuilder();
             formatListStrings(output, spawn, "spawn");
             formatListStrings(output, extension, "extension");
+            formatListStrings(output, link, "link");
             formatListStrings(output, storage, "storage");
             formatListStrings(output, tower, "tower");
             formatListStrings(output, terminal, "terminal");
@@ -150,6 +156,30 @@ namespace csv_to_coords
         private void btnClipboard_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(txtOutput.Text);
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            txtFilePath.Clear();
+            numOffsetX.Value = 0;
+            numOffsetY.Value = 0;
+            numLineBreak.Value = 7;
+            txtOutput.Clear();
+        }
+
+        private void numOffsetX_Enter(object sender, EventArgs e)
+        {
+            numOffsetX.Select(0, numOffsetX.Value.ToString().Length);
+        }
+
+        private void numOffsetY_Enter(object sender, EventArgs e)
+        {
+            numOffsetY.Select(0, numOffsetY.Value.ToString().Length);
+        }
+
+        private void numLineBreak_Enter(object sender, EventArgs e)
+        {
+            numLineBreak.Select(0, numLineBreak.Value.ToString().Length);
         }
     }
 }

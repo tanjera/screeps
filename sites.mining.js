@@ -95,7 +95,7 @@ module.exports = {
 			if (rmColony == rmHarvest)
 				listPopulation = Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level];
 			else
-				listPopulation = isVisible
+				listPopulation = (isVisible && _.get(Game, ["rooms", rmHarvest]) != null)
 			        ? Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level]
 			        : Population_Mining["R1"][Game.rooms[rmColony].controller.level];
 		}

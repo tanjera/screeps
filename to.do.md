@@ -10,7 +10,7 @@
 
 
 # Implementing...
-
+- ? Links near storage? Link definitions as -> link by storage for energy flow
 
 
 # To Implement
@@ -19,7 +19,7 @@
 	- Towers only target hostiles within ? distance of structures? Or within ? distance of towers and sources?
 
 - Invasion
-	- Victory conditions for Sites.Invasion.... 
+	- Victory conditions for Sites.Invasion.... e.g. all listTargets are destroyed.
 
 - Colony function
 	- Creep ability to request another creep to move/swap spaces
@@ -29,7 +29,7 @@
 	- Sites.Support, help an ally build
 
 - Code Standardization
-	- Change all "listRoute" in Memory objects to "route" e.g. colonize()
+	? Change all "listRoute" in Memory objects to "route" e.g. colonize()
 
 - Misc
 	- Set default room controller message via Memory
