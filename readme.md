@@ -16,7 +16,7 @@ Just like colonies are automatically run and populated with a preset population,
 
 #### Construction Sites: Set Origin Coordinates (esp. For Colony #1)
 
-**This codebase will automate the layout and construction of your base within your colony, based on two pre-fabricated base layouts that can be found in base.layouts.js (with origins of 0,0 being the top left spawn, not including the defensive walls/buffer space).** Every 200-500 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal", "default\_vertical", or "default\_compact"):
+**This codebase will automate the layout and construction of your base within your colony, based on different pre-fabricated base layouts that are programmed in blueprint.layouts.js and can be visualized in Excel format in base\_layouts/base\_layouts.xlsc!!! Layouts have origins of 0,0 being the top left spawn, not including the defensive walls/buffer space).** Every 200-500 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal", "default\_vertical", or "default\_compact"):
 
 `blueprint.set_layout(rmName, originX, originY, layoutName)`
 
@@ -44,7 +44,7 @@ Once the colonizer claims the new controller, the code-base will remove the colo
 
 #### Set Custom Room Functions
 
-Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_assist.rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_assist.route), and creating somewhat complex link systems in rooms that are only accessed by either miners or workers (link\_definitions). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
+Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_assist.rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_assist.route). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
 
 Note: If you set a custom room population (as shown in main.js' comments), you _must set the entire room's population_ including mining, industry, etc; if you only include colony workers, you won't spawn any miners to fill the spawn and extensions!
 
@@ -77,6 +77,10 @@ To save CPU and prevent 3 creeps from trying to do a job that only takes 1 creep
 Though the task system helps creeps stay organized as a group, iterating every room and creating a new task list each tick would chew through CPU very quickly. Compiling tasks and processing terminal orders are done on a "pulse" defined by Hive.isPulse(). If the CPU bucket (Game.cpu.bucket) is full, it will pulse every ~8 ticks. If the CPU bucket is half empty, it will pulse every ~30 seconds. If you are entirely out of CPU, it will pulse every ~1 minute. By scaling its CPU usage through pulsing, the codebase won't chew through all your CPU. Depending on how efficient your code edits are, or if you overload your CPU with a massive amount of creeps, you may need to change the frequency of pulses.
 
 ### Industry
+
+#### Links
+
+Links are automatically built based on the defined room layout and their functionality is automatically defined. Links built in different places as they are unlocked as your room's controller level (RCL) increases. Initially, links direct the flow of energy from sources to the room controller for upgrading. At higher RCL, links are built near the room's storage to direct energy for stockpiling as well.
 
 #### Labs
 
@@ -161,5 +165,3 @@ Rarely used but useful when needed, you can keep a continuous occupation of a ro
 There are a number of commands that can be run from the console that are part of the codebase and assist in managing your Screeps empire. These range from logs to show your resource amounts, to using a "blueprint" feature that saves your room layout (using flags) and will automatically rebuild after an attack, along with a CPU profiler that can show you which functions are using the most CPU. For a full list of console commands, simply go to the console and type:
 
 `commands()`
-
-Note: As I develop the codebase to shift away from hard-coding data and move to a Memory-based setup, more and more console commands will be added to simplify colonizing new rooms, setting up links, etc!

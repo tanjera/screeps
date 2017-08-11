@@ -10,7 +10,6 @@
 
 
 # Implementing...
-- ? Links near storage? Link definitions as -> link by storage for energy flow
 
 
 # To Implement
