@@ -48,6 +48,7 @@ module.exports.loop = function () {
 	/* Run end-tick Hive functions */
 	Hive.processSpawnRequests();
 	Hive.processSpawnRenewing();
+	Hive.endMemory();
 
 	/* Finish the profiler cycle */
 	_CPU.Finish();

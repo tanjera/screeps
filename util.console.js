@@ -69,6 +69,16 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting Blueprint() cycles; Blueprint() will initiate next tick.`;
 		};
 
+		command_list.push("blueprint.redefine_links()");
+		blueprint.redefine_links = function() {
+			_.each(_.filter(Game.rooms, r => { return (r.controller != null && r.controller.my); }), r => {
+				if (_.has(Memory, ["rooms", r.name, "links"]))
+					delete Memory["rooms"][r.name]["links"];
+			});
+
+			Memory["pulses"]["reset_links"] = true;
+			return `<font color=\"#D3FFA3\">[Console]</font> Resetting all link definitions; will redefine next tick.`;
+		};
 
 		command_list.push("");
 		command_list.push("log.labs()");

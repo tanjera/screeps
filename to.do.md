@@ -30,5 +30,8 @@
 - Code Standardization
 	? Change all "listRoute" in Memory objects to "route" e.g. colonize()
 
+- Known Bugs
+	- If 1 link is within range of multiple targets (controller, source), will make erroneous definitions.
+
 - Misc
 	- Set default room controller message via Memory

@@ -119,6 +119,11 @@ let Hive = {
 		}
 	},
 
+	endMemory: function() {
+		if (_.has(Memory, ["pulses", "reset_links"]))
+			delete Memory["pulses"]["reset_links"];
+	},
+
 
 	runColonies: function() {
 		_.each(Game.rooms, room => {

@@ -235,10 +235,9 @@ module.exports = {
 							subtype: "deposit",
 							structure: "link",
 							resource: "energy",
-							role: l["role"],
 							id: l["id"],
 							pos: link.pos,
-							key: `carry:deposit-link:${l["role"]}-${l["id"]}`,
+							key: `carry:deposit-link:${l["id"]}`,
 							timer: 20,
 							creeps: 1,
 							priority: (l["role"] == "miner" ? 2 : 3)
@@ -253,7 +252,7 @@ module.exports = {
 							role: l["role"],
 							id: l["id"],
 							pos: link.pos,
-							key: `energy:withdraw-link:${l["role"]}-${l["id"]}`,
+							key: `energy:withdraw-link:${l["id"]}-${l["role"]}`,
 							timer: 20,
 							creeps: (roomLvl > 6 ? 1 : 2),
 							priority: 2

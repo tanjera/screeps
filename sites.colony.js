@@ -40,8 +40,9 @@ module.exports = {
         _CPU.End(rmColony, "Colony-runTowers");
 		
 		_CPU.Start(rmColony, "Colony-defineLinks");
-		if (Game.time % 200 == 0)
+		if (Game.time % 200 == 0 || _.has(Memory, ["pulses", "reset_links"])) {
 			this.defineLinks(rmColony);
+		}
 		_CPU.End(rmColony, "Colony-defineLinks");
 
 		_CPU.Start(rmColony, "Colony-runLinks");
@@ -190,10 +191,11 @@ module.exports = {
 			});
 
 			_.each(room.controller.pos.findInRange(links, 2), link => {
-				link_defs.push({id: link.id, dir: "receive"});
+				link_defs.push({id: link.id, dir: "receive", role: "upgrade"});
 			});
 
 			Memory["rooms"][rmColony]["links"] = link_defs;
+			console.log(`<font color=\"#D3FFA3\">[Console]</font> Links defined for ${rmColony}.`);
 		}
 		
 	},

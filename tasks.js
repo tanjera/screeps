@@ -110,8 +110,7 @@ module.exports = {
 			}
 
 			task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-					t => { return t.type == "energy" && t.resource == "energy"
-						&& (t.structure != "link" || t.role == "worker")
+					t => { return t.type == "energy" && t.resource == "energy"						
 						&& (t.creeps == null || t.creeps > 0); }),
 					t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }));
 			if (task != null) {
@@ -178,13 +177,6 @@ module.exports = {
 			if (task != null) {
 				this.giveTask(creep, task);
 				return;
-			}
-			
-			task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"],	// Help keep the mining links clear for the carriers
-					t => { return t.type == "energy" && t.structure == "link" && t.role == "miner" && (t.creeps == null || t.creeps > 0); }));
-			if (task != null) {
-				this.giveTask(creep, task);
-				return;
 			} else {    // If no tasks, then wait
 				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 				return;
@@ -245,8 +237,8 @@ module.exports = {
 			}
 			else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.subtype == "pickup" || t.type == "energy"
-							&& (t.structure != "link" || t.role == "miner")
+						t => { return t.subtype == "pickup" || t.type == "energy"							
+							&& (t.structure != "link" || t.role != "upgrade")
 							&& (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 						"priority"));
@@ -285,8 +277,7 @@ module.exports = {
 
 			if (_.get(creep, ["carry", "energy"], 0) > 0) {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"
-							&& (t.structure != "link" || (t.role != "miner" || creep.pos.getRangeTo(t.pos.x, t.pos.y) <= 6))
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"							
 							&& (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),
 						"priority"));
