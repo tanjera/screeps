@@ -281,6 +281,7 @@ module.exports = {
 			if (Memory["labs"] == null) Memory["labs"] = {};
 			if (Memory["labs"]["targets"] == null) Memory["labs"]["targets"] = {};
 			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
+			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} target set to ${amount} (priority ${priority}.`;
 		};
 		
 		command_list.push("resources.to_overflow(capAmount)");
@@ -288,6 +289,7 @@ module.exports = {
 		resources.to_overflow = function(amount) {
 			if (Memory["resources"] == null) Memory["resources"] = {};
 			Memory["resources"]["to_overflow"] = amount;
+			return `<font color=\"#D3FFA3\">[Console]</font> Energy overflow cap set to ${amount}.`;
 		};
 
 		command_list.push("resources.to_market(resource, capAmount)");
@@ -296,13 +298,15 @@ module.exports = {
 			if (Memory["resources"] == null) Memory["resources"] = {};
 			if (Memory["resources"]["to_market"] == null) Memory["resources"]["to_market"] = {};
 			Memory["resources"]["to_market"][resource] = amount;
+			return `<font color=\"#D3FFA3\">[Console]</font> ${resource} market overflow set to ${amount}.`;
 		};
 
 		command_list.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
 
 		resources.send = function(orderName, rmFrom, rmTo, resource, amount) {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][orderName] = { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1};	
+			Memory["terminal_orders"][orderName] = { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1};
+			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
@@ -310,7 +314,7 @@ module.exports = {
 		resources.market_sell = function(orderName, marketOrderID, rmFrom, amount) {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
 			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4};
-			
+			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
@@ -318,6 +322,7 @@ module.exports = {
 		resources.market_buy = function(orderName, marketOrderID, rmTo, amount) {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
 			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4};
+			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 

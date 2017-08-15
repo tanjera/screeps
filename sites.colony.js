@@ -166,7 +166,17 @@ module.exports = {
 		let structures = room.find(FIND_MY_STRUCTURES);
 		let links = _.filter(structures, s => { return s.structureType == "link"; });
 		
-		if (link_defs == null || link_defs < links.length) {
+		// Check that link definitions are current with GameObject ID's
+		if (link_defs != null && Object.keys(link_defs).length == links.length) {
+			for (let i = 0; i < Object.keys(link_defs).length; i++) {
+				if (_.filter(links, s => { return s.id == link_defs[i].id}).length == 0) {
+					delete Memory["rooms"][rmColony]["links"];
+				}
+			}
+		}
+
+		// Define missing link definitions
+		if (link_defs == null || Object.keys(link_defs).length != links.length) {
 			link_defs = [];
 			let sources = room.find(FIND_SOURCES);
 			_.each(sources, source => { _.each(source.pos.findInRange(links, 2), link => {
@@ -182,9 +192,10 @@ module.exports = {
 			_.each(room.controller.pos.findInRange(links, 2), link => {
 				link_defs.push({id: link.id, dir: "receive"});
 			});
-		}
 
-		_.set(Memory, ["rooms", rmColony, "links"], link_defs);
+			Memory["rooms"][rmColony]["links"] = link_defs;
+		}
+		
 	},
 
 	runLinks: function (rmColony) {		

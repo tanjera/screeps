@@ -2,7 +2,6 @@
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
 - resources.lab_target()
-- resources.to_overflow()
 - resources.to_market()
 - resources.market_sell(order_name, market_order_id, room_from, amount)
 - resources.market_buy(order_name, market_order_id, room_to, amount)
@@ -18,6 +17,7 @@
 	- Towers only target hostiles within ? distance of structures? Or within ? distance of towers and sources?
 
 - Invasion
+	- Pass "tactics" object to Sites.Invasion- switch() tactic types, modifies army behavior (e.g. moves in a playbook)
 	- Victory conditions for Sites.Invasion.... e.g. all listTargets are destroyed.
 
 - Colony function

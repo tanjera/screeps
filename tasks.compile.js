@@ -256,7 +256,7 @@ module.exports = {
 							key: `energy:withdraw-link:${l["role"]}-${l["id"]}`,
 							timer: 20,
 							creeps: (roomLvl > 6 ? 1 : 2),
-							priority: (l["role"] == "miner" ? 2 : 3)
+							priority: 2
 						});
 					}
 				});
