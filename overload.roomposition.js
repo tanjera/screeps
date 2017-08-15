@@ -52,3 +52,22 @@ RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range) {
 
 	return null;
 }
+
+RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range) {
+	for (let x = -range; x <= range; x++) {
+		for (let y = -range; y <= range; y++) {
+			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
+
+			if (newPos.x < 0 || newPos.x > 49 || newPos.y < 0 || newPos.y > 49)
+				continue;
+
+			if (newPos.lookFor("structure").length == 0 && newPos.lookFor("terrain") != "wall") {
+				let path = this.findPathTo(newPos.x, newPos.y, {maxOps: 200, ignoreCreeps: true, ignoreRoads: true});
+				if (path.length <= 2)
+					return newPos;
+			}
+		}
+	}
+
+	return null;
+}

@@ -201,18 +201,20 @@ let Blueprint = {
 			if (sites < sites_per_room) {
 				let links = _.filter(structures, s => { return s.structureType == "link"; });
 				
-				_.each(sources, source => {
+				for (let i = 0; i < sources.length && i < (CONTROLLER_STRUCTURES["link"][room.controller.level] - 1); i++) {
+					let source = sources[i];
 					if (sites < sites_per_room && source.pos.findInRange(links, 2).length == 0) {
-						let adj = source.pos.getOpenTile_Range(2);
+						let adj = source.pos.getOpenTile_Path(2);
 						if (adj != null && adj.createConstructionSite("link") == OK) {							
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
 							sites += 1;
 						}
 					}
-				});
+				};
 
-				if (sites < sites_per_room && room.controller.pos.findInRange(links, 2).length < 2) {
-					let adj = room.controller.pos.getOpenTile_Range(2);
+				if (sites < sites_per_room && links.length < CONTROLLER_STRUCTURES["link"][room.controller.level]
+						&& room.controller.pos.findInRange(links, 2).length < 2) {
+					let adj = room.controller.pos.getOpenTile_Path(2);
 					if (adj != null && adj.createConstructionSite("link") == OK) {							
 						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
 						sites += 1;
@@ -245,7 +247,7 @@ let Blueprint = {
 			}
 		}
 
-		if (level == 7) {
+		if (level >= 7) {
 			// Builds links near storage last (facilitate upgrading controller before filling storage...)
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "link");
 		}
