@@ -5,7 +5,15 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 
-	Run: function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
+	Run: function(rmColony, rmOccupy) {
+
+		_CPU.Start(rmColony, "Occupy-init");
+		listSpawnRooms = _.get(Memory, ["occupation_requests", rmOccupy, "spawn_assist"]);
+		listArmy = _.get(Memory, ["occupation_requests", rmOccupy, "army"]);
+		listTargets = _.get(Memory, ["occupation_requests", rmOccupy, "targets"]);
+		listRoute = _.get(Memory, ["occupation_requests", rmOccupy, "route"]);		
+		_CPU.End(rmColony, "Occupy-init");
+
 		_CPU.Start(rmColony, `Occupy-${rmOccupy}-listCreeps`);
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmOccupy && c.memory.colony == rmColony);
 		_CPU.End(rmColony, `Occupy-${rmOccupy}-listCreeps`);

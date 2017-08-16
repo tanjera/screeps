@@ -9,14 +9,11 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 
-	Run: function(rmColony, listSpawnRooms, listPopulation, labDefinitions) {
+	Run: function(rmColony) {
 		_CPU.Start(rmColony, "Industry-init");
-		if (listSpawnRooms == null)
-			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
-		if (listPopulation == null)
-			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
-		if (labDefinitions == null)
-			labDefinitions = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
+		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
+		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+		labDefinitions = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
 		_CPU.End(rmColony, "Industry-init");
 
 		_CPU.Start(rmColony, "Industry-listCreeps");

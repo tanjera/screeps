@@ -5,15 +5,12 @@ let Hive = require("hive");
 
 module.exports = {
 
-	Run: function(rmColony, listSpawnRooms, listPopulation, listSpawnRoute) {
+	Run: function(rmColony) {
 
 		_CPU.Start(rmColony, "Colony-init");
-		if (listSpawnRooms == null)
-			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
-		if (listSpawnRoute == null)
-			listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
-		if (listPopulation == null)
-			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
+		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
+		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
 		_CPU.End(rmColony, "Colony-init");
 
 		_CPU.Start(rmColony, "Colony-listCreeps");

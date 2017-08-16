@@ -5,7 +5,7 @@ let Hive = require("hive");
 
 module.exports = {
 
-	Run: function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnRooms, listPopulation) {
+	Run: function(rmColony, rmHarvest) {
 
 		_CPU.Start(rmColony, "Mining-init");
 
@@ -19,27 +19,23 @@ module.exports = {
 			console.log(`Attempt at remote mining failed, ${rmColony} not found in Game.rooms; colony destroyed?`);
 			return;
 		}
+		
+		listSpawnRooms = rmColony == rmHarvest
+			? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
+			: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "rooms"]);
 
-		if (listSpawnRooms == null) {
-			listSpawnRooms = rmColony == rmHarvest
-				? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
-				: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "rooms"]);
-		}
-		if (listRoute == null) {
-			listRoute = rmColony == rmHarvest
-				? listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
-				: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "route"]);
-		}
-		if (listPopulation == null) {
-			listPopulation = rmColony == rmHarvest
-				? _.get(Memory, ["rooms", rmColony, "custom_population"])
-				: _.get(Memory, ["remote_mining", rmHarvest, "custom_population"]);
-		}
-		if (hasKeepers == null) {
-			hasKeepers = rmColony == rmHarvest 
-				? (_.get(Memory, ["rooms", rmColony, "has_keepers"]) == true ? true : false)
-				: (_.get(Memory, ["remote_mining", rmHarvest, "has_keepers"]) == true ? true : false);
-		}
+		listRoute = rmColony == rmHarvest
+			? listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
+			: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "route"]);
+
+		listPopulation = rmColony == rmHarvest
+			? _.get(Memory, ["rooms", rmColony, "custom_population"])
+			: _.get(Memory, ["remote_mining", rmHarvest, "custom_population"]);
+
+		hasKeepers = rmColony == rmHarvest 
+			? (_.get(Memory, ["rooms", rmColony, "has_keepers"]) == true ? true : false)
+			: (_.get(Memory, ["remote_mining", rmHarvest, "has_keepers"]) == true ? true : false);
+
 		_CPU.End(rmColony, "Mining-init");
 
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-listCreeps`);

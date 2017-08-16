@@ -5,10 +5,19 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 	
-	Run: function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
+	Run: function(rmColony, rmInvade) {
 		if (_.get(Memory, ["rooms", rmColony, `invasion_${rmInvade}`]) == null)
 			_.set(Memory, ["rooms", rmColony, `invasion_${rmInvade}`], { state: "spawning", time: Game.time });
 		
+		_CPU.Start(rmColony, "Invade-init");
+		toOccupy = _.get(Memory, ["invasion_requests", rmInvade, "occupy"]);
+		listSpawnRooms = _.get(Memory, ["invasion_requests", rmInvade, "spawn_assist"]);
+		listArmy = _.get(Memory, ["invasion_requests", rmInvade, "army"]);
+		listTargets = _.get(Memory, ["invasion_requests", rmInvade, "targets"]);
+		posRally = _.get(Memory, ["invasion_requests", rmInvade, "rally_point"]);
+		listRoute = _.get(Memory, ["invasion_requests", rmInvade, "route"]);
+		_CPU.End(rmColony, "Invade-init");
+
 		_CPU.Start(rmColony, `Invade-${rmInvade}-listCreeps`);
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmInvade && c.memory.colony == rmColony);
 		_CPU.End(rmColony, `Invade-${rmInvade}-listCreeps`);

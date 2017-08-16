@@ -1,38 +1,33 @@
 module.exports = {
     
-	Colony: function(rmColony, listSpawnRooms, listPopulation, listRoute) {
+	Colony: function(rmColony) {
 		let Colony = require("sites.colony");
-		Colony.Run(rmColony, listSpawnRooms, listPopulation, listRoute)
+		Colony.Run(rmColony)
 	},
 	
-	Mining: function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnRooms, listPopulation) {
+	Mining: function(rmColony, rmHarvest) {
 		let Mining = require("sites.mining");
-		Mining.Run(rmColony, rmHarvest, listSpawnRooms, hasKeepers, listPopulation, listRoute);
+		Mining.Run(rmColony, rmHarvest);
 	},	
 	
-    Industry: function(rmColony, listSpawnRooms, listPopulation, listLabs) {
+    Industry: function(rmColony) {
 		let Industry = require("sites.industry");
-		Industry.Run(rmColony, listSpawnRooms, listPopulation, listLabs);
-	},
-	
-	Reservation: function(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute) {
-		let Reservation = require("sites.reservation");
-		Reservation.Run(rmColony, rmReserve, listSpawnRooms, listPopulation, listRoute);
+		Industry.Run(rmColony);
 	},
 
-	Colonization: function(rmColony, rmTarget, listRoute) {
+	Colonization: function(rmColony, rmTarget) {
 		let Colonization = require("sites.colonization");
-		Colonization.Run(rmColony, rmTarget, listRoute);
+		Colonization.Run(rmColony, rmTarget);
 	},
     
-	Occupation: function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
+	Occupation: function(rmColony, rmOccupy) {
 		let Occupation = require("sites.occupation");
-		Occupation.Run(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute);
+		Occupation.Run(rmColony, rmOccupy);
 	},
 	
-	Invasion: function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
+	Invasion: function(rmColony, rmInvade) {
 		let Invasion = require("sites.invasion");
-		Invasion.Run(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute);
+		Invasion.Run(rmColony, rmInvade);
 	}
     
 };

@@ -154,12 +154,6 @@ module.exports = {
 			console.log(`<font color=\"#D3FFA3">log.resources</font> <table>${output}</table>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
-		
-		command_list.push("log.room_list()");
-
-		log.room_list = function() {
-			return `["${String(Object.keys(Game.rooms)).replace(/[,]/g, "\", \"")}"]`;
-		};
 
 		command_list.push("log.storage()");
 
@@ -257,67 +251,63 @@ module.exports = {
 
 
 		command_list.push("");
-		command_list.push("resources.stockpile.set(rmName, resource, amount)");
+		command_list.push("labs.set_reaction(mineral, amount, priority)");
 
-		resources = new Object()
-		resources.stockpile = new Object();
-
-		resources.stockpile.set = function (rmName, resource, amount) {
-			if (amount < 1) {
-				delete Memory.rooms[rmName].stockpile[resource];
-				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms[${rmName}].stockpile[${resource}] deleted`;
-			} else {
-				Memory.rooms[rmName].stockpile[resource] = amount;
-				return `<font color=\"#D3FFA3\">[Console]</font> Memory.rooms[${rmName}].stockpile[${resource}] = ${amount}`;
-			}
-		};
-
-		command_list.push("resources.stockpile.log()");
-
-		resources.stockpile.log = function() {
-			console.log(`<font color=\"#D3FFA3">log-stockpile</font>`);
-
-			for (var r in Memory["rooms"]) {
-				if (Memory["rooms"][r]["stockpile"] == null || Object.keys(Memory["rooms"][r]["stockpile"]).length == 0)
-					continue;
-
-				let output = `<font color=\"#D3FFA3\">${r}</font>: `;
-
-				for (var res in Memory["rooms"][r]["stockpile"]) {
-					output += `<font color=\"#D3FFA3\">${res}</font>: ${Memory["rooms"][r]["stockpile"][res]};  `;
-				}
-
-				console.log(output);
-			}
-			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
-		};
-
-		command_list.push("resources.stockpile.reset()");
-
-		resources.stockpile.reset = function() {
-			_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
-			return "<font color=\"#D3FFA3\">[Console]</font> All Memory.rooms.[r].stockpile reset!";
-		};
-
-		command_list.push("resources.lab_target(mineral, amount, priority)");
-
-		resources.lab_target = function(mineral, amount, priority) {
+		labs = new Object();
+		labs.set_reaction = function(mineral, amount, priority) {
 			if (Memory["labs"] == null) Memory["labs"] = {};
 			if (Memory["labs"]["targets"] == null) Memory["labs"]["targets"] = {};
 			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
-			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} target set to ${amount} (priority ${priority}).`;
+			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} reaction target set to ${amount} (priority ${priority}).`;
 		};
 
-		command_list.push("resources.lab_assignment_renew()");
+		command_list.push("labs.set_boost(labID, mineral, role, subrole)");	
+	
+		labs.set_boost = function(labID, mineral, role, subrole) {
+
+			let lab = Game.getObjectById(labID);
+			let room = lab.pos.room;
+			if (lab == null) return;
+
+			if (_.get(Memory, ["rooms", room.name, "lab_definitions"]) == null)
+				Memory["rooms"][room.name]["lab_definitions"] = [];
+
+			Memory["rooms"][rmColony]["lab_definitions"].push(
+				{ action: "boost", mineral: mineral, lab: labID, role: role, subrole: subrole });
+				
+			delete Memory["pulses"]["lab"];	
+			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
+		};
+
+		command_list.push("labs.clear_boosts(rmName)");	
 		
-		resources.lab_assignment_renew = function() {
+		labs.clear_boosts = function(rmName) {
+			delete Memory["rooms"][rmName]["lab_definitions"];
+			delete Memory["pulses"]["lab"];	
+			return `<font color=\"#D3FFA3\">[Console]</font> All boosts cleared for ${rmName}`;
+		};
+
+		command_list.push("labs.clear_reactions()");
+		
+		labs.clear_reactions = function() {
+			if (Memory["labs"] == null) Memory["labs"] = {};
+			Memory["labs"]["targets"] = {};	
+			delete Memory["pulses"]["lab"];			
+			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
+		};
+
+		command_list.push("labs.renew_assignments()");
+		
+		labs.renew_assignments = function() {
 			delete Memory["pulses"]["lab"];			
 			return `<font color=\"#D3FFA3\">[Console]</font> Labs will renew definitions and reaction assignments next tick.`;
 		};
 		
+
 		command_list.push("");
 		command_list.push("resources.overflow_cap(capAmount)");
 
+		resources = new Object();
 		resources.overflow_cap = function(amount) {
 			if (Memory["resources"] == null) Memory["resources"] = {};
 			Memory["resources"]["to_overflow"] = amount;
@@ -357,7 +347,6 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
-		command_list.push("");
 		command_list.push("resources.clear_market_cap()");
 		
 		resources.clear_market_cap = function() {
@@ -373,15 +362,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
 		};
 
-		command_list.push("resources.clear_lab_targets()");
 		
-		resources.clear_lab_targets = function() {
-			if (Memory["labs"] == null) Memory["labs"] = {};
-			Memory["labs"]["targets"] = {};			
-			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
-		};
-
-
 		command_list.push("");
 		command_list.push("colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, [listRoute])");
 
@@ -393,17 +374,17 @@ module.exports = {
 		command_list.push("invade(rmFrom, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute)");
 
 		invade = function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
-			_.set(Memory, ["invasion_requests", rmTarget], { from: rmColony, target: rmInvade, occupy: toOccupy, 
+			_.set(Memory, ["invasion_requests", rmInvade], { from: rmColony, target: rmInvade, occupy: toOccupy, 
 				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, rally_point: posRally, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.invasion_requests.${rmTarget} ... to cancel, delete the entry.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.invasion_requests.${rmInvade} ... to cancel, delete the entry.`;
 		};
 
-		command_list.push("occupy(rmFrom, rmInvade, listSpawnRooms, listArmy, listTargets, listRoute)");
+		command_list.push("occupy(rmFrom, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute)");
 
 		occupy = function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
-			_.set(Memory, ["occupation_requests", rmTarget], { from: rmColony, target: rmOccupy,
+			_.set(Memory, ["occupation_requests", rmOccupy], { from: rmColony, target: rmOccupy,
 				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.invasion_requests.${rmTarget} ... to cancel, delete the entry.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.invasion_requests.${rmOccupy} ... to cancel, delete the entry.`;
 		};
 		
 		command_list.push("");

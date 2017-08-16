@@ -1,12 +1,13 @@
 # Implemented, Needs Debugging/Testing
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
+- labs.set_boost()
+- labs.clear_boosts()
+- all sites()
 
 
 
 # Implementing...
-- Console command for setting boost labs
-	* Then test to ensure that define_labs() doesn't overwrite boost!
 
 
 

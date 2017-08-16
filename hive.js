@@ -138,14 +138,13 @@ let Hive = {
 		let remote_mining = _.get(Memory, "remote_mining");
 		_.each(Object.keys(remote_mining), req => {
 			if (_.get(remote_mining, [req, "colony"]) != null)
-				Sites.Mining(_.get(remote_mining, [req, "colony"]), req, _.get(remote_mining, [req, "has_keepers"]),
-					_.get(remote_mining, [req, "listRoute"]), _.get(remote_mining, [req, "spawn_assist"]), _.get(remote_mining, [req, "population"]));
+				Sites.Mining(_.get(remote_mining, [req, "colony"]), req);
 		});
 	},
 
 	runColonizationRequests: function() {
 		_.each(_.get(Memory, "colonization_requests"), req => {
-			Sites.Colonization(_.get(req, "from"), _.get(req, "target"), _.get(req, "listRoute"));
+			Sites.Colonization(_.get(req, "from"), _.get(req, "target"));
 		});
 	},
 
@@ -158,8 +157,7 @@ let Hive = {
 
 	runOccupationRequests: function() {
 		_.each(_.get(Memory, "occupation_requests"), req => {
-			Sites.Occupation(_.get(req, "from"), _.get(req, "target"), _.get(req, "spawn_assist"), 
-				_.get(req, "army"), _.get(req, "targets"), _.get(req, "route"));
+			Sites.Occupation(_.get(req, "from"), _.get(req, "target"));
 		});
 	},
 

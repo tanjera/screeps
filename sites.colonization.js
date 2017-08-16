@@ -5,11 +5,15 @@ let Hive = require("hive");
 
 module.exports = {
 
-	Run: function(rmColony, rmTarget, listRoute) {
+	Run: function(rmColony, rmTarget) {
 
 		controller = _.get(Game, ["rooms", rmColony, "controller"]);
 		if (controller == null || !_.get(controller, "my") || _.get(controller, "level") < 3)
 			return;
+
+		_CPU.Start(rmColony, `Colonization-${rmTarget}-init`);
+		listRoute = _.get(Memory, ["colonization_requests", rmTarget, "listRoute"]);
+		_CPU.End(rmColony, `Colonization-${rmTarget}-init`);
 
 		_CPU.Start(rmColony, `Colonization-${rmTarget}-listCreeps`);
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmTarget && c.memory.colony == rmColony);
