@@ -41,7 +41,7 @@ RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range) {
 		for (let y = -range; y <= range; y++) {
 			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
 
-			if (newPos.x < 0 || newPos.x > 49 || newPos.y < 0 || newPos.y > 49)
+			if (newPos.x <= 1 || newPos.x >= 48 || newPos.y <= 1 || newPos.y >= 48)
 				continue;
 
 			if (newPos.lookFor("structure").length == 0 && newPos.lookFor("terrain") != "wall") {
@@ -58,7 +58,7 @@ RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range) {
 		for (let y = -range; y <= range; y++) {
 			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
 
-			if (newPos.x < 0 || newPos.x > 49 || newPos.y < 0 || newPos.y > 49)
+			if (newPos.x <= 1 || newPos.x >= 48 || newPos.y <= 1 || newPos.y >= 48)
 				continue;
 
 			if (newPos.lookFor("structure").length == 0 && newPos.lookFor("terrain") != "wall") {

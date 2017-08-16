@@ -1,10 +1,6 @@
 # Implemented, Needs Debugging/Testing
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
-- resources.lab_target()
-- resources.to_market()
-- resources.market_sell(order_name, market_order_id, room_from, amount)
-- resources.market_buy(order_name, market_order_id, room_to, amount)
 
 
 # Implementing...

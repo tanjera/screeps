@@ -22,7 +22,7 @@ Just like colonies are automatically run and populated with a preset population,
 
 If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked (e.g. by terrain), placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base\_layouts/base\_layouts.xlsx** and try to find adequate space if possible. 
 
-Links will automatically be built near sources and the room controller, and will facilitate feeding energy to upgraders. Refining the placement and flow of energy across links will be revisited in the future.
+Links will automatically be built near sources and the room controller, and will facilitate feeding energy to upgraders.
 
 To manually block off areas from being constructed (such as if the code is trying to build a wall up against a terrain wall, which is a useless waste of energy), you can set off blocked areas defined by start and end (x, y) coordinates. The blocked areas are defined as objects in a list, so you can add multiple blocked areas per room by adding to the list array. You can set them like this:
 
@@ -94,13 +94,13 @@ To set reaction targets, "mineral" is the mineral's abbreviation, "amount" is th
 
 Once you have reach RCL 6 a courier will spawn and begin to automatically do a lot of functions for you. For example, if you set up mineral reactions, the code will automatically request other rooms with terminals to load any excess minerals used for the reaction, and send it over! Also, if any rooms have an excess of energy, you can set the "cap_amount" so that when a room reaches the energy cap, it will start to overflow energy into other rooms:
 
-`resources.to_overflow(cap_amount)`
+`resources.overflow_cap(cap_amount)`
 
 and any rooms with more energy than the limit will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your empire. 
 
 The codebase also will automatically off-load excess minerals and energy, selling them to the market to the highest bidder, but only if you enter manually into Memory the limit at which you want excess minerals to be sold. This is great for selling excess basic minerals, and you can always manually enter market trades for minerals that you don't include in automatic sales. To set up automatic market selling, you can use the following command on the console, where "resource" is the mineral abbreviation (or "energy"!), and "cap_amount" is the amount at which it will start overflowing that resource onto the market:
 
-`resources.to_market(resource, cap_amount)`
+`resources.market_cap(resource, cap_amount)`
 
 Terminals also process manually entered terminal orders, which you can use to send resources to friends, by using the following manual entries in the console:
 

@@ -110,7 +110,8 @@ let Blueprint = {
 		let layout = _.get(Memory, ["rooms", room.name, "layout", "name"]);
 		let blocked_areas = _.get(Memory, ["rooms", room.name, "layout", "blocked_areas"]);
 
-		let sources = room.find(FIND_SOURCES);			
+		let sources = room.find(FIND_SOURCES);
+		let mineral = _.head(room.find(FIND_MINERALS));
 		let sites = room.find(FIND_MY_CONSTRUCTION_SITES).length;
 		let all_structures = room.find(FIND_STRUCTURES);
 		let structures = _.filter(all_structures, s => { return s.my; });
@@ -134,6 +135,36 @@ let Blueprint = {
 				layout = Blueprint__Compact_Horizontal;
 				break;
 		}
+
+		// Block areas around sources, minerals, and the room controller; prevents cycle of building and destroying.		
+		if (blocked_areas == null) Memory["rooms"][room.name]["layout"]["blocked_areas"] = [];
+
+		_.each(sources, s => {
+			if (_.filter(blocked_areas, a => { 
+					return _.get(a, ["start", "x"]) == s.pos.x -1 && _.get(a, ["start", "y"]) == s.pos.y - 1
+					&& _.get(a, ["end", "x"]) == s.pos.x + 1 && _.get(a, ["end", "y"]) == s.pos.y + 1; }).length == 0) {
+				Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
+					{start: {x: (s.pos.x - 1), y: (s.pos.y - 1)}, end: {x: (s.pos.x + 1), y: (s.pos.y + 1)}});
+				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for source around (${s.pos.x}, ${s.pos.y}).`);
+			}
+		});
+
+		if (mineral != null && _.filter(blocked_areas, a => { 
+				return _.get(a, ["start", "x"]) == mineral.pos.x - 1 && _.get(a, ["start", "y"]) == mineral.pos.y - 1
+				&& _.get(a, ["end", "x"]) == mineral.pos.x + 1 && _.get(a, ["end", "y"]) == mineral.pos.y + 1; }).length == 0) {
+			Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
+				{start: {x: (mineral.pos.x - 1), y: (mineral.pos.y - 1)}, end: {x: (mineral.pos.x + 1), y: (mineral.pos.y + 1)}});
+			console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for mineral around (${mineral.pos.x}, ${mineral.pos.y}).`);
+		}
+
+		if (_.filter(blocked_areas, a => { 
+				return _.get(a, ["start", "x"]) == room.controller.pos.x - 1 && _.get(a, ["start", "y"]) == room.controller.pos.y - 1
+				&& _.get(a, ["end", "x"]) == room.controller.pos.x + 1 && _.get(a, ["end", "y"]) == room.controller.pos.y + 1; }).length == 0) {
+			Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
+				{start: {x: (room.controller.pos.x - 1), y: (room.controller.pos.y - 1)}, end: {x: (room.controller.pos.x + 1), y: (room.controller.pos.y + 1)}});
+			console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for room controller around (${room.controller.pos.x}, ${room.controller.pos.y}).`);
+		}
+
 
 		// Build the 1st base's spawn alone, as priority!
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "spawn");
@@ -207,6 +238,7 @@ let Blueprint = {
 						let adj = source.pos.getOpenTile_Path(2);
 						if (adj != null && adj.createConstructionSite("link") == OK) {							
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
+							links.push(new Object());
 							sites += 1;
 						}
 					}
@@ -217,6 +249,7 @@ let Blueprint = {
 					let adj = room.controller.pos.getOpenTile_Path(2);
 					if (adj != null && adj.createConstructionSite("link") == OK) {							
 						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
+						links.push(new Object());
 						sites += 1;
 					}
 				}
@@ -224,10 +257,9 @@ let Blueprint = {
 		}
 
 		if (level >= 6) {
-			if (sites < sites_per_room) {
+			if (sites < sites_per_room && mineral != null) {
 				let extractors = _.filter(structures, s => { return s.structureType == "extractor"; }).length;
 				if (extractors < CONTROLLER_STRUCTURES["extractor"][level]) {
-					let mineral = _.head(room.find(FIND_MINERALS));
 					if (room.createConstructionSite(mineral.pos.x, mineral.pos.y, "extractor") == OK) {
 						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extractor at `
 							+ `(${mineral.pos.x}, ${mineral.pos.y})`);

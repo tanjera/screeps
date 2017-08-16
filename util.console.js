@@ -84,6 +84,15 @@ module.exports = {
 		command_list.push("log.labs()");
 		
 		log = new Object();
+
+		log.all = function() {
+			this.nukers();
+			this.labs();
+			this.controllers();
+			this.resources();
+			return `<font color=\"#D3FFA3\">[Console]</font> Main logs printed.`;
+		}
+
 		log.labs = function() {
 			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
 				+ "<table><tr><th>Room \t</th><th>Mineral \t</th><th>Amount \t</th><th>Target Amount \t</th><th>Reagent #1 \t</th><th>Reagent #2</th></tr>";
@@ -291,25 +300,26 @@ module.exports = {
 			if (Memory["labs"] == null) Memory["labs"] = {};
 			if (Memory["labs"]["targets"] == null) Memory["labs"]["targets"] = {};
 			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
-			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} target set to ${amount} (priority ${priority}.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} target set to ${amount} (priority ${priority}).`;
 		};
 		
-		command_list.push("resources.to_overflow(capAmount)");
+		command_list.push("");
+		command_list.push("resources.overflow_cap(capAmount)");
 
-		resources.to_overflow = function(amount) {
+		resources.overflow_cap = function(amount) {
 			if (Memory["resources"] == null) Memory["resources"] = {};
 			Memory["resources"]["to_overflow"] = amount;
 			return `<font color=\"#D3FFA3\">[Console]</font> Energy overflow cap set to ${amount}.`;
 		};
 
-		command_list.push("resources.to_market(resource, capAmount)");
+		command_list.push("resources.market_cap(resource, capAmount)");
 
-		resources.to_market = function(resource, amount) {
+		resources.market_cap = function(resource, amount) {
 			if (Memory["resources"] == null) Memory["resources"] = {};
 			if (Memory["resources"]["to_market"] == null) Memory["resources"]["to_market"] = {};
 			Memory["resources"]["to_market"][resource] = amount;
 			return `<font color=\"#D3FFA3\">[Console]</font> ${resource} market overflow set to ${amount}.`;
-		};
+		};		
 
 		command_list.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
 
@@ -333,6 +343,30 @@ module.exports = {
 			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
 			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4};
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
+		};
+
+		command_list.push("");
+		command_list.push("resources.clear_market_cap()");
+		
+		resources.clear_market_cap = function() {
+			if (Memory["resources"] == null) Memory["resources"] = {};
+			Memory["resources"]["to_market"] = {};			
+			return `<font color=\"#D3FFA3\">[Console]</font> Market overflow limits deleted; existing transactions can be deleted with resources.clear_transactions().`;
+		};
+
+		command_list.push("resources.clear_transactions()");
+		
+		resources.clear_transactions = function() {
+			Memory["terminal_orders"] = {};
+			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
+		};
+
+		command_list.push("resources.clear_lab_targets()");
+		
+		resources.clear_lab_targets = function() {
+			if (Memory["labs"] == null) Memory["labs"] = {};
+			Memory["labs"]["targets"] = {};			
+			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
 		};
 
 
