@@ -3,7 +3,10 @@
 - invasion(toOccupy) -> occupation
 
 
+
 # Implementing...
+- Console command for setting boost labs
+	* Then test to ensure that define_labs() doesn't overwrite boost!
 
 
 

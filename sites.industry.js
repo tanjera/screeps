@@ -9,26 +9,14 @@ let _CPU = require("util.cpu");
 
 module.exports = {
 
-	Run: function(rmColony, listSpawnRooms, listPopulation, listLabs) {
-
-		/* For setting lab targets:
-				Memory.labs.targets[""] = { mineral: "", amount: , priority: };
-
-		 * For internal transfers:
-				Memory["terminal_orders"][""] = { room: "", resource: "energy", amount: , priority: 1};
-				Memory["terminal_orders"][""] = { room: "", resource: "", amount: , from: "", priority: 1};
-		 * For market trading:
-				Memory["terminal_orders"][""] = { market_id: "", amount: , from: "", priority: 4};
-				Memory["terminal_orders"][""] = { market_id: "", amount: , to: "", priority: 4};
-		*/
-
+	Run: function(rmColony, listSpawnRooms, listPopulation, labDefinitions) {
 		_CPU.Start(rmColony, "Industry-init");
 		if (listSpawnRooms == null)
-			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
-		if (listLabs == null)
-			listLabs = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
+			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
 		if (listPopulation == null)
 			listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+		if (labDefinitions == null)
+			labDefinitions = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
 		_CPU.End(rmColony, "Industry-init");
 
 		_CPU.Start(rmColony, "Industry-listCreeps");
@@ -41,8 +29,14 @@ module.exports = {
 			_CPU.End(rmColony, "Industry-runPopulation");
 		}
 
+		_CPU.Start(rmColony, "Industry-defineLabs");
+		if (Hive.isPulse_Labs()) {
+			this.defineLabs(rmColony);
+		}
+		_CPU.End(rmColony, "Industry-defineLabs");
+
 		_CPU.Start(rmColony, "Industry-runLabs");
-		this.runLabs(rmColony, listLabs);
+		this.runLabs(rmColony, labDefinitions);
 		_CPU.End(rmColony, "Industry-runLabs");
 
 		if (Hive.isPulse_Main()) {
@@ -51,7 +45,7 @@ module.exports = {
 			_CPU.End(rmColony, "Industry-loadNukers");
 
 			_CPU.Start(rmColony, "Industry-createLabTasks");
-			this.createLabTasks(rmColony, listLabs);
+			this.createLabTasks(rmColony, labDefinitions);
 			_CPU.End(rmColony, "Industry-createLabTasks");
 
 			_CPU.Start(rmColony, "Industry-runTerminal");
@@ -145,8 +139,47 @@ module.exports = {
 
 	},
 
-	runLabs: function(rmColony, listLabs) {
-		/* Arguments for listLabs:
+	defineLabs: function(rmColony, labDefinitions) {
+		let labs = _.filter(Game["rooms"][rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType == "lab" 
+			&& _.filter(labDefinitions, def => { return _.get(def, "action") == "boost" && _.get(def, "lab") == s.id; }).length == 0 });
+		if (labs.length < 3)
+			return;
+
+		let terminal = _.get(Game, ["rooms", rmColony, "terminal"]);
+		if (terminal == null)
+			terminal = _.head(labs);
+
+		labs = _.sortBy(labs, lab => { return lab.pos.getRangeTo(terminal.pos.x, terminal.pos.y); });
+		let supply1 = _.get(labs, [0, "id"]);
+		let supply2 = _.get(labs, [1, "id"]);
+		let reactors = [];
+		for (let i = 2; i < labs.length; i++)
+			reactors.push(_.get(labs, [i, "id"]));
+
+		// Clear existing "reaction" actions before adding new ones
+		if (labDefinitions == null) 
+			labDefinitions = [];
+		else {
+			for (let i = labDefinitions.length - 1; i >= 0; i--) {
+				if (_.get(labDefinitions, [i, "action"]) == "reaction")
+					labDefinitions = labDefinitions.splice(i, 1)
+			}
+		} 
+
+		labDefinitions.push({ action: "reaction", supply1: supply1, supply2: supply2, reactors: reactors });
+		Memory["rooms"][rmColony]["lab_definitions"] = labDefinitions;
+		console.log(`<font color=\"#A17BFF\">[Labs]</font> Labs defined for ${rmColony}.`);
+	},
+
+	runLabs: function(rmColony, labDefinitions) {
+		/* Arguments for labDefinitions:
+
+			Memory["rooms"][rmColony]["lab_definitions"]
+
+			[ { action: "reaction", supply1: "5827cdeb16de9e4869377e4a", supply2: "5827f4b3a0ed8e9f6bf5ae3c",
+				reactors: [ "5827988a4f975a7d696dba90", "5828280b74d604b04955e2f6", "58283338cc371cf674426315", "5827fcc4d448f67249f48185",
+					"582825566948cb7d61593ab9", "58271f0e740746b259c029e9", "5827e49f0177f1ea2582a419" ] } ]);
+
 			{ action: "boost", mineral: "", lab: "", role: "", subrole: "" }
 			{ action: "reaction", amount: -1, mineral: "",
 			  supply1: "", supply2: "",
@@ -154,8 +187,8 @@ module.exports = {
 			{ action: "empty", labs: ["", "", ...] }
 		*/
 
-        for (let l in listLabs) {
-            let listing = listLabs[l];
+        for (let l in labDefinitions) {
+            let listing = labDefinitions[l];
              switch (listing["action"]) {
                 default:
                     break;
@@ -215,7 +248,7 @@ module.exports = {
         }
 	},
 
-	createLabTasks: function(rmColony, listLabs) {
+	createLabTasks: function(rmColony, labDefinitions) {
 		/* Terminal task priorities:
 		 * 2: emptying labs
 		 * 3: filling labs
@@ -224,9 +257,9 @@ module.exports = {
 		 * 6: emptying terminal
 		 */
 
-		for (let l in listLabs) {
+		for (let l in labDefinitions) {
 			var lab, storage;
-			let listing = listLabs[l];
+			let listing = labDefinitions[l];
 
 			switch (listing["action"]) {
 				default:

@@ -312,7 +312,7 @@ let Blueprint = {
 			return sites;
 		
 		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] 
-				&& i < layout[structureType].length; i++) {
+				&& layout[structureType] != null && i < layout[structureType].length; i++) {
 			let x = origin.x + layout[structureType][i].x;
 			let y = origin.y + layout[structureType][i].y;
 

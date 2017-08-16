@@ -25,8 +25,13 @@ module.exports = {
 		command_list.push("allies.remove(ally)");
 		
 		allies.remove = function(ally) {
-			Memory["allies"].pop(ally);
-			return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} removed from ally list.`
+			let index = Memory["allies"].indexOf(ally);
+			if (index >= 0) {
+				Memory["allies"] = Memory["allies"].splice(index, 1);
+				return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} removed from ally list.`
+			} else {
+				return `<font color=\"#D3FFA3\">[Console]</font> Error: Player ${ally} not found in ally list.`
+			}
 		};
 
 		command_list.push("allies.clear()");
@@ -301,6 +306,13 @@ module.exports = {
 			if (Memory["labs"]["targets"] == null) Memory["labs"]["targets"] = {};
 			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
 			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} target set to ${amount} (priority ${priority}).`;
+		};
+
+		command_list.push("resources.lab_assignment_renew()");
+		
+		resources.lab_assignment_renew = function() {
+			delete Memory["pulses"]["lab"];			
+			return `<font color=\"#D3FFA3\">[Console]</font> Labs will renew definitions and reaction assignments next tick.`;
 		};
 		
 		command_list.push("");
