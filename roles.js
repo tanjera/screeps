@@ -207,6 +207,7 @@ module.exports = {
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "rooms"], [_.get(request, ["from"])]);
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "route"], _.get(request, ["listRoute"]));
 				_.set(Memory, ["rooms", creep.room.name, "layout"], _.get(request, "layout"));
+				_.set(Memory, ["pulses", "blueprint", "request"], creep.room.name);
 				creep.suicide();
 			} else if (result != OK) {
 				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);

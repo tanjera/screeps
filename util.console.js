@@ -11,6 +11,7 @@ module.exports = {
 		
 		allies = new Object()
 		allies.add = function(ally) {
+			if (_.get(Memory, ["allies"]) == null) Memory["allies"] = [];
 			Memory["allies"].push(ally);
 			return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} added to ally list.`
 		};
@@ -27,7 +28,7 @@ module.exports = {
 		allies.remove = function(ally) {
 			let index = Memory["allies"].indexOf(ally);
 			if (index >= 0) {
-				Memory["allies"] = Memory["allies"].splice(index, 1);
+				Memory["allies"].splice(index, 1);
 				return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} removed from ally list.`
 			} else {
 				return `<font color=\"#D3FFA3\">[Console]</font> Error: Player ${ally} not found in ally list.`
@@ -47,7 +48,7 @@ module.exports = {
 		command_list.push("blueprint.set_layout(rmName, originX, originY, layoutName)");
 
 		blueprint.set_layout = function(rmName, originX, originY, layoutName) {
-			Memory["rooms"][rmName]["layout"] = { origin: {x: originX, y: originY}, name: layoutName};
+			_.set(Memory, ["rooms", rmName, "layout"], { origin: {x: originX, y: originY}, name: layoutName });
 			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint layout set for ${rmName}.`;
 		};
 
@@ -64,13 +65,13 @@ module.exports = {
 		command_list.push("blueprint.request(rmName)");
 
 		blueprint.request = function(rmName) {
-			Memory["pulses"]["blueprint"]["request"] = rmName;
+			_.set(Memory, ["pulses", "blueprint", "request"], rmName);
 			return `<font color=\"#D3FFA3\">[Console]</font> Setting Blueprint() request for ${rmName}; Blueprint() will run this request next tick.`;
 		};
 
 		command_list.push("blueprint.reset()");
 		blueprint.reset = function() {
-			delete Memory.pulses.blueprint;
+			delete Memory["pulses"]["blueprint"];
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting Blueprint() cycles; Blueprint() will initiate next tick.`;
 		};
 
@@ -81,15 +82,12 @@ module.exports = {
 					delete Memory["rooms"][r.name]["links"];
 			});
 
-			Memory["pulses"]["reset_links"] = true;
+			_.set(Memory, ["pulses", "reset_links"], true);
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting all link definitions; will redefine next tick.`;
 		};
 
-		command_list.push("");
-		command_list.push("log.labs()");
 		
 		log = new Object();
-
 		log.all = function() {
 			this.nukers();
 			this.labs();
@@ -97,6 +95,48 @@ module.exports = {
 			this.resources();
 			return `<font color=\"#D3FFA3\">[Console]</font> Main logs printed.`;
 		}
+
+		command_list.push("");
+		command_list.push("log.can_build()");
+		
+		log.can_build = function() {
+			let rooms = _.filter(Game.rooms, n => { return n.controller != null && n.controller.my; });
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Buildable structures:");
+			for (let r in rooms) {
+				room = rooms[r];
+
+				let output = `${room.name}: `;
+				for (let s in CONTROLLER_STRUCTURES) {
+					if (s == "road" || s == "constructedWall" || s == "rampart")
+						continue;
+
+					let amount = CONTROLLER_STRUCTURES[s][room.controller.level]
+						- room.find(FIND_STRUCTURES, { filter: t => { return t.structureType == s; }}).length;
+					output += amount < 1 ? "" : `${amount} x ${s};  `;
+				}
+				console.log(output);
+			}
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		};
+
+		command_list.push("log.controllers()");
+		
+		log.controllers = function() {
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
+			let output = "<table>"
+			_.each(_.sortBy(_.sortBy(_.filter(Game.rooms, 
+					r => { return r.controller != null && r.controller.my; }), 
+					r => { return -r.controller.progress; }), 
+					r => { return -r.controller.level; }), r => {
+				output += `<tr><td><font color=\"#D3FFA3\">${r.name}:</font>  (${r.controller.level})  </td> `
+					+ `<td>${r.controller.progress}  </td><td>  /  </td><td>${r.controller.progressTotal}    </td> `
+					+ `<td>(${(r.controller.progress / r.controller.progressTotal * 100).toFixed()} %)</td></tr>`;
+			});
+			console.log(`${output}</table>`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		};
+
+		command_list.push("log.labs()");
 
 		log.labs = function() {
 			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
@@ -155,6 +195,22 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
+		command_list.push("log.remote_mining()");
+		
+		log.remote_mining = function() {
+			let output = "";
+			let remote = _.get(Memory, "remote_mining");
+		
+			_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {
+				output += `<tr><td>${r.name}</td><td>  ->  </td>`;
+				_.each(_.filter(Object.keys(remote), rem => { return _.get(remote[rem], "colony") == r.name; }), rem => { output += `<td>  ${rem}  </td>`; });
+				output += `</tr>`;
+			});
+
+			console.log(`<font color=\"#D3FFA3">log.mining</font><table>${output}</table>`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		};
+
 		command_list.push("log.storage()");
 
 		log.storage = function() {
@@ -191,28 +247,6 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.can_build()");
-
-		log.can_build = function() {
-			let rooms = _.filter(Game.rooms, n => { return n.controller != null && n.controller.my; });
-			console.log("<font color=\"#D3FFA3\">[Console]</font> Buildable structures:");
-			for (let r in rooms) {
-				room = rooms[r];
-
-				let output = `${room.name}: `;
-				for (let s in CONTROLLER_STRUCTURES) {
-					if (s == "road" || s == "constructedWall" || s == "rampart")
-						continue;
-
-					let amount = CONTROLLER_STRUCTURES[s][room.controller.level]
-						- room.find(FIND_STRUCTURES, { filter: t => { return t.structureType == s; }}).length;
-					output += amount < 1 ? "" : `${amount} x ${s};  `;
-				}
-				console.log(output);
-			}
-			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
-		};
-
 		command_list.push("log.nukers()");
 
 		log.nukers = function() {
@@ -232,39 +266,19 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.controllers()");
-
-		log.controllers = function() {
-			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
-			let output = "<table>"
-			_.each(_.sortBy(_.sortBy(_.filter(Game.rooms, 
-					r => { return r.controller != null && r.controller.my; }), 
-					r => { return -r.controller.progress; }), 
-					r => { return -r.controller.level; }), r => {
-				output += `<tr><td><font color=\"#D3FFA3\">${r.name}:</font>  (${r.controller.level})  </td> `
-					+ `<td>${r.controller.progress}  </td><td>  /  </td><td>${r.controller.progressTotal}    </td> `
-					+ `<td>(${(r.controller.progress / r.controller.progressTotal * 100).toFixed()} %)</td></tr>`;
-			});
-			console.log(`${output}</table>`);
-			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
-		};
-
 
 		command_list.push("");
 		command_list.push("labs.set_reaction(mineral, amount, priority)");
 
 		labs = new Object();
 		labs.set_reaction = function(mineral, amount, priority) {
-			if (Memory["labs"] == null) Memory["labs"] = {};
-			if (Memory["labs"]["targets"] == null) Memory["labs"]["targets"] = {};
-			Memory["labs"]["targets"][mineral] = { mineral: mineral, amount: amount, priority: priority };
+			_.set(Memory, ["labs", "targets", mineral], { mineral: mineral, amount: amount, priority: priority });
 			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} reaction target set to ${amount} (priority ${priority}).`;
 		};
 
 		command_list.push("labs.set_boost(labID, mineral, role, subrole)");	
 	
 		labs.set_boost = function(labID, mineral, role, subrole) {
-
 			let lab = Game.getObjectById(labID);
 			let room = lab.pos.room;
 			if (lab == null) return;
@@ -279,21 +293,20 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
 		};
 
+		command_list.push("labs.clear_reactions()");
+		
+		labs.clear_reactions = function() {
+			_.set(Memory, ["labs", "targets"], new Object());	
+			delete Memory["pulses"]["lab"];			
+			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
+		};
+
 		command_list.push("labs.clear_boosts(rmName)");	
 		
 		labs.clear_boosts = function(rmName) {
 			delete Memory["rooms"][rmName]["lab_definitions"];
 			delete Memory["pulses"]["lab"];	
 			return `<font color=\"#D3FFA3\">[Console]</font> All boosts cleared for ${rmName}`;
-		};
-
-		command_list.push("labs.clear_reactions()");
-		
-		labs.clear_reactions = function() {
-			if (Memory["labs"] == null) Memory["labs"] = {};
-			Memory["labs"]["targets"] = {};	
-			delete Memory["pulses"]["lab"];			
-			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
 		};
 
 		command_list.push("labs.renew_assignments()");
@@ -309,49 +322,42 @@ module.exports = {
 
 		resources = new Object();
 		resources.overflow_cap = function(amount) {
-			if (Memory["resources"] == null) Memory["resources"] = {};
-			Memory["resources"]["to_overflow"] = amount;
+			_.set(Memory, ["resources", "to_overflow"], amount);
 			return `<font color=\"#D3FFA3\">[Console]</font> Energy overflow cap set to ${amount}.`;
 		};
 
 		command_list.push("resources.market_cap(resource, capAmount)");
 
 		resources.market_cap = function(resource, amount) {
-			if (Memory["resources"] == null) Memory["resources"] = {};
-			if (Memory["resources"]["to_market"] == null) Memory["resources"]["to_market"] = {};
-			Memory["resources"]["to_market"][resource] = amount;
+			_.set(Memory, ["resources", "to_market", resource], amount);
 			return `<font color=\"#D3FFA3\">[Console]</font> ${resource} market overflow set to ${amount}.`;
 		};		
 
 		command_list.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
 
 		resources.send = function(orderName, rmFrom, rmTo, resource, amount) {
-			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][orderName] = { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1};
+			_.set(Memory, ["terminal_orders", orderName], { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
 
 		resources.market_sell = function(orderName, marketOrderID, rmFrom, amount) {
-			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4};
+			_.set(Memory, ["terminal_orders", orderName], { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
 
 		resources.market_buy = function(orderName, marketOrderID, rmTo, amount) {
-			if (Memory["terminal_orders"] == null) Memory["terminal_orders"] = {};			
-			Memory["terminal_orders"][orderName] = { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4};
+			_.set(Memory, ["terminal_orders", orderName], { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.clear_market_cap()");
 		
 		resources.clear_market_cap = function() {
-			if (Memory["resources"] == null) Memory["resources"] = {};
-			Memory["resources"]["to_market"] = {};			
+			_.set(Memory, ["resources", "to_market"], new Object());			
 			return `<font color=\"#D3FFA3\">[Console]</font> Market overflow limits deleted; existing transactions can be deleted with resources.clear_transactions().`;
 		};
 
@@ -360,6 +366,24 @@ module.exports = {
 		resources.clear_transactions = function() {
 			Memory["terminal_orders"] = {};
 			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
+		};
+
+		command_list.push("resources.pause_upgrading()");
+		
+		resources.pause_upgrading = function() {
+			let pause = _.get(Memory, ["triggers", "pause_upgrading"]);
+			if (pause == null || pause == false) {
+				_.set(Memory, ["triggers", "pause_upgrading"], true);
+				_.each(Memory["creeps"], creep => {
+					if (_.get(creep, ["subrole"]) == "upgrader")
+						delete creep["subrole"];
+				});
+				return `<font color=\"#D3FFA3\">[Console]</font> Pausing upgrading; converting all upgraders to regular workers.`;
+			}
+			else if (pause == true) {
+				_.set(Memory, ["triggers", "pause_upgrading"], false);
+				return `<font color=\"#D3FFA3\">[Console]</font> Resuming upgrading; will resume upgrader spawning and tasks.`;
+			}			
 		};
 
 		
@@ -394,8 +418,8 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Spawn assist added to Memory.rooms.${rmToAssist}.spawn_assist ... to cancel, delete the entry.`;
 		};
 
-		command_list.push("remote_mining(rmHarvest, rmColony, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
-		remote_mining = function(rmHarvest, rmColony, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
+		command_list.push("remote_mining(rmColony, rmHarvest, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
+		remote_mining = function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
 			_.set(Memory, ["remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
@@ -422,7 +446,7 @@ module.exports = {
 		command_list.push("");
 
 		commands = function() {
-			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}`);
+			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}<br>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Command list complete";
 		};
 	}

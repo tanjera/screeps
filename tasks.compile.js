@@ -23,7 +23,7 @@ module.exports = {
 						creeps: 15,
 						priority: 1
 					});
-			} else {
+			} else if (_.get(Memory, ["triggers", "pause_upgrading"]) != true) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",

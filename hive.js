@@ -98,6 +98,9 @@ let Hive = {
 
 		Memory["spawn_requests"] = new Array();
 
+		if (Game.time % 100 == 0 && _.get(Memory, ["triggers", "pause_upgrading"]))
+			console.log(`<font color=\"#D3FFA3\">[Console]</font> Reminder: upgrading is paused; toggle with resources.pause_upgrading()`);
+
 		let _Console = require("util.console");
 		_Console.Init();
 		

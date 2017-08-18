@@ -52,7 +52,7 @@ Note: If you set a custom room population (as shown in main.js' comments), you _
 
 Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined via a console command. You can do that like so:
 
-`remote_mining(room_to_harvest, colony_room);`
+`remote_mining(colony_room, room_to_harvest);`
 
 and it's pretty much that simple. The creep population for the remote mining is automatically chosen, but more complex operations are definitely possible and a few fields are read from Memory, including adjacent room assistance with spawning, spawning of soldiers to accompany miners in rooms that have source keepers, and custom populations for the mining operation, all set through Memory. For example, if you will be mining a room with source keepers and assist in spawning the creeps from an adjacent room, your command would look like this:
 

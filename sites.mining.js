@@ -26,7 +26,7 @@ module.exports = {
 
 		listRoute = rmColony == rmHarvest
 			? listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
-			: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "route"]);
+			: _.get(Memory, ["remote_mining", rmHarvest, "route"]);
 
 		listPopulation = rmColony == rmHarvest
 			? _.get(Memory, ["rooms", rmColony, "custom_population"])

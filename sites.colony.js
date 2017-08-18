@@ -92,7 +92,8 @@ module.exports = {
 					scale_level: listPopulation["repairer"] == null ? true : listPopulation["repairer"]["scale_level"],
 					body: (listPopulation["repairer"]["body"] || "worker"),
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
-		} else if (listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {
+		} else if (_.get(Memory, ["triggers", "pause_upgrading"]) != true
+					&& listPopulation["upgrader"] != null && lUpgrader.length < listPopulation["upgrader"]["amount"]) {
 				Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["upgrader"]["level"],
 					scale_level: listPopulation["upgrader"] == null ? true : listPopulation["upgrader"]["scale_level"],
 					body: (listPopulation["upgrader"]["body"] || "worker"),

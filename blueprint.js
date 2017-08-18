@@ -197,8 +197,10 @@ let Blueprint = {
 
 		// Ordered by priority; lower priority than defensive structures (in case high RCL rebuilding after attack)
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "storage");
-		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "terminal");
-		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "terminal") && this.atMaxStructureCount(room, structures, layout, "nuker"))
+		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "extractor"))
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "terminal");
+		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "terminal") 
+				&& this.atMaxStructureCount(room, structures, layout, "nuker"))
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "lab");
 		
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "nuker");
