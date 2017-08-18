@@ -45,7 +45,7 @@ module.exports = {
 	acquireTarget_Creep: function(creep) {
 		if (creep.memory.target == null) {
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_HOSTILE_CREEPS, 
-				{ filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}),				
+				{ filter: (c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}),				
 				c => { return -(c.getActiveBodyparts(ATTACK) + c.getActiveBodyparts(RANGED_ATTACK) + c.getActiveBodyparts(HEAL)); })),
 				c => { return c.pos.getRangeTo(creep.pos); }),
 				c => { return c.owner.username == "Source Keeper"; });
@@ -59,7 +59,7 @@ module.exports = {
 		if (creep.memory.target == null) {			
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
 				s => { return s.hits != null && s.hits > 0 && s.hits < 20000 && s.structureType != "storage"
-					&& (s.owner != null && !s.my && Memory["allies"].indexOf(s.owner.username) < 0); }}),
+					&& (s.owner != null && !s.my && _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 				s => { return creep.pos.getRangeTo(s.pos); } ),
 				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
 				s => { switch (s.structureType) {
@@ -70,7 +70,7 @@ module.exports = {
 				}}));
 			if (target == null)
 				target = _.head(_.sortBy(creep.room.find(FIND_CONSTRUCTION_SITES, { filter:
-					s => { return s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0; }}),
+					s => { return s.owner == null || _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0; }}),
 					s => { return creep.pos.getRangeTo(s.pos); } ));
 				
 			if (target != null)

@@ -22,19 +22,19 @@ module.exports = {
 		
 		listSpawnRooms = rmColony == rmHarvest
 			? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
-			: _.get(Memory, ["remote_mining", rmHarvest, "spawn_assist", "rooms"]);
+			: _.get(Memory, ["sites", "remote_mining", rmHarvest, "spawn_assist", "rooms"]);
 
 		listRoute = rmColony == rmHarvest
 			? listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
-			: _.get(Memory, ["remote_mining", rmHarvest, "route"]);
+			: _.get(Memory, ["sites", "remote_mining", rmHarvest, "route"]);
 
 		listPopulation = rmColony == rmHarvest
 			? _.get(Memory, ["rooms", rmColony, "custom_population"])
-			: _.get(Memory, ["remote_mining", rmHarvest, "custom_population"]);
+			: _.get(Memory, ["sites", "remote_mining", rmHarvest, "custom_population"]);
 
 		hasKeepers = rmColony == rmHarvest 
 			? (_.get(Memory, ["rooms", rmColony, "has_keepers"]) == true ? true : false)
-			: (_.get(Memory, ["remote_mining", rmHarvest, "has_keepers"]) == true ? true : false);
+			: (_.get(Memory, ["sites", "remote_mining", rmHarvest, "has_keepers"]) == true ? true : false);
 
 		_CPU.End(rmColony, "Mining-init");
 
@@ -65,7 +65,7 @@ module.exports = {
 			visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
 		let amountHostiles = visible
-			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }}).length : 0;
+			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}).length : 0;
 		let isSafe = !visible || rmColony == rmHarvest || amountHostiles == 0;
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"], isSafe);
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "amount_hostiles"], amountHostiles);

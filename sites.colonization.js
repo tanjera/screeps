@@ -12,7 +12,7 @@ module.exports = {
 			return;
 
 		_CPU.Start(rmColony, `Colonization-${rmTarget}-init`);
-		listRoute = _.get(Memory, ["colonization_requests", rmTarget, "listRoute"]);
+		listRoute = _.get(Memory, ["sites", "colonization", rmTarget, "listRoute"]);
 		_CPU.End(rmColony, `Colonization-${rmTarget}-init`);
 
 		_CPU.Start(rmColony, `Colonization-${rmTarget}-listCreeps`);
@@ -40,7 +40,7 @@ module.exports = {
 		Hive.populationTally(rmColony, popTarget, popActual);
 
 		if (listPopulation["colonizer"] != null && lColonizer.length < listPopulation["colonizer"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, level: listPopulation["colonizer"]["level"],
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, level: listPopulation["colonizer"]["level"],
 				scale_level: listPopulation["colonizer"] == null ? true : listPopulation["colonizer"]["scale_level"],
 				body: (listPopulation["colonizer"]["body"] || "reserver_at"),
 				name: null, args: {role: "colonizer", room: rmTarget, colony: rmColony} });

@@ -18,8 +18,8 @@ let Blueprint = {
 		this.Pulse();
 		
 		// Process special blueprint requests (from console) immediately, effectively pausing cycles/pulses by 1 tick.
-		if (_.get(Memory, ["pulses", "blueprint", "request"]) != null) {			
-			let room = Game.rooms[_.get(Memory, ["pulses", "blueprint", "request"])];
+		if (_.get(Memory, ["hive", "pulses", "blueprint", "request"]) != null) {			
+			let room = Game.rooms[_.get(Memory, ["hive", "pulses", "blueprint", "request"])];
 			
 			if (room == null) {
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blueprint() request for ${_.get(Memory, ["pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
@@ -30,30 +30,30 @@ let Blueprint = {
 				_CPU.End("Hive", "Blueprint-Run");
 			}
 
-			delete Memory["pulses"]["blueprint"]["request"];
+			delete Memory["hive"]["pulses"]["blueprint"]["request"];
 			return;			
 		}
 		
 		// Check if there is any cycle, or if the cycles are active/inactive
-		if (_.get(Memory, ["pulses", "blueprint", "cycle"]) == null 
-				|| _.get(Memory, ["pulses", "blueprint", "cycle", "active"]) == false)
+		if (_.get(Memory, ["hive", "pulses", "blueprint", "cycle"]) == null 
+				|| _.get(Memory, ["hive", "pulses", "blueprint", "cycle", "active"]) == false)
 			return;
 
 		_CPU.Start("Hive", "Blueprint-Init");		
 
-		let room_list = _.get(Memory, ["pulses", "blueprint", "cycle", "room_list"]);
-		let cycle_count = _.get(Memory, ["pulses", "blueprint", "cycle", "cycle_count"]);
-		let tick_count = _.get(Memory, ["pulses", "blueprint", "cycle", "tick_count"]);
+		let room_list = _.get(Memory, ["hive", "pulses", "blueprint", "cycle", "room_list"]);
+		let cycle_count = _.get(Memory, ["hive", "pulses", "blueprint", "cycle", "cycle_count"]);
+		let tick_count = _.get(Memory, ["hive", "pulses", "blueprint", "cycle", "tick_count"]);
 		let current_room = cycle_count + (tick_count * 5);
 
 		// Iteration has is through room_list, iterate cycle and check if all cycles are complete (then reset cycles)
 		if (current_room >= room_list.length) {
-			Memory["pulses"]["blueprint"]["cycle"]["tick_count"] = 0;
-			Memory["pulses"]["blueprint"]["cycle"]["cycle_count"] = cycle_count + 1;
-			Memory["pulses"]["blueprint"]["cycle"]["active"] = false;
+			_.set(Memory, ["hive", "pulses", "blueprint", "cycle", "tick_count"], 0);
+			_.set(Memory, ["hive", "pulses", "blueprint", "cycle", "cycle_count"], cycle_count + 1);
+			_.set(Memory, ["hive", "pulses", "blueprint", "cycle", "active"], false);
 
 			if ((cycle_count + 1) >= 5)
-				delete Memory["pulses"]["blueprint"]["cycle"];
+				delete Memory["hive"]["pulses"]["blueprint"]["cycle"];
 
 			_CPU.End("Hive", "Blueprint-Init");
 			return;			
@@ -74,28 +74,26 @@ let Blueprint = {
 		
 		_CPU.End("Hive", "Blueprint-Run");
 
-		Memory["pulses"]["blueprint"]["cycle"]["tick_count"] = tick_count + 1;
+		Memory["hive"]["pulses"]["blueprint"]["cycle"]["tick_count"] = tick_count + 1;
 	},
 
 	Pulse: function() {
 		let minTicks = 200, maxTicks = 1000;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["pulses", "blueprint", "last_tick"]);
-
-		if (Memory["pulses"]["blueprint"] == null) Memory["pulses"]["blueprint"] = {};		
+		let lastTick = _.get(Memory, ["hive", "pulses", "blueprint", "last_tick"]);		
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			Memory["pulses"]["blueprint"]["last_tick"] = Game.time; 
+			_.set(Memory, ["hive", "pulses", "blueprint", "last_tick"], Game.time); 
 
-			if (Memory["pulses"]["blueprint"]["cycle"] == null) {
+			if (_.get(Memory, ["hive", "pulses", "blueprint", "cycle"]) == null) {
 				let rooms = _.sortBy(_.filter(Object.keys(Game.rooms), 
 					n => { return Game.rooms[n].controller != null && Game.rooms[n].controller.my; }), 
 					n => { return Game.rooms[n].controller.level; });
-				Memory["pulses"]["blueprint"]["cycle"] = {cycle_count: 0, tick_count: 0, room_list: rooms };
+				_.set(Memory, ["hive", "pulses", "blueprint", "cycle"], {cycle_count: 0, tick_count: 0, room_list: rooms });
 			} else {
-				Memory["pulses"]["blueprint"]["cycle"]["active"] = true;
+				_.set(Memory, ["hive", "pulses", "blueprint", "cycle", "active"], true);
 			}
 		} 
 	},
@@ -306,7 +304,8 @@ let Blueprint = {
 
 	atMaxStructureCount: function(room, structures, layout, structureType) {
 		let count = _.filter(structures, s => { return s.structureType == structureType; }).length;
-		return count == CONTROLLER_STRUCTURES[structureType][room.controller.level] || count == layout[structureType].length;
+		return count == CONTROLLER_STRUCTURES[structureType][room.controller.level] 
+			|| (layout[structureType] == null ? false : count == layout[structureType].length);
 	},
 
 	iterateStructure: function(room, sites, structures, layout, origin, sites_per_room, blocked_areas, structureType) {

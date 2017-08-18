@@ -3,76 +3,69 @@ module.exports = {
 	Init: function() {
 		profiler = new Object();
 		profiler.run = function(cycles) {
-			Memory["profiler"]["cycles"] = (cycles == null) ? 1 : cycles;
-			Memory["profiler"]["cycles_total"] = (cycles == null) ? 1 : cycles;
-			Memory["profiler"]["status"] = "on";
+			_.set(Memory, ["hive", "profiler", "cycles"], (cycles == null) ? 1 : cycles);
+			_.set(Memory, ["hive", "profiler", "cycles_total"], (cycles == null) ? 1 : cycles);
+			_.set(Memory, ["hive", "profiler", "status"], "on");
 			return "<font color=\"#D3FFA3\">[CPU]</font> Profiler started"
 		};
 		
 		profiler.stop = function() {
-			Memory["profiler"]["cycles"] = 0;
+			_.set(Memory, ["hive", "profiler", "cycles"], 0);
 			return "<font color=\"#D3FFA3\">[CPU]</font> Profiler stopped"
 		};
 		
-		if (Memory["profiler"] == null) 
-			Memory["profiler"] = new Object();
+		if (_.get(Memory, ["hive", "profiler"]) == null) 
+			_.set(Memory, ["hive", "profiler"], new Object());
 		
-		if (Memory["profiler"]["status"] == null)
-			Memory["profiler"]["status"] = "off";
+		if (_.get(Memory, ["hive", "profiler", "status"]) == null)
+			_.set(Memory, ["hive", "profiler", "status"], "off");
 		
-		if (Memory["profiler"]["status"] != "on")
+		if (_.get(Memory, ["hive", "profiler", "status"]) != "on")
 			return;
 		
-		if (Memory["profiler"]["cycles"] == null)
-			Memory["profiler"]["cycles"] = 0;
+		if (_.get(Memory, ["hive", "profiler", "cycles"]) == null)
+			_.set(Memory, ["hive", "profiler", "cycles"], 0);
 		else
-			Memory["profiler"]["cycles"] -= 1;
+			_.set(Memory, ["hive", "profiler", "cycles"], 
+				_.get(Memory, ["hive", "profiler", "cycles"]) - 1);
 		
-		if (Memory["profiler"]["current"] == null)
-			Memory["profiler"]["current"] = new Object();
+		if (_.get(Memory, ["hive", "profiler", "current"]) == null)
+			_.set(Memory, ["hive", "profiler", "current"], new Object());
 	},
 	
 	Start: function(room, name) {
-		if (Memory["profiler"]["status"] != "on")
+		if (_.get(Memory, ["hive", "profiler", "status"]) != "on")
 			return;
 		
-		let cycle = Memory["profiler"]["cycles"];
-		
-		if (Memory["profiler"]["current"][room] == null)
-			Memory["profiler"]["current"][room] = new Object();
-		
-		if (Memory["profiler"]["current"][room][name] == null)
-			Memory["profiler"]["current"][room][name] = new Object();
-		
-		if (Memory["profiler"]["current"][room][name][cycle] == null)
-			Memory["profiler"]["current"][room][name][cycle] = new Object();
-		
-		Memory["profiler"]["current"][room][name][cycle]["start"] = Game.cpu.getUsed();
+		_.set(Memory, ["hive", "profiler", "current", room, name, 
+			_.get(Memory, ["hive", "profiler", "cycles"]), 
+			"start"], Game.cpu.getUsed());
 	},
 
 	End: function(room, name) {
-		if (Memory["profiler"]["status"] != "on")
+		if (_.get(Memory, ["hive", "profiler", "status"]) != "on")
 			return;
 		
 		let cycle = Memory["profiler"]["cycles"];		
-		Memory["profiler"]["current"][room][name][cycle]["used"] = Game.cpu.getUsed() - Memory["profiler"]["current"][room][name][cycle]["start"];
+		_.set(Memory, ["hive", "profiler", "current", room, name, cycle, "used"], 
+			Game.cpu.getUsed() - _.get(Memory, ["hive", "profiler", "current", room, name, cycle, "start"]));
 	},
 	
 	Finish: function() {
-		if (Memory["profiler"]["status"] != "on")
+		if (_.get(Memory, ["hive", "profiler", "status"]) != "on")
 			return;		
 		
-		if (Memory["profiler"]["cycles"] <= 0) {	
-			let total_cycles = Memory["profiler"]["cycles_total"];
+		if (_.get(Memory, ["hive", "profiler", "cycles"]) <= 0) {	
+			let total_cycles = _.get(Memory, ["hive", "profiler", "cycles_total"]);
 			
-			for (let r in Memory["profiler"]["current"]) {
+			for (let r in _.get(Memory, ["hive", "profiler", "current"])) {
 				let output = "";
 				let room_used = 0, room_cycles = 0;				
 				
-				for (let n in Memory["profiler"]["current"][r]) {					
+				for (let n in _.get(Memory, ["hive", "profiler", "current", r])) {					
 					let used = 0;
-					let cycles = Object.keys(Memory["profiler"]["current"][r][n]).length;					
-					_.forEach(Memory["profiler"]["current"][r][n], c => { used += c["used"]; } );
+					let cycles = Object.keys(_.get(Memory, ["hive", "profiler", "current", r, n])).length;					
+					_.forEach(_.get(Memory, ["hive", "profiler", "current", r, n]), c => { used += c["used"]; });
 					used = ((used > 0 == true) ? used : 0);
 					output += `<tr><td>(${parseFloat(used).toFixed(2)} / ${cycles})</td><td>${parseFloat(used / cycles).toFixed(2)}</td><td>${n}</td></tr>`;
 					
@@ -89,10 +82,10 @@ module.exports = {
 					+ `${output}</table>`);
 			}			
 			
-			Memory["profiler"]["status"] = "off";			
-			Memory["profiler"]["current"] = new Object();	// Wipe for the next use			
-		} else if (Memory["profiler"]["cycles"] % 5 == 0) {
-			console.log(`<font color=\"#D3FFA3\">[CPU]</font> Profiler running, ${Memory["profiler"]["cycles"]} ticks remaining.`);
+			_.set(Memory, ["hive", "profiler", "status"], "off");
+			_.set(Memory, ["hive", "profiler", "current"], new Object());	// Wipe for the next use
+		} else if (_.set(Memory, ["hive", "profiler", "cycles"]) % 5 == 0) {
+			console.log(`<font color=\"#D3FFA3\">[CPU]</font> Profiler running, ${_.get(Memory, ["hive", "profiler", "cycles"])} ticks remaining.`);
 		}
 	}
 };

@@ -6,12 +6,12 @@ let Hive = {
 	isPulse_Main: function() {
 		let minTicks = 5, maxTicks = 60;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["pulses", "main"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "main"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
-				|| Game.time - Memory["pulses"]["main"] >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["pulses", "main"], Game.time);
+				|| (Game.time - lastTick) >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
+			_.set(Memory, ["hive", "pulses", "main"], Game.time);
 			return true;
 		} else {
 			return false;
@@ -21,12 +21,12 @@ let Hive = {
 	isPulse_Spawn: function() {
 		let minTicks = 10, maxTicks = 20;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["pulses", "spawn"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "spawn"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["pulses", "spawn"], Game.time);
+			_.set(Memory, ["hive", "pulses", "spawn"], Game.time);
 			return true;
 		} else {
 			return false;
@@ -35,12 +35,12 @@ let Hive = {
 	
 	isPulse_Labs: function() {
 		let ticks = 2000;		
-		let lastTick = _.get(Memory, ["pulses", "lab"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "lab"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| Game.time - lastTick >= ticks) {
-			_.set(Memory, ["pulses", "lab"], Game.time);
+			_.set(Memory, ["hive", "pulses", "lab"], Game.time);
 			return true;
 		} else {
 			return false;
@@ -82,24 +82,24 @@ let Hive = {
 	initMemory: function() {
 		_CPU.Start("Hive", "initMemory");
 		
-		if (Memory["rooms"] == null) Memory["rooms"] = {};
-		if (Memory["allies"] == null) Memory["allies"] = [];
-		if (Memory["pulses"] == null) Memory["pulses"] = {};
-		if (Memory["remote_mining"] == null) Memory["remote_mining"] = {};
-		if (Memory["colonization_requests"] == null) Memory["colonization_requests"] = {};
-		if (Memory["invasion_requests"] == null) Memory["invasion_requests"] = {};
-		if (Memory["occupation_requests"] == null) Memory["occupation_requests"] = {};
+		if (_.get(Memory, ["rooms"]) == null) _.set(Memory, ["rooms"], new Object());
+		if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory, ["hive", "allies"], new Array());
+		if (_.get(Memory, ["hive", "pulses"]) == null) _.set(Memory, ["hive", "pulses"], new Object());
+		if (_.get(Memory, ["sites", "remote_mining"]) == null) _.set(Memory, ["sites", "remote_mining"], new Object());
+		if (_.get(Memory, ["sites", "colonization"]) == null) _.set(Memory, ["sites", "colonization"], new Object());
+		if (_.get(Memory, ["sites", "invasion"]) == null) _.set(Memory, ["sites", "invasion"], new Object());
+		if (_.get(Memory, ["sites", "occupation"]) == null) _.set(Memory, ["sites", "occupation"], new Object());
 
 		for (let r in Game["rooms"]) {
-			if (Memory["rooms"][r] == null) Memory["rooms"][r] = {};
-			if (Memory["rooms"][r]["tasks"] == null) Memory["rooms"][r]["tasks"] = {};
-			Memory["rooms"][r]["population_balance"] = null;
+			if (_.get(Memory, ["rooms", r]) == null) _.set(Memory, ["rooms", r], new Object());
+			if (_.get(Memory, ["rooms", r, "tasks"]) == null) _.set(Memory, ["rooms", r, "tasks"], new Object());
+			_.set(Memory, ["rooms", r, "population_balance"], null);
 		}
 
-		Memory["spawn_requests"] = new Array();
+		_.set(Memory, ["hive", "spawn_requests"], new Array());
 
-		if (_.get(Memory, ["pulses", "pause_upgrading"]) != null && Game.time >= _.get(Memory, ["pulses", "pause_upgrading"]))
-			_.set(Memory, ["pulses", "pause_upgrading"], null);
+		if (_.get(Memory, ["hive", "pulses", "pause_upgrading"]) != null && Game.time >= _.get(Memory, ["hive", "pulses", "pause_upgrading"]))
+			_.set(Memory, ["hive", "pulses", "pause_upgrading"], null);
 
 		let _Console = require("util.console");
 		_Console.Init();
@@ -123,7 +123,7 @@ let Hive = {
 	},
 
 	endMemory: function() {
-		if (_.has(Memory, ["pulses", "reset_links"])) delete Memory["pulses"]["reset_links"];
+		if (_.has(Memory, ["hive", "pulses", "reset_links"])) delete Memory["hive"]["pulses"]["reset_links"];
 	},
 
 
@@ -138,28 +138,28 @@ let Hive = {
 			}
 		});
 
-		let remote_mining = _.get(Memory, "remote_mining");
+		let remote_mining = _.get(Memory, ["sites", "remote_mining"]);
 		_.each(Object.keys(remote_mining), req => {
 			if (_.get(remote_mining, [req, "colony"]) != null)
 				Sites.Mining(_.get(remote_mining, [req, "colony"]), req);
 		});
 	},
 
-	runColonizationRequests: function() {
-		_.each(_.get(Memory, "colonization_requests"), req => {
+	runColonizations: function() {
+		_.each(_.get(Memory, ["sites", "colonization"]), req => {
 			Sites.Colonization(_.get(req, "from"), _.get(req, "target"));
 		});
 	},
 
-	runInvasionRequests: function() {
-		_.each(_.get(Memory, "invasion_requests"), req => {
+	runInvasions: function() {
+		_.each(_.get(Memory, ["sites", "invasion"]), req => {
 			Sites.Invasion(_.get(req, "from"), _.get(req, "target"), _.get(req, "occupy"), _.get(req, "spawn_assist"), 
 				_.get(req, "army"), _.get(req, "targets"), _.get(req, "rally_point"), _.get(req, "route"));
 		});
 	},
 
-	runOccupationRequests: function() {
-		_.each(_.get(Memory, "occupation_requests"), req => {
+	runOccupations: function() {
+		_.each(_.get(Memory, ["sites", "occupation"]), req => {
 			Sites.Occupation(_.get(req, "from"), _.get(req, "target"));
 		});
 	},
@@ -189,12 +189,12 @@ let Hive = {
 
 		_CPU.Start("Hive", "processSpawnRequests");
 
-		let listRequests = _.sortBy(Object.keys(Memory["spawn_requests"]), r => { return Memory["spawn_requests"][r]["priority"]; });
+		let listRequests = _.sortBy(Object.keys(_.get(Memory, ["hive", "spawn_requests"])), r => { return _.get(Memory, ["hive", "spawn_requests", r, "priority"]); });
 		let listSpawns = _.filter(Object.keys(Game["spawns"]), s => { return Game["spawns"][s].spawning == null; });
 		let _Creep = require("util.creep");
 		
 		for (let i = 0; i < Object.keys(listRequests).length; i++) {
-			let request = Memory["spawn_requests"][listRequests[i]];
+			let request = _.get(Memory, ["hive", "spawn_requests", listRequests[i]]);
 			
 			_.each(_.sortBy(Object.keys(listSpawns),
 					s => { return request != null && _.get(Game, ["spawns", listSpawns[s], "room", "name"]) == _.get(request, ["room"]); }),
@@ -286,7 +286,7 @@ let Hive = {
 
 		for (let res in resources) {
 			let excess = _.sum(resources[res]) - overflow[res];
-			if (excess > 0 && _.get(Memory, ["terminal_orders", `overflow_${res}`]) == null) {
+			if (excess > 0 && _.get(Memory, ["resources", "terminal_orders", `overflow_${res}`]) == null) {
 				let room = _.head(_.sortBy(Object.keys(resources[res]), r => { return -resources[res][r]; }));
 				let order = _.head(_.sortBy(_.sortBy(Game.market.getAllOrders(
 					o => { return o.type == "buy" && o.resourceType == res; }),
@@ -294,7 +294,7 @@ let Hive = {
 					o => { return -o.price; } ));
 
 				if (order != null) {
-					_.set(Memory, ["terminal_orders", `overflow_${res}`], { market_id: order.id, amount: excess, from: room, priority: 4 });
+					_.set(Memory, ["resources", "terminal_orders", `overflow_${res}`], { market_id: order.id, amount: excess, from: room, priority: 4 });
 					console.log(`<font color=\"#F7FF00\">[Hive]</font> Selling overflow resource to market: ${excess} of ${res} from ${room}`);
 				}
 			}
@@ -325,9 +325,9 @@ let Hive = {
 
 		if (tgtRoom != null) {
 			_.forEach(_.filter(Object.keys(energy),
-					r => { return !_.has(Memory, ["terminal_orders", `overflow_energy_${r}`]) && energy[r] - limit > 100; } ),
+					r => { return !_.has(Memory, ["resources", "terminal_orders", `overflow_energy_${r}`]) && energy[r] - limit > 100; } ),
 					r => {	// Terminal transfers: minimum quantity of 100.
-				_.set(Memory, ["terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
+				_.set(Memory, ["resources", "terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
 				console.log(`<font color=\"#F7FF00\">[Hive]</font> Creating overflow energy transfer: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);
 			});
 		}
@@ -344,16 +344,16 @@ let Hive = {
 		_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 		
 		// Reset automated terminal orders
-		_.each(_.filter(_.keys(Memory["terminal_orders"]),
+		_.each(_.filter(_.keys(Memory["resources", "terminal_orders"]),
 			o => { return _.get(Memory, ["terminal_orders", o, "automated"]) == true; }),
-			o => { delete Memory["terminal_orders"][o]; });
+			o => { delete Memory["resources"]["terminal_orders"][o]; });
 		
 		// Reset reagent targets, prevents accidental reagent pileup
-		_.each(_.filter(_.keys(_.get(Memory, ["labs", "targets"])), 
-			t => { return _.get(Memory, ["labs", "targets", t, "is_reagent"]) == true; }), 
-			t => delete Memory.labs.targets[t]);
+		_.each(_.filter(_.keys(_.get(Memory, ["resources", "labs", "targets"])), 
+			t => { return _.get(Memory, ["resources", "labs", "targets", t, "is_reagent"]) == true; }), 
+			t => delete Memory["resources"]["labs"]["targets"][t]);
 		
-		let targets = _.filter(_.get(Memory, ["labs", "targets"]), 
+		let targets = _.filter(_.get(Memory, ["resources", "labs", "targets"]), 
 			t => {
 				if (_.get(t, "amount") < 0)
 					return true;
@@ -375,10 +375,10 @@ let Hive = {
 				_.each(_.filter(Game.rooms, 
 					r => { return r.controller != null && r.controller.my && r.terminal; }), 
 					r => { amount += r.store(reagent); });
-				if (amount <= 1000 && !_.has(Memory, ["labs", "targets", reagent]) && getReagents(reagent) != null) {					
+				if (amount <= 1000 && !_.has(Memory, ["resources", "labs", "targets", reagent]) && getReagents(reagent) != null) {					
 					console.log(`<font color=\"#A17BFF\">[Labs]</font> reagent ${reagent} missing for ${target.mineral}, creating target goal.`);
-					Memory.labs.targets[reagent] = { amount: target.amount, priority: target.priority, mineral: reagent, is_reagent: true };
-					this.createReagentTargets(Memory.labs.targets[reagent]);
+					Memory["resources"]["labs"]["targets"][reagent] = { amount: target.amount, priority: target.priority, mineral: reagent, is_reagent: true };
+					this.createReagentTargets(Memory["resources"]["labs"]["targets"][reagent]);
 				} 
 			});		
 	},

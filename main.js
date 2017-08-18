@@ -40,9 +40,9 @@ module.exports.loop = function () {
 	 * 		populations.js for format; WARNING: If set, this field must include ALL POPULATION TYPES including colony, mining, and industry!!!
 	 * */
 	Hive.runColonies();
-	Hive.runColonizationRequests();
-	Hive.runInvasionRequests();
-	Hive.runOccupationRequests();
+	Hive.runColonizations();
+	Hive.runInvasions();
+	Hive.runOccupations();
 
 
 	/* Run end-tick Hive functions */

@@ -6,7 +6,7 @@ module.exports = {
     Worker: function(creep, isSafe) {
         let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
+				c => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}))
 			: null;
 
 		if (hostile == null) {
@@ -50,7 +50,7 @@ module.exports = {
     Mining: function(creep, isSafe) {
 		let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
+				c => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}))
 			: null;
 
 		if (hostile == null) {
@@ -129,7 +129,7 @@ module.exports = {
     Extracter: function(creep, isSafe) {
 		let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return Memory["allies"].indexOf(c.owner.username) < 0; }}))
+				c => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}))
 			: null;
 
 		if (hostile == null) {
@@ -201,13 +201,13 @@ module.exports = {
 			creep.moveTo(creep.room.controller)
 			return;
 		} else {
-			let request = _.get(Memory, ["colonization_requests", creep.memory.room]);			
+			let request = _.get(Memory, ["sites", "colonization", creep.memory.room]);			
 			if (_.get(request, ["target"]) == creep.room.name && creep.room.controller.my) {
-				delete Memory["colonization_requests"][creep.room.name];
+				delete Memory["sites"]["colonization"][creep.room.name];
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "rooms"], [_.get(request, ["from"])]);
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "route"], _.get(request, ["listRoute"]));
 				_.set(Memory, ["rooms", creep.room.name, "layout"], _.get(request, "layout"));
-				_.set(Memory, ["pulses", "blueprint", "request"], creep.room.name);
+				_.set(Memory, ["hive", "pulses", "blueprint", "request"], creep.room.name);
 				creep.suicide();
 			} else if (result != OK) {
 				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);
@@ -304,7 +304,7 @@ module.exports = {
 
 		if (creep.memory.target == null) {
 			target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter:
-				(c) => { return Memory["allies"].indexOf(c.owner.username) < 0; }});
+				(c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }});
 			if (target != null)
 				creep.memory.target = target.id;
 		}
@@ -312,7 +312,7 @@ module.exports = {
 		if (creep.memory.target == null && destroyStructures != null && destroyStructures == true) {
 			target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
 				s => { return s.hits != null && s.hits > 0
-					&& (s.owner == null || Memory["allies"].indexOf(s.owner.username) < 0); }}),
+					&& (s.owner == null || _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 				s => { return creep.pos.getRangeTo(s.pos); } ),
 				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
 				s => { 	if (s.structureType == "tower")

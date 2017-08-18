@@ -8,10 +8,10 @@ module.exports = {
 	Run: function(rmColony, rmOccupy) {
 
 		_CPU.Start(rmColony, "Occupy-init");
-		listSpawnRooms = _.get(Memory, ["occupation_requests", rmOccupy, "spawn_assist"]);
-		listArmy = _.get(Memory, ["occupation_requests", rmOccupy, "army"]);
-		listTargets = _.get(Memory, ["occupation_requests", rmOccupy, "targets"]);
-		listRoute = _.get(Memory, ["occupation_requests", rmOccupy, "route"]);		
+		listSpawnRooms = _.get(Memory, ["sites", "occupation", rmOccupy, "spawn_assist"]);
+		listArmy = _.get(Memory, ["sites", "occupation", rmOccupy, "army"]);
+		listTargets = _.get(Memory, ["sites", "occupation", rmOccupy, "targets"]);
+		listRoute = _.get(Memory, ["sites", "occupation", rmOccupy, "route"]);		
 		_CPU.End(rmColony, "Occupy-init");
 
 		_CPU.Start(rmColony, `Occupy-${rmOccupy}-listCreeps`);
@@ -43,15 +43,15 @@ module.exports = {
         Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listArmy["soldier"] != null && lSoldier.length < listArmy["soldier"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listArmy["soldier"]["level"],
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listArmy["soldier"]["level"],
 				scale_level: listArmy["soldier"] == null ? true : listArmy["soldier"]["scale_level"],
 				body: "soldier", name: null, args: {role: "soldier", room: rmOccupy, colony: rmColony} });
         } else if (listArmy["archer"] != null && lArcher.length < listArmy["archer"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listArmy["archer"]["level"],
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listArmy["archer"]["level"],
 				scale_level: listArmy["archer"] == null ? true : listArmy["archer"]["scale_level"],
 				body: "archer", name: null, args: {role: "archer", room: rmOccupy, colony: rmColony} });
         } else if (listArmy["healer"] != null && lHealer.length < listArmy["healer"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listArmy["healer"]["level"],
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listArmy["healer"]["level"],
 				scale_level: listArmy["healer"] == null ? true : listArmy["healer"]["scale_level"],
 				body: "healer", name: null, args: {role: "healer", room: rmOccupy, colony: rmColony} });
         }

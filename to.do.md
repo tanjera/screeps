@@ -4,14 +4,17 @@
 - labs.set_boost()
 - labs.clear_boosts()
 - all sites()
-- pause upgrading working as expected?
 
 
 
 # Implementing...
-* log.mining() for remote mining lists...
 - Remote mining creates a road from source to colony
-* All offensive code goes under one pipeline- combat.
+
+
+
+# To Implement
+- Combat
+	* All offensive code goes under one pipeline- combat.
 	- Use object "tactics" to define actions from a playbook and victory conditions
 		- Trickle (spawn, move to room and attack, no rally)
 		- Waves (spawn, rally, attack)
@@ -29,8 +32,6 @@
 		- Spawns wiped
 		- Buildings wiped
 
-
-# To Implement
 - Defense
 	- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
 	- Towers only target hostiles within ? distance of structures? Or within ? distance of towers and sources?

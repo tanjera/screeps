@@ -11,24 +11,24 @@ module.exports = {
 		
 		allies = new Object()
 		allies.add = function(ally) {
-			if (_.get(Memory, ["allies"]) == null) Memory["allies"] = [];
-			Memory["allies"].push(ally);
+			if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory["hive", "allies"], []);
+			Memory["hive"]["allies"].push(ally);
 			return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} added to ally list.`
 		};
 
 		command_list.push("allies.add_list([ally1, ally2, ...])");
 
 		allies.add_list = function(allyList) {
-			Array.prototype.push.apply(Memory["allies"], allyList);
+			Array.prototype.push.apply(Memory["hive"]["allies"], allyList);
 			return `<font color=\"#D3FFA3\">[Console]</font> Players added to ally list.`
 		};
 
 		command_list.push("allies.remove(ally)");
 		
 		allies.remove = function(ally) {
-			let index = Memory["allies"].indexOf(ally);
+			let index = _.get(Memory, ["hive", "allies"]).indexOf(ally);
 			if (index >= 0) {
-				Memory["allies"].splice(index, 1);
+				Memory["hive"]["allies"].splice(index, 1);
 				return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} removed from ally list.`
 			} else {
 				return `<font color=\"#D3FFA3\">[Console]</font> Error: Player ${ally} not found in ally list.`
@@ -37,7 +37,7 @@ module.exports = {
 
 		command_list.push("allies.clear()");
 		allies.clear = function() {
-			Memory["allies"] = [];
+			_.set(Memory, ["hive", "allies"], []);
 			return `<font color=\"#D3FFA3\">[Console]</font> Ally list cleared.`
 		};
 
@@ -65,13 +65,13 @@ module.exports = {
 		command_list.push("blueprint.request(rmName)");
 
 		blueprint.request = function(rmName) {
-			_.set(Memory, ["pulses", "blueprint", "request"], rmName);
+			_.set(Memory, ["hive", "pulses", "blueprint", "request"], rmName);
 			return `<font color=\"#D3FFA3\">[Console]</font> Setting Blueprint() request for ${rmName}; Blueprint() will run this request next tick.`;
 		};
 
 		command_list.push("blueprint.reset()");
 		blueprint.reset = function() {
-			delete Memory["pulses"]["blueprint"];
+			delete Memory["hive", "pulses"]["blueprint"];
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting Blueprint() cycles; Blueprint() will initiate next tick.`;
 		};
 
@@ -82,7 +82,7 @@ module.exports = {
 					delete Memory["rooms"][r.name]["links"];
 			});
 
-			_.set(Memory, ["pulses", "reset_links"], true);
+			_.set(Memory, ["hive", "pulses", "reset_links"], true);
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting all link definitions; will redefine next tick.`;
 		};
 
@@ -142,8 +142,8 @@ module.exports = {
 			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
 				+ "<table><tr><th>Room \t</th><th>Mineral \t</th><th>Amount \t</th><th>Target Amount \t</th><th>Reagent #1 \t</th><th>Reagent #2</th></tr>";
 			
-			_.each(_.keys(_.get(Memory, ["labs", "reactions"])), r => {
-				let rxn = Memory.labs.reactions[r];
+			_.each(_.keys(_.get(Memory, ["resources", "labs", "reactions"])), r => {
+				let rxn = Memory["resources"]["labs"]["reactions"][r];
 				
 				let amount = 0;
 				_.each(_.filter(Game.rooms, 
@@ -199,7 +199,7 @@ module.exports = {
 		
 		log.remote_mining = function() {
 			let output = "";
-			let remote = _.get(Memory, "remote_mining");
+			let remote = _.get(Memory, ["sites", "remote_mining"]);
 		
 			_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {
 				output += `<tr><td>${r.name}</td><td>  ->  </td>`;
@@ -272,7 +272,7 @@ module.exports = {
 
 		labs = new Object();
 		labs.set_reaction = function(mineral, amount, priority) {
-			_.set(Memory, ["labs", "targets", mineral], { mineral: mineral, amount: amount, priority: priority });
+			_.set(Memory, ["resources", "labs", "targets", mineral], { mineral: mineral, amount: amount, priority: priority });
 			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} reaction target set to ${amount} (priority ${priority}).`;
 		};
 
@@ -289,15 +289,15 @@ module.exports = {
 			Memory["rooms"][rmColony]["lab_definitions"].push(
 				{ action: "boost", mineral: mineral, lab: labID, role: role, subrole: subrole });
 				
-			delete Memory["pulses"]["lab"];	
+			delete Memory["hive"]["pulses"]["lab"];	
 			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
 		};
 
 		command_list.push("labs.clear_reactions()");
 		
 		labs.clear_reactions = function() {
-			_.set(Memory, ["labs", "targets"], new Object());	
-			delete Memory["pulses"]["lab"];			
+			_.set(Memory, ["resources", "labs", "targets"], new Object());	
+			delete Memory["hive"]["pulses"]["lab"];			
 			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
 		};
 
@@ -305,14 +305,14 @@ module.exports = {
 		
 		labs.clear_boosts = function(rmName) {
 			delete Memory["rooms"][rmName]["lab_definitions"];
-			delete Memory["pulses"]["lab"];	
+			delete Memory["hive"]["pulses"]["lab"];	
 			return `<font color=\"#D3FFA3\">[Console]</font> All boosts cleared for ${rmName}`;
 		};
 
 		command_list.push("labs.renew_assignments()");
 		
 		labs.renew_assignments = function() {
-			delete Memory["pulses"]["lab"];			
+			delete Memory["hive"]["pulses"]["lab"];			
 			return `<font color=\"#D3FFA3\">[Console]</font> Labs will renew definitions and reaction assignments next tick.`;
 		};
 		
@@ -336,22 +336,22 @@ module.exports = {
 		command_list.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
 
 		resources.send = function(orderName, rmFrom, rmTo, resource, amount) {
-			_.set(Memory, ["terminal_orders", orderName], { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1});
-			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
+			_.set(Memory, ["resources", "terminal_orders", orderName], { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1});
+			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources"]["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
 
 		resources.market_sell = function(orderName, marketOrderID, rmFrom, amount) {
-			_.set(Memory, ["terminal_orders", orderName], { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4});
-			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
+			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4});
+			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources"]["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
 
 		resources.market_buy = function(orderName, marketOrderID, rmTo, amount) {
-			_.set(Memory, ["terminal_orders", orderName], { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4});
-			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
+			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4});
+			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources", "terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
 		command_list.push("resources.clear_market_cap()");
@@ -364,7 +364,7 @@ module.exports = {
 		command_list.push("resources.clear_transactions()");
 		
 		resources.clear_transactions = function() {
-			Memory["terminal_orders"] = {};
+			_.set(Memory, ["resources", "terminal_orders"], new Object());
 			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
 		};
 
@@ -372,10 +372,10 @@ module.exports = {
 		
 		resources.pause_upgrading = function(ticks) {
 			if (ticks == 0 || ticks == null) {
-				_.set(Memory, ["pulses", "pause_upgrading"], null);
+				_.set(Memory, ["hive", "pulses", "pause_upgrading"], null);
 				return `<font color=\"#D3FFA3\">[Console]</font> Resuming upgrading; will resume upgrader spawning and tasks.`;
 			} else {
-				_.set(Memory, ["pulses", "pause_upgrading"], Game.time + ticks);
+				_.set(Memory, ["hive", "pulses", "pause_upgrading"], Game.time + ticks);
 				_.each(Memory["creeps"], creep => {
 					if (_.get(creep, ["subrole"]) == "upgrader")
 						delete creep["subrole"];
@@ -389,24 +389,24 @@ module.exports = {
 		command_list.push("colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, [listRoute])");
 
 		colonize = function(rmFrom, rmTarget, layout, listRoute) {
-			_.set(Memory, ["colonization_requests", rmTarget], { from: rmFrom, target: rmTarget, layout: layout, listRoute: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.colonization_requests.${rmTarget} ... to cancel, delete the entry.`;
+			_.set(Memory, ["sites", "colonization", rmTarget], { from: rmFrom, target: rmTarget, layout: layout, listRoute: listRoute });
+			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${rmTarget} ... to cancel, delete the entry.`;
 		};
 
 		command_list.push("invade(rmFrom, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute)");
 
 		invade = function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
-			_.set(Memory, ["invasion_requests", rmInvade], { from: rmColony, target: rmInvade, occupy: toOccupy, 
+			_.set(Memory, ["sites", "invasion", rmInvade], { from: rmColony, target: rmInvade, occupy: toOccupy, 
 				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, rally_point: posRally, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.invasion_requests.${rmInvade} ... to cancel, delete the entry.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.sites.invasion.${rmInvade} ... to cancel, delete the entry.`;
 		};
 
 		command_list.push("occupy(rmFrom, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute)");
 
 		occupy = function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
-			_.set(Memory, ["occupation_requests", rmOccupy], { from: rmColony, target: rmOccupy,
+			_.set(Memory, ["sites", "occupation", rmOccupy], { from: rmColony, target: rmOccupy,
 				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.invasion_requests.${rmOccupy} ... to cancel, delete the entry.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.sites.invasion.${rmOccupy} ... to cancel, delete the entry.`;
 		};
 		
 		command_list.push("");
@@ -418,7 +418,7 @@ module.exports = {
 
 		command_list.push("remote_mining(rmColony, rmHarvest, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
 		remote_mining = function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
-			_.set(Memory, ["remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
+			_.set(Memory, ["sites", "remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		

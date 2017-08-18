@@ -67,7 +67,7 @@ module.exports = {
         Hive.populationTally(rmColony, popTarget, popActual);
 
         if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {
-			Memory["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["courier"]["level"],
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["courier"]["level"],
 				scale_level: listPopulation["courier"] == null ? true : listPopulation["courier"]["scale_level"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
@@ -109,7 +109,7 @@ module.exports = {
 	},
 
 	assignReaction: function(rmColony) {
-		let target = _.head(_.sortBy(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["labs", "targets"]),
+		let target = _.head(_.sortBy(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["resources", "labs", "targets"]),
 			t => {
 				let amount = 0, r1_amount = 0, r2_amount = 0;
 				let reagents = getReagents(_.get(t, "mineral"));
@@ -124,13 +124,13 @@ module.exports = {
 			}),
 			t => _.get(t, "priority")),
 			t => _.get(t, "is_reagent")),
-			t => _.filter(_.get(Memory, ["labs", "reactions"]), r => { return _.get(r, "mineral") == _.get(t, "mineral"); }).length));
+			t => _.filter(_.get(Memory, ["resources", "labs", "reactions"]), r => { return _.get(r, "mineral") == _.get(t, "mineral"); }).length));
 
 		if (target != null) {
-			_.set(Memory, ["labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
+			_.set(Memory, ["resources", "labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
 			console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
 		} else {
-			_.set(Memory, ["labs", "reactions", rmColony], { mineral: null, amount: null });
+			_.set(Memory, "resources", ["labs", "reactions", rmColony], { mineral: null, amount: null });
 			console.log(`<font color=\"#A17BFF\">[Labs]</font> No reaction to assign to ${rmColony}, idling.`);
 		}
 
@@ -215,18 +215,18 @@ module.exports = {
 					if (labSupply1 == null && labSupply2 == null)
 						break;
 
-					let mineral = _.get(Memory, ["labs", "reactions", rmColony, "mineral"]);
+					let mineral = _.get(Memory, ["resources", "labs", "reactions", rmColony, "mineral"]);
 					if (mineral == null)
 						return;
 					
 					if (_.get(REACTIONS, [labSupply1.mineralType, labSupply2.mineralType]) != mineral)
 						return;
 
-					let amount = _.get(Memory, ["labs", "reactions", rmColony, "amount"], -1);
+					let amount = _.get(Memory, ["resources", "labs", "reactions", rmColony, "amount"], -1);
 					if (amount > 0 && Game.rooms[rmColony].store(mineral) >= amount) {
-						if (_.get(Memory, ["labs", "targets", mineral, "is_reagent"]))
-							delete Memory.labs.targets[mineral];
-						delete Memory.labs.reactions[rmColony];
+						if (_.get(Memory, ["resources", "labs", "targets", mineral, "is_reagent"]))
+							delete Memory["resources"]["labs"]["targets"][mineral];
+						delete Memory.["resources"]["labs"]["reactions"][rmColony];
 						console.log(`<font color=\"#A17BFF\">[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
 
 						if (Hive.isPulse_Main())
@@ -320,7 +320,7 @@ module.exports = {
 					storage = Game.rooms[rmColony].storage;
 					if (storage == null) break;
 
-					let mineral = _.get(Memory, ["labs", "reactions", rmColony, "mineral"]);
+					let mineral = _.get(Memory, ["resources", "labs", "reactions", rmColony, "mineral"]);
 					if (mineral == null)
 						return;
 
@@ -535,6 +535,9 @@ module.exports = {
 				if ((res != "energy" && terminal.store["energy"] >= cost)
 						|| (res == "energy" && terminal.store["energy"] >= cost + amount)) {
 
+					if (terminal.cooldown > 0)
+						return false;				
+
 					let result = (order["market_id"] == null)
 						? terminal.send(res, amount, order["room"])
 						: Game.market.deal(order["market_id"], amount, rmColony);
@@ -550,7 +553,7 @@ module.exports = {
 						return true;
 
 					} else {
-						console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: failed to send , `
+						console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: failed to send, `
 							+ `${amount} of ${res} ${rmColony} -> ${order["room"]} (code: ${result})`);
 					}
 				} else {
@@ -599,6 +602,9 @@ module.exports = {
 
 		if (terminal.store["energy"] != null && terminal.store["energy"] > cost) {
 			filling.push("energy");
+
+			if (terminal.cooldown > 0)
+				return false;
 
 			let result = Game.market.deal(order["market_id"], amount, rmColony);
 
