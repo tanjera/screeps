@@ -368,22 +368,20 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
 		};
 
-		command_list.push("resources.pause_upgrading()");
+		command_list.push("resources.pause_upgrading(ticks)");
 		
-		resources.pause_upgrading = function() {
-			let pause = _.get(Memory, ["triggers", "pause_upgrading"]);
-			if (pause == null || pause == false) {
-				_.set(Memory, ["triggers", "pause_upgrading"], true);
+		resources.pause_upgrading = function(ticks) {
+			if (ticks == 0 || ticks == null) {
+				_.set(Memory, ["pulses", "pause_upgrading"], null);
+				return `<font color=\"#D3FFA3\">[Console]</font> Resuming upgrading; will resume upgrader spawning and tasks.`;
+			} else {
+				_.set(Memory, ["pulses", "pause_upgrading"], Game.time + ticks);
 				_.each(Memory["creeps"], creep => {
 					if (_.get(creep, ["subrole"]) == "upgrader")
 						delete creep["subrole"];
 				});
-				return `<font color=\"#D3FFA3\">[Console]</font> Pausing upgrading; converting all upgraders to regular workers.`;
+				return `<font color=\"#D3FFA3\">[Console]</font> Pausing upgrading for ${ticks} ticks; converting all upgraders to regular workers.`;
 			}
-			else if (pause == true) {
-				_.set(Memory, ["triggers", "pause_upgrading"], false);
-				return `<font color=\"#D3FFA3\">[Console]</font> Resuming upgrading; will resume upgrader spawning and tasks.`;
-			}			
 		};
 
 		
