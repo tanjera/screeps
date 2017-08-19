@@ -36,6 +36,36 @@ module.exports = {
 						priority: 5
 					});
 			}
+
+			let room_sign = _.get(Memory, ["hive", "signs", rmName]);
+			let default_sign = _.get(Memory, ["hive", "signs", "default"]);
+			if (room_sign != null && _.get(room, ["controller", "sign"]) != room_sign) {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "work",
+						subtype: "sign",
+						message: room_sign,
+						id: room.controller.id,
+						pos: room.controller.pos,
+						key: `sign-${room.controller.id}`,
+						timer: 30,
+						creeps: 1,
+						priority: 2
+					});
+			} else if (room_sign == null && default_sign != null && _.get(room, ["controller", "sign"]) != default_sign) {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "work",
+						subtype: "sign",
+						message: default_sign,
+						id: room.controller.id,
+						pos: room.controller.pos,
+						key: `sign-${room.controller.id}`,
+						timer: 30,
+						creeps: 1,
+						priority: 2
+					});
+			}
 		}
 
 		structures = __Colony.findByNeed_RepairMaintenance(room);

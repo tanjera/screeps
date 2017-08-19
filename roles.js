@@ -179,6 +179,16 @@ module.exports = {
 			creep.moveTo(creep.room.controller)
 			return;
 		} else if (result == OK) {
+
+			if (Game.time % 50 == 0) {
+				let room_sign = _.get(Memory, ["hive", "signs", creep.room.name]);
+				let default_sign = _.get(Memory, ["hive", "signs", "default"]);
+				if (room_sign != null && creep.room.controller.sign != room_sign)
+					creep.signController(creep.room.controller, room_sign);
+				else if (room_sign == null && default_sign != null && creep.room.controller.sign != default_sign)
+					creep.signController(creep.room.controller, default_sign);
+			}
+
 			if (Game.time % 5 == 0) {  // Don't park next to a source (and possibly block it!)
 				let sources = creep.pos.findInRange(FIND_SOURCES, 1);
 				if (sources != null && sources.length > 0) {

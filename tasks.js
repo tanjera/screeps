@@ -147,7 +147,8 @@ module.exports = {
 						"priority"));
 			} else if (creep.memory.subrole == "upgrader") {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.type == "work" && t.subtype == "upgrade" && (t.creeps == null || t.creeps > 0); }),
+						t => { return t.type == "work" && (t.subtype == "upgrade" || t.subtype == "sign") 
+						&& (t.creeps == null || t.creeps > 0); }),
 						"priority"));
 			} else {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],

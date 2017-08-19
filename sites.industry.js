@@ -226,7 +226,7 @@ module.exports = {
 					if (amount > 0 && Game.rooms[rmColony].store(mineral) >= amount) {
 						if (_.get(Memory, ["resources", "labs", "targets", mineral, "is_reagent"]))
 							delete Memory["resources"]["labs"]["targets"][mineral];
-						delete Memory.["resources"]["labs"]["reactions"][rmColony];
+						delete Memory["resources"]["labs"]["reactions"][rmColony];
 						console.log(`<font color=\"#A17BFF\">[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
 
 						if (Hive.isPulse_Main())
@@ -404,22 +404,22 @@ module.exports = {
 	runTerminal: function (rmColony) {
 		if (Game.rooms[rmColony].terminal != null && Game.rooms[rmColony].terminal.my) {
 
-			if (Memory["terminal_orders"] == null)
-				Memory["terminal_orders"] = new Object();
-			if (Memory["rooms"][rmColony]["stockpile"] == null)
-				Memory["rooms"][rmColony]["stockpile"] = new Object();
+			if (_.get(Memory, ["resources", "terminal_orders"]) == null)
+				_.set(Memory, ["resources", "terminal_orders"], new Object());
+			if (_.get(Memory, ["rooms", rmColony, "stockpile"]) == null)
+				_.set(Memory, ["rooms", rmColony, "stockpile"], new Object());
 
 			let shortage = {};
 			let room = Game.rooms[rmColony];
 			let storage = Game.rooms[rmColony].storage;
 			let terminal = Game.rooms[rmColony].terminal;
 
-			for (let res in Memory["rooms"][rmColony]["stockpile"]) {
-				shortage[res] = Memory["rooms"][rmColony]["stockpile"][res] - room.store(res);
+			for (let res in _.get(Memory, ["rooms", rmColony, "stockpile"])) {
+				shortage[res] = _.get(Memory, ["rooms", rmColony, "stockpile", res]) - room.store(res);
 
-				if (shortage[res] > 0) {
-					Memory["terminal_orders"][`${rmColony}-${res}`] = { room: rmColony, resource: res, amount: shortage[res], automated: true, priority: 2 };
-				}
+				if (shortage[res] > 0)
+					_.set(Memory, ["resources", "terminal_orders", `${rmColony}-${res}`], 
+						{ room: rmColony, resource: res, amount: shortage[res], automated: true, priority: 2 });
 			}
 
 			let filling = new Array();
@@ -437,10 +437,10 @@ module.exports = {
 		 *	5: filling energy for a market order
 		*/
 
-		for (let o in Memory["terminal_orders"])
-			Memory["terminal_orders"][o]["name"] = o;
+		for (let o in _.get(Memory, ["resources", "terminal_orders"]))
+			_.set(Memory, ["resources", "terminal_orders", o, "name"], o);
 
-		let orders = _.sortBy(Memory["terminal_orders"], "priority");
+		let orders = _.sortBy(_.get(Memory, ["resources", "terminal_orders"]), "priority");
 
 		for (let n in orders) {
 			let order = orders[n];
@@ -496,7 +496,7 @@ module.exports = {
 					} else {
 						console.log(`<font color=\"#00F0FF\">[Market]</font> No replacement market order found for ${o}; order deleted!`);
 
-						delete Memory["terminal_orders"][o];
+						delete Memory["resources"]["terminal_orders"][o];
 						return false;
 					}
 				}
@@ -546,9 +546,9 @@ module.exports = {
 						console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} sent, ${rmColony}`
 							+ ` -> ${order["room"]}`);
 
-						Memory["terminal_orders"][o]["amount"] -= amount;
-						if (Memory["terminal_orders"][o]["amount"] <= 0)
-							delete Memory["terminal_orders"][o];
+						Memory["resources"]["terminal_orders"][o]["amount"] -= amount;
+						if (_.get(Memory, ["resources", "terminal_orders", o, "amount"]) <= 0)
+							delete Memory["resources"]["terminal_orders"][o];
 
 						return true;
 
@@ -568,8 +568,8 @@ module.exports = {
 							id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
 					} else if (res != "energy") {
 						shortage["energy"] = (shortage["energy"] == null) ? cost : shortage["energy"] + cost;
-						Memory["terminal_orders"][`${rmColony}-energy`] =
-							{ room: rmColony, resource: "energy", amount: cost, automated: true, priority: order["market_id"] == null ? 3 : 5 };
+						_.set(Memory, ["resources", "terminal_orders", `${rmColony}-energy`],
+							{ room: rmColony, resource: "energy", amount: cost, automated: true, priority: order["market_id"] == null ? 3 : 5 });
 					}
 				}
 			} else if (storage != null && storage.store[res] != null) {
@@ -597,7 +597,7 @@ module.exports = {
 
 		let o = order["name"];
 		let res = order["resource"];
-		let amount = Math.max(100, Math.min(Memory["terminal_orders"][o]["amount"], 2000));
+		let amount = Math.max(100, Math.min(_.get(Memory, ["resources", "terminal_orders", o, "amount"]), 2000));
 		let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 
 		if (terminal.store["energy"] != null && terminal.store["energy"] > cost) {
@@ -612,9 +612,9 @@ module.exports = {
 				console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} received, ${order["room"]}`
 					+ ` -> ${rmColony} `);
 
-				Memory["terminal_orders"][o]["amount"] -= amount;
-				if (Memory["terminal_orders"][o]["amount"] <= 0)
-					delete Memory["terminal_orders"][o];
+				Memory["resources"]["terminal_orders"][o]["amount"] -= amount;
+				if (_.get(Memory, ["resources", "terminal_orders", o, "amount"]) <= 0)
+					delete Memory["resources"]["terminal_orders"][o];
 
 				return true;
 			} else {
@@ -634,7 +634,8 @@ module.exports = {
 					type: "industry", subtype: "deposit", resource: "energy",
 					id: terminal.id, pos: terminal.pos, timer: 10, creeps: 8, priority: 5 });
 			} else if (res != "energy") {
-				Memory["terminal_orders"][`${rmColony}-energy`] = { room: rmColony, resource: "energy", amount: cost, automated: true, priority: 5 };
+				_.set(Memory, ["resources", "terminal_orders", `${rmColony}-energy`], 
+					{ room: rmColony, resource: "energy", amount: cost, automated: true, priority: 5 });
 			}
 		}
 

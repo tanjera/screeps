@@ -440,6 +440,18 @@ module.exports = {
 			
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
 		};
+
+		command_list.push("set_sign(message, rmName)")
+
+		set_sign = function(message, rmName) {
+			if (rmName != null) {
+				_.set(Memory, ["hive", "signs", rmName], message);
+				return `<font color=\"#D3FFA3\">[Console]</font> Message for ${rmName} set.`;
+			} else {
+				_.set(Memory, ["hive", "signs", "default"], message);
+				return `<font color=\"#D3FFA3\">[Console]</font> Default message set.`;
+			}
+		}
 		
 		command_list.push("");
 

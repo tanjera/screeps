@@ -22,7 +22,7 @@ let Blueprint = {
 			let room = Game.rooms[_.get(Memory, ["hive", "pulses", "blueprint", "request"])];
 			
 			if (room == null) {
-				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blueprint() request for ${_.get(Memory, ["pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
+				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blueprint() request for ${_.get(Memory, ["hive", "pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
 			} else {
 				_CPU.Start("Hive", "Blueprint-Run");
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Processing requested Blueprint() for ${room.name}`);

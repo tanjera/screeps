@@ -112,6 +112,19 @@ module.exports = {
                 } else { return; }
             }
 
+            case "sign": {
+                let controller = Game.getObjectById(creep.memory.task["id"]);
+                let message = creep.memory.task["message"];
+                let result = creep.signController(controller, message);
+                if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(controller, {reusePath: Hive.moveReusePath()});
+                    return;
+                } else if (result != OK) {
+                    this.finishedTask(creep);
+                    return;
+                } else { return; }
+            }
+
             case "repair": {
                 let structure = Game.getObjectById(creep.memory.task["id"]);
                 let result = creep.repair(structure);
