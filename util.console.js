@@ -368,19 +368,18 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
 		};
 
-		command_list.push("resources.pause_upgrading(ticks)");
+		command_list.push("resources.pause_upgrading(rmName, ticks)");
 		
-		resources.pause_upgrading = function(ticks) {
+		resources.pause_upgrading = function(rmName, ticks) {
 			if (ticks == 0 || ticks == null) {
-				_.set(Memory, ["hive", "pulses", "pause_upgrading"], null);
+				_.set(Memory, ["hive", "pulses", "pause_upgrading", rmName], null);
 				return `<font color=\"#D3FFA3\">[Console]</font> Resuming upgrading; will resume upgrader spawning and tasks.`;
 			} else {
-				_.set(Memory, ["hive", "pulses", "pause_upgrading"], Game.time + ticks);
-				_.each(Memory["creeps"], creep => {
-					if (_.get(creep, ["subrole"]) == "upgrader")
-						delete creep["subrole"];
-				});
-				return `<font color=\"#D3FFA3\">[Console]</font> Pausing upgrading for ${ticks} ticks; converting all upgraders to regular workers.`;
+				_.set(Memory, ["hive", "pulses", "pause_upgrading", rmName], Game.time + ticks);
+				_.each(_.filter(Memory["creeps"], 
+					c => { return _.get(c, ["subrole"]) == "upgrader" && _.get(c, ["room"]) == rmName; }), 
+					c => { delete c["subrole"]; });
+				return `<font color=\"#D3FFA3\">[Console]</font> Pausing upgrading in ${rmName} for ${ticks} ticks; converting all upgraders to regular workers.`;
 			}
 		};
 
@@ -418,8 +417,11 @@ module.exports = {
 
 		command_list.push("remote_mining(rmColony, rmHarvest, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
 		remote_mining = function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
+			if (rmColony == null || rmHarvest == null) 
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, invalid entry for remote_mining()`;
+			
 			_.set(Memory, ["sites", "remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
-			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		
 		command_list.push("");

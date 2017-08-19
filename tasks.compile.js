@@ -23,7 +23,7 @@ module.exports = {
 						creeps: 15,
 						priority: 1
 					});
-			} else if (_.get(Memory, ["hive", "pulses", "pause_upgrading"]) == null || roomLvl < 6) {
+			} else if (_.get(Memory, ["hive", "pulses", "pause_upgrading", rmName]) == null) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -39,7 +39,7 @@ module.exports = {
 
 			let room_sign = _.get(Memory, ["hive", "signs", rmName]);
 			let default_sign = _.get(Memory, ["hive", "signs", "default"]);
-			if (room_sign != null && _.get(room, ["controller", "sign"]) != room_sign) {
+			if (room_sign != null && _.get(room, ["controller", "sign", "text"]) != room_sign) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -52,7 +52,7 @@ module.exports = {
 						creeps: 1,
 						priority: 2
 					});
-			} else if (room_sign == null && default_sign != null && _.get(room, ["controller", "sign"]) != default_sign) {
+			} else if (room_sign == null && default_sign != null && _.get(room, ["controller", "sign", "text"]) != default_sign) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",

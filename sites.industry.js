@@ -130,7 +130,7 @@ module.exports = {
 			_.set(Memory, ["resources", "labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
 			console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
 		} else {
-			_.set(Memory, "resources", ["labs", "reactions", rmColony], { mineral: null, amount: null });
+			_.set(Memory, ["resources", "labs", "reactions", rmColony], { mineral: null, amount: null });
 			console.log(`<font color=\"#A17BFF\">[Labs]</font> No reaction to assign to ${rmColony}, idling.`);
 		}
 

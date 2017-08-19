@@ -183,9 +183,9 @@ module.exports = {
 			if (Game.time % 50 == 0) {
 				let room_sign = _.get(Memory, ["hive", "signs", creep.room.name]);
 				let default_sign = _.get(Memory, ["hive", "signs", "default"]);
-				if (room_sign != null && creep.room.controller.sign != room_sign)
+				if (room_sign != null && _.get(creep, ["room", "controller", "sign", "text"]) != room_sign)
 					creep.signController(creep.room.controller, room_sign);
-				else if (room_sign == null && default_sign != null && creep.room.controller.sign != default_sign)
+				else if (room_sign == null && default_sign != null && _.get(creep, ["room", "controller", "sign", "text"]) != default_sign)
 					creep.signController(creep.room.controller, default_sign);
 			}
 
