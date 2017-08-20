@@ -446,6 +446,19 @@ module.exports = {
 		command_list.push("set_sign(message, rmName)")
 
 		set_sign = function(message, rmName) {
+			/* Sorting algorithm for left -> right, top -> bottom (in SW sector!! Reverse sortBy() for other sectors...
+			 * Ensure quote.length == room.length!! Place in main.js
+			 			 			
+				let quote = [];
+				let rooms = _.sortBy(_.sortBy(_.filter(Game.rooms, 
+					r => {return r.controller != null && r.controller.my}), 
+					r => {return 0 - r.name.substring(1).split("S")[0]}), 
+					r => {return r.name.substring(1).split("S")[1]});
+				for (let i = 0; i < rooms.length; i++) { 
+					set_sign(quote[i], rooms[i].name); 
+				}
+			*/
+
 			if (rmName != null) {
 				_.set(Memory, ["hive", "signs", rmName], message);
 				return `<font color=\"#D3FFA3\">[Console]</font> Message for ${rmName} set.`;

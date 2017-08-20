@@ -17,6 +17,15 @@ RoomPosition.prototype.isWalkable = function isWalkable() {
 	return true;
 };
 
+RoomPosition.prototype.inRangeToListTargets = function inRangeToListTargets(listTargets, range) {
+	for (let i = 0; i < listTargets.length; i++) {
+		if (this.getRangeTo(listTargets[i].pos.x, listTargets[i].pos.y) < range)
+			return true;
+	}
+
+	return false;
+}
+
 RoomPosition.prototype.getAccessAmount = function getAccessAmount() {
 	let access = 0;
 	

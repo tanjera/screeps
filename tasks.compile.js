@@ -294,7 +294,7 @@ module.exports = {
 			let towers = room.find(FIND_MY_STRUCTURES, { filter: s => {
 				return s.structureType == STRUCTURE_TOWER; }});
 			for (let i in towers) {
-				if (towers[i].energy < towers[i].energyCapacity * 0.4) {
+				if (towers[i].energy < towers[i].energyCapacity * 0.25) {
 					_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "carry",
@@ -306,7 +306,7 @@ module.exports = {
 						key: `carry:deposit-${towers[i].id}`,
 						timer: 30,
 						creeps: 1,
-						priority: 1
+						priority: 2
 					});
 				} else if (towers[i].energy < towers[i].energyCapacity) {
 					_Tasks.addTask(rmName,
@@ -320,7 +320,7 @@ module.exports = {
 						key: `carry:deposit-${towers[i].id}`,
 						timer: 30,
 						creeps: 1,
-						priority: 5
+						priority: 4
 					});
 				}
 			}
@@ -328,20 +328,39 @@ module.exports = {
 			structures = room.find(FIND_MY_STRUCTURES, { filter: s => {
 				return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
 					|| (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
-			for (let i in structures) {
-				_Tasks.addTask(rmName,
-				{   room: rmName,
-					type: "carry",
-					subtype: "deposit",
-					structure: structures[i].structureType,
-					resource: "energy",
-					id: structures[i].id,
-					pos: structures[i].pos,
-					key: `carry:deposit-${structures[i].id}`,
-					timer: 20,
-					creeps: 1,
-					priority: 2
-				});
+
+			if (room.energyAvailable < room.energyCapacityAvailable * 0.75) {
+				for (let i in structures) {
+					_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "carry",
+						subtype: "deposit",
+						structure: structures[i].structureType,
+						resource: "energy",
+						id: structures[i].id,
+						pos: structures[i].pos,
+						key: `carry:deposit-${structures[i].id}`,
+						timer: 20,
+						creeps: 1,
+						priority: 1
+					});
+				}
+			} else {
+				for (let i in structures) {
+					_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "carry",
+						subtype: "deposit",
+						structure: structures[i].structureType,
+						resource: "energy",
+						id: structures[i].id,
+						pos: structures[i].pos,
+						key: `carry:deposit-${structures[i].id}`,
+						timer: 20,
+						creeps: 1,
+						priority: 3
+					});
+				}
 			}
 		}
 	}

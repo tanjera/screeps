@@ -8,7 +8,9 @@
 
 
 # Implementing...
-
+- Implement tower repairing?
+	- If not attacking or healing...
+	- Check structures if (Game.time % 25 == 0)
 
 
 # To Implement
@@ -33,7 +35,6 @@
 
 - Defense
 	- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
-	- Towers only target hostiles within ? distance of structures? Or within ? distance of towers and sources?
 
 - Colony function
 	- Creep ability to request another creep to move/swap spaces
@@ -47,6 +48,12 @@
 
 - Code Standardization
 	? Change all "listRoute" in Memory objects to "route" e.g. colonize()
+
+- CPU Optimization
+	- Replace _.filter(room.find(list)) with room.find(list, {filter: ()}) 
+		- Prevents extra step of API cloning array
+	- When sequentially calling _.sortBy ... figure out how to combine sorting conditions into 1 statement
+		- More _sortBy's * longer arrays to sort == CPU hog.
 
 - Known Bugs
 	- If 1 link is within range of multiple targets (controller, source), will make erroneous definitions.
