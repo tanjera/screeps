@@ -280,15 +280,17 @@ module.exports = {
 	
 		labs.set_boost = function(labID, mineral, role, subrole) {
 			let lab = Game.getObjectById(labID);
-			let room = lab.pos.room;
+			let rmName = lab.pos.roomName;
+			let labDefinitions = _.get(Memory, ["rooms", rmName, "lab_definitions"]);
 			if (lab == null) return;
 
-			if (_.get(Memory, ["rooms", room.name, "lab_definitions"]) == null)
-				Memory["rooms"][room.name]["lab_definitions"] = [];
+			if (labDefinitions == null)
+				labDefinitions = [];
 
-			Memory["rooms"][rmColony]["lab_definitions"].push(
+			labDefinitions.push(
 				{ action: "boost", mineral: mineral, lab: labID, role: role, subrole: subrole });
 				
+			_.set(Memory, ["rooms", rmName, "lab_definitions"], labDefinitions);
 			delete Memory["hive"]["pulses"]["lab"];	
 			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
 		};

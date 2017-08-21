@@ -1,16 +1,16 @@
 # Implemented, Needs Debugging/Testing
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
-- labs.set_boost()
-- labs.clear_boosts()
 - all sites()
 
 
 
 # Implementing...
+- Log to show all boosts in action... or add to log.labs()
 - Implement tower repairing?
 	- If not attacking or healing...
 	- Check structures if (Game.time % 25 == 0)
+
 
 
 # To Implement

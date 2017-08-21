@@ -7,13 +7,15 @@ let Tasks = require("tasks");
 let _Creep = require("util.creep");
 let _CPU = require("util.cpu");
 
+let labDefinitions;
+
 module.exports = {
 
 	Run: function(rmColony) {
 		_CPU.Start(rmColony, "Industry-init");
-		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
-		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
 		labDefinitions = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
+		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
+		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);		
 		_CPU.End(rmColony, "Industry-init");
 
 		_CPU.Start(rmColony, "Industry-listCreeps");
@@ -33,7 +35,7 @@ module.exports = {
 		_CPU.End(rmColony, "Industry-defineLabs");
 
 		_CPU.Start(rmColony, "Industry-runLabs");
-		this.runLabs(rmColony, labDefinitions);
+		this.runLabs(rmColony);
 		_CPU.End(rmColony, "Industry-runLabs");
 
 		if (Hive.isPulse_Main()) {
@@ -42,7 +44,7 @@ module.exports = {
 			_CPU.End(rmColony, "Industry-loadNukers");
 
 			_CPU.Start(rmColony, "Industry-createLabTasks");
-			this.createLabTasks(rmColony, labDefinitions);
+			this.createLabTasks(rmColony);
 			_CPU.End(rmColony, "Industry-createLabTasks");
 
 			_CPU.Start(rmColony, "Industry-runTerminal");
@@ -108,7 +110,13 @@ module.exports = {
 		}
 	},
 
-	assignReaction: function(rmColony) {
+	assignReaction: function(rmColony) {		
+		if (_.filter(Game["rooms"][rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType == "lab" 
+			&& _.filter(labDefinitions, def => { return _.get(def, "action") == "boost" && _.get(def, "lab") == s.id; }).length == 0 }).length < 3) {
+			console.log(`<font color=\"#A17BFF\">[Labs]</font> Unable to assign a reaction to ${rmColony}- not enough labs available for reactions (labs boosting?).`);
+			return;
+		}
+
 		let target = _.head(_.sortBy(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["resources", "labs", "targets"]),
 			t => {
 				let amount = 0, r1_amount = 0, r2_amount = 0;
@@ -136,11 +144,40 @@ module.exports = {
 
 	},
 
-	defineLabs: function(rmColony, labDefinitions) {
+	defineLabs: function(rmColony) {
+		// Clean up labDefinitions, remove duplicate boosts
+		if (labDefinitions != null) {
+			for (let i = labDefinitions.length - 1; i >= 0; i--) {
+				if (_.get(labDefinitions[i], "action") != "boost")
+					continue;
+
+				for (let j = labDefinitions.length - 1; j >= 0; j--) {
+					if (i == j)
+						continue;
+
+					if (_.get(labDefinitions[i], "lab") == _.get(labDefinitions[j], "lab")) {					
+						labDefinitions.splice(i, 1)
+						continue;
+					}
+				}
+			}
+			_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
+		}	
+
+		// Get labs able to process reactions (exclude labs defined to boost)
 		let labs = _.filter(Game["rooms"][rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType == "lab" 
 			&& _.filter(labDefinitions, def => { return _.get(def, "action") == "boost" && _.get(def, "lab") == s.id; }).length == 0 });
-		if (labs.length < 3)
+		
+		// Not enough labs to support a reaction? Remove defined reactions and return
+		if (labDefinitions != null && labs.length < 3) {			
+			for (let i = labDefinitions.length - 1; i >= 0; i--) {
+				if (_.get(labDefinitions, [i, "action"]) == "reaction")
+					labDefinitions.splice(i, 1)
+			}
+
+			_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
 			return;
+		}
 
 		let terminal = _.get(Game, ["rooms", rmColony, "terminal"]);
 		if (terminal == null)
@@ -159,16 +196,16 @@ module.exports = {
 		else {
 			for (let i = labDefinitions.length - 1; i >= 0; i--) {
 				if (_.get(labDefinitions, [i, "action"]) == "reaction")
-					labDefinitions = labDefinitions.splice(i, 1)
+					labDefinitions.splice(i, 1)
 			}
 		} 
 
 		labDefinitions.push({ action: "reaction", supply1: supply1, supply2: supply2, reactors: reactors });
-		Memory["rooms"][rmColony]["lab_definitions"] = labDefinitions;
+		_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
 		console.log(`<font color=\"#A17BFF\">[Labs]</font> Labs defined for ${rmColony}.`);
 	},
 
-	runLabs: function(rmColony, labDefinitions) {
+	runLabs: function(rmColony) {
 		/* Arguments for labDefinitions:
 
 			Memory["rooms"][rmColony]["lab_definitions"]
@@ -183,6 +220,10 @@ module.exports = {
 			  reactors: ["", "", ...] }
 			{ action: "empty", labs: ["", "", ...] }
 		*/
+
+		if (Hive.isPulse_Labs()) {
+			this.assignReaction(rmColony);
+		}
 
         for (let l in labDefinitions) {
             let listing = labDefinitions[l];
@@ -205,10 +246,6 @@ module.exports = {
 					break;
 
                 case "reaction":
-					if (Hive.isPulse_Labs()) {
-						this.assignReaction(rmColony);
-					}
-
                     let labSupply1 = Game.getObjectById(listing["supply1"]);
                     let labSupply2 = Game.getObjectById(listing["supply2"]);
 
@@ -228,9 +265,7 @@ module.exports = {
 							delete Memory["resources"]["labs"]["targets"][mineral];
 						delete Memory["resources"]["labs"]["reactions"][rmColony];
 						console.log(`<font color=\"#A17BFF\">[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
-
-						if (Hive.isPulse_Main())
-							this.assignReaction(rmColony);
+						delete Memory["hive"]["pulses"]["lab"];	
 						return;
 					}
 
@@ -245,7 +280,7 @@ module.exports = {
         }
 	},
 
-	createLabTasks: function(rmColony, labDefinitions) {
+	createLabTasks: function(rmColony) {
 		/* Terminal task priorities:
 		 * 2: emptying labs
 		 * 3: filling labs
