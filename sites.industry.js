@@ -145,20 +145,31 @@ module.exports = {
 	},
 
 	defineLabs: function(rmColony) {
-		// Clean up labDefinitions, remove duplicate boosts
+		// Clean up labDefinitions, remove duplicate "boosts", remove "empty" if already empty
 		if (labDefinitions != null) {
 			for (let i = labDefinitions.length - 1; i >= 0; i--) {
-				if (_.get(labDefinitions[i], "action") != "boost")
-					continue;
+				if (_.get(labDefinitions[i], "action") == "boost") {
+					for (let j = labDefinitions.length - 1; j >= 0; j--) {
+						if (i == j)
+							continue;
 
-				for (let j = labDefinitions.length - 1; j >= 0; j--) {
-					if (i == j)
-						continue;
-
-					if (_.get(labDefinitions[i], "lab") == _.get(labDefinitions[j], "lab")) {					
-						labDefinitions.splice(i, 1)
-						continue;
+						if (_.get(labDefinitions[i], "lab") == _.get(labDefinitions[j], "lab")) {
+							labDefinitions.splice(i, 1)
+							continue;
+						}
 					}
+				} else if (_.get(labDefinitions[i], "action") == "empty") {
+					let labs = _.get(labDefinitions[i], "labs");
+					for (let j = labs.length - 1; j >= 0; j--) {
+						let lab = Game.getObjectById(labs[j]);
+						if (lab == null || lab.mineralAmount == 0)
+							labs.splice(j, 1);
+					}
+
+					if (labs.length == 0)
+						labDefinitions.splice(i, 1)
+					else
+						_.set(labDefinitions[i], "labs", labs);
 				}
 			}
 			_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
@@ -168,11 +179,19 @@ module.exports = {
 		let labs = _.filter(Game["rooms"][rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType == "lab" 
 			&& _.filter(labDefinitions, def => { return _.get(def, "action") == "boost" && _.get(def, "lab") == s.id; }).length == 0 });
 		
-		// Not enough labs to support a reaction? Remove defined reactions and return
+		// Not enough labs to support a reaction? Remove defined reactions, empty labs (if needed) and return
 		if (labDefinitions != null && labs.length < 3) {			
 			for (let i = labDefinitions.length - 1; i >= 0; i--) {
 				if (_.get(labDefinitions, [i, "action"]) == "reaction")
 					labDefinitions.splice(i, 1)
+			}
+
+			for (let i = 0; i < labs.length; i++) {
+				if (labs[i].mineralAmount > 0 && _.filter(labDefinitions, d => { return _.get(d, "action") == "empty" 
+						&& _.filter(_.get(d, "labs"), l => { return l == labs[i].id;}).length > 0 }).length == 0) {
+
+					labDefinitions.push({ action: "empty", labs: [labs[i].id] });
+				}			
 			}
 
 			_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
@@ -449,12 +468,39 @@ module.exports = {
 			let storage = Game.rooms[rmColony].storage;
 			let terminal = Game.rooms[rmColony].terminal;
 
+			// Add low energy level to room's stockpile (to prevent sending to other rooms)
+			let __Colony = require("util.colony");
+			let energy_shortage_level = __Colony.getLowStockpile(_.get(Game, ["rooms", rmColony, "controller", "level"]));
+			let energy_stockpile = _.get(Memory, ["rooms", rmColony, "stockpile", "energy"]);
+			if (energy_stockpile == null || energy_stockpile < energy_shortage_level) {				
+				_.set(Memory, ["rooms", rmColony, "stockpile", "energy"],
+					energy_stockpile == null ? energy_shortage_level : energy_stockpile + energy_shortage_level);
+			}
+
+			// Create orders to request resources to meet per-room stockpile
 			for (let res in _.get(Memory, ["rooms", rmColony, "stockpile"])) {
 				shortage[res] = _.get(Memory, ["rooms", rmColony, "stockpile", res]) - room.store(res);
 
 				if (shortage[res] > 0)
 					_.set(Memory, ["resources", "terminal_orders", `${rmColony}-${res}`], 
 						{ room: rmColony, resource: res, amount: shortage[res], automated: true, priority: 2 });
+			}
+
+			// Create high priority order to fix critical shortage of energy in this room (and start early, aim high, include margins for error!)
+			let room_energy_level = _.get(storage, ["store", "energy"]) + _.get(terminal, ["store", "energy"]);
+			if (room_energy_level < (energy_shortage_level * 1.1)) {
+				let amount = Math.max((energy_shortage_level * 1.25) - room_energy_level, 1000);
+
+				if (amount > 0) {
+					// Prevent spamming "new energy order creted" if it's just modifying the amount on an existing order...
+					if (_.get(Memory, ["resources", "terminal_orders", `${rmColony}-energy_critical`]) == null)
+						console.log(`<font color=\"#DC00FF\">[Terminals]</font> Creating critical energy order for ${rmColony} for ${amount} energy.`);
+					_.set(Memory, ["resources", "terminal_orders", `${rmColony}-energy_critical`], 
+						{ room: rmColony, resource: "energy", amount: amount, automated: true, priority: 1 });
+					
+				}
+			} else {
+				delete Memory["resources"]["terminal_orders"][`${rmColony}-energy_critical`];
 			}
 
 			let filling = new Array();

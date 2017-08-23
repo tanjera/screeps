@@ -2,14 +2,29 @@
 - invade(), occupy()
 - invasion(toOccupy) -> occupation
 - all sites()
+- downgrade_critical?
 
 
 
 # Implementing...
-- Log to show all boosts in action... or add to log.labs()
-- Implement tower repairing?
-	- If not attacking or healing...
-	- Check structures if (Game.time % 25 == 0)
+- Spawns *not* renew soldiers (they park next to spawns forever if no hostiles!)
+- Remote mining: if a room is not visible
+	- Add "scout" body, 1 MOVE
+	- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
+
+
+Industry
+	* when defining reactions, splice out labs already defined in boosts!!!!!!! but not empty...
+	- @ sites.industry() line ~141: if no reaction available to be assigned, check if any labs need emptying
+		- and empty them!
+	- refactor industry functions; Refactor industry... write out steps for industry and try to refactor to it
+	- In defining labs, if no reaction or boost, if not empty, then empty
+
+Misc
+	- Log to show all boosts in action... or add to log.labs()
+	- Implement tower repairing?
+		- If not attacking or healing...
+		- Check structures if (Game.time % 25 == 0)
 
 
 
@@ -48,6 +63,9 @@
 
 - Code Standardization
 	? Change all "listRoute" in Memory objects to "route" e.g. colonize()
+
+- Memory Optimization
+	- Delete old remote mining data from Memory.rooms... Memory.rooms.rmName.mining-name
 
 - CPU Optimization
 	- Replace _.filter(room.find(list)) with room.find(list, {filter: ()}) 

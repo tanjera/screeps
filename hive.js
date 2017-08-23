@@ -98,11 +98,6 @@ let Hive = {
 
 		_.set(Memory, ["hive", "spawn_requests"], new Array());
 
-		for (let r in _.get(Memory, ["hive", "pulses", "pause_upgrading"])) {
-			if (Game.time >= _.get(Memory, ["hive", "pulses", "pause_upgrading", r]))
-				delete Memory["hive"]["pulses"]["pause_upgrading"][r];
-		};
-
 		let _Console = require("util.console");
 		_Console.Init();
 		

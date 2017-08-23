@@ -238,7 +238,7 @@ module.exports = {
 			}
 			else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.subtype == "pickup" || t.type == "energy"							
+						t => { return (t.subtype == "pickup" || t.type == "energy" || t.type == "energy-critical")
 							&& (t.structure != "link" || t.role != "upgrade")
 							&& (t.creeps == null || t.creeps > 0); }),
 						t => { return creep.pos.getRangeTo(t.pos.x, t.pos.y); }),

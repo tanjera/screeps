@@ -24,7 +24,7 @@ module.exports = {
             return 7;
         else											  // lvl 8, 12900 energy
             return 8;
-		},
+    },
 
     getWalls_targetHits: function(level) {
         let t = [ 0,
@@ -37,7 +37,33 @@ module.exports = {
                     250000,
                     1000000 ];
         return t[level];
-	},
+    },
+    
+    getCriticalStockpile: function(level) {
+        let energy = [ 0,
+            0,
+            0,
+            0,
+            10000,
+            20000,
+            35000,
+            50000,
+            75000 ];
+        return energy[level];
+    },
+
+    getLowStockpile: function(level) {
+        let energy = [ 0,
+            0,
+            0,
+            0,
+            20000,
+            40000,
+            70000,
+            100000,
+            150000 ];
+        return energy[level];
+    },
 
     findByNeed_RepairCritical: function(room) {
         return room.find(FIND_STRUCTURES, {

@@ -3,13 +3,20 @@ _Tasks = require("tasks");
 module.exports = {
 
 	compileTasks: function (rmName) {
-		var structures;
 		let __Colony = require("util.colony");
 		let room = Game.rooms[rmName];
 		let roomLvl = (room.controller == null || room.controller.level == 0) ? 8 : room.controller.level;
 		let amOwner = (room.controller == null || room.controller.level == 0) ? false : room.controller.my;
+		let is_safe = _.get(Memory, ["rooms", rmName, "is_safe"]);
 
-		/* Worker-based tasks (upgrading controllers, building and maintaining structures) */
+		var structures;
+		let all_structures = room.find(FIND_STRUCTURES);
+		let my_structures = _.filter(all_structures, s => { return s.my; });
+		
+		
+
+		/* Room Controllers (upgrading, signing) */
+		
 		if (amOwner) {
 			if (room.controller.ticksToDowngrade < 3500) {
 				_Tasks.addTask(rmName,
@@ -85,6 +92,9 @@ module.exports = {
 			}
 		}
 
+
+		/* Repair maintenance */
+
 		structures = __Colony.findByNeed_RepairCritical(room);
 		for (let i in structures) {
 			if (amOwner || structures[i].structureType == "road" || structures[i].structureType == "container") {
@@ -102,6 +112,8 @@ module.exports = {
 			}
 		}
 
+		/* Construction sites */
+
 		structures = room.find(FIND_CONSTRUCTION_SITES, { filter: s => { return s.my; }});
 		for (let i in structures) {
 			_Tasks.addTask(rmName,
@@ -117,7 +129,9 @@ module.exports = {
 				});
 		}
 
-		/* Carrier-based tasks & energy supply for workers) */
+		
+		/* Dropped resources */
+		
 		let piles = room.find(FIND_DROPPED_RESOURCES);
 		for (let i in piles) {
 			_Tasks.addTask(rmName,
@@ -133,6 +147,9 @@ module.exports = {
 					priority: piles[i].resourceType == "energy" ? 2 : 1,
 				});
 		}
+
+
+		/* Source mining */
 
 		let sources = room.find(FIND_SOURCES, { filter: s => { return s.energy > 0; }});
 		for (let i in sources) {
@@ -164,6 +181,9 @@ module.exports = {
 				});
 		}
 
+
+		/* Mineral extraction */
+
 		let minerals = room.find(FIND_MINERALS, { filter: m => { return m.mineralAmount > 0; }});
 		for (let i in minerals) {
 			let look = minerals[i].pos.look();
@@ -185,74 +205,128 @@ module.exports = {
 			}
 		}
 
-		let storages = room.find(FIND_STRUCTURES, { filter: s => {
-			return (s.structureType == STRUCTURE_STORAGE && s.my)
-				|| (s.structureType == STRUCTURE_CONTAINER); }});
-		for (let i in storages) {
-			if (storages[i].store["energy"] > 0) {
+
+		/* Containers */
+
+		let containers = _.filter(all_structures, s => { return s.structureType == STRUCTURE_CONTAINER; });
+		for (let i in containers) {
+			if (containers[i].store["energy"] > 0) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "energy",
 						subtype: "withdraw",
-						structure: storages[i].structureType,
+						structure: containers[i].structureType,
 						resource: "energy",
-						id: storages[i].id,
-						pos: storages[i].pos,
-						key: `energy:withdraw-energy-${storages[i].id}`,
+						id: containers[i].id,
+						pos: containers[i].pos,
+						key: `energy:withdraw-energy-${containers[i].id}`,
 						timer: 20,
-						creeps: Math.ceil(storages[i].store["energy"] / (roomLvl * 200)),
+						creeps: Math.ceil(containers[i].store["energy"] / (roomLvl * 180)),
 						priority: 3
 					});
 			}
-			if (_.sum(storages[i].store) < storages[i].storeCapacity) {
+			if (_.sum(containers[i].store) < containers[i].storeCapacity) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "carry",
 						subtype: "deposit",
-						structure: storages[i].structureType,
+						structure: containers[i].structureType,
 						resource: "energy",
-						id: storages[i].id,
-						pos: storages[i].pos,
-						key: `carry:deposit-energy-${storages[i].id}`,
+						id: containers[i].id,
+						pos: containers[i].pos,
+						key: `carry:deposit-energy-${containers[i].id}`,
 						timer: 20,
 						creeps: 10,
-						priority: (storages[i].structureType == "storage" ? 8 : 9)
+						priority: 9
 					});
-				if (storages[i].structureType == "storage") {
-					// Storages receive all minerals... industry tasks work from storage!
-					_Tasks.addTask(rmName,
-						{   room: rmName,
-							type: "carry",
-							subtype: "deposit",
-							structure: storages[i].structureType,
-							resource: "mineral",
-							id: storages[i].id,
-							pos: storages[i].pos,
-							key: `carry:deposit-mineral-${storages[i].id}`,
-							timer: 20,
-							creeps: 10,
-							priority: 9
-						});
-				} else if (storages[i].structureType == "container") {
-					// Empty stray minerals from containers! type: "energy" for carriers (not an industry task!)
-					_.each(_.filter(Object.keys(storages[i].store), res => { return res != "energy"; }), res => {
-						_Tasks.addTask(rmName,
-							{   room: rmName,
-								type: "energy",
-								subtype: "withdraw",
-								structure: storages[i].structureType,
-								resource: res,
-								id: storages[i].id,
-								pos: storages[i].pos,
-								key: `energy:withdraw-energy-${storages[i].id}`,
-								timer: 20,
-								creeps: Math.ceil(storages[i].store[res] / (roomLvl * 200)),
-								priority: 2
-							});
-					});
-				}
 			}
+			// Empty stray minerals from containers! type: "energy" for carriers (not an industry task!)
+			_.each(_.filter(Object.keys(containers[i].store), res => { return res != "energy"; }), res => {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "energy",
+						subtype: "withdraw",
+						structure: containers[i].structureType,
+						resource: res,
+						id: containers[i].id,
+						pos: containers[i].pos,
+						key: `energy:withdraw-energy-${containers[i].id}`,
+						timer: 20,
+						creeps: Math.ceil(containers[i].store[res] / (roomLvl * 180)),
+						priority: 2
+					});
+			});
 		}
+
+
+
+		/* Storage */
+
+		let storage = _.head(_.filter(my_structures, s => { return s.structureType == "storage"; }));
+		if (storage != null) {
+			if (storage.store["energy"] > 0 && _.get(Memory, ["rooms", rmName, "energy_critical"]) == true) {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "energy-critical",
+						subtype: "withdraw",
+						structure: storage.structureType,
+						resource: "energy",
+						id: storage.id,
+						pos: storage.pos,
+						key: `energy:withdraw-energy-${storage.id}`,
+						timer: 20,
+						creeps: Math.ceil(storage.store["energy"] / (roomLvl * 180)),
+						priority: 3
+					});
+			} else if (storage.store["energy"] > 0) {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "energy",
+						subtype: "withdraw",					
+						structure: storage.structureType,
+						resource: "energy",
+						id: storage.id,
+						pos: storage.pos,
+						key: `energy:withdraw-energy-${storage.id}`,
+						timer: 20,
+						creeps: Math.ceil(storage.store["energy"] / (roomLvl * 180)),
+						priority: 3
+					});
+			}
+			if (_.sum(storage.store) < storage.storeCapacity) {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "carry",
+						subtype: "deposit",
+						structure: storage.structureType,
+						resource: "energy",
+						id: storage.id,
+						pos: storage.pos,
+						key: `carry:deposit-energy-${storage.id}`,
+						timer: 20,
+						creeps: 10,
+						priority: 8
+					});
+			}
+			// Storages receive all minerals... industry tasks work from storage!
+			_Tasks.addTask(rmName,
+				{   room: rmName,
+					type: "carry",
+					subtype: "deposit",
+					structure: storage.structureType,
+					resource: "mineral",
+					id: storage.id,
+					pos: storage.pos,
+					key: `carry:deposit-mineral-${storage.id}`,
+					timer: 20,
+					creeps: 10,
+					priority: 9
+				});
+		}
+		
+
+
+		/* Links */
 
 		if (amOwner) {
 			if (Memory["rooms"][rmName]["links"] != null) {
@@ -291,6 +365,9 @@ module.exports = {
 				});
 			}
 
+
+			/* Towers */
+
 			let towers = room.find(FIND_MY_STRUCTURES, { filter: s => {
 				return s.structureType == STRUCTURE_TOWER; }});
 			for (let i in towers) {
@@ -324,6 +401,9 @@ module.exports = {
 					});
 				}
 			}
+
+
+			/* Spawns and Extensions */
 
 			structures = room.find(FIND_MY_STRUCTURES, { filter: s => {
 				return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)

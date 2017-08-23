@@ -370,21 +370,6 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> All terminal transactions cleared.`;
 		};
 
-		command_list.push("resources.pause_upgrading(rmName, ticks)");
-		
-		resources.pause_upgrading = function(rmName, ticks) {
-			if (ticks == 0 || ticks == null) {
-				_.set(Memory, ["hive", "pulses", "pause_upgrading", rmName], null);
-				return `<font color=\"#D3FFA3\">[Console]</font> Resuming upgrading; will resume upgrader spawning and tasks.`;
-			} else {
-				_.set(Memory, ["hive", "pulses", "pause_upgrading", rmName], Game.time + ticks);
-				_.each(_.filter(Memory["creeps"], 
-					c => { return _.get(c, ["subrole"]) == "upgrader" && _.get(c, ["room"]) == rmName; }), 
-					c => { delete c["subrole"]; });
-				return `<font color=\"#D3FFA3\">[Console]</font> Pausing upgrading in ${rmName} for ${ticks} ticks; converting all upgraders to regular workers.`;
-			}
-		};
-
 		
 		command_list.push("");
 		command_list.push("colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, [listRoute])");

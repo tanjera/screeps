@@ -6,3 +6,8 @@ Creep.prototype.isBoosted = function isBoosted() {
 	}
 	return false;
 };
+
+Creep.prototype.isAlly = function isAlly() {
+	let allyList = _.get(Memory, ["hive", "allies"]);
+	return this.my || (allyList != null && allyList.indexOf(this.owner.username) >= 0);
+}
