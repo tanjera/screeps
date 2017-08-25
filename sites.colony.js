@@ -20,6 +20,8 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-surveyRoom");
 		if (Game.time % 3 == 0)
 			this.surveyRoom(rmColony);
+		if (Game.time % 9 == 0)
+			this.surveySafeMode(rmColony);
 		_CPU.End(rmColony, "Colony-surveyRoom");
 
 		if (Hive.isPulse_Spawn()) {
@@ -56,7 +58,7 @@ module.exports = {
 
 		let amountHostiles = visible
 			? Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: 
-				(c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}).length 
+				(c) => { return c.isHostile(); }}).length 
 			: 0;
 		let isSafe = !visible || amountHostiles == 0;
 		_.set(Memory, ["rooms", rmColony, "is_safe"], isSafe);
@@ -71,6 +73,30 @@ module.exports = {
 		
 		let ticks_downgrade = _.get(Game, ["rooms", rmColony, "controller", "ticksToDowngrade"]);
 		_.set(Memory, ["rooms", rmColony, "downgrade_critical"], (ticks_downgrade > 0 && ticks_downgrade < 3500))
+	},
+
+	surveySafeMode: function(rmColony) {
+		let room = _.get(Game, ["rooms", rmColony]);
+		let controller = _.get(room, "controller");
+		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);
+
+		if (is_safe || room == null || controller == null || controller.safeMode > 0 
+				|| controller.safeModeCooldown > 0 || controller.safeModeAvailable == 0)
+			return;
+
+		let hostiles = _.filter(room.find(FIND_HOSTILE_CREEPS), c => { 
+			return c.isHostile() && c.owner.username != "Invader"; });
+		let structures = _.filter(room.find(FIND_MY_STRUCTURES), s => {
+			return s.structureType == "spawn" || s.structureType == "storage"
+				|| s.structureType == "tower" || s.structureType == "terminal"
+				|| s.structureType == "nuker"; });
+
+		_.each(structures, s => {
+			if (s.pos.findInRange(hostiles, 1).length > 0) {
+				if (room.controller.activateSafeMode() == "OK")
+					console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; enemy detected at key base structure!`);
+			}
+		});
 	},
 
 	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {

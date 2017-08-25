@@ -65,7 +65,7 @@ module.exports = {
 			visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
 		let amountHostiles = visible
-			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}).length : 0;
+			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return c.isHostile(); }}).length : 0;
 		let is_safe = !visible || rmColony == rmHarvest || amountHostiles == 0;
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"], is_safe);
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "amount_hostiles"], amountHostiles);

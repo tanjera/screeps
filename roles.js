@@ -6,7 +6,7 @@ module.exports = {
     Worker: function(creep, isSafe) {
         let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}))
+				c => { return c.isHostile(); }}))
 			: null;
 
 		if (hostile == null) {
@@ -50,7 +50,7 @@ module.exports = {
     Mining: function(creep, isSafe) {
 		let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}))
+				c => { return c.isHostile(); }}))
 			: null;
 
 		if (hostile == null) {
@@ -129,7 +129,7 @@ module.exports = {
     Extracter: function(creep, isSafe) {
 		let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}))
+				c => { return c.isHostile(); }}))
 			: null;
 
 		if (hostile == null) {
@@ -314,7 +314,7 @@ module.exports = {
 
 		if (creep.memory.target == null) {
 			target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter:
-				(c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }});
+				(c) => { return c.isHostile(); }});
 			if (target != null)
 				creep.memory.target = target.id;
 		}

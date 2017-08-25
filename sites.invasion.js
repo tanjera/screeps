@@ -98,7 +98,7 @@ module.exports = {
 							creep.moveTo(posRally);
 						else {
 							let hostile = _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, 
-								{ filter: (c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}));
+								{ filter: (c) => { return c.isHostile(); }}));
 							if (hostile != null) {
 								creep.rangedAttack(hostile);
 								creep.attack(hostile);								
