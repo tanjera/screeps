@@ -283,7 +283,7 @@ let Hive = {
 
 		for (let res in resources) {
 			let excess = _.sum(resources[res]) - overflow[res];
-			if (excess > 0 && _.get(Memory, ["resources", "terminal_orders", `overflow_${res}`]) == null) {
+			if (excess > 100 && _.get(Memory, ["resources", "terminal_orders", `overflow_${res}`]) == null) {
 				let room = _.head(_.sortBy(Object.keys(resources[res]), r => { return -resources[res][r]; }));
 				let order = _.head(_.sortBy(_.sortBy(Game.market.getAllOrders(
 					o => { return o.type == "buy" && o.resourceType == res; }),
@@ -291,8 +291,10 @@ let Hive = {
 					o => { return -o.price; } ));
 
 				if (order != null) {
+					if (_.get(Memory, ["resources", "terminal_orders", `overflow_${res}`]) != null)
+						console.log(`<font color=\"#F7FF00\">[Hive]</font> Selling overflow resource to market: ${excess} of ${res} from ${room}`);
 					_.set(Memory, ["resources", "terminal_orders", `overflow_${res}`], { market_id: order.id, amount: excess, from: room, priority: 4 });
-					console.log(`<font color=\"#F7FF00\">[Hive]</font> Selling overflow resource to market: ${excess} of ${res} from ${room}`);
+					
 				}
 			}
 		}
