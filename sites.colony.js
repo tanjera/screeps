@@ -97,7 +97,7 @@ module.exports = {
 
 		if (!is_safe || energy_critical) {
 			_.set(listPopulation, ["worker", "level"], 
-				Math.max(1, Math.floor(_.get(listPopulation, ["worker", "level"]) / 4)));
+				Math.max(1, Math.floor(_.get(listPopulation, ["worker", "level"]) / 2)));
 			_.set(listPopulation, ["worker", "amount"], 1);
 			_.set(listPopulation, ["upgrader", "level"], 1);
 			_.set(listPopulation, ["upgrader", "amount"], 1);

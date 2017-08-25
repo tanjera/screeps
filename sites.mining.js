@@ -43,7 +43,7 @@ module.exports = {
 		_CPU.End(rmColony, `Mining-${rmHarvest}-listCreeps`);
 
 		_CPU.Start(rmColony, `Mining-${rmHarvest}-surveyRoom`);
-		if (Game.time % 3 == 0)
+		if (Game.time % 3 == 0 || Game.time % 100 == 0)
 			this.surveyRoom(rmColony, rmHarvest);
 		_CPU.End(rmColony, `Mining-${rmHarvest}-surveyRoom`);
 
@@ -66,16 +66,32 @@ module.exports = {
 
 		let amountHostiles = visible
 			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}).length : 0;
-		let isSafe = !visible || rmColony == rmHarvest || amountHostiles == 0;
-		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"], isSafe);
+		let is_safe = !visible || rmColony == rmHarvest || amountHostiles == 0;
+		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"], is_safe);
 		_.set(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "amount_hostiles"], amountHostiles);
+
+		if (visible && rmColony != rmHarvest && Game.time % 100 == 0) {
+			// Record amount of dropped energy available (for adjusting carrier amounts)
+			if (_.get(Memory, ["sites", "remote_mining", rmHarvest, "energy_amounts"]) == null)
+				_.set(Memory, ["sites", "remote_mining", rmHarvest, "energy_amounts"], new Array());
+			
+			_.get(Memory, ["sites", "remote_mining", rmHarvest, "energy_amounts"]).push( 
+				{ tick: Game.time, amount: _.sum(_.filter(Game["rooms"][rmHarvest].find(FIND_DROPPED_RESOURCES), 
+					res => { return res.resourceType == "energy"; }),
+					res => { return res.amount; }) });
+		}
 	},
 
 	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, listPopulation) {
 		let hasMinerals = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "has_minerals"]);
-		let isSafe = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"]);
+		let is_safe = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"]);
+		let is_safe_colony = _.get(Memory, ["rooms", rmColony, "is_safe"]);
 		let isVisible = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "visible"]);
 		let amountHostiles = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "amount_hostiles"]);
+
+		// If the colony is not safe (under siege?) pause spawning remote_mining; frees colony spawns to make soldiers
+		if (rmColony != rmHarvest && !is_safe_colony)
+			return;
 
 		let lPaladin = _.filter(listCreeps, c => c.memory.role == "paladin" && (c.ticksToLive == undefined || c.ticksToLive > 200));
 		let lSoldier = _.filter(listCreeps, c => c.memory.role == "soldier" && (c.ticksToLive == undefined || c.ticksToLive > 200));
@@ -90,11 +106,38 @@ module.exports = {
 		if (listPopulation == null) {
 			if (rmColony == rmHarvest)
 				listPopulation = Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level];
-			else
+			else {
 				listPopulation = (isVisible && _.get(Game, ["rooms", rmHarvest]) != null)
 			        ? Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level]
-			        : Population_Mining["R1"][Game.rooms[rmColony].controller.level];
-		}		
+					: Population_Mining["R1"][Game.rooms[rmColony].controller.level];
+			}	
+		}
+
+		// If remote mining, adjust carrier amount according to average amount of dropped energy over last 1500 ticks
+		let addCarrier = 0;
+		if (rmHarvest != rmColony && _.get(listPopulation, ["carrier"]) != null
+				&& _.get(Memory, ["sites", "remote_mining", rmHarvest, "energy_amounts"]) != null) {
+			let amount = 0;
+			let array = _.get(Memory, ["sites", "remote_mining", rmHarvest, "energy_amounts"]);
+
+			for (let i = array.length - 1; i >= 0; i--) {
+				if (_.get(array[i], "tick") < Game.time - 1500)
+					Memory["sites"]["remote_mining"][rmHarvest]["energy_amounts"].splice(i, 1);
+				else
+					amount += _.get(array[i], "amount");
+			}
+			
+			let _Creep = require("util.creep");
+			let _Body = require("util.creep.body");
+			let dropped = Math.floor(amount / Memory["sites"]["remote_mining"][rmHarvest]["energy_amounts"].length);
+			let body = _Creep.getBody((listPopulation["carrier"]["body"] || "carrier"), listPopulation["carrier"]["level"]);
+			let cost = _Body.getBodyCost(body);
+			
+			if (cost < dropped) {				
+				let round = Math.round(dropped / (cost * 5))
+				addCarrier = round > 0 ? round : 1;
+			}
+		}
 
         let popTarget =
               (listPopulation["paladin"] == null ? 0 : listPopulation["paladin"]["amount"])
@@ -114,7 +157,7 @@ module.exports = {
 				scale_level: listPopulation["paladin"] == null ? true : listPopulation["paladin"]["scale_level"],
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
 		}
-		else if ((!hasKeepers && !isSafe && amountHostiles > lSoldier.length + lMultirole.length)
+		else if ((!hasKeepers && !is_safe && amountHostiles > lSoldier.length + lMultirole.length)
 				|| (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 				level: listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"],
@@ -149,7 +192,7 @@ module.exports = {
 					name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
             }
         }
-        else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"]) {
+        else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] + addCarrier) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["carrier"]["level"],
 				scale_level: listPopulation["carrier"] == null ? true : listPopulation["carrier"]["scale_level"],
 				body: (listPopulation["carrier"]["body"] || "carrier"),
@@ -180,15 +223,15 @@ module.exports = {
 	runCreeps: function(rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {
 		let Roles = require("roles");
 
-		let isSafe = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"]);
+		let is_safe = _.get(Memory, ["rooms", rmColony, `mining_${rmHarvest}`, "is_safe"]);
 
         _.each(listCreeps, creep => {
 			creep.memory.listRoute = listRoute;
 
 			if (creep.memory.role == "miner" || creep.memory.role == "burrower" || creep.memory.role == "carrier") {
-				Roles.Mining(creep, isSafe);
+				Roles.Mining(creep, is_safe);
 			} else if (creep.memory.role == "extractor") {
-				Roles.Extracter(creep, isSafe);
+				Roles.Extracter(creep, is_safe);
 			} else if (creep.memory.role == "reserver") {
 				Roles.Reserver(creep);
 			} else if (creep.memory.role == "soldier" || creep.memory.role == "paladin") {
@@ -196,8 +239,8 @@ module.exports = {
 			} else if (creep.memory.role == "healer") {
 				Roles.Healer(creep);
 			} else if (creep.memory.role == "multirole") {
-				if (hasKeepers || isSafe)
-					Roles.Worker(creep, isSafe);
+				if (hasKeepers || is_safe)
+					Roles.Worker(creep, is_safe);
 				else
 					Roles.Soldier(creep, false, true);
 			}

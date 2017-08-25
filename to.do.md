@@ -7,10 +7,9 @@
 
 
 # Implementing...
-- Spawns *not* renew soldiers (they park next to spawns forever if no hostiles!)
 - Remote mining: if a room is not visible
 	- Add "scout" body, 1 MOVE
-	- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
+		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
 
 
 Industry
@@ -56,7 +55,9 @@ Misc
 		- If burrower blocked from source, request blocking creep to swap spaces
 
 - Remote Mining
+	- Combine colony mining and remote mining under one mining tree in Memory?
 	- Creates a road from source to colony
+	- Calculating additional carriers assumes all carriers are carrier_AT body type...
 
 - Alliance
 	- Sites.Support, help an ally build

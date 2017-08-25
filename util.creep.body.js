@@ -1,5 +1,27 @@
 module.exports = {
 
+    getPartCount: function(body, part) {
+        return _.filter(body, p => { return p == part; }).length;
+    },
+
+    getBodyCost: function(body) {
+        let cost = 0;
+        for (let p in body) {
+            switch (body[p]) {
+                case "move": cost += 50; break;
+                case "work": cost += 100; break;
+                case "carry": cost += 50; break;
+                case "attack": cost += 80; break;
+                case "ranged_attack": cost += 150; break;
+                case "heal": cost += 250; break;
+                case "claim": cost +=600; break;
+                case "tough": cost += 10; break;
+            }
+        }
+        return cost;
+    },
+
+
 	getBody_Soldier: function(level) {
         switch (level) {
             default:
