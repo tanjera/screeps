@@ -3,6 +3,18 @@ let Tasks = require("tasks");
 
 module.exports = {
 	
+	acquireBoost: function(creep) {
+		if (creep.room.name == creep.memory.colony) {
+			if (creep.memory.boost == null && !creep.isBoosted()) {
+				if (this.seekBoost(creep))
+					return;
+			} else if (creep.memory.boost != null && !creep.isBoosted()) {
+				creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+				return;
+			}
+		}
+	},
+
 	seekBoost: function(creep) {
 		if (creep.isBoosted())
 			return false;
@@ -21,7 +33,15 @@ module.exports = {
 				return false;
 		}
 	},
-	
+
+	moveToDestination: function(creep) {
+		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
+			_Creep.moveToRoom(creep, creep.memory.room, true);
+			if (Game.time % 10 != 0)
+				return;	// Evaluates for targets in this room every 10 ticks...
+		}
+	},
+
 	checkTarget_Existing: function(creep) {
 		if (creep.memory.target != null) {
 			let target = Game.getObjectById(creep.memory.target);
@@ -76,15 +96,34 @@ module.exports = {
 			if (target != null)
 				creep.memory.target = target.id;
 		}
+	},	
+
+	setCamp: function(creep) {
+		if (creep.memory.camp != null || Game.time % 5 != 0)
+			return;
+
+		if (creep.room.name != creep.memory.room) {
+			let lair = _.head(_.sortBy(_.filter(creep.room.find(FIND_STRUCTURES), 
+				s => { return s.structureType == "keeperLair"; }),
+				s => { return s.ticksToSpawn; }));		
+			if (lair != null)
+				creep.memory.camp = lair.id;
+		} else {
+			let ramparts = _.filter(creep.room.find(FIND_MY_STRUCTURES), 
+				s => { return s.structureType == "rampart" && s.pos.lookFor(LOOK_CREEPS).length == 0; });					
+			let rampart = creep.pos.findClosestByPath(ramparts);
+			if (rampart != null)
+				creep.memory.camp = rampart.id;
+		}
 	},
-	
-	moveTo_SourceKeeperLair: function(creep) {
-		let lair = _.head(_.sortBy(
-			creep.room.find(FIND_STRUCTURES, { filter: s => { return s.structureType == "keeperLair"; }}),
-			s => { return s.ticksToSpawn; } ));
-		if (lair != null)
-			creep.moveTo(lair);
+
+	moveToCamp: function(creep) {
+		if (creep.memory.camp != null) {
+			let camp = Game.getObjectById(creep.memory.camp);
+			if (camp == null)
+				delete creep.memory.camp;
+			else
+				creep.moveTo(camp);				
+		}
 	}
-	
-	
 }

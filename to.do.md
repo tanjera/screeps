@@ -5,10 +5,8 @@
 
 
 # Implementing...
-
-if soldier idle, move into room dont stay on edges
-if soldier moving to other room, but is being attacked (or has hostiles in current room)... attack them!
-
+- Grafana
+	- Add lab assignments, reactions (as tables?); nuker filling status
 - If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
 	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
 

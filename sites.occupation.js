@@ -65,7 +65,7 @@ module.exports = {
 			if (creep.memory.role == "soldier") {
 				Roles.Soldier(creep, true, true, listTargets);
 			} else if (creep.memory.role == "archer") {
-				Roles.Archer(creep, true, listTargets);
+				Roles.Archer(creep, true, true, listTargets);
 			} else if (creep.memory.role == "healer") {
 				Roles.Healer(creep);
 			}

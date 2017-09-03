@@ -17,6 +17,10 @@ RoomPosition.prototype.isWalkable = function isWalkable() {
 	return true;
 };
 
+RoomPosition.prototype.isEdge = function isEdge() {
+	return (this.x == 0 || this.x == 49 || this.y == 0 || this.y == 49);
+}
+
 RoomPosition.prototype.inRangeToListTargets = function inRangeToListTargets(listTargets, range) {
 	for (let i = 0; i < listTargets.length; i++) {
 		if (this.getRangeTo(listTargets[i].pos.x, listTargets[i].pos.y) < range)

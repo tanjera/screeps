@@ -229,22 +229,8 @@ module.exports = {
     Soldier: function(creep, targetStructures, targetCreeps, listTargets) {
 		let _Combat = require("roles.combat");
 		
-		if (creep.room.name == creep.memory.colony) {
-			if (creep.memory.boost == null && !creep.isBoosted()) {
-				if (_Combat.seekBoost(creep))
-					return;
-			} else if (creep.memory.boost != null && !creep.isBoosted()) {
-				creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
-				return;
-			}
-		}
-
-		if (creep.memory.room != null && creep.room.name != creep.memory.room
-				&& creep.memory.target == null) {	// Prevent room edge fighting from breaking logic...
-			_Creep.moveToRoom(creep, creep.memory.room, true);
-			if (Game.time % 10 != 0)
-				return;	// Evaluates for targets in this room every 10 ticks...
-		}
+		_Combat.acquireBoost(creep);
+		_Combat.moveToDestination(creep);		
 		
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);
@@ -283,64 +269,29 @@ module.exports = {
 				return;
 			}
 		} else {
-			_Combat.moveTo_SourceKeeperLair(creep);
 			creep.heal(creep);
+
+			_Combat.setCamp(creep);
+			_Combat.moveToCamp(creep);					
 			return;
 		}
 	},
 
-	Archer: function(creep, destroyStructures, listTargets) {
-		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-			_Creep.moveToRoom(creep, creep.memory.room);
-			if (Game.time % 10 != 0)
-				return;	// Evaluates for targets in this room every 10 ticks...
-        }
+	Archer: function(creep, targetStructures, targetCreeps, listTargets) {
 
-		let target;
+		_Combat.acquireBoost(creep);
+		_Combat.moveToDestination(creep);
 
-		if (creep.memory.target != null) {
-			target = Game.getObjectById(creep.memory.target);
-			if (target == null)
-				delete creep.memory.target;
-		}
-
-		if (creep.memory.target == null) {
-			for (let t in listTargets) {
-				target = Game.getObjectById(listTargets[t]);
-				if (target != null) {
-					creep.memory.target = target.id;
-					break;
-				}
-			}
-		}
-
-		if (creep.memory.target == null) {
-			target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter:
-				(c) => { return c.isHostile(); }});
-			if (target != null)
-				creep.memory.target = target.id;
-		}
-
-		if (creep.memory.target == null && destroyStructures != null && destroyStructures == true) {
-			target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
-				s => { return s.hits != null && s.hits > 0
-					&& (s.owner == null || _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
-				s => { return creep.pos.getRangeTo(s.pos); } ),
-				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
-				s => { 	if (s.structureType == "tower")
-							return 0;
-						else if (s.structureType == "spawn")
-							return 1;
-						else
-							return 2;
-				} ));
-
-			if (target != null)
-				creep.memory.target = target.id;
-		}
+		_Combat.checkTarget_Existing(creep);
+		_Combat.acquireTarget_ListTarget(creep, listTargets);
+		
+		if (targetCreeps)
+			_Combat.acquireTarget_Creep(creep);		
+		if (targetStructures) 
+			_Combat.acquireTarget_Structure(creep);
 
 		if (creep.memory.target != null) {
-			target = Game.getObjectById(creep.memory.target);
+			let target = Game.getObjectById(creep.memory.target);
 			let result = creep.rangedAttack(target);
 			if (result == ERR_NOT_IN_RANGE) {
 				creep.heal(creep);
@@ -358,6 +309,8 @@ module.exports = {
 		}
 		else {
 			creep.heal(creep);
+			_Combat.setCamp(creep);
+			_Combat.moveToCamp(creep);
 			return;
 		}
 	},
