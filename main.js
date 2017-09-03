@@ -7,12 +7,13 @@ require("populations");
 
 let Hive = require("hive");
 let Blueprint = require("blueprint");
-let _CPU = require("util.cpu");
+let CPU = require("util.cpu");
+let Grafana = require("util.grafana");
 
 module.exports.loop = function () {
 
 	/* Init functions */
-	_CPU.Init();
+	CPU.Init();
 	Blueprint.Init();
 
 	Hive.clearDeadMemory();
@@ -50,6 +51,9 @@ module.exports.loop = function () {
 	Hive.processSpawnRenewing();
 	Hive.endMemory();
 
+	/* Output stats to Grafana */
+	Grafana.Run();
+
 	/* Finish the profiler cycle */
-	_CPU.Finish();
+	CPU.Finish();
 };

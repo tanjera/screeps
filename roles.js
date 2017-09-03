@@ -242,7 +242,8 @@ module.exports = {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room
 				&& creep.memory.target == null) {	// Prevent room edge fighting from breaking logic...
 			_Creep.moveToRoom(creep, creep.memory.room, true);
-			return;
+			if (Game.time % 10 != 0)
+				return;	// Evaluates for targets in this room every 10 ticks...
 		}
 		
 		_Combat.checkTarget_Existing(creep);
@@ -291,7 +292,8 @@ module.exports = {
 	Archer: function(creep, destroyStructures, listTargets) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
 			_Creep.moveToRoom(creep, creep.memory.room);
-			return;
+			if (Game.time % 10 != 0)
+				return;	// Evaluates for targets in this room every 10 ticks...
         }
 
 		let target;
@@ -363,7 +365,8 @@ module.exports = {
     Healer: function(creep) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
             _Creep.moveToRoom(creep, creep.memory.room);
-			return;
+			if (Game.time % 10 != 0)
+				return;	// Evaluates for targets in this room every 10 ticks...
         }
 
 		let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter:

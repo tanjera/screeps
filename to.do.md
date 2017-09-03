@@ -1,12 +1,22 @@
 # Implemented, Needs Debugging/Testing
-- invade(), occupy()
+- invade()
 - invasion(toOccupy) -> occupation
-- all sites()
-- downgrade_critical?
 
 
 
 # Implementing...
+
+if soldier idle, move into room dont stay on edges
+if soldier moving to other room, but is being attacked (or has hostiles in current room)... attack them!
+
+- If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
+	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
+
+- log.labs show active boosts? Or add a log.boosts...
+
+- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
+	- Needs to define central labs as supply to reach all reactors
+
 - Remote mining: if a room is not visible
 	- Add "scout" body, 1 MOVE
 		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)

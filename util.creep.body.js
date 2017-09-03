@@ -33,14 +33,14 @@ module.exports = {
                         MOVE, ATTACK];
             case 2:
                 return [ // 390 energy, 3x ATTACK, 3x MOVE
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
             case 3:
                 return [ // 650 energy, 4x ATTACK, 4x MOVE
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK];
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
             case 4:
                 return [ // 910 energy, 6x ATTACK, 6x MOVE
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK];
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE];
             case 5:
                 return [ // 1700 energy, 10x ATTACK, 12x MOVE, 2x RANGED_ATTACK
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
@@ -80,23 +80,23 @@ module.exports = {
             case 5:
                 return [ // 1700 energy, 11x ATTACK, 15x MOVE, 4x TOUGH
 						TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK ];
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE ];
             case 6:
                 return [ // 2160 energy, 14x ATTACK, 19x MOVE, 5x TOUGH
 						TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK ];
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE ];
             case 7:                
             case 8:
                 return [ // 2700 energy, 20x MOVE, 20x ATTACK, 10x TOUGH
                         TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
-						MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK ];
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE ];
         }
 	},
 
@@ -124,8 +124,42 @@ module.exports = {
 						ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,						
 						HEAL, HEAL, HEAL, HEAL, HEAL];
         }
-	},
-
+    },
+    
+    getBody_Tank: function(level) {
+        switch (level) {
+            default:
+				console.log(`Error @ getBody_Tank, ${level} is not a proper number!`);
+				return;
+            case 1:
+                return [ // 240 energy, 4x TOUGH, 4x MOVE
+                    TOUGH, TOUGH, TOUGH, TOUGH, 
+                    MOVE, MOVE, MOVE, MOVE];
+            case 2:
+                return [ // 480 energy, 8x TOUGH, 8x MOVE
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 3:
+                return [ // 480 energy, 12x TOUGH, 12x MOVE
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, 
+                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE];
+            case 4:
+            case 5:
+            case 6:
+            case 7:                
+            case 8:            
+                return [ // 1180 energy, 33x TOUGH, 17x MOVE
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    TOUGH, TOUGH, TOUGH,
+                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        }
+    },
+    
     getBody_Archer: function(level) {
         switch (level) {
             default:
@@ -146,28 +180,28 @@ module.exports = {
                         RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
             case 4:
                 return [ // 1000 energy, 5x RANGED_ATTACK, 5x MOVE
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
             case 5:
                 return [ // 1600 energy, 8x RANGED_ATTACK, 8x MOVE
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-						MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+						RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
             case 6:
                 return [ // 2000 energy, 10x RANGED_ATTACK, 10x MOVE
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-						MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+						RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
             case 7:
                 return [ // 4000 energy, 20x RANGED_ATTACK, 20x MOVE
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
             case 8:
                 return [ // 5000 energy, 25x RANGED_ATTACK, 25x MOVE
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK,
-                        MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK];
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
+                        RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
         }
 	},
 
@@ -179,43 +213,39 @@ module.exports = {
             case 1:
             case 2:
                 return [ // 300 energy, 1x HEAL, 1x MOVE
-                        MOVE, HEAL];
+                        HEAL, MOVE];
             case 3:
-                return [ // 600 energy, 2x HEAL, 2x MOVE
-                        MOVE, MOVE,
-                        HEAL, HEAL];
+                return [ // 600 energy, 2x HEAL, 2x MOVE                        
+                        HEAL, MOVE, HEAL, MOVE];
             case 4:
                 return [ // 1200 energy, 4x HEAL, 4x MOVE
-                        MOVE, MOVE, MOVE, MOVE,
-                        HEAL, HEAL, HEAL, HEAL];
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE];
             case 5:
                 return [ // 1680 energy, 5x HEAL, 8x MOVE, 3x TOUGH
                         TOUGH, TOUGH, TOUGH,
-						MOVE, MOVE, MOVE,
-						MOVE, MOVE, MOVE, MOVE, MOVE,
-                        HEAL, HEAL, HEAL, HEAL, HEAL];
+						MOVE, MOVE, MOVE,						
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE];
             case 6:
                 return [ // 2100 energy, 6x HEAL, 11x MOVE, 5x TOUGH
                         TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-						MOVE, MOVE, MOVE, MOVE, MOVE,
-						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL ];
+						MOVE, MOVE, MOVE, MOVE, MOVE,						
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, 
+                        HEAL, MOVE];
             case 7:
                 return [ // 4800 energy, 15x HEAL, 15x MOVE
 						TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-						MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE,
-                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
-                        HEAL, HEAL, HEAL, HEAL, HEAL];
+						MOVE, MOVE, MOVE, MOVE, MOVE,                        
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, 
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, 
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE];
             case 8:
                 return [ // 6300 energy, 20x HEAL, 5x TOUGH, 25x MOVE
                         TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
 						MOVE, MOVE, MOVE, MOVE, MOVE,
-						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
-                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL];
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, 
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, 
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, 
+                        HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE, HEAL, MOVE];
         }
 	},
 
@@ -263,14 +293,13 @@ module.exports = {
 						ATTACK, ATTACK];
             case 7:                
             case 8:
-                return [ // 3380 energy, 6x WORK, 10x CARRY, 24x MOVE, 4x RANGED_ATTACK, 6x ATTACK
+                return [ // 3380 energy, 6x WORK, 10x CARRY, 25x MOVE, 4x RANGED_ATTACK, 5x ATTACK
                         WORK, WORK, WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                        MOVE, MOVE, MOVE, MOVE,
-						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
-                        ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,                        
+						RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, 
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
         }
 	},
 

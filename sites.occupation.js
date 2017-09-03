@@ -62,17 +62,14 @@ module.exports = {
             creep.memory.listRoute = listRoute;
 			let _Creep = require("util.creep");
 
-			if (creep.room.name != rmOccupy)
-				_Creep.moveToRoom(creep, rmOccupy, true);
-			else {
-				if (creep.memory.role == "soldier") {
-					Roles.Soldier(creep, true, true, listTargets);
-				} else if (creep.memory.role == "archer") {
-					Roles.Archer(creep, true, listTargets);
-				} else if (creep.memory.role == "healer") {
-					Roles.Healer(creep);
-				}
+			if (creep.memory.role == "soldier") {
+				Roles.Soldier(creep, true, true, listTargets);
+			} else if (creep.memory.role == "archer") {
+				Roles.Archer(creep, true, listTargets);
+			} else if (creep.memory.role == "healer") {
+				Roles.Healer(creep);
 			}
+			
         });
 	}
 };

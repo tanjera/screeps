@@ -193,14 +193,16 @@ module.exports = {
             if (forwardRoute == true) {
                 for (let i = 1; i < creep.memory.listRoute.length; i++) {
                     if (creep.room.name == creep.memory.listRoute[i - 1]) {
-                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: Hive.moveReusePath()});
+                        if (creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH)
+                            creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {maxOps: 5000, reusePath: Hive.moveReusePath()});
                         return;
                     }
                 }
             } else if (forwardRoute == false) {
                 for (let i = creep.memory.listRoute.length - 2; i >= 0; i--) {
                     if (creep.room.name == creep.memory.listRoute[i + 1]) {
-                        creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: Hive.moveReusePath()});
+                        if (creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {reusePath: Hive.moveReusePath()}) == ERR_NO_PATH)
+                            creep.moveTo(new RoomPosition(25, 25, creep.memory.listRoute[i]), {maxOps: 5000, reusePath: Hive.moveReusePath()});                        
                         return;
                     }
                 }
@@ -250,7 +252,8 @@ module.exports = {
         switch (type) {
             case "soldier": return _Body.getBody_Soldier(level);
 			case "brawler": return _Body.getBody_Brawler(level);
-			case "paladin": return _Body.getBody_Paladin(level);
+            case "paladin": return _Body.getBody_Paladin(level);
+            case "tank": return _Body.getBody_Tank(level);
             case "archer": return _Body.getBody_Archer(level);
             case "healer": return _Body.getBody_Healer(level);
             case "multirole": return _Body.getBody_Multirole(level);
