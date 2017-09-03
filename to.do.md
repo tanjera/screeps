@@ -1,45 +1,13 @@
 # Implemented, Needs Debugging/Testing
-- invade()
-- invasion(toOccupy) -> occupation
 
 
 
 # Implementing...
-
-if soldier idle, move into room dont stay on edges
-if soldier moving to other room, but is being attacked (or has hostiles in current room)... attack them!
-
-- If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
-	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
-
-- log.labs show active boosts? Or add a log.boosts...
-
-- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
-	- Needs to define central labs as supply to reach all reactors
-
 - Remote mining: if a room is not visible
 	- Add "scout" body, 1 MOVE
 		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
 
-
-Industry
-	* when defining reactions, splice out labs already defined in boosts!!!!!!! but not empty...
-	- @ sites.industry() line ~141: if no reaction available to be assigned, check if any labs need emptying
-		- and empty them!
-	- refactor industry functions; Refactor industry... write out steps for industry and try to refactor to it
-	- In defining labs, if no reaction or boost, if not empty, then empty
-
-Misc
-	- Log to show all boosts in action... or add to log.labs()
-	- Implement tower repairing?
-		- If not attacking or healing...
-		- Check structures if (Game.time % 25 == 0)
-
-
-
-# To Implement
 - Combat
-	* All offensive code goes under one pipeline- combat.
 	- Use object "tactics" to define actions from a playbook and victory conditions
 		- Trickle (spawn, move to room and attack, no rally)
 		- Waves (spawn, rally, attack)
@@ -57,8 +25,39 @@ Misc
 		- Spawns wiped
 		- Buildings wiped
 
-- Defense
-	- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
+
+
+
+
+
+# To Implement
+
+- If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
+	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
+
+- log.labs show active boosts? Or add a log.boosts...
+
+- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
+	- Needs to define central labs as supply to reach all reactors
+
+
+- Industry
+	* when defining reactions, splice out labs already defined in boosts!!!!!!! but not empty...
+	- @ sites.industry() line ~141: if no reaction available to be assigned, check if any labs need emptying
+		- and empty them!
+	- refactor industry functions; Refactor industry... write out steps for industry and try to refactor to it
+	- In defining labs, if no reaction or boost, if not empty, then empty
+
+- Log to show all boosts in action... or add to log.labs()
+
+- Implement tower repairing?
+	- If not attacking or healing...
+	- Check structures if (Game.time % 25 == 0)
+
+
+- Refactor spawning code in sites.colony() sites.mining(); 
+	- Just iterate listPopulation and request each in spawning 
+		- Use more priority #s to "sort"
 
 - Colony function
 	- Creep ability to request another creep to move/swap spaces

@@ -19,15 +19,10 @@ module.exports = {
 		let Colonization = require("sites.colonization");
 		Colonization.Run(rmColony, rmTarget);
 	},
-    
-	Occupation: function(rmColony, rmOccupy) {
-		let Occupation = require("sites.occupation");
-		Occupation.Run(rmColony, rmOccupy);
-	},
 	
-	Invasion: function(rmColony, rmInvade) {
-		let Invasion = require("sites.invasion");
-		Invasion.Run(rmColony, rmInvade);
+	Combat: function(memory_id) {
+		let Combat = require("sites.combat");
+		Combat.Run(memory_id);
 	}
     
 };

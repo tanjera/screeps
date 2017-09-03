@@ -148,19 +148,10 @@ let Hive = {
 		});
 	},
 
-	runInvasions: function() {
-		_.each(_.get(Memory, ["sites", "invasion"]), req => {
-			Sites.Invasion(_.get(req, "from"), _.get(req, "target"), _.get(req, "occupy"), _.get(req, "spawn_assist"), 
-				_.get(req, "army"), _.get(req, "targets"), _.get(req, "rally_point"), _.get(req, "route"));
-		});
+	runCombat: function() {
+		for (let memory_id in _.get(Memory, ["sites", "combat"]))
+			Sites.Combat(memory_id);
 	},
-
-	runOccupations: function() {
-		_.each(_.get(Memory, ["sites", "occupation"]), req => {
-			Sites.Occupation(_.get(req, "from"), _.get(req, "target"));
-		});
-	},
-
 	
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing

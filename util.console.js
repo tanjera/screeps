@@ -379,6 +379,9 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${rmTarget} ... to cancel, delete the entry.`;
 		};
 
+
+/* <<<< Update to Sites.Combat() >>>>
+
 		command_list.push("invade(rmFrom, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute)");
 
 		invade = function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
@@ -386,14 +389,7 @@ module.exports = {
 				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, rally_point: posRally, route: listRoute });
 			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.sites.invasion.${rmInvade} ... to cancel, delete the entry.`;
 		};
-
-		command_list.push("occupy(rmFrom, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute)");
-
-		occupy = function(rmColony, rmOccupy, listSpawnRooms, listArmy, listTargets, listRoute) {
-			_.set(Memory, ["sites", "occupation", rmOccupy], { from: rmColony, target: rmOccupy,
-				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Occupation request added to Memory.sites.invasion.${rmOccupy} ... to cancel, delete the entry.`;
-		};
+*/
 		
 		command_list.push("");
 		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");

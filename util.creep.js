@@ -185,7 +185,7 @@ module.exports = {
 
     moveToRoom: function(creep, tgtRoom, forwardRoute) {
         if (creep.room.name == tgtRoom) {
-            console.log("Error: trying to move creep " + creep.name + " to its own room... check logic!!!");
+            console.log(`Error: trying to move creep ${creep.name} to its own room ${tgtRoom}... check logic!!!`);
             return;
         }
 
