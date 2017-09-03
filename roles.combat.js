@@ -45,7 +45,7 @@ module.exports = {
 	acquireTarget_Creep: function(creep) {
 		if (creep.memory.target == null) {
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_HOSTILE_CREEPS, 
-				{ filter: (c) => { return _.get(Memory, ["hive", "allies"]).indexOf(c.owner.username) < 0; }}),				
+				{ filter: (c) => { return c.isHostile(); }}),				
 				c => { return -(c.getActiveBodyparts(ATTACK) + c.getActiveBodyparts(RANGED_ATTACK) + c.getActiveBodyparts(HEAL)); })),
 				c => { return c.pos.getRangeTo(creep.pos); }),
 				c => { return c.owner.username == "Source Keeper"; });
