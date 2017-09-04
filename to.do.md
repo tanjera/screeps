@@ -5,8 +5,9 @@
 
 
 # Implementing...
-- Grafana
-	- Add lab assignments, reactions (as tables?); nuker filling status
+
+- Replace all walls with ramparts??
+
 - If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
 	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
 

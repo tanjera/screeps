@@ -18,10 +18,10 @@ module.exports = {
 		_CPU.End(rmColony, "Colony-listCreeps");
 
 		_CPU.Start(rmColony, "Colony-surveyRoom");
-		if (Game.time % 3 == 0)
-			this.surveyRoom(rmColony);
-		if (Game.time % 9 == 0)
+		if (Game.time % 3 == 0) {
+			this.surveyRoom(rmColony);		
 			this.surveySafeMode(rmColony);
+		}
 		_CPU.End(rmColony, "Colony-surveyRoom");
 
 		if (Hive.isPulse_Spawn()) {

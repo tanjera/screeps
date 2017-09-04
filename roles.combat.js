@@ -45,7 +45,8 @@ module.exports = {
 	checkTarget_Existing: function(creep) {
 		if (creep.memory.target != null) {
 			let target = Game.getObjectById(creep.memory.target);
-			if (target == null || Game.time % 10 == 0)	// Refresh target every 10 ticks...
+			// Refresh target every 10 ticks...
+			if (target == null || target.room.name != creep.room.name || Game.time % 10 == 0)
 				delete creep.memory.target;
 		}
 	},
@@ -64,14 +65,21 @@ module.exports = {
 	
 	acquireTarget_Creep: function(creep) {
 		if (creep.memory.target == null) {
+			if (_.get(Memory, ["rooms", creep.room.name, "towers", "target_attack"]) != null) {
+				creep.memory.target = _.get(Memory, ["rooms", creep.room.name, "towers", "target_attack"]);
+				return;
+			}
+
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_HOSTILE_CREEPS, 
 				{ filter: (c) => { return c.isHostile(); }}),				
-				c => { return -(c.getActiveBodyparts(ATTACK) + c.getActiveBodyparts(RANGED_ATTACK) + c.getActiveBodyparts(HEAL)); })),
+				c => { return -(c.getActiveBodyparts(ATTACK) + c.getActiveBodyparts(RANGED_ATTACK) 
+					+ c.getActiveBodyparts(HEAL)) + c.getActiveBodyparts(WORK); })),
 				c => { return c.pos.getRangeTo(creep.pos); }),
-				c => { return c.owner.username == "Source Keeper"; });
-				
-			if (target != null)
+				c => { return c.owner.username == "Source Keeper"; });				
+			if (target != null) {
 				creep.memory.target = target.id;
+				return;
+			}
 		}
 	},
 	
