@@ -40,7 +40,7 @@ module.exports = {
 						key: `work:upgrade-${room.controller.id}`,
 						timer: 30,
 						creeps: 20,
-						priority: 5
+						priority: 9
 					});
 			}
 
@@ -75,6 +75,9 @@ module.exports = {
 			}
 		}
 
+		
+		/* Repairing- critical and maintenance */
+
 		structures = __Colony.findByNeed_RepairMaintenance(room);
 		for (let i in structures) {
 			if (amOwner || structures[i].structureType == "road" || structures[i].structureType == "container") {
@@ -87,13 +90,10 @@ module.exports = {
 						key: `work:repair-${structures[i].id}`,
 						timer: 20,
 						creeps: 2,
-						priority: 6
+						priority: 8
 					});
 			}
 		}
-
-
-		/* Repair maintenance */
 
 		structures = __Colony.findByNeed_RepairCritical(room);
 		for (let i in structures) {
@@ -116,6 +116,18 @@ module.exports = {
 
 		structures = room.find(FIND_CONSTRUCTION_SITES, { filter: s => { return s.my; }});
 		for (let i in structures) {
+
+			let priority = 0;
+			switch (structures[i].structureType) {
+				case "tower": 		priority = 4; 	break;
+				case "spawn":		priority = 5; 	break;
+				case "extension":	priority = 6; 	break;
+				default:  			priority = 7;  	break;
+			}
+
+			if (structures[i].progress > 0)
+				priority += 1;
+
 			_Tasks.addTask(rmName,
 				{   room: rmName,
 					type: "work",
@@ -124,8 +136,8 @@ module.exports = {
 					pos: structures[i].pos,
 					key: `work:build-${structures[i].id}`,
 					timer: 30,
-					creeps: 3,
-					priority: 3
+					creeps: 10,
+					priority: _.clone(priority)
 				});
 		}
 

@@ -252,6 +252,10 @@ module.exports = {
 
 				case "boost":
 					let lab = Game.getObjectById(listing["lab"]);
+					
+					if (lab == null)
+						break;
+
 					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, { filter: (c) => { 
 						return c.memory.role == listing["role"]
 							&& c.memory.subrole == listing["subrole"]
@@ -318,6 +322,9 @@ module.exports = {
 
 				case "boost":
 					lab = Game.getObjectById(listing["lab"]);
+					if (lab == null)
+						break;
+
 					if (_.get(Memory, ["rooms", rmColony, "stockpile", listing["mineral"]]) == null)
 						_.set(Memory, ["rooms", rmColony, "stockpile", listing["mineral"]], 1000)
 

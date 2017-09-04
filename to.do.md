@@ -1,12 +1,8 @@
 # Implemented, Needs Debugging/Testing
-- invade()
-- invasion(toOccupy) -> occupation
-
+- tasks.compile construction site priority working?
 
 
 # Implementing...
-
-- Replace all walls with ramparts??
 
 - If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
 	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
