@@ -4,6 +4,7 @@ require("overload.room");
 require("overload.roomposition");
 
 require("populations");
+require("populations.combat")
 
 let Hive = require("hive");
 let Blueprint = require("blueprint");
@@ -42,8 +43,7 @@ module.exports.loop = function () {
 	 * */
 	Hive.runColonies();
 	Hive.runColonizations();
-	Hive.runInvasions();
-	Hive.runOccupations();
+	Hive.runCombat();
 
 
 	/* Run end-tick Hive functions */

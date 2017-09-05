@@ -11,9 +11,12 @@ Population_Colonization =
 	
 Population_Colony = {
 	Standalone: {
-		1: {	worker:   {level: 1, amount: 4} },
-		2: { 	worker:   {level: 2, amount: 4} },
-		3: { 	worker:   {level: 3, amount: 4},
+		1: {	soldier:  {level: 1, amount: 2},
+				worker:   {level: 1, amount: 4} },
+		2: { 	soldier:  {level: 2, amount: 2},
+				worker:   {level: 2, amount: 4} },
+		3: { 	soldier:  {level: 3, amount: 2},
+				worker:   {level: 3, amount: 4},
 				repairer: {level: 3, amount: 1} },
 		4: {    worker:   {level: 4, amount: 2},
 			  	repairer: {level: 4, amount: 1},
@@ -31,9 +34,12 @@ Population_Colony = {
 		  		repairer: {level: 6, amount: 1} } },
 
 	Assisted: {
-		1: {	worker:   {level: 4, amount: 4} },
-		2: { 	worker:   {level: 4, amount: 4} },
-		3: { 	worker:   {level: 5, amount: 4},
+		1: {	soldier:  {level: 4, amount: 2},
+				worker:   {level: 4, amount: 4} },
+		2: { 	soldier:  {level: 4, amount: 2},
+				worker:   {level: 4, amount: 4} },
+		3: { 	soldier:  {level: 4, amount: 2},
+				worker:   {level: 5, amount: 4},
 				repairer: {level: 5, amount: 1} },
 		4: {    worker:   {level: 6, amount: 2},
 			  	repairer: {level: 5, amount: 1},

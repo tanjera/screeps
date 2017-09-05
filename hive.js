@@ -87,8 +87,7 @@ let Hive = {
 		if (_.get(Memory, ["hive", "pulses"]) == null) _.set(Memory, ["hive", "pulses"], new Object());
 		if (_.get(Memory, ["sites", "remote_mining"]) == null) _.set(Memory, ["sites", "remote_mining"], new Object());
 		if (_.get(Memory, ["sites", "colonization"]) == null) _.set(Memory, ["sites", "colonization"], new Object());
-		if (_.get(Memory, ["sites", "invasion"]) == null) _.set(Memory, ["sites", "invasion"], new Object());
-		if (_.get(Memory, ["sites", "occupation"]) == null) _.set(Memory, ["sites", "occupation"], new Object());
+		if (_.get(Memory, ["sites", "combat"]) == null) _.set(Memory, ["sites", "combat"], new Object());
 
 		for (let r in Game["rooms"]) {
 			if (_.get(Memory, ["rooms", r]) == null) _.set(Memory, ["rooms", r], new Object());
@@ -148,19 +147,10 @@ let Hive = {
 		});
 	},
 
-	runInvasions: function() {
-		_.each(_.get(Memory, ["sites", "invasion"]), req => {
-			Sites.Invasion(_.get(req, "from"), _.get(req, "target"), _.get(req, "occupy"), _.get(req, "spawn_assist"), 
-				_.get(req, "army"), _.get(req, "targets"), _.get(req, "rally_point"), _.get(req, "route"));
-		});
+	runCombat: function() {
+		for (let memory_id in _.get(Memory, ["sites", "combat"]))
+			Sites.Combat(memory_id);
 	},
-
-	runOccupations: function() {
-		_.each(_.get(Memory, ["sites", "occupation"]), req => {
-			Sites.Occupation(_.get(req, "from"), _.get(req, "target"));
-		});
-	},
-
 	
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing

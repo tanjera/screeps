@@ -1,8 +1,30 @@
 # Implemented, Needs Debugging/Testing
-- tasks.compile construction site priority working?
+- sites.combat() tactic: waves
+	- conditions: 
+		- target creeps OR target structures: ... (target all tested...) 
+		- target list: ... 
+		- listRoute: ... 
+		- spawn_repeat: needs false, true tested
+- sites.combat() use_boosts true
+
 
 
 # Implementing...
+- Remote mining: if a room is not visible
+	- Add "scout" body, 1 MOVE
+		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
+
+- Combat
+	* Console command to add sites.combat()'s!!!!!!
+	- Add to_occupy to tactic.waves
+	- Implement tactics:
+		- Trickle (constant stream of soldiers, move to room and attack, no rally)
+		- Occupation (tactic logic same as "trickle", soldiers, archers, healer)
+		- Soak (healer and tough soak tower energy; soldiers move to walls)
+
+
+
+# To Implement
 
 - If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
 	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
@@ -12,48 +34,24 @@
 - Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
 	- Needs to define central labs as supply to reach all reactors
 
-- Remote mining: if a room is not visible
-	- Add "scout" body, 1 MOVE
-		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
 
-
-Industry
+- Industry
 	* when defining reactions, splice out labs already defined in boosts!!!!!!! but not empty...
 	- @ sites.industry() line ~141: if no reaction available to be assigned, check if any labs need emptying
 		- and empty them!
 	- refactor industry functions; Refactor industry... write out steps for industry and try to refactor to it
 	- In defining labs, if no reaction or boost, if not empty, then empty
 
-Misc
-	- Log to show all boosts in action... or add to log.labs()
-	- Implement tower repairing?
-		- If not attacking or healing...
-		- Check structures if (Game.time % 25 == 0)
+- Log to show all boosts in action... or add to log.labs()
+
+- Implement tower repairing?
+	- If not attacking or healing...
+	- Check structures if (Game.time % 25 == 0)
 
 
-
-# To Implement
-- Combat
-	* All offensive code goes under one pipeline- combat.
-	- Use object "tactics" to define actions from a playbook and victory conditions
-		- Trickle (spawn, move to room and attack, no rally)
-		- Waves (spawn, rally, attack)
-		- Forked Waves (2 groups, 2 rallies, attack simultaneous at seperate points)
-		- Soak (healer and tough soak tower energy; soldiers move to walls)
-	- Armies
-		- Only soldiers
-		- Soldiers, healers
-		- Archers, soldiers, healers
-		- Paladins, archers
-		- Brawlers?
-	- Victory conditions
-		- None (continuous)
-		- Target list wiped
-		- Spawns wiped
-		- Buildings wiped
-
-- Defense
-	- If hostile present (not Invader), no towers present, ?? conditions: pop safe mode
+- Refactor spawning code in sites.colony() sites.mining(); 
+	- Just iterate listPopulation and request each in spawning 
+		- Use more priority #s to "sort"
 
 - Colony function
 	- Creep ability to request another creep to move/swap spaces
@@ -80,4 +78,5 @@ Misc
 		- More _sortBy's * longer arrays to sort == CPU hog.
 
 - Known Bugs
+	- If multiple spawns in 1 room start spawning at the same tick, only 1 console.log() reaches output
 	- If 1 link is within range of multiple targets (controller, source), will make erroneous definitions.
