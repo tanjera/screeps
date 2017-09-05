@@ -1,4 +1,11 @@
 # Implemented, Needs Debugging/Testing
+- sites.combat() tactic: waves
+	- conditions: 
+		- target creeps OR target structures: ... (target all tested...) 
+		- target list: ... 
+		- listRoute: ... 
+		- spawn_repeat: needs false, true tested
+- sites.combat() use_boosts true
 
 
 
@@ -8,21 +15,12 @@
 		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
 
 - Combat
+	* Console command to add sites.combat()'s!!!!!!
 	- Add to_occupy to tactic.waves
-	- Use object "tactics" to define actions from a playbook and victory conditions
+	- Implement tactics:
 		- Trickle (constant stream of soldiers, move to room and attack, no rally)
-		- Waves (soldiers & healers, rally, attack)
 		- Occupation (tactic logic same as "trickle", soldiers, archers, healer)
 		- Soak (healer and tough soak tower energy; soldiers move to walls)
-	- Armies
-		- Only soldiers
-		- Soldiers, healers
-		- Archers, soldiers, healers
-		- Paladins, archers
-		- Brawlers?
-
-
-
 
 
 
@@ -80,4 +78,5 @@
 		- More _sortBy's * longer arrays to sort == CPU hog.
 
 - Known Bugs
+	- If multiple spawns in 1 room start spawning at the same tick, only 1 console.log() reaches output
 	- If 1 link is within range of multiple targets (controller, source), will make erroneous definitions.

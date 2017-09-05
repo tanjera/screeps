@@ -13,7 +13,8 @@ module.exports = {
  * 		- tactic.army		<< population list; set by setPopulation()
  * 	>> variable by tactic
  * 		- tactic.rally_pos
- * 		- tactic.target_all
+ * 		- tactic.target_creeps
+ * 		- tactic.target_structures
  * 		- tactic.target_list
  * 	
  * sites.combat_id.colony			<<< set by console command
@@ -21,18 +22,27 @@ module.exports = {
  * sites.combat_id.use_boosts		<<< T/F, set by console command
  * sites.combat_id.list_spawns		<<< set by console command
  * sites.combat_id.list_route		<<< set by console command
- * sites.combat_id.state_spawn		<<< set by tactic; spawning, constant, complete
+ * sites.combat_id.spawn_repeat		<<< set by console command; constant || 
  * sites.combat_id.state_combat		<<< spawning, attacking, etc; 
  * 
- * 
- * To Implement
- *  - runTactics()...
+ 
+ _.set(Memory, ["sites", "combat", "COMBAT_ID"], { colony: , target_room: , use_boosts: , list_spawns: , list_route: , tactic: { type: , rally_pos: target_creeps: , target_structures: , target_list: [] } });
+
+ _.set(Memory, ["sites", "combat", "testingggg"], 
+ { colony: "W1N8", target_room: "W1N9", use_boosts: false, list_spawns: null, list_route: null, spawn_repeat: true,
+ tactic: { army: { soldier: {amount: 2, level: 4}, healer: {amount: 3, level: 4} },
+ type: "waves", rally_pos: new RoomPosition(6, 6, "W1N8"), target_creeps: false, target_structures: true, target_list: null } });
+
+
+
 */
 
 
 	Run: function(combat_id) {
-		if (_.get(Memory, ["sites", combat_id, "tactic"]) == null)
+		if (_.get(Memory, ["sites", "combat", combat_id, "tactic"]) == null)
 			return;
+
+		let rmColony = _.get(Memory, ["sites", "combat", combat_id, "colony"]);
 		
 		if (Hive.isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Combat-${combat_id}-runPopulation`);
@@ -49,11 +59,18 @@ module.exports = {
 	setPopulation: function(combat_id) {
 		let _Colony = require("util.colony");
 
-		let combat = _.get(Memory, ["sites", combat_id]);
+		let combat = _.get(Memory, ["sites", "combat", combat_id]);
 		let tacticType = _.get(combat, ["tactic", "type"]);
 		let rmColony = _.get(combat, ["colony"]);
 		let rmLevel = _Colony.getRoom_Level(rmColony);
-		let army = new Object();
+		let army = _.get(combat, ["tactic", "army"]);
+
+
+		if (_.get(combat, "spawn_repeat") == null)
+			_.set(Memory, ["sites", "combat", combat_id, "spawn_repeat"], true);
+
+		if (army != null)
+			return;
 
 		switch(tacticType) {
 			default:
@@ -68,35 +85,18 @@ module.exports = {
 				_.set(army[each], "level", rmLevel);
 		}
 
-		_.set(Memory, ["sites", combat_id, "tactic", "army"], _.clone(army));
+		_.set(Memory, ["sites", "combat", combat_id, "tactic", "army"], _.clone(army));
 	},
 	
 	runPopulation: function(combat_id) {
-		let combat = _.get(Memory, ["sites", combat_id]);
-		let state_spawn = _.get(combat, "state_spawn");
+		let combat = _.get(Memory, ["sites", "combat", combat_id]);
+		let state_combat = _.get(combat, "state_combat");
 		let rmColony = _.get(combat, ["colony"]);
-		
-		if (state_spawn == null) {
-			let tacticType = _.get(combat, ["tactic", "type"]);
 
-			switch (tacticType) {
-				case "waves":
-				case "tower_drain":
-					state_spawn = "spawning";
-					break;
-
-				case "trickle":	
-				case "occupation":
-					state_spawn = "constant";
-					break;
-			}
-
-			_.set(Memory, ["sites", combat_id, "state_spawn"], state_spawn);
-		}
-
-		if (state_spawn == "spawning" || state_spawn == "constant") {
+		if (state_combat == "spawning") {
 			let _Colony = require("util.colony");
 			let listArmy = _.get(combat, ["tactic", "army"]);
+			let lengthArmy = _.sum(listArmy, s => { return s.amount; });
 			let rmColony = _.get(combat, ["colony"]);
 			let rmLevel = _Colony.getRoom_Level(rmColony);
 			let listSpawnRooms = _.get(combat, ["list_spawns"]);
@@ -110,7 +110,7 @@ module.exports = {
 						room: rmColony, 
 						listRooms: listSpawnRooms, 
 						priority: 0, 
-						level: listArmy[role]["level"],
+						level: (_.get(listArmy, [role, "level"]) == null ? rmLevel : listArmy[role]["level"]),
 						scale_level: false,
 						body: (listArmy[role]["body"] == null ? role : listArmy[role]["body"]), 
 						name: null, 
@@ -119,18 +119,15 @@ module.exports = {
 								listRoute: _.get(combat, "list_route") } });
 				}
 			}
-
-			if (state_spawn == "spawning" && listCreeps.length == listArmy.length)
-				_.set(Memory, ["sites", combat_id, "state_spawn"], "complete");
 		}
 	},
 	
 	runTactic: function(combat_id) {
-		let combat = _.get(Memory, ["sites", combat_id]);
+		let combat = _.get(Memory, ["sites", "combat", combat_id]);
 		let state_combat = _.get(combat, "state_combat");
 
 		if (state_combat == null)
-			_.set(Memory, ["sites", combat_id, "state_combat"], "spawning");
+			_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "spawning");
 
 		switch (_.get(combat, ["tactic", "type"])) {
 			case "waves": 			this.runTactic_Waves(combat_id, combat);				break;
@@ -141,10 +138,11 @@ module.exports = {
 	},
 
 	runTactic_Waves: function(combat_id, combat) {
-		// combat_id.tactic = { type: "waves", rally_pos: RoomPosition(), target_all: , target_list: [] }
 		let tactic = _.get(combat, "tactic");
 		let state_combat = _.get(combat, "state_combat");
 		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
+		let army = _.get(combat, ["tactic", "army"]);
+		let army_amount = _.sum(army, s => { return s.amount; });
 		
 		switch (state_combat) {	
 			case "spawning":
@@ -159,30 +157,36 @@ module.exports = {
 					this.creepRally(creep, rally_pos);	
 				});
 				
-				let creeps_rallied = _.filter(listCreeps, c => c.room.name == rally_pos.roomName && rally_pos.inRangeTo(c.pos, rally_range));
-				if (state_combat == "rallying" && listCreeps.length > 0 && Game.time % 5 == 0) {
-					if (creeps_rallied.length == listCreeps.length) {
-						_.set(Memory, ["sites", combat_id, "state_combat"], "attacking");
-						console.log(`<font color=\"#FFA100\">[Combat: Waves]</font> ${combat_id}: Launching attack!`);
-					}
-					
-					if (Game.time % 50 == 0) {	
-						console.log(`<font color=\"#FFA100\">[Combat: Waves]</font> ${combat_id}: Rallying troops, `
-						+ `${creeps_rallied.length} of ${listCreeps.length} at rally point.`);
-					}
+				if (state_combat == "spawning" && listCreeps.length == army_amount) {
+					_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "rallying");
+					return;
 				}
 
+				let posRally = new RoomPosition(rally_pos.x, rally_pos.y, rally_pos.roomName);
+				let creeps_rallied = _.filter(listCreeps, c => c.room.name == rally_pos.roomName && posRally.inRangeTo(c.pos, rally_range));
+				if (state_combat == "rallying" && listCreeps.length > 0 && Game.time % 5 == 0) {
+					if (creeps_rallied.length == listCreeps.length) {
+						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "attacking");
+						console.log(`<font color=\"#FFA100\">[Combat: Waves]</font> ${combat_id}: Launching attack!`);
+						return;
+					}
+				} else if (Game.time % 50 == 0) {	
+					console.log(`<font color=\"#FFA100\">[Combat: Waves]</font> ${combat_id}: Spawning and rallying troops, `
+					+ `${creeps_rallied.length} of ${army_amount} at rally point.`);
+				}
+			
 				return;
 			
 			case "attacking":
-				let target_all = _.get(tactic, "target_all");
+				let target_creeps = _.get(tactic, "target_creeps");
+				let target_structures = _.get(tactic, "target_structures");
 				let target_list = _.get(tactic, "target_list");
 
 				_.each(listCreeps, creep => {
 					if (creep.memory.role == "soldier") {
-						Roles.Soldier(creep, target_all, target_all, target_list);
+						Roles.Soldier(creep, target_structures, target_creeps, target_list);
 					} else if (creep.memory.role == "archer") {
-						Roles.Archer(creep, target_all, target_all, target_list);
+						Roles.Archer(creep, target_structures, target_creeps, target_list);
 					} else if (creep.memory.role == "healer") {
 						Roles.Healer(creep);
 					}
@@ -190,12 +194,12 @@ module.exports = {
 				
 				// Evaluate victory or reset conditions
 				if (Game.time % 10 == 0) {
-					let state_spawn = _.get(combat, "state_spawn");
-					if (listCreeps.length == 0 && state_spawn != "constant") {
-						_.set(Memory, ["sites", combat_id, "state_combat"], "complete");
+					let spawn_repeat = _.get(combat, "spawn_repeat");
+					if (listCreeps.length == 0 && !spawn_repeat) {
+						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
 						return;
-					} else if (listCreeps.length == 0 && state_spawn == "constant") {
-						_.set(Memory, ["sites", combat_id, "state_combat"], "spawning");
+					} else if (listCreeps.length == 0 && spawn_repeat) {
+						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "spawning");
 						return;
 					}
 
@@ -205,8 +209,8 @@ module.exports = {
 						let owned_structures = _.filter(room_structures, s => {
 							return s.owner != null && s.structureType != "rampart" });
 						
-						if (target_all && owned_structures.length == 0) {
-							_.set(Memory, ["sites", combat_id, "state_combat"], "complete");
+						if (target_structures && owned_structures.length == 0) {
+							_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
 							return;	
 						}
 
@@ -215,7 +219,7 @@ module.exports = {
 								return target_list.indexOf(s.id) >= 0; });
 							
 							if (targets_remaining.length == 0) {
-								_.set(Memory, ["sites", combat_id, "state_combat"], "complete");
+								_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
 								return;
 							}
 						}
@@ -258,8 +262,9 @@ module.exports = {
 		return false;
 	},
 
-	creepRally: function(creep, posRally, rallyRange) {
+	creepRally: function(creep, rally_pos, rallyRange) {
 		let _Creep = require("util.creep");
+		let posRally = new RoomPosition(rally_pos.x, rally_pos.y, rally_pos.roomName);
 
 		if (creep.room.name != posRally.roomName)
 			_Creep.moveToRoom(creep, posRally.roomName, true);

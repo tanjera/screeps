@@ -87,8 +87,7 @@ let Hive = {
 		if (_.get(Memory, ["hive", "pulses"]) == null) _.set(Memory, ["hive", "pulses"], new Object());
 		if (_.get(Memory, ["sites", "remote_mining"]) == null) _.set(Memory, ["sites", "remote_mining"], new Object());
 		if (_.get(Memory, ["sites", "colonization"]) == null) _.set(Memory, ["sites", "colonization"], new Object());
-		if (_.get(Memory, ["sites", "invasion"]) == null) _.set(Memory, ["sites", "invasion"], new Object());
-		if (_.get(Memory, ["sites", "occupation"]) == null) _.set(Memory, ["sites", "occupation"], new Object());
+		if (_.get(Memory, ["sites", "combat"]) == null) _.set(Memory, ["sites", "combat"], new Object());
 
 		for (let r in Game["rooms"]) {
 			if (_.get(Memory, ["rooms", r]) == null) _.set(Memory, ["rooms", r], new Object());

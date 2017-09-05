@@ -229,8 +229,10 @@ module.exports = {
     Soldier: function(creep, targetStructures, targetCreeps, listTargets) {
 		let _Combat = require("roles.combat");
 		
-		_Combat.acquireBoost(creep);
-		_Combat.moveToDestination(creep);		
+		if (_Combat.acquireBoost(creep))
+			return;
+		if (_Combat.moveToDestination(creep))
+			return;
 		
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);
@@ -279,8 +281,10 @@ module.exports = {
 
 	Archer: function(creep, targetStructures, targetCreeps, listTargets) {
 
-		_Combat.acquireBoost(creep);
-		_Combat.moveToDestination(creep);
+		if (_Combat.acquireBoost(creep))
+			return;
+		if (_Combat.moveToDestination(creep))
+			return;
 
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);

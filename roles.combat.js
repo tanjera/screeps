@@ -6,11 +6,10 @@ module.exports = {
 	acquireBoost: function(creep) {
 		if (creep.room.name == creep.memory.colony) {
 			if (creep.memory.boost == null && !creep.isBoosted()) {
-				if (this.seekBoost(creep))
-					return;
+				return this.seekBoost(creep);
 			} else if (creep.memory.boost != null && !creep.isBoosted()) {
 				creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
-				return;
+				return true;
 			}
 		}
 	},
@@ -37,9 +36,9 @@ module.exports = {
 	moveToDestination: function(creep) {
 		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
 			_Creep.moveToRoom(creep, creep.memory.room, true);
-			if (Game.time % 10 != 0)
-				return;	// Evaluates for targets in this room every 10 ticks...
-		}
+			return true;
+		} else
+			return false;
 	},
 
 	checkTarget_Existing: function(creep) {
