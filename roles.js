@@ -231,7 +231,7 @@ module.exports = {
 		
 		if (_Combat.acquireBoost(creep))
 			return;
-		if (_Combat.moveToDestination(creep))
+		if (_Combat.moveToDestination(creep, 10))
 			return;
 		
 		_Combat.checkTarget_Existing(creep);
@@ -284,7 +284,7 @@ module.exports = {
 		
 		if (_Combat.acquireBoost(creep))
 			return;
-		if (_Combat.moveToDestination(creep))
+		if (_Combat.moveToDestination(creep, 10))
 			return;
 
 		_Combat.checkTarget_Existing(creep);
@@ -321,11 +321,10 @@ module.exports = {
 	},
 
     Healer: function(creep) {
-		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-            _Creep.moveToRoom(creep, creep.memory.room);
-			if (Game.time % 10 != 0)
-				return;	// Evaluates for targets in this room every 10 ticks...
-        }
+		if (_Combat.acquireBoost(creep))
+			return;
+		if (_Combat.moveToDestination(creep, 10))
+			return;
 
 		let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter:
 			c => { return c.hits < c.hitsMax; }});
@@ -340,7 +339,7 @@ module.exports = {
 		}
 
 		if (creep.memory.partner == null) {
-			let p = _.head(_.sortBy(_.sortBy(creep.pos.findInRange(FIND_MY_CREEPS, 8, { filter: c => { return c.memory.role != "healer" }}),
+			let p = _.head(_.sortBy(_.sortBy(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
 				c => c.memory.healer != null),
 				c => c.pos.getRangeTo(creep)));
 
@@ -348,10 +347,10 @@ module.exports = {
 			_.set(p, ["memory", "healer"], creep.id);
 		} else {
 			let p = Game.getObjectById(creep.memory.partner);
-			if (p != null)
-				creep.moveTo(p);
-			else
+			if (p == null)
 				creep.memory.partner = null;
+			else if (creep.pos.getRangeTo(p) > 1)
+				creep.moveTo(p);
 		}
 	},
 };

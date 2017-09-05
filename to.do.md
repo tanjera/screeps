@@ -1,4 +1,5 @@
 # Implemented, Needs Debugging/Testing
+- sites.combat(), re-test victory conditions after refactoring... :(
 - sites.combat() tactic: waves
 	- conditions: 
 		- target creeps OR target structures: ... (target all tested...) 
@@ -6,6 +7,8 @@
 		- listRoute: ... 
 		- spawn_repeat: needs false, true tested
 - sites.combat() use_boosts true
+- setOccupation (to_occupy); working?
+- PRIVATE SERVER TEST AND DEBUG ALL COMBAT MODES
 
 
 
@@ -15,7 +18,8 @@
 		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
 
 - Combat
-	* Console command to add sites.combat()'s!!!!!!
+	- Refactor util.creep.body.js; use base types for RCL 1-5 (e.g. soldier), specialize for RCL 6-8 (e.g. paladin)
+	- Console command tactic info for occupation, tower_drain, trickle
 	- Add to_occupy to tactic.waves
 	- Implement tactics:
 		- Trickle (constant stream of soldiers, move to room and attack, no rally)

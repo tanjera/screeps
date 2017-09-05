@@ -13,7 +13,7 @@ Population_Combat__Trickle = {
     soldier:    {amount: 5}
 };
 
-Population_Combat__Occupation = {
+Population_Combat__Occupy = {
     soldier:    {amount: 2},
     archer:     {amount: 2},
     healer:     {amount: 1}

@@ -33,12 +33,13 @@ module.exports = {
 		}
 	},
 
-	moveToDestination: function(creep) {
+	moveToDestination: function(creep, recheck_targets) {
 		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
 			_Creep.moveToRoom(creep, creep.memory.room, true);
-			return true;
-		} else
-			return false;
+			// Evaluates for targets in this room every evaluate_targets ticks...
+			return (recheck_targets == null || Game.time % recheck_targets != 0);
+		}
+		return false;
 	},
 
 	checkTarget_Existing: function(creep) {
