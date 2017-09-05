@@ -8,10 +8,11 @@
 		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
 
 - Combat
+	- Add to_occupy to tactic.waves
 	- Use object "tactics" to define actions from a playbook and victory conditions
-		- Trickle (spawn, move to room and attack, no rally)
-		- Waves (spawn, rally, attack)
-		- Forked Waves (2 groups, 2 rallies, attack simultaneous at seperate points)
+		- Trickle (constant stream of soldiers, move to room and attack, no rally)
+		- Waves (soldiers & healers, rally, attack)
+		- Occupation (tactic logic same as "trickle", soldiers, archers, healer)
 		- Soak (healer and tough soak tower energy; soldiers move to walls)
 	- Armies
 		- Only soldiers
@@ -19,11 +20,6 @@
 		- Archers, soldiers, healers
 		- Paladins, archers
 		- Brawlers?
-	- Victory conditions
-		- None (continuous)
-		- Target list wiped
-		- Spawns wiped
-		- Buildings wiped
 
 
 

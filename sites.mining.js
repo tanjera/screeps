@@ -170,15 +170,9 @@ module.exports = {
 					body: "healer", name: null, args: {role: "healer", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["miner"] != null && lMiner.length < listPopulation["miner"]["amount"]) {
-            if (lMiner.length == 0) { 
-				// Possibly colony wiped? Need restart?
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
-					scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
-			} else {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["miner"]["level"],
-					scale_level: listPopulation["miner"] == null ? true : listPopulation["miner"]["scale_level"],
-					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
-            }
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["miner"]["level"],
+				scale_level: listPopulation["miner"] == null ? true : listPopulation["miner"]["scale_level"],
+				body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
         }
         else if (listPopulation["burrower"] != null && lBurrower.length < listPopulation["burrower"]["amount"]) {
             if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] && lMiner.length == 0) { 

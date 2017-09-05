@@ -78,7 +78,7 @@ module.exports = {
 	acquireTarget_Structure: function(creep) {
 		if (creep.memory.target == null) {			
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
-				s => { return s.hits != null && s.hits > 0 && s.hits < 20000 && s.structureType != "storage"
+				s => { return s.hits != null && s.hits > 0
 					&& (s.owner != null && !s.my && _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 				s => { return creep.pos.getRangeTo(s.pos); } ),
 				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
@@ -86,7 +86,9 @@ module.exports = {
 					case "spawn": return 0;
 					case "tower": return 1;
 					case "extension": return 2;
-					default: return 3; 
+					default: return 3;
+					case "rampart":
+					case "constructedWall": return 4;
 				}}));
 			if (target == null)
 				target = _.head(_.sortBy(creep.room.find(FIND_CONSTRUCTION_SITES, { filter:

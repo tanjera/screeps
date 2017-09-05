@@ -4,6 +4,7 @@ require("overload.room");
 require("overload.roomposition");
 
 require("populations");
+require("populations.combat")
 
 let Hive = require("hive");
 let Blueprint = require("blueprint");
