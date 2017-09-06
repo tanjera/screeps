@@ -65,8 +65,8 @@ module.exports = {
 	
 	acquireTarget_Creep: function(creep) {
 		if (creep.memory.target == null) {
-			if (_.get(Memory, ["rooms", creep.room.name, "towers", "target_attack"]) != null) {
-				creep.memory.target = _.get(Memory, ["rooms", creep.room.name, "towers", "target_attack"]);
+			if (_.get(Memory, ["rooms", creep.room.name, "target_attack"]) != null) {
+				creep.memory.target = _.get(Memory, ["rooms", creep.room.name, "target_attack"]);
 				return;
 			}
 
