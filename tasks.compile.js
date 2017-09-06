@@ -80,7 +80,22 @@ module.exports = {
 
 		structures = __Colony.findByNeed_RepairMaintenance(room);
 		for (let i in structures) {
-			if (amOwner || structures[i].structureType == "road" || structures[i].structureType == "container") {
+			// Hits < 80% target, workers will assist repairers before upgrading;
+			// Hit point cut-off prevents continual disruption to upgrading
+			if (((structures[i].hits / __Colony.getWalls_targetHits(roomLvl)) < 0.8)
+				&& (structures[i].structureType == "rampart" || structures[i].structureType == "constructedWall")) {
+					_Tasks.addTask(rmName,
+						{   room: rmName,
+							type: "work",
+							subtype: "repair",
+							id: structures[i].id,
+							pos: structures[i].pos,
+							key: `work:repair-${structures[i].id}`,
+							timer: 20,
+							creeps: 2,
+							priority: 8
+						});
+			} else if (amOwner || structures[i].structureType == "road" || structures[i].structureType == "container") {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -90,7 +105,7 @@ module.exports = {
 						key: `work:repair-${structures[i].id}`,
 						timer: 20,
 						creeps: 2,
-						priority: 8
+						priority: 10
 					});
 			}
 		}
@@ -107,7 +122,7 @@ module.exports = {
 						key: `work:repair-${structures[i].id}`,
 						timer: 20,
 						creeps: 2,
-						priority: 2
+						priority: 5
 					});
 			}
 		}
@@ -120,8 +135,8 @@ module.exports = {
 			let priority = 0;
 			switch (structures[i].structureType) {
 				case "tower": 		priority = 4; 	break;
-				case "spawn":		priority = 5; 	break;
-				case "extension":	priority = 6; 	break;
+				case "spawn":		priority = 2; 	break;
+				case "extension":	priority = 3; 	break;
 				default:  			priority = 7;  	break;
 			}
 

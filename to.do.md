@@ -6,7 +6,7 @@
 		- listRoute: ... 
 		- spawn_repeat: needs false, true tested
 - sites.combat() use_boosts true
-
+- scout
 
 
 # Implementing...
@@ -44,10 +44,6 @@
 
 - Log to show all boosts in action... or add to log.labs()
 
-- Implement tower repairing?
-	- If not attacking or healing...
-	- Check structures if (Game.time % 25 == 0)
-
 
 - Refactor spawning code in sites.colony() sites.mining(); 
 	- Just iterate listPopulation and request each in spawning 
@@ -58,18 +54,10 @@
 		- If burrower blocked from source, request blocking creep to swap spaces
 
 - Remote Mining
-	- Combine colony mining and remote mining under one mining tree in Memory?
 	- Creates a road from source to colony
-	- Calculating additional carriers assumes all carriers are carrier_AT body type...
 
 - Alliance
 	- Sites.Support, help an ally build
-
-- Code Standardization
-	? Change all "listRoute" in Memory objects to "route" e.g. colonize()
-
-- Memory Optimization
-	- Delete old remote mining data from Memory.rooms... Memory.rooms.rmName.mining-name
 
 - CPU Optimization
 	- Replace _.filter(room.find(list)) with room.find(list, {filter: ()}) 

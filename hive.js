@@ -85,7 +85,7 @@ let Hive = {
 		if (_.get(Memory, ["rooms"]) == null) _.set(Memory, ["rooms"], new Object());
 		if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory, ["hive", "allies"], new Array());
 		if (_.get(Memory, ["hive", "pulses"]) == null) _.set(Memory, ["hive", "pulses"], new Object());
-		if (_.get(Memory, ["sites", "remote_mining"]) == null) _.set(Memory, ["sites", "remote_mining"], new Object());
+		if (_.get(Memory, ["sites", "mining"]) == null) _.set(Memory, ["sites", "mining"], new Object());
 		if (_.get(Memory, ["sites", "colonization"]) == null) _.set(Memory, ["sites", "colonization"], new Object());
 		if (_.get(Memory, ["sites", "combat"]) == null) _.set(Memory, ["sites", "combat"], new Object());
 
@@ -127,17 +127,17 @@ let Hive = {
 		_.each(Game.rooms, room => {
 			if (room.controller != null && room.controller.my) {
 				Sites.Colony(room.name);
-				Sites.Mining(room.name, room.name);
+				_.set(Memory, ["sites", "mining", room.name], { colony: room.name, has_keepers: false });
 
 				if (room.controller.level >= 6)
 					Sites.Industry(room.name);
 			}
 		});
 
-		let remote_mining = _.get(Memory, ["sites", "remote_mining"]);
-		_.each(Object.keys(remote_mining), req => {
-			if (_.get(remote_mining, [req, "colony"]) != null)
-				Sites.Mining(_.get(remote_mining, [req, "colony"]), req);
+		let mining = _.get(Memory, ["sites", "mining"]);
+		_.each(Object.keys(mining), req => {
+			if (_.get(mining, [req, "colony"]) != null)
+				Sites.Mining(_.get(mining, [req, "colony"]), req);
 		});
 	},
 

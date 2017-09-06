@@ -22,11 +22,13 @@ module.exports = {
     },
 
 
+    getBody_Scout: function() {
+        return [ // 300 energy, 5x MOVE
+            MOVE, MOVE, MOVE, MOVE, MOVE];
+    },
+
 	getBody_Soldier: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Soldier, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 190 energy, 1x TOUGH, 1x ATTACK, 2x MOVE
                         TOUGH, MOVE,
@@ -54,8 +56,7 @@ module.exports = {
 						MOVE, ATTACK, MOVE, ATTACK, 
 						MOVE, MOVE, MOVE,
 						RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
-            case 7:                
-            case 8:
+            case 7: case 8:
                 return [ // 3700 energy, 25x MOVE, 20x ATTACK, 4x RANGED_ATTACK, 1x HEAL
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
                         MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK,
@@ -70,13 +71,7 @@ module.exports = {
 	getBody_Brawler: function(level) {
         switch (level) {
             default:
-				console.log(`Error @ getBody_Brawler, ${level} is not a proper number!`);
-				return;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                return null
+                return this.getBody_Soldier(level)
             case 5:
                 return [ // 1700 energy, 11x ATTACK, 15x MOVE, 4x TOUGH
 						TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE,
@@ -89,8 +84,7 @@ module.exports = {
                         ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
 						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
 						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE ];
-            case 7:                
-            case 8:
+            case 7: case 8:
                 return [ // 2700 energy, 20x MOVE, 20x ATTACK, 10x TOUGH
                         TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
 						ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
@@ -103,18 +97,8 @@ module.exports = {
 	getBody_Paladin: function(level) {
         switch (level) {
             default:
-				console.log(`Error @ getBody_Paladin, ${level} is not a proper number!`);
-				return;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-				return null;
-
-            case 7:
-            case 8:
+				return this.getBody_Soldier(level);
+            case 7: case 8:
                 return [ // 4450 energy, 25x MOVE, 5x RANGED_ATTACK, 15x ATTACK, 5x HEAL
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
 						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
@@ -128,9 +112,6 @@ module.exports = {
     
     getBody_Tank: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Tank, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 240 energy, 4x TOUGH, 4x MOVE
                     TOUGH, TOUGH, TOUGH, TOUGH, 
@@ -145,11 +126,7 @@ module.exports = {
                     TOUGH, TOUGH, 
                     MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                     MOVE, MOVE];
-            case 4:
-            case 5:
-            case 6:
-            case 7:                
-            case 8:            
+            case 4: case 5: case 6: case 7: case 8:            
                 return [ // 1180 energy, 33x TOUGH, 17x MOVE
                     TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
                     TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
@@ -207,11 +184,7 @@ module.exports = {
 
     getBody_Healer: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Healer, ${level} is not a proper number!`);
-				return;
-            case 1:
-            case 2:
+            case 1: case 2:
                 return [ // 300 energy, 1x HEAL, 1x MOVE
                         HEAL, MOVE];
             case 3:
@@ -251,9 +224,6 @@ module.exports = {
 
     getBody_Multirole: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Multirole, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 280 energy, 1x WORK, 1x CARRY, 1x MOVE, 1x ATTACK
                         WORK, CARRY,
@@ -291,8 +261,7 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE,
                         RANGED_ATTACK, RANGED_ATTACK, 
 						ATTACK, ATTACK];
-            case 7:                
-            case 8:
+            case 7: case 8:
                 return [ // 3380 energy, 6x WORK, 10x CARRY, 25x MOVE, 4x RANGED_ATTACK, 5x ATTACK
                         WORK, WORK, WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -305,9 +274,6 @@ module.exports = {
 
     getBody_Worker: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Worker, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 300 energy, 1x WORK, 2x CARRY, 2x MOVE
                         WORK,
@@ -359,9 +325,6 @@ module.exports = {
 
     getBody_Worker_AT: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Worker_AT, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 250 energy, 1x WORK, 1x CARRY, 2x MOVE
                         WORK,
@@ -394,8 +357,7 @@ module.exports = {
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
 						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-            case 7:
-			case 8:
+            case 7: case 8:
                 return [ // 3100 energy, 15x WORK, 10x CARRY, 25x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
 						WORK, WORK, WORK, WORK, WORK,
@@ -408,9 +370,6 @@ module.exports = {
 
     getBody_Burrower: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Burrower, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 300 energy, 2x WORK, 2x MOVE
                         WORK, MOVE, WORK, MOVE];
@@ -454,9 +413,6 @@ module.exports = {
 
     getBody_Burrower_AT: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Burrower_AT, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 300 energy, 2x WORK, 2x MOVE
                         WORK, MOVE, WORK, MOVE];
@@ -502,9 +458,6 @@ module.exports = {
 
 	getBody_Extractor: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Extractor, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 300 energy, 1x WORK, 2x CARRY, 2x MOVE
                         WORK,
@@ -536,8 +489,7 @@ module.exports = {
 						WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-            case 7:
-			case 8:
+            case 7: case 8:
                 return [ // 3750 energy, 25x WORK, 8x CARRY, 17x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
@@ -550,9 +502,6 @@ module.exports = {
 
 	getBody_Extractor_REM: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Extractor_REM, ${level} is not a proper number!`);
-				return;
             case 1:
                 return [ // 250 energy, 1x WORK, 1x CARRY, 2x MOVE
                         WORK,
@@ -584,8 +533,7 @@ module.exports = {
 						WORK, WORK, WORK, WORK,
                         CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-            case 7:
-			case 8:
+            case 7: case 8:
                 return [ // 3650 energy, 23x WORK, 10x CARRY, 17x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
@@ -598,9 +546,6 @@ module.exports = {
 
     getBody_Carrier: function(level) {
         switch (level) {
-			default:
-				console.log(`Error @ getBody_Carrier, ${level} is not a proper number!`);
-				return;
             case 1:
             		return [ // 300 energy, 3x CARRY, 3x MOVE
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
@@ -628,8 +573,7 @@ module.exports = {
                         CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE];
-            case 7:
-            case 8:
+            case 7: case 8:
                 return [ // 2500 energy, 33x CARRY, 17x MOVE
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -642,9 +586,6 @@ module.exports = {
 
     getBody_Carrier_AT: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Carrier_AT, ${level} is not a proper number!`);
-				return;
             case 1:
             		return [ // 300 energy, 3x CARRY, 3x MOVE
                         CARRY, MOVE, CARRY, MOVE, CARRY, MOVE];
@@ -671,8 +612,7 @@ module.exports = {
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-            case 7:
-            case 8:
+            case 7: case 8:
                 return [ // 2500 energy, 25x CARRY, 25x MOVE
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                         CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -685,20 +625,12 @@ module.exports = {
 
     getBody_Reserver: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Reserver, ${level} is not a proper number!`);
-				return;
-            case 1:
-            case 2:
+            case 1: case 2:
                 return null;
-            case 3:
-            case 4:
+            case 3: case 4:
                 return [ // 650 energy, 1x CLAIM, 1x MOVE
                         CLAIM, MOVE];
-            case 5:
-            case 6:
-            case 7:
-            case 8:
+            case 5: case 6: case 7: case 8:
                 return [ // 1300 energy, 2x CLAIM, 2x MOVE
                         CLAIM, CLAIM, MOVE, MOVE];
         }
@@ -706,11 +638,7 @@ module.exports = {
 
     getBody_Reserver_AT: function(level) {
         switch (level) {
-            default:
-				console.log(`Error @ getBody_Reserver_AT, ${level} is not a proper number!`);
-				return;
-            case 1:
-            case 2:
+            case 1: case 2:
                 return null;
             case 3:
 				return [ // 750 energy, 1x CLAIM, 3x MOVE
@@ -718,10 +646,7 @@ module.exports = {
             case 4:
                 return [ // 850 energy, 1x CLAIM, 5x MOVE
                         CLAIM, MOVE, MOVE, MOVE, MOVE, MOVE];
-            case 5:
-            case 6:
-            case 7:
-            case 8:
+            case 5: case 6: case 7: case 8:
                 return [ // 1700 energy, 2x CLAIM, 10x MOVE
                         CLAIM, CLAIM, 
 						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];

@@ -33,14 +33,6 @@ module.exports = {
 		}
 	},
 
-	moveToDestination: function(creep) {
-		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
-			_Creep.moveToRoom(creep, creep.memory.room, true);
-			return true;
-		} else
-			return false;
-	},
-
 	checkTarget_Existing: function(creep) {
 		if (creep.memory.target != null) {
 			let target = Game.getObjectById(creep.memory.target);

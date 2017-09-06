@@ -3,6 +3,10 @@ let Tasks = require("tasks");
 
 module.exports = {
 
+	Scout: function(creep) {
+		this.moveToDestination(creep);
+	},
+
     Worker: function(creep, isSafe) {
         let hostile = (isSafe == true)
 			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
@@ -231,7 +235,7 @@ module.exports = {
 		
 		if (_Combat.acquireBoost(creep))
 			return;
-		if (_Combat.moveToDestination(creep))
+		if (this.moveToDestination(creep))
 			return;
 		
 		_Combat.checkTarget_Existing(creep);
@@ -284,7 +288,7 @@ module.exports = {
 		
 		if (_Combat.acquireBoost(creep))
 			return;
-		if (_Combat.moveToDestination(creep))
+		if (this.moveToDestination(creep))
 			return;
 
 		_Combat.checkTarget_Existing(creep);
@@ -353,5 +357,14 @@ module.exports = {
 			else
 				creep.memory.partner = null;
 		}
+	},
+
+
+	moveToDestination: function(creep) {
+		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
+			_Creep.moveToRoom(creep, creep.memory.room, true);
+			return true;
+		} else
+			return false;
 	},
 };

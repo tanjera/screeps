@@ -199,11 +199,11 @@ module.exports = {
 		
 		log.remote_mining = function() {
 			let output = "";
-			let remote = _.get(Memory, ["sites", "remote_mining"]);
+			let remote = _.get(Memory, ["sites", "mining"]);
 		
 			_.each(_.filter(Game.rooms, r => { return r.controller != null && r.controller.my; }), r => {
 				output += `<tr><td>${r.name}</td><td>  ->  </td>`;
-				_.each(_.filter(Object.keys(remote), rem => { return _.get(remote[rem], "colony") == r.name; }), rem => { output += `<td>  ${rem}  </td>`; });
+				_.each(_.filter(Object.keys(remote), rem => { return rem != r.name && _.get(remote[rem], "colony") == r.name; }), rem => { output += `<td>  ${rem}  </td>`; });
 				output += `</tr>`;
 			});
 
@@ -403,7 +403,7 @@ module.exports = {
 			if (rmColony == null || rmHarvest == null) 
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, invalid entry for remote_mining()`;
 			
-			_.set(Memory, ["sites", "remote_mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
+			_.set(Memory, ["sites", "mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		

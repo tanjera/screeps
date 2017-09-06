@@ -250,6 +250,7 @@ module.exports = {
 		_Body = require("util.creep.body");
 
         switch (type) {
+            case "scout": return _Body.getBody_Scout();
             case "soldier": return _Body.getBody_Soldier(level);
 			case "brawler": return _Body.getBody_Brawler(level);
             case "paladin": return _Body.getBody_Paladin(level);
