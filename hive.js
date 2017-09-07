@@ -3,47 +3,47 @@ let _CPU = require("util.cpu");
 
 let Hive = {
 
-	isPulse_Main: function() {
+	setPulse_Main: function() {
 		let minTicks = 5, maxTicks = 60;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["hive", "pulses", "main"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "main", "last_tick"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| (Game.time - lastTick) >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["hive", "pulses", "main"], Game.time);
-			return true;
+			_.set(Memory, ["hive", "pulses", "main", "last_tick"], Game.time);
+			_.set(Memory, ["hive", "pulses", "main", "active"], true);
 		} else {
-			return false;
+			_.set(Memory, ["hive", "pulses", "main", "active"], false);
 		}
 	},
 
-	isPulse_Spawn: function() {
+	setPulse_Spawn: function() {
 		let minTicks = 10, maxTicks = 20;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["hive", "pulses", "spawn"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "spawn", "last_tick"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["hive", "pulses", "spawn"], Game.time);
-			return true;
+			_.set(Memory, ["hive", "pulses", "spawn", "last_tick"], Game.time);
+			_.set(Memory, ["hive", "pulses", "spawn", "active"], true);
 		} else {
-			return false;
+			_.set(Memory, ["hive", "pulses", "spawn", "active"], false);
 		}
 	},
 	
-	isPulse_Labs: function() {
+	setPulse_Lab: function() {
 		let ticks = 2000;		
-		let lastTick = _.get(Memory, ["hive", "pulses", "lab"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "lab", "last_tick"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| Game.time - lastTick >= ticks) {
-			_.set(Memory, ["hive", "pulses", "lab"], Game.time);
-			return true;
+			_.set(Memory, ["hive", "pulses", "lab", "last_tick"], Game.time);
+			_.set(Memory, ["hive", "pulses", "lab", "active"], true);
 		} else {
-			return false;
+			_.set(Memory, ["hive", "pulses", "lab", "active"], false);
 		}
 	},
 
@@ -56,7 +56,7 @@ let Hive = {
 
 	
 	clearDeadMemory: function() {
-		if (!this.isPulse_Main())
+		if (!isPulse_Main())
 			return;
 
 		if (Memory.creeps != null) {
@@ -81,6 +81,10 @@ let Hive = {
 
 	initMemory: function() {
 		_CPU.Start("Hive", "initMemory");
+
+		this.setPulse_Main();
+		this.setPulse_Spawn();
+		this.setPulse_Lab();
 		
 		if (_.get(Memory, ["rooms"]) == null) _.set(Memory, ["rooms"], new Object());
 		if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory, ["hive", "allies"], new Array());
@@ -104,7 +108,7 @@ let Hive = {
 	},
 
 	initTasks: function() {
-		if (Hive.isPulse_Main()) {
+		if (isPulse_Main()) {
 			_CPU.Start("Hive", "initTasks");
 
 			let _Compile = require("tasks.compile");
@@ -171,7 +175,7 @@ let Hive = {
 			listRooms is an array of room names that would be acceptable to spawn the request (user defined)
 		*/
 
-		if (!this.isPulse_Spawn())
+		if (!isPulse_Spawn())
 			return;
 
 		_CPU.Start("Hive", "processSpawnRequests");
@@ -252,7 +256,7 @@ let Hive = {
 
 	
 	sellExcessResources: function() {
-		if (!Hive.isPulse_Main())
+		if (!isPulse_Main())
 			return;
 
 		_CPU.Start("Hive", "sellExcessResources");
@@ -293,7 +297,7 @@ let Hive = {
 	},
 
 	moveExcessEnergy: function() {
-		if (!Hive.isPulse_Main())
+		if (!isPulse_Main())
 			return;
 
 		_CPU.Start("Hive", "moveExcessEnergy");
@@ -326,7 +330,7 @@ let Hive = {
 	
 	
 	initLabs: function() {
-		if (!this.isPulse_Labs())
+		if (!isPulse_Lab())
 			return;
 
 		// Reset stockpiles...

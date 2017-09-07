@@ -24,7 +24,7 @@ module.exports = {
 		}
 		_CPU.End(rmColony, "Colony-surveyRoom");
 
-		if (Hive.isPulse_Spawn()) {
+		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Colony-runPopulation");
 			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, "Colony-runPopulation");

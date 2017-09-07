@@ -4,6 +4,8 @@
 
 
 # Implementing...
+- Tactics: keeper-kite (zookeeper), keeper-wipe (paladin)
+
 - Implement dismantler role (copy soldier role?)
 
 - If a soldier's target has an adjacent rampart, stand on the rampart.

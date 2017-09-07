@@ -22,14 +22,14 @@ module.exports = {
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Industry-listCreeps");
 
-		if (Hive.isPulse_Spawn()) {
+		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Industry-runPopulation");
 			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
 			_CPU.End(rmColony, "Industry-runPopulation");
 		}
 
 		_CPU.Start(rmColony, "Industry-defineLabs");
-		if (Hive.isPulse_Labs()) {
+		if (isPulse_Lab()) {
 			this.defineLabs(rmColony);
 		}
 		_CPU.End(rmColony, "Industry-defineLabs");
@@ -38,7 +38,7 @@ module.exports = {
 		this.runLabs(rmColony);
 		_CPU.End(rmColony, "Industry-runLabs");
 
-		if (Hive.isPulse_Main()) {
+		if (isPulse_Main()) {
 			_CPU.Start(rmColony, "Industry-loadNukers");
 			this.loadNukers(rmColony);
 			_CPU.End(rmColony, "Industry-loadNukers");
@@ -240,7 +240,7 @@ module.exports = {
 			{ action: "empty", labs: ["", "", ...] }
 		*/
 
-		if (Hive.isPulse_Labs()) {
+		if (isPulse_Lab()) {
 			this.assignReaction(rmColony);
 		}
 

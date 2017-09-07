@@ -133,10 +133,12 @@ module.exports = {
 
 			let priority = 0;
 			switch (sites[i].structureType) {
-				case "tower": 		priority = 4; 	break;
 				case "spawn":		priority = 2; 	break;
 				case "extension":	priority = 3; 	break;
-				default:  			priority = 7;  	break;
+				case "tower": 		priority = 4; 	break;
+				case "storage":		priority = 5;	break;
+				default:  			priority = 6;  	break;
+				case "road":		priority = 7;	break;
 			}
 
 			if (sites[i].progress > 0)

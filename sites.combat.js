@@ -1,5 +1,4 @@
 let Roles = require("roles");
-let Hive = require("hive");
 
 let _CPU = require("util.cpu");
 
@@ -10,7 +9,7 @@ module.exports = {
 
 		let rmColony = _.get(Memory, ["sites", "combat", combat_id, "colony"]);
 		
-		if (Hive.isPulse_Spawn()) {
+		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Combat-${combat_id}-runPopulation`);
 			this.setPopulation(combat_id);
 			this.runPopulation(combat_id);
@@ -61,7 +60,7 @@ module.exports = {
 	},
 
 	runPopulation_SpawnRequests: function(combat_id) {
-		if (!Hive.isPulse_Spawn())
+		if (!isPulse_Spawn())
 			return;
 
 		let _Colony = require("util.colony");

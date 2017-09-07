@@ -47,7 +47,7 @@ module.exports = {
 			this.surveyRoom(rmColony, rmHarvest);
 		_CPU.End(rmColony, `Mining-${rmHarvest}-surveyRoom`);
 
-		if (Hive.isPulse_Spawn()) {
+		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Mining-${rmHarvest}-runPopulation`);
 			this.runPopulation(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, listPopulation);
 			_CPU.End(rmColony, `Mining-${rmHarvest}-runPopulation`);

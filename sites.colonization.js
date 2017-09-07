@@ -19,7 +19,7 @@ module.exports = {
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmTarget && c.memory.colony == rmColony);
 		_CPU.End(rmColony, `Colonization-${rmTarget}-listCreeps`);
 
-		if (Hive.isPulse_Spawn()) {
+		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Colonization-${rmTarget}-runPopulation`);
 			this.runPopulation(rmColony, rmTarget, listCreeps);
 			_CPU.End(rmColony, `Colonization-${rmTarget}-runPopulation`);

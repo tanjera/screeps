@@ -55,6 +55,11 @@ module.exports = {
 		command_list.push("blueprint.block_area(rmName, startX, startY, endX, endY)");
 
 		blueprint.block_area = function(rmName, startX, startY, endX, endY) {
+			if (endX == null)
+				endX = startX;
+			if (endY == null)
+				endY = startY;
+			
 			if (_.get(Memory, ["rooms", rmName, "layout", "blocked_areas"]) == null)
 				Memory["rooms"][rmName]["layout"]["blocked_areas"] = [];
 			Memory["rooms"][rmName]["layout"]["blocked_areas"].push({start: {x: startX, y: startY}, end: {x: endX, y: endY}});
