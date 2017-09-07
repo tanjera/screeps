@@ -5,7 +5,7 @@
 */
 
 Population_Combat__Waves = {
-    soldier:    {amount: 2},
+    soldier:    {amount: 3},
     healer:     {amount: 3}
 };
 
@@ -14,7 +14,7 @@ Population_Combat__Trickle = {
 };
 
 Population_Combat__Occupy = {
-    soldier:    {amount: 2},
+    soldier:    {amount: 3},
     archer:     {amount: 2},
     healer:     {amount: 1}
 };

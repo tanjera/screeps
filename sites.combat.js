@@ -99,7 +99,7 @@ module.exports = {
 			case "waves": 			this.runTactic_Waves(combat_id, combat);				break;
 			case "trickle":			this.runTactic_Trickle(combat_id, combat);				break;
 			// Occupy tactic same as Trickle tactic using different army population.
-			case "occupy":		this.runTactic_Trickle(combat_id, combat);				break;
+			case "occupy":			this.runTactic_Trickle(combat_id, combat);				break;
 			case "tower_drain":		this.runTactic_Tower_Drain(combat_id, combat);			break;
 		}
 	},
@@ -123,38 +123,40 @@ module.exports = {
 					this.creepRally(creep, rally_pos);	
 				});
 				
-				if (checkSpawnComplete_toRally(combat_id, combat, listCreeps, army_amount))
+				if (this.checkSpawnComplete_toRally(combat_id, combat, listCreeps, army_amount))
 					return;
-				if (checkRallyComplete_toAttack(combat_id, combat, listCreeps, rally_pos, rally_range, army_amount))
+				if (this.checkRallyComplete_toAttack(combat_id, combat, listCreeps, rally_pos, rally_range, army_amount))
 					return;
 				return;
 			
 			case "attacking":
 				// Run the creeps' base roles!
-				creepRoles(listCreeps, tactic);
+				this.creepRoles(listCreeps, tactic);
 
 				// Evaluate victory or reset conditions
 				if (Game.time % 10 == 0) {
-					if (evaluateDefeat_CreepsWiped(combat_id, combat, listCreeps))
+					if (this.evaluateDefeat_CreepsWiped(combat_id, combat, listCreeps))
 						return;
-					else if (listCreeps.length == 0 && _.get(combat, "spawn_repeat")) {
+					else if (listCreeps.length == 0 && _.get(tactic, "spawn_repeat")) {
 						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "spawning");
 						return;
 					}
 
-					let target_room = _.get(combat, "target_room");
-					let room_structures = Game["rooms"][target_room].find(FIND_STRUCTURES);
-					if (evaluateVictory_TargetStructures(combat_id, combat, room_structures))
-						return;
-					if (evaluateVictory_TargetList(combat_id, combat, room_structures))
-						return;
+					let target_room = Game["rooms"][_.get(combat, "target_room")];
+					if (target_room != null) {
+						let room_structures = target_room.find(FIND_STRUCTURES);
+						if (this.evaluateVictory_TargetStructures(combat_id, combat, room_structures))
+							return;
+						if (this.evaluateVictory_TargetList(combat_id, combat, room_structures))
+							return;
+					}
 				}
 				return;
 				
 			case "complete":
 				if (_.get(combat, ["tactic", "to_occupy"]))
-					setOccupation(combat_id, combat, tactic);
-				delete Memory["sites"][combat_id];	
+					this.setOccupation(combat_id, combat, tactic);
+				delete Memory["sites"]["combat"][combat_id];	
 				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
 					+ `Combat completed, removing from memory.`);			
 				return;
@@ -175,23 +177,25 @@ module.exports = {
 				});
 				
 				// Run the creeps' base roles!
-				creepRoles(listCreeps, tactic);
+				this.creepRoles(listCreeps, tactic);
 
-				// Evaluate victory
-				if (Game.time % 10 == 0) {
-					let target_room = _.get(combat, "target_room");
-					let room_structures = Game["rooms"][target_room].find(FIND_STRUCTURES);
-					if (evaluateVictory_TargetStructures(combat_id, combat, room_structures))
-						return;
-					if (evaluateVictory_TargetList(combat_id, combat, room_structures))
-						return;
+				// Evaluate victory; occupations are never-ending
+				if (Game.time % 10 == 0 && _.get(combat, ["tactic", "type"]) != "occupy") {
+					let target_room = Game["rooms"][_.get(combat, "target_room")];
+					if (target_room != null) {
+						let room_structures = target_room.find(FIND_STRUCTURES);
+						if (this.evaluateVictory_TargetStructures(combat_id, combat, room_structures))
+							return;
+						if (this.evaluateVictory_TargetList(combat_id, combat, room_structures))
+							return;
+					}
 				}
 				return;
 				
 			case "complete":
 				if (_.get(combat, ["tactic", "to_occupy"]))
-					setOccupation(combat_id, combat, tactic);
-				delete Memory["sites"][combat_id];	
+					this.setOccupation(combat_id, combat, tactic);
+				delete Memory["sites"]["combat"][combat_id];	
 				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
 					+ `Combat completed, removing from memory.`);
 				return;
@@ -203,7 +207,7 @@ module.exports = {
 	},
 		
 	checkSpawnComplete_toRally: function(combat_id, combat, listCreeps, army_amount) {
-		if (_.get(combat, "state_combat") == "spawning" && listCreeps.length == army_amount) {
+		if (_.get(combat, "state_combat") == "spawning" && army_amount > 0 && listCreeps.length == army_amount) {
 			_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "rallying");
 			return true;
 		}
@@ -293,9 +297,9 @@ module.exports = {
 	evaluateVictory_TargetStructures: function(combat_id, combat, room_structures) {
 		if (_.get(Game, ["rooms", _.get(combat, "target_room")]) != null) {
 			let owned_structures = _.filter(room_structures, s => {
-				return s.owner != null && s.structureType != "rampart" });
+				return s.owner != null && s.structureType != "controller" && s.structureType != "rampart" });
 			
-			if (_.get(combat, ["tactic", "target_structures"]) && owned_structures.length == 0) {
+			if (_.get(combat, ["tactic", "target_structures"]) == true && owned_structures.length == 0) {
 				_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
 				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> `
 					+ `Victory detected by destroying all structures! Stopping attack.`);
@@ -308,7 +312,7 @@ module.exports = {
 	evaluateVictory_TargetList: function(combat_id, combat, room_structures) {
 		let target_list = _.get(combat, ["tactic", "target_list"]);
 
-		if (target_list != null && _.get(combat, ["tactic", "target_structures"]) == null
+		if (target_list != null && _.get(combat, ["tactic", "target_structures"]) != true
 				&& _.get(Game, ["rooms", _.get(combat, "target_room")]) != null) {
 			let targets_remaining = _.filter(room_structures, s => {
 				return target_list.indexOf(s.id) >= 0; });
@@ -325,8 +329,8 @@ module.exports = {
 
 	setOccupation: function(combat_id, combat, tactic) {
 		console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
-			+ `Setting occupation request in Memory; combat_id ${combatID}-occupy.`);
-		_.set(Memory, ["sites", "combat", `${combatID}-occupy`], 
+			+ `Setting occupation request in Memory; combat_id ${combat_id}-occupy.`);
+		_.set(Memory, ["sites", "combat", `${combat_id}-occupy`], 
 			{ colony: combat.colony, target_room: combat.target_room, use_boosts: combat.use_boosts, 
 				list_spawns: combat.list_spawns, list_route: combat.list_route, 
 				tactic: { type: "occupy", target_creeps: tactic.target_creeps, target_structures: tactic.target_structures, 

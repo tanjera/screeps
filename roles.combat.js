@@ -100,7 +100,7 @@ module.exports = {
 				}}));
 			if (target == null)
 				target = _.head(_.sortBy(creep.room.find(FIND_CONSTRUCTION_SITES, { filter:
-					s => { return s.owner == null || _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0; }}),
+					s => { return s.owner == null || (!s.my && _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 					s => { return creep.pos.getRangeTo(s.pos); } ));
 				
 			if (target != null)

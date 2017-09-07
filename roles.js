@@ -250,19 +250,7 @@ module.exports = {
 
 			if (result == ERR_NOT_IN_RANGE || (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true)) {
 				creep.heal(creep);
-
-				if (creep.memory.healer != null) {
-					let healer = Game.getObjectById(creep.memory.healer);
-
-					if (healer == null)
-						creep.memory.healer = null;
-					else if (creep.pos.getRangeTo(healer) > 1) {
-						creep.moveTo(healer);
-						return;
-					}
-				}
-
-				creep.moveTo(target);
+				creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK) {
 				return;
@@ -272,7 +260,6 @@ module.exports = {
 			}
 		} else {
 			creep.heal(creep);
-
 			_Combat.setCamp(creep);
 			_Combat.moveToCamp(creep);					
 			return;
@@ -300,7 +287,7 @@ module.exports = {
 			let result = creep.rangedAttack(target);
 			if (result == ERR_NOT_IN_RANGE) {
 				creep.heal(creep);
-				creep.moveTo(target);
+				creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK && creep.pos.getRangeTo(target < 3)) {
 				let _Creep = require("util.creep");
@@ -310,9 +297,9 @@ module.exports = {
 				return;
 			} else {
 				creep.heal(creep);
+				return;
 			}
-		}
-		else {
+		} else {
 			creep.heal(creep);
 			_Combat.setCamp(creep);
 			_Combat.moveToCamp(creep);
@@ -321,6 +308,8 @@ module.exports = {
 	},
 
     Healer: function(creep) {
+		let _Combat = require("roles.combat");
+
 		if (_Combat.acquireBoost(creep))
 			return;
 		if (_Combat.moveToDestination(creep, 10))
@@ -334,23 +323,22 @@ module.exports = {
 			return;
 		}
 
-		if (creep.hits < creep.hitsMax) {
-			creep.heal(creep)
-		}
+		if (creep.hits < creep.hitsMax)
+			creep.heal(creep)	
 
-		if (creep.memory.partner == null) {
-			let p = _.head(_.sortBy(_.sortBy(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
+		if (_.get(creep, ["memory", "partner"]) == null) {
+			let p = _.head(_.sortBy(_.filter(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
 				c => c.memory.healer != null),
 				c => c.pos.getRangeTo(creep)));
 
 			creep.memory.partner = _.get(p, "id", null);
 			_.set(p, ["memory", "healer"], creep.id);
 		} else {
-			let p = Game.getObjectById(creep.memory.partner);
+			let p = Game.getObjectById(_.get(creep, ["memory", "partner"]));
 			if (p == null)
-				creep.memory.partner = null;
+				_.set(creep, ["memory", "partner"], null);
 			else if (creep.pos.getRangeTo(p) > 1)
-				creep.moveTo(p);
+				creep.moveTo(p, { reusePath: 0 });
 		}
 	},
 };
