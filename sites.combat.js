@@ -54,36 +54,39 @@ module.exports = {
 		_.set(Memory, ["sites", "combat", combat_id, "tactic", "army"], _.clone(army));
 	},
 	
-	runPopulation: function(combat_id) {
-		let combat = _.get(Memory, ["sites", "combat", combat_id]);
-		let state_combat = _.get(combat, "state_combat");
+	runPopulation: function(combat_id) {				
+		if (_.get(Memory, ["sites", "combat", combat_id, "state_combat"]) == "spawning") {
+			this.runPopulation_SpawnRequests(combat_id);
+		}
+	},
+
+	runPopulation_SpawnRequests: function(combat_id) {
+		if (!Hive.isPulse_Spawn())
+			return;
+
+		let _Colony = require("util.colony");
+		let combat = _.get(Memory, ["sites", "combat", combat_id]);		
+		let listArmy = _.get(combat, ["tactic", "army"]);
+		let lengthArmy = _.sum(listArmy, s => { return s.amount; });
 		let rmColony = _.get(combat, ["colony"]);
+		let rmLevel = _Colony.getRoom_Level(rmColony);
+		let listSpawnRooms = _.get(combat, ["list_spawns"]);
+		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
 
-		if (state_combat == "spawning") {
-			let _Colony = require("util.colony");
-			let listArmy = _.get(combat, ["tactic", "army"]);
-			let lengthArmy = _.sum(listArmy, s => { return s.amount; });
-			let rmColony = _.get(combat, ["colony"]);
-			let rmLevel = _Colony.getRoom_Level(rmColony);
-			let listSpawnRooms = _.get(combat, ["list_spawns"]);
-
-			let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
-
-			for (let role in listArmy) {
-				let listRole = _.filter(listCreeps, c => { return _.get(c, ["memory", "role"]) == role; });
-				if (listRole.length < _.get(listArmy, [role, "amount"])) {
-					Memory["hive"]["spawn_requests"].push({ 
-						room: rmColony, 
-						listRooms: listSpawnRooms, 
-						priority: 0, 
-						level: (_.get(listArmy, [role, "level"]) == null ? rmLevel : listArmy[role]["level"]),
-						scale_level: false,
-						body: (listArmy[role]["body"] == null ? role : listArmy[role]["body"]), 
-						name: null, 
-						args: { role: role, combat_id: combat_id, 
-								room: _.get(combat, "target_room") , colony: rmColony,
-								listRoute: _.get(combat, "list_route") } });
-				}
+		for (let role in listArmy) {
+			let listRole = _.filter(listCreeps, c => { return _.get(c, ["memory", "role"]) == role; });
+			if (listRole.length < _.get(listArmy, [role, "amount"])) {
+				Memory["hive"]["spawn_requests"].push({ 
+					room: rmColony, 
+					listRooms: listSpawnRooms, 
+					priority: 0, 
+					level: (_.get(listArmy, [role, "level"]) == null ? rmLevel : listArmy[role]["level"]),
+					scale_level: false,
+					body: (listArmy[role]["body"] == null ? role : listArmy[role]["body"]), 
+					name: null, 
+					args: { role: role, combat_id: combat_id, 
+							room: _.get(combat, "target_room") , colony: rmColony,
+							listRoute: _.get(combat, "list_route") } });
 			}
 		}
 	},
@@ -157,8 +160,7 @@ module.exports = {
 				if (_.get(combat, ["tactic", "to_occupy"]))
 					this.setOccupation(combat_id, combat, tactic);
 				delete Memory["sites"]["combat"][combat_id];	
-				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
-					+ `Combat completed, removing from memory.`);			
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);			
 				return;
 		}
 	},
@@ -196,14 +198,90 @@ module.exports = {
 				if (_.get(combat, ["tactic", "to_occupy"]))
 					this.setOccupation(combat_id, combat, tactic);
 				delete Memory["sites"]["combat"][combat_id];	
-				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
-					+ `Combat completed, removing from memory.`);
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
 				return;
 		}
 	},
 	
 	runTactic_Tower_Drain: function(combat_id, combat) {
+		let tactic = _.get(combat, "tactic");
+		let state_combat = _.get(combat, "state_combat");
+		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
+		let army = _.get(combat, ["tactic", "army"]);
+		let army_amount = _.sum(army, s => { return s.amount; });
+		let rally_range = 3;
+		let rally_pos = _.get(tactic, "rally_pos");
+		let drain_pos = _.get(tactic, "drain_pos");
 		
+		switch (state_combat) {	
+			case "spawning":
+			case "rallying":
+				_.each(listCreeps, creep => {
+					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
+						return;
+					this.creepRally(creep, rally_pos);	
+				});
+				
+				if (this.checkSpawnComplete_toRally(combat_id, combat, listCreeps, army_amount))
+					return;
+				if (this.checkRallyComplete_toAttack(combat_id, combat, listCreeps, rally_pos, rally_range, army_amount))
+					return;
+				return;
+			
+			case "attacking":
+				// Replenish any creeps that die
+				this.runPopulation_SpawnRequests(combat_id);
+
+				// Run the creeps' roles for griefing the room and draining the towers' energy
+				let pos_rally = new RoomPosition(rally_pos.x, rally_pos.y, rally_pos.roomName);
+				let pos_drain = new RoomPosition(drain_pos.x, drain_pos.y, drain_pos.roomName);
+
+				_.each(listCreeps, creep => {
+					if (creep.memory.role == "tank") {
+						if (creep.hits < (creep.hitsMax * 0.4))
+							creep.moveTo(pos_rally, { reusePath: 0 });
+						else if (creep.hits == creep.hitsMax)
+							creep.moveTo(pos_drain, { reusePath: 0 });						
+					} else if (creep.memory.role == "healer") {
+						let wounded = _.head(_.filter(listCreeps, 
+							c => { return c.hits < c.hitsMax && c.pos.roomName == pos_rally.roomName 
+								&& c.pos.getRangeTo(pos_rally) <= rally_range; }));
+						if (wounded != null) {
+							if (creep.heal(wounded) == ERR_NOT_IN_RANGE) {
+								creep.rangedHeal(wounded);
+								creep.moveTo(wounded, { reusePath: 0 });
+							}							
+						} else {
+							if (creep.hits < creep.hitsMax)
+								creep.heal(creep);
+							this.creepRally(creep, rally_pos);
+						}
+					}
+				});
+
+				// Evaluate victory or reset conditions
+				if (Game.time % 10 == 0) {
+					if (this.evaluateDefeat_CreepsWiped(combat_id, combat, listCreeps))
+						return;
+					else if (listCreeps.length == 0 && _.get(tactic, "spawn_repeat")) {
+						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "spawning");
+						return;
+					}
+
+					let target_room = Game["rooms"][_.get(combat, "target_room")];
+					if (target_room != null && _.filter(target_room.find(FIND_STRUCTURES), s => { return s.structureType == "tower"; }).length == 0) {						
+						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
+						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> No enemy towers detected! Completing tower drain combat.`);
+						return;
+					}
+				}
+				return;
+				
+			case "complete":				
+				delete Memory["sites"]["combat"][combat_id];	
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
+				return;
+		}
 	},
 		
 	checkSpawnComplete_toRally: function(combat_id, combat, listCreeps, army_amount) {
@@ -221,8 +299,7 @@ module.exports = {
 		if (state_combat == "rallying" && listCreeps.length > 0 && Game.time % 5 == 0) {
 			if (creeps_rallied.length == listCreeps.length) {
 				_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "attacking");
-				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> `
-					+ `All creeps at rally point. Launching attack!`);
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> All creeps at rally point. Launching attack!`);
 				return true;
 			}
 		} else if (Game.time % 50 == 0) {	
@@ -253,18 +330,18 @@ module.exports = {
 		if (creep.room.name != posRally.roomName)
 			_Creep.moveToRoom(creep, posRally.roomName, true);
 		else if (creep.room.name == posRally.roomName) {
-			if (!posRally.inRangeTo(creep.pos, rallyRange))
+			if (!posRally.inRangeTo(creep.pos, rallyRange)) {
 				creep.moveTo(posRally);
-			else {
+			} else if (creep.getActiveBodyparts(ATTACK) > 0 || creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
 				let hostile = _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, 
 					{ filter: (c) => { return c.isHostile(); }}));
 				if (hostile != null) {
 					creep.rangedAttack(hostile);
 					creep.attack(hostile);								
 				}
-				if (Game.time % 15 == 0)
-					creep.moveTo(posRally);
-			}
+			} else if (Game.time % 15 == 0) {
+					creep.moveTo(posRally);	
+			}		
 		}
 	},
 
@@ -279,7 +356,7 @@ module.exports = {
 			} else if (creep.memory.role == "archer") {
 				Roles.Archer(creep, target_structures, target_creeps, target_list);
 			} else if (creep.memory.role == "healer") {
-				Roles.Healer(creep);
+				Roles.Healer(creep, true);
 			}
 		});
 	},
@@ -287,8 +364,7 @@ module.exports = {
 	evaluateDefeat_CreepsWiped: function(combat_id, combat, listCreeps) {
 		if (listCreeps.length == 0 && _.get(combat, ["tactic", "spawn_repeat"]) != true) {
 			_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-			console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
-				+ `Defeat detected by all friendly creeps killed! Stopping attack.`);
+			console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Defeat detected by all friendly creeps killed! Stopping attack.`);
 			return true;
 		}
 		return false;
@@ -301,8 +377,7 @@ module.exports = {
 			
 			if (_.get(combat, ["tactic", "target_structures"]) == true && owned_structures.length == 0) {
 				_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> `
-					+ `Victory detected by destroying all structures! Stopping attack.`);
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Victory detected by destroying all structures! Stopping attack.`);
 				return true;	
 			}
 		}
@@ -319,8 +394,7 @@ module.exports = {
 			
 			if (targets_remaining.length == 0) {
 				_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> `
-					+ `Victory detected by destroying all targets on target list! Stopping attack.`);
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Victory detected by destroying all targets on target list! Stopping attack.`);
 				return true;
 			}
 		}

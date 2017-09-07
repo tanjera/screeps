@@ -316,7 +316,7 @@ module.exports = {
 		}
 	},
 
-    Healer: function(creep) {
+    Healer: function(creep, to_partner) {
 		let _Combat = require("roles.combat");
 
 		if (_Combat.acquireBoost(creep))
@@ -335,19 +335,21 @@ module.exports = {
 		if (creep.hits < creep.hitsMax)
 			creep.heal(creep)	
 
-		if (_.get(creep, ["memory", "partner"]) == null) {
-			let p = _.head(_.sortBy(_.filter(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
-				c => c.memory.healer != null),
-				c => c.pos.getRangeTo(creep)));
+		if (to_partner) {
+			if (_.get(creep, ["memory", "partner"]) == null) {
+				let p = _.head(_.sortBy(_.filter(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
+					c => c.memory.healer != null),
+					c => c.pos.getRangeTo(creep)));
 
-			creep.memory.partner = _.get(p, "id", null);
-			_.set(p, ["memory", "healer"], creep.id);
-		} else {
-			let p = Game.getObjectById(_.get(creep, ["memory", "partner"]));
-			if (p == null)
-				_.set(creep, ["memory", "partner"], null);
-			else if (creep.pos.getRangeTo(p) > 1)
-				creep.moveTo(p, { reusePath: 0 });
+				creep.memory.partner = _.get(p, "id", null);
+				_.set(p, ["memory", "healer"], creep.id);
+			} else {
+				let p = Game.getObjectById(_.get(creep, ["memory", "partner"]));
+				if (p == null)
+					_.set(creep, ["memory", "partner"], null);
+				else if (creep.pos.getRangeTo(p) > 1)
+					creep.moveTo(p, { reusePath: 0 });
+			}
 		}
 	},
 };

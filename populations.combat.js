@@ -20,6 +20,6 @@ Population_Combat__Occupy = {
 };
 
 Population_Combat__Tower_Drain = {
-    tank:       {amount: 2},
+    tank:       {amount: 3},
     healer:     {amount: 3}
 };

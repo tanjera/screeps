@@ -236,7 +236,7 @@ module.exports = {
 				case "scout": 		Roles.Scout(creep);					break;
 				case "extractor": 	Roles.Extracter(creep, is_safe);	break;
 				case "reserver": 	Roles.Reserver(creep);				break;
-				case "healer": 		Roles.Healer(creep);				break;
+				case "healer": 		Roles.Healer(creep, true);			break;
 				
 				case "miner": case "burrower": case "carrier":
 					Roles.Mining(creep, is_safe);
