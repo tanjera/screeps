@@ -1,27 +1,14 @@
-# Implemented, Needs Debugging/Testing
-- sites.combat() tactic: waves
-	- conditions: 
-		- target creeps OR target structures: ... (target all tested...) 
-		- target list: ... 
-		- listRoute: ... 
-		- spawn_repeat: needs false, true tested
-- sites.combat() use_boosts true
-- scout
+# Implemented, Needs Debugging/Testing	
+- Sites.Combat: use_boosts
+
 
 
 # Implementing...
-- Remote mining: if a room is not visible
-	- Add "scout" body, 1 MOVE
-		- Will go initially to ensure room is safe (will not waste larger creep bodies/spawn time)
+- If a soldier's target has an adjacent rampart, stand on the rampart.
 
-- Combat
-	* Console command to add sites.combat()'s!!!!!!
-	- Add to_occupy to tactic.waves
-	- Implement tactics:
-		- Trickle (constant stream of soldiers, move to room and attack, no rally)
-		- Occupation (tactic logic same as "trickle", soldiers, archers, healer)
-		- Soak (healer and tough soak tower energy; soldiers move to walls)
-
+- If room has hostiles (not invaders), turn off all mining
+	- Disable remote mining (all), local (burrowers, extractors), and stop carrier tasks from containers!
+	
 
 
 # To Implement

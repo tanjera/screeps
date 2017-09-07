@@ -8,8 +8,7 @@ module.exports = {
 		let roomLvl = (room.controller == null || room.controller.level == 0) ? 8 : room.controller.level;
 		let amOwner = (room.controller == null || room.controller.level == 0) ? false : room.controller.my;
 		let is_safe = _.get(Memory, ["rooms", rmName, "is_safe"]);
-
-		var structures;
+		
 		let all_structures = room.find(FIND_STRUCTURES);
 		let my_structures = _.filter(all_structures, s => { return s.my; });
 		
@@ -78,31 +77,31 @@ module.exports = {
 		
 		/* Repairing- critical and maintenance */
 
-		structures = __Colony.findByNeed_RepairMaintenance(room);
-		for (let i in structures) {
+		let repair_maintenance = __Colony.findByNeed_RepairMaintenance(room);
+		for (let i in repair_maintenance) {
 			// Hits < 80% target, workers will assist repairers before upgrading;
 			// Hit point cut-off prevents continual disruption to upgrading
-			if (((structures[i].hits / __Colony.getWalls_targetHits(roomLvl)) < 0.8)
-				&& (structures[i].structureType == "rampart" || structures[i].structureType == "constructedWall")) {
+			if (((repair_maintenance[i].hits / __Colony.getWalls_targetHits(roomLvl)) < 0.8)
+				&& (repair_maintenance[i].structureType == "rampart" || repair_maintenance[i].structureType == "constructedWall")) {
 					_Tasks.addTask(rmName,
 						{   room: rmName,
 							type: "work",
 							subtype: "repair",
-							id: structures[i].id,
-							pos: structures[i].pos,
-							key: `work:repair-${structures[i].id}`,
+							id: repair_maintenance[i].id,
+							pos: repair_maintenance[i].pos,
+							key: `work:repair-${repair_maintenance[i].id}`,
 							timer: 20,
 							creeps: 2,
 							priority: 8
 						});
-			} else if (amOwner || structures[i].structureType == "road" || structures[i].structureType == "container") {
+			} else if (amOwner || repair_maintenance[i].structureType == "road" || repair_maintenance[i].structureType == "container") {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
 						subtype: "repair",
-						id: structures[i].id,
-						pos: structures[i].pos,
-						key: `work:repair-${structures[i].id}`,
+						id: repair_maintenance[i].id,
+						pos: repair_maintenance[i].pos,
+						key: `work:repair-${repair_maintenance[i].id}`,
 						timer: 20,
 						creeps: 2,
 						priority: 10
@@ -110,16 +109,16 @@ module.exports = {
 			}
 		}
 
-		structures = __Colony.findByNeed_RepairCritical(room);
-		for (let i in structures) {
-			if (amOwner || structures[i].structureType == "road" || structures[i].structureType == "container") {
+		let repair_critical = __Colony.findByNeed_RepairCritical(room);
+		for (let i in repair_critical) {
+			if (amOwner || repair_critical[i].structureType == "road" || repair_critical[i].structureType == "container") {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
 						subtype: "repair",
-						id: structures[i].id,
-						pos: structures[i].pos,
-						key: `work:repair-${structures[i].id}`,
+						id: repair_critical[i].id,
+						pos: repair_critical[i].pos,
+						key: `work:repair-${repair_critical[i].id}`,
 						timer: 20,
 						creeps: 2,
 						priority: 5
@@ -129,27 +128,27 @@ module.exports = {
 
 		/* Construction sites */
 
-		structures = room.find(FIND_CONSTRUCTION_SITES, { filter: s => { return s.my; }});
-		for (let i in structures) {
+		let sites = room.find(FIND_CONSTRUCTION_SITES, { filter: s => { return s.my; }});
+		for (let i in sites) {
 
 			let priority = 0;
-			switch (structures[i].structureType) {
+			switch (sites[i].structureType) {
 				case "tower": 		priority = 4; 	break;
 				case "spawn":		priority = 2; 	break;
 				case "extension":	priority = 3; 	break;
 				default:  			priority = 7;  	break;
 			}
 
-			if (structures[i].progress > 0)
-				priority += 1;
+			if (sites[i].progress > 0)
+				priority -= 1;
 
 			_Tasks.addTask(rmName,
 				{   room: rmName,
 					type: "work",
 					subtype: "build",
-					id: structures[i].id,
-					pos: structures[i].pos,
-					key: `work:build-${structures[i].id}`,
+					id: sites[i].id,
+					pos: sites[i].pos,
+					key: `work:build-${sites[i].id}`,
 					timer: 30,
 					creeps: 10,
 					priority: _.clone(priority)
@@ -432,37 +431,37 @@ module.exports = {
 
 			/* Spawns and Extensions */
 
-			structures = room.find(FIND_MY_STRUCTURES, { filter: s => {
+			let spawns_exts = _.filter(my_structures, s => {
 				return (s.structureType == STRUCTURE_SPAWN && s.energy < s.energyCapacity * 0.85)
-					|| (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); }});
+					|| (s.structureType == STRUCTURE_EXTENSION && s.energy < s.energyCapacity); });
 
 			if (room.energyAvailable < room.energyCapacityAvailable * 0.75) {
-				for (let i in structures) {
+				for (let i in spawns_exts) {
 					_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "carry",
 						subtype: "deposit",
-						structure: structures[i].structureType,
+						structure: spawns_exts[i].structureType,
 						resource: "energy",
-						id: structures[i].id,
-						pos: structures[i].pos,
-						key: `carry:deposit-${structures[i].id}`,
+						id: spawns_exts[i].id,
+						pos: spawns_exts[i].pos,
+						key: `carry:deposit-${spawns_exts[i].id}`,
 						timer: 20,
 						creeps: 1,
 						priority: 1
 					});
 				}
 			} else {
-				for (let i in structures) {
+				for (let i in spawns_exts) {
 					_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "carry",
 						subtype: "deposit",
-						structure: structures[i].structureType,
+						structure: spawns_exts[i].structureType,
 						resource: "energy",
-						id: structures[i].id,
-						pos: structures[i].pos,
-						key: `carry:deposit-${structures[i].id}`,
+						id: spawns_exts[i].id,
+						pos: spawns_exts[i].pos,
+						key: `carry:deposit-${spawns_exts[i].id}`,
 						timer: 20,
 						creeps: 1,
 						priority: 3

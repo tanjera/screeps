@@ -33,6 +33,15 @@ module.exports = {
 		}
 	},
 
+	moveToDestination: function(creep, recheck_targets) {
+		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
+			_Creep.moveToRoom(creep, creep.memory.room, true);
+			// Evaluates for targets in this room every evaluate_targets ticks...
+			return (recheck_targets == null || Game.time % recheck_targets != 0);
+		}
+		return false;
+	},
+
 	checkTarget_Existing: function(creep) {
 		if (creep.memory.target != null) {
 			let target = Game.getObjectById(creep.memory.target);
@@ -56,8 +65,8 @@ module.exports = {
 	
 	acquireTarget_Creep: function(creep) {
 		if (creep.memory.target == null) {
-			if (_.get(Memory, ["rooms", creep.room.name, "towers", "target_attack"]) != null) {
-				creep.memory.target = _.get(Memory, ["rooms", creep.room.name, "towers", "target_attack"]);
+			if (_.get(Memory, ["rooms", creep.room.name, "target_attack"]) != null) {
+				creep.memory.target = _.get(Memory, ["rooms", creep.room.name, "target_attack"]);
 				return;
 			}
 
@@ -91,7 +100,7 @@ module.exports = {
 				}}));
 			if (target == null)
 				target = _.head(_.sortBy(creep.room.find(FIND_CONSTRUCTION_SITES, { filter:
-					s => { return s.owner == null || _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0; }}),
+					s => { return s.owner == null || (!s.my && _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 					s => { return creep.pos.getRangeTo(s.pos); } ));
 				
 			if (target != null)

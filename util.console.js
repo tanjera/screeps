@@ -379,17 +379,18 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${rmTarget} ... to cancel, delete the entry.`;
 		};
 
-
-/* <<<< Update to Sites.Combat() >>>>
-
-		command_list.push("invade(rmFrom, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute)");
-
-		invade = function(rmColony, rmInvade, toOccupy, listSpawnRooms, listArmy, listTargets, posRally, listRoute) {
-			_.set(Memory, ["sites", "invasion", rmInvade], { from: rmColony, target: rmInvade, occupy: toOccupy, 
-				spawn_assist: listSpawnRooms, army: listArmy, targets: listTargets, rally_point: posRally, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Invasion request added to Memory.sites.invasion.${rmInvade} ... to cancel, delete the entry.`;
+		command_list.push("combat(combatID, rmColony, rmTarget, useBoosts, listSpawnRooms, listRoute, tactic)");
+		command_list.push(" - tactic 'waves': { type: 'waves', spawn_repeat: t/f, rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
+		command_list.push(" - tactic 'trickle': { type: 'trickle', target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
+		command_list.push(" - tactic 'occupy': { type: 'occupy', target_creeps: t/f, target_structures: t/f, target_list: [] }");
+		
+		combat = function(combat_id, colony, target_room, use_boosts, list_spawns, list_route, tactic) {
+			_.set(Memory, ["sites", "combat", combat_id], 
+				{ colony: colony, target_room: target_room, use_boosts: use_boosts, list_spawns: list_spawns, 
+					list_route: list_route, tactic: tactic });
+			return `<font color=\"#D3FFA3\">[Console]</font> Combat request added to Memory.sites.combat.${combat_id} ... to cancel, delete the entry.`;
 		};
-*/
+		
 		
 		command_list.push("");
 		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");

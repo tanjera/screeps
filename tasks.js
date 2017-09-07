@@ -22,14 +22,15 @@ module.exports = {
 			creeps:     maximum # of creeps to run this task
 		 */
 
-		if (incTask.key == null)
-			console.log(`<font color=\"#FF0000">[Error]</font> Task missing key: ${incTask.room} ${incTask.type} ${incTask.subtype}`);
+		if (incTask == null || _.get(incTask, "key") == null) {
+			console.log(`<font color=\"#FF0000">[Error]</font> Task missing key: ${_.get(incTask, "room")} ${_.get(incTask, "type")} ${_.get(incTask, "subtype")}`);
+			return;
+		}
 
-		if (Memory["rooms"][rmName]["tasks_running"] != null
-				&& Memory["rooms"][rmName]["tasks_running"][incTask.key] != null)
-			incTask.creeps = Math.max(0, incTask.creeps - Object.keys(Memory["rooms"][rmName]["tasks_running"][incTask.key]).length);
+		if (_.get(Memory, ["rooms", rmName, "tasks_running", incTask.key]) != null)
+			_.set(incTask, "creeps", Math.max(0, _.get(incTask, "creeps") - _.keys(Memory["rooms"][rmName]["tasks_running"][incTask.key]).length));
 
-		Memory["rooms"][rmName]["tasks"][incTask.key] = incTask;
+		_.set(Memory, ["rooms", rmName, "tasks", incTask.key], incTask);
 	},
 
 	giveTask: function(creep, task) {
@@ -74,12 +75,8 @@ module.exports = {
 		}
 
 		// Assign role tasks
-		switch (creep.memory.role) {
-			default:
-				return;
-
-			case "multirole":
-			case "worker":
+		switch (creep.memory.role) {			
+			case "multirole": case "worker":
 				this.assignTask_Work(creep, isRefueling);
 				return;
 
@@ -87,9 +84,7 @@ module.exports = {
 				this.assignTask_Industry(creep, isRefueling);
 				return;
 
-			case "miner":
-			case "burrower":
-			case "carrier":
+			case "miner": case "burrower": case "carrier":
 				this.assignTask_Mine(creep, isRefueling);
 				return;
 
@@ -103,11 +98,8 @@ module.exports = {
 		let task;
 
 		if (isRefueling) {
-			if (creep.room.name != creep.memory.room) {
-				let _Creep = require("util.creep");
-				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
-			}
 
 			task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 					t => { return t.type == "energy" && t.resource == "energy"						
@@ -134,11 +126,8 @@ module.exports = {
 				return;
 			}
 		} else {
-			if (creep.room.name != creep.memory.room) {
-				let _Creep = require("util.creep");
-				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
-			}
 
 			if (creep.memory.subrole == "repairer") {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
@@ -221,11 +210,8 @@ module.exports = {
 		let task;
 
 		if (isRefueling) {
-			if (creep.room.name != creep.memory.room) {
-				let _Creep = require("util.creep");
-				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
-			}
 
 			if (creep.memory.role == "burrower") {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
@@ -270,11 +256,8 @@ module.exports = {
 				}
 			}
 		} else {
-			if (creep.room.name != creep.memory.colony) {
-				let _Creep = require("util.creep");
-				_Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
+			if (this.goToRoom(creep, creep.memory.colony, isRefueling))
 				return;
-			}
 
 			if (_.get(creep, ["carry", "energy"], 0) > 0) {
 				task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
@@ -299,11 +282,8 @@ module.exports = {
 		let task;
 
 		if (isRefueling) {
-			if (creep.room.name != creep.memory.room) {
-				let _Creep = require("util.creep");
-				_Creep.moveToRoom(creep, creep.memory.room, isRefueling);
+			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
-			}
 
 			task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 				t => { return t.subtype == "pickup" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
@@ -323,11 +303,8 @@ module.exports = {
 			}
 
 		} else {
-			if (creep.room.name != creep.memory.colony) {
-				let _Creep = require("util.creep");
-				_Creep.moveToRoom(creep, creep.memory.colony, isRefueling);
+			if (this.goToRoom(creep, creep.memory.colony, isRefueling))
 				return;
-			}
 
 			task = _.head(_.sortBy(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 				t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && (t.creeps == null || t.creeps > 0); }),
@@ -338,5 +315,14 @@ module.exports = {
 				return;
 			}
 		}
+	},
+
+	goToRoom: function(creep, room_name, is_refueling) {
+		if (creep.room.name != room_name) {
+			let _Creep = require("util.creep");
+			_Creep.moveToRoom(creep, room_name, is_refueling);
+			return true;
+		}
+		return false;
 	},
 }
