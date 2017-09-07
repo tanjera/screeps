@@ -123,8 +123,9 @@ module.exports = {
 		let popActual = lWorker.length + lRepairer.length + lUpgrader.length + lSoldier.length;
 		Hive.populationTally(rmColony, popTarget, popActual);
 
-		if ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])
-			|| (lSoldier.length < _.get(Memory, ["rooms", rmColony, "amount_hostiles"]))) {
+		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
+			&& ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])
+			|| (lSoldier.length < _.get(Memory, ["rooms", rmColony, "amount_hostiles"])))) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 					level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]),
 					scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],

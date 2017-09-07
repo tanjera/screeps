@@ -30,9 +30,8 @@ module.exports = {
 	getBody_Soldier: function(level) {
         switch (level) {
             case 1:
-                return [ // 190 energy, 1x TOUGH, 1x ATTACK, 2x MOVE
-                        TOUGH, MOVE,
-                        MOVE, ATTACK];
+                return [ // 130 energy, 1x ATTACK, 1x MOVE                        
+                        ATTACK, MOVE ];
             case 2:
                 return [ // 390 energy, 3x ATTACK, 3x MOVE
                         ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
@@ -72,6 +71,11 @@ module.exports = {
         switch (level) {
             default:
                 return this.getBody_Soldier(level)
+            case 4:
+                return [ // 1210 energy, 10 TOUGH, 6x ATTACK, 10x MOVE                        
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE,
+                        ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 5:
                 return [ // 1700 energy, 11x ATTACK, 15x MOVE, 4x TOUGH
 						TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE,

@@ -89,7 +89,7 @@ module.exports = {
 		let is_visible = _.get(Memory, ["sites", "mining", rmHarvest, "visible"]);
 		let amountHostiles = _.get(Memory, ["sites", "mining", rmHarvest, "amount_hostiles"]);
 
-		// If the colony is not safe (under siege?) pause spawning remote_mining; frees colony spawns to make soldiers
+		// If the colony is not safe (under siege?) pause spawning remote mining; frees colony spawns to make soldiers
 		if (rmColony != rmHarvest && !is_safe_colony)
 			return;
 
@@ -133,14 +133,14 @@ module.exports = {
 
 			for (let i = array.length - 1; i >= 0; i--) {
 				if (_.get(array[i], "tick") < Game.time - 1500)
-					Memory["sites"]["remote_mining"][rmHarvest]["energy_amounts"].splice(i, 1);
+					Memory["sites"]["mining"][rmHarvest]["energy_amounts"].splice(i, 1);
 				else
 					amount += _.get(array[i], "amount");
 			}
 			
 			let _Creep = require("util.creep");
 			let _Body = require("util.creep.body");
-			let dropped = Math.floor(amount / Memory["sites"]["remote_mining"][rmHarvest]["energy_amounts"].length);
+			let dropped = Math.floor(amount / Memory["sites"]["mining"][rmHarvest]["energy_amounts"].length);
 			let body = _Creep.getBody((listPopulation["carrier"]["body"] || "carrier"), listPopulation["carrier"]["level"]);
 			let cost = _Body.getBodyCost(body);
 			

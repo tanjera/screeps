@@ -411,7 +411,7 @@ module.exports = {
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, invalid entry for remote_mining()`;
 			
 			_.set(Memory, ["sites", "mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
-			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.remote_mining.${rmHarvest} ... to cancel, delete the entry.`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		
 		command_list.push("");

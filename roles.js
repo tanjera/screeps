@@ -12,7 +12,15 @@ module.exports = {
 	},
 
 	Scout: function(creep) {
-		this.moveToDestination(creep);
+		if (creep.memory.room != null) {
+			if (creep.room.name != creep.memory.room) {
+				_Creep.moveToRoom(creep, creep.memory.room, true);
+			} else {
+				let controller = _.get(Game, ["rooms", creep.memory.room, "controller"]);
+				if (controller != null)
+					creep.moveTo(controller, { reusePath: 100 });
+			}
+		}
 	},
 
     Worker: function(creep, isSafe) {
