@@ -443,6 +443,22 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Avoid position added to Memory.hive.paths.avoid.rooms.${avoid_pos.roomName}`;
 		};
 
+		command_list.push("path.avoid_area(roomName, startX, startY, endX, endY)");
+
+		path.avoid_area = function(room_name, start_x, start_y, end_x, end_y) {
+			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", room_name]) == null)
+				_.set(Memory, ["hive", "paths", "avoid", "rooms", room_name], new Array());
+			
+			for (let x = start_x; x <= end_x; x++) {
+				for (let y = start_y; y <= end_y; y++) {
+					Memory["hive"]["paths"]["avoid"]["rooms"][room_name].push(new RoomPosition(x, y, room_name));
+				}
+			}
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Avoid positions added to Memory.hive.paths.avoid.rooms.${room_name}`;
+		};
+
+
 		command_list.push("set_sign(message, rmName)")
 
 		set_sign = function(message, rmName) {
