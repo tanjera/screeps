@@ -1,11 +1,10 @@
-let _Creep = require("util.creep");
 let Tasks = require("tasks");
 
 module.exports = {
 
 	moveToDestination: function(creep) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-			_Creep.moveToRoom(creep, creep.memory.room, true);
+			creep.moveToRoom(creep.memory.room, true);
 			return true;
 		} else
 			return false;
@@ -14,11 +13,11 @@ module.exports = {
 	Scout: function(creep) {
 		if (creep.memory.room != null) {
 			if (creep.room.name != creep.memory.room) {
-				_Creep.moveToRoom(creep, creep.memory.room, true);
+				creep.moveToRoom(creep.memory.room, true);
 			} else {
 				let controller = _.get(Game, ["rooms", creep.memory.room, "controller"]);
-				if (controller != null)
-					creep.moveTo(controller, { reusePath: 100 });
+				if (controller != null && !creep.pos.inRangeTo(controller, 3))
+					creep.travel(controller);
 			}
 		}
 	},
@@ -38,8 +37,8 @@ module.exports = {
 				}
 
 				Tasks.assignTask(creep, true);
-				if (_Creep.runTaskTimer(creep)) {
-					_Creep.runTask(creep);
+				if (creep.runTaskTimer(creep)) {
+					creep.runTask(creep);
 				}
 				return;
 
@@ -51,8 +50,8 @@ module.exports = {
 					}
 
 				Tasks.assignTask(creep, false);
-				if (_Creep.runTaskTimer(creep)) {
-					_Creep.runTask(creep);
+				if (creep.runTaskTimer(creep)) {
+					creep.runTask(creep);
 				}
 				return;
 
@@ -60,9 +59,8 @@ module.exports = {
 				creep.memory.state = "refueling";
 				return;
 			}
-		} else if (hostile != null) {
-			let _Creep = require("util.creep");
-			_Creep.moveFrom(creep, hostile);
+		} else if (hostile != null) {			
+			creep.moveFrom(creep, hostile);
 			return;
 		}
 	},
@@ -82,8 +80,8 @@ module.exports = {
 				}
 
 				Tasks.assignTask(creep, true);
-				if (_Creep.runTaskTimer(creep)) {
-					_Creep.runTask(creep);
+				if (creep.runTaskTimer(creep)) {
+					creep.runTask(creep);
 				}
 				return;
 
@@ -95,8 +93,8 @@ module.exports = {
 				}
 
 				Tasks.assignTask(creep, false);
-				if (_Creep.runTaskTimer(creep)) {
-					_Creep.runTask(creep);
+				if (creep.runTaskTimer(creep)) {
+					creep.runTask(creep);
 				}
 				return;
 
@@ -105,8 +103,7 @@ module.exports = {
 				return;
 			}
 		} else if (hostile != null) {
-			let _Creep = require("util.creep");
-			_Creep.moveFrom(creep, hostile);
+			creep.moveFrom(creep, hostile);
 			return;
 		}
 	},
@@ -123,8 +120,8 @@ module.exports = {
             }
 
             Tasks.assignTask(creep, true);
-            if (_Creep.runTaskTimer(creep)) {
-                _Creep.runTask(creep);
+            if (creep.runTaskTimer(creep)) {
+                creep.runTask(creep);
             }
             return;
 
@@ -136,8 +133,8 @@ module.exports = {
                 }
 
             Tasks.assignTask(creep, false);
-            if (_Creep.runTaskTimer(creep)) {
-                _Creep.runTask(creep);
+            if (creep.runTaskTimer(creep)) {
+                creep.runTask(creep);
             }
             return;
 
@@ -164,8 +161,8 @@ module.exports = {
 					}
 
 					Tasks.assignTask(creep, true);
-					if (_Creep.runTaskTimer(creep)) {
-						_Creep.runTask(creep);
+					if (creep.runTaskTimer(creep)) {
+						creep.runTask(creep);
 					}
 				return;
 
@@ -177,14 +174,13 @@ module.exports = {
 					}
 
 					Tasks.assignTask(creep, false);
-					if (_Creep.runTaskTimer(creep)) {
-						_Creep.runTask(creep);
+					if (creep.runTaskTimer(creep)) {
+						creep.runTask(creep);
 					}
 				return;
 			}
 		} else if (hostile != null) {
-			let _Creep = require("util.creep");
-			_Creep.moveFrom(creep, hostile);
+			creep.moveFrom(creep, hostile);
 			return;
 		}
 	},
@@ -211,8 +207,7 @@ module.exports = {
 			if (Game.time % 5 == 0) {  // Don't park next to a source (and possibly block it!)
 				let sources = creep.pos.findInRange(FIND_SOURCES, 1);
 				if (sources != null && sources.length > 0) {
-					let __creep = require("util.creep");
-					__creep.moveFrom(creep, sources[0]);
+					creep.moveFrom(creep, sources[0]);
 				}
 			}
 			return;
@@ -307,8 +302,7 @@ module.exports = {
 				creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK && creep.pos.getRangeTo(target < 3)) {
-				let _Creep = require("util.creep");
-				_Creep.moveFrom(creep, target);
+				creep.moveFrom(creep, target);
 				return;
 			} else if (result == OK) {
 				return;

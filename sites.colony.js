@@ -50,8 +50,6 @@ module.exports = {
 	},
 
 	surveyRoom: function(rmColony) {
-		let __Colony = require("util.colony");
-
 		let visible = _.keys(Game.rooms).includes(rmColony);
 		_.set(Memory, ["rooms", rmColony, "has_minerals"],
 			visible ? Game.rooms[rmColony].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
@@ -67,10 +65,10 @@ module.exports = {
 		let storage = _.get(Game, ["rooms", rmColony, "storage"]);
 		
 		_.set(Memory, ["rooms", rmColony, "energy_low"], 
-		(storage != null && storage.store["energy"] < __Colony.getLowStockpile(_.get(Game, ["rooms", rmColony, "controller", "level"]))));
+			(visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getLowEnergy()));
 		_.set(Memory, ["rooms", rmColony, "energy_critical"], 
-			(storage != null && storage.store["energy"] < __Colony.getCriticalStockpile(_.get(Game, ["rooms", rmColony, "controller", "level"]))));
-		
+			(visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getCriticalEnergy()));
+
 		let ticks_downgrade = _.get(Game, ["rooms", rmColony, "controller", "ticksToDowngrade"]);
 		_.set(Memory, ["rooms", rmColony, "downgrade_critical"], (ticks_downgrade > 0 && ticks_downgrade < 3500))
 	},

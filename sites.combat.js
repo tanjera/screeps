@@ -22,12 +22,10 @@ module.exports = {
 	},
 	
 	setPopulation: function(combat_id) {
-		let _Colony = require("util.colony");
-
 		let combat = _.get(Memory, ["sites", "combat", combat_id]);
 		let tacticType = _.get(combat, ["tactic", "type"]);
 		let rmColony = _.get(combat, ["colony"]);
-		let rmLevel = _Colony.getRoom_Level(rmColony);
+		let rmLevel = Game["rooms"][rmColony].getLevel();
 		let army = _.get(combat, ["tactic", "army"]);
 
 
@@ -63,12 +61,11 @@ module.exports = {
 		if (!isPulse_Spawn())
 			return;
 
-		let _Colony = require("util.colony");
 		let combat = _.get(Memory, ["sites", "combat", combat_id]);		
 		let listArmy = _.get(combat, ["tactic", "army"]);
 		let lengthArmy = _.sum(listArmy, s => { return s.amount; });
 		let rmColony = _.get(combat, ["colony"]);
-		let rmLevel = _Colony.getRoom_Level(rmColony);
+		let rmLevel = Game["rooms"][rmColony].getLevel();
 		let listSpawnRooms = _.get(combat, ["list_spawns"]);
 		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
 
@@ -315,7 +312,7 @@ module.exports = {
 				if (_Combat.seekBoost(creep))
 					return true;
 			} else if (creep.memory.boost != null && !creep.isBoosted()) {
-				creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+				creep.travel(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
 				return true;
 			}
 		}
@@ -323,11 +320,10 @@ module.exports = {
 	},
 
 	creepRally: function(creep, rally_pos, rallyRange) {
-		let _Creep = require("util.creep");
 		let posRally = new RoomPosition(rally_pos.x, rally_pos.y, rally_pos.roomName);
 
 		if (creep.room.name != posRally.roomName)
-			_Creep.moveToRoom(creep, posRally.roomName, true);
+			creep.moveToRoom(posRally.roomName, true);
 		else if (creep.room.name == posRally.roomName) {
 			if (!posRally.inRangeTo(creep.pos, rallyRange)) {
 				creep.moveTo(posRally);

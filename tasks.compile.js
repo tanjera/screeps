@@ -3,7 +3,6 @@ _Tasks = require("tasks");
 module.exports = {
 
 	compileTasks: function (rmName) {
-		let __Colony = require("util.colony");
 		let room = Game.rooms[rmName];
 		let roomLvl = (room.controller == null || room.controller.level == 0) ? 8 : room.controller.level;
 		let amOwner = (room.controller == null || room.controller.level == 0) ? false : room.controller.my;
@@ -77,11 +76,11 @@ module.exports = {
 		
 		/* Repairing- critical and maintenance */
 
-		let repair_maintenance = __Colony.findByNeed_RepairMaintenance(room);
+		let repair_maintenance = room.findRepair_Maintenance();
 		for (let i in repair_maintenance) {
 			// Hits < 80% target, workers will assist repairers before upgrading;
 			// Hit point cut-off prevents continual disruption to upgrading
-			if (((repair_maintenance[i].hits / __Colony.getWalls_targetHits(roomLvl)) < 0.8)
+			if (((repair_maintenance[i].hits / room.getWallTarget()) < 0.8)
 				&& (repair_maintenance[i].structureType == "rampart" || repair_maintenance[i].structureType == "constructedWall")) {
 					_Tasks.addTask(rmName,
 						{   room: rmName,
@@ -109,7 +108,7 @@ module.exports = {
 			}
 		}
 
-		let repair_critical = __Colony.findByNeed_RepairCritical(room);
+		let repair_critical = room.findRepair_Critical();
 		for (let i in repair_critical) {
 			if (amOwner || repair_critical[i].structureType == "road" || repair_critical[i].structureType == "container") {
 				_Tasks.addTask(rmName,
@@ -134,8 +133,8 @@ module.exports = {
 			let priority = 0;
 			switch (sites[i].structureType) {
 				case "spawn":		priority = 2; 	break;
-				case "extension":	priority = 3; 	break;
-				case "tower": 		priority = 4; 	break;
+				case "tower": 		priority = 3; 	break;
+				case "extension":	priority = 4; 	break;
 				case "storage":		priority = 5;	break;
 				default:  			priority = 6;  	break;
 				case "road":		priority = 7;	break;

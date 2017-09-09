@@ -4,8 +4,14 @@
 
 
 # Implementing...
-- Tactics: keeper-kite (zookeeper), keeper-wipe (paladin)
-
+- Creep.prototype.travel - path caching
+	- TEST
+	- Creeps will need to be trying to move to room edge... ?
+		- Will need to signify which position is best bridge between rooms?
+	
+- Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
+	- Copy o4kapuk's behavior; burrow, if a source keeper, keep at distance, attack ranged, heal through
+	
 - Implement dismantler role (copy soldier role?)
 
 - If a soldier's target has an adjacent rampart, stand on the rampart.

@@ -319,8 +319,7 @@ module.exports = {
 
 	goToRoom: function(creep, room_name, is_refueling) {
 		if (creep.room.name != room_name) {
-			let _Creep = require("util.creep");
-			_Creep.moveToRoom(creep, room_name, is_refueling);
+			creep.moveToRoom(room_name, is_refueling);
 			return true;
 		}
 		return false;

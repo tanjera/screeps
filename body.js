@@ -21,6 +21,31 @@ module.exports = {
         return cost;
     },
 
+    
+    getBody: function(type, level) {
+        switch (type) {
+            case "scout": return this.getBody_Scout();
+            case "soldier": return this.getBody_Soldier(level);
+			case "brawler": return this.getBody_Brawler(level);
+            case "paladin": return this.getBody_Paladin(level);
+            case "tank": return this.getBody_Tank(level);
+            case "archer": return this.getBody_Archer(level);
+            case "healer": return this.getBody_Healer(level);
+            case "multirole": return this.getBody_Multirole(level);
+            case "worker": return this.getBody_Worker(level);
+			case "worker_at": return this.getBody_Worker_AT(level);
+            case "burrower": return this.getBody_Burrower(level);
+			case "burrower_at": return this.getBody_Burrower_AT(level);
+			case "extractor": return this.getBody_Extractor(level);
+			case "extractor_rem": return this.getBody_Extractor_REM(level);
+            case "courier":
+            case "carrier": return this.getBody_Carrier(level);
+            case "carrier_at": return this.getBody_Carrier_AT(level);
+            case "reserver": return this.getBody_Reserver(level);
+			case "reserver_at": return this.getBody_Reserver_AT(level);
+        }
+    },
+    
 
     getBody_Scout: function() {
         return [ // 300 energy, 5x MOVE
@@ -413,7 +438,7 @@ module.exports = {
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
         }
-	},
+    },
 
     getBody_Burrower_AT: function(level) {
         switch (level) {
@@ -459,6 +484,35 @@ module.exports = {
 						MOVE, MOVE, MOVE, MOVE, MOVE];
         }
 	},
+    
+    getBody_Dredger: function(level) {
+        switch (level) {
+            default: 
+                return getBody_Burrower(level);
+            case 7: case 8:
+                return [ // 5250 energy, 10x WORK, 14x MOVE, 10x RANGED_ATTACK, 8X HEAL
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        MOVE, MOVE, MOVE, MOVE, 
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
+                        HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL ];
+        }
+    },
+
+    getBody_Dismantler: function(level) {
+        switch (level) {
+            default: 
+                return getBody_Burrower_AT(level);
+            case 7: case 8:
+                return [ // 3100 energy, 10x TOUGH, 20x WORK, 20x MOVE
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, 
+                        WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, 
+                        WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, 
+                        WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE, WORK, MOVE ];
+        }
+    },
 
 	getBody_Extractor: function(level) {
         switch (level) {

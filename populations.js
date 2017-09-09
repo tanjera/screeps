@@ -170,5 +170,8 @@ Population_Mining = {
 		8: {    burrower:  {level: 5, amount: 1, body: "burrower_at"},
     	        carrier:   {level: 7, amount: 3, body: "carrier_at"},
     	        multirole: {level: 6, amount: 1},
-    	        reserver:  {level: 6, amount: 1, body: "reserver_at"} } },
+				reserver:  {level: 6, amount: 1, body: "reserver_at"} } },
+				
+	SK: {		dredger:   {level: 8, amount: 4, body: "dredger"},
+				carrier:   {level: 8, amount: 5, body: "carrier_at"} }
 };

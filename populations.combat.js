@@ -1,6 +1,6 @@
 /* Note:
  * Remember, not all creep body types have support for all levels; since sites.combat() sets creep level
- * automatically, only use creeps that have bodies for all RCL levels; see util.creep.body.js for creep
+ * automatically, only use creeps that have bodies for all RCL levels; see body.js for creep
  * bodies.
 */
 

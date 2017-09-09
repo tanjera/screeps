@@ -164,4 +164,4 @@ Rarely used but useful when needed, you can keep a continuous occupation of a ro
 
 There are a number of commands that can be run from the console that are part of the codebase and assist in managing your Screeps empire. These range from logs to show your resource amounts, to using a "blueprint" feature that saves your room layout (using flags) and will automatically rebuild after an attack, along with a CPU profiler that can show you which functions are using the most CPU. For a full list of console commands, simply go to the console and type:
 
-`commands()`
+`help()`

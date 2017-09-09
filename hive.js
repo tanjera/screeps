@@ -54,6 +54,12 @@ let Hive = {
 		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 	},
 
+	moveMaxOps: function() {
+		let minOps = 3000, maxOps = 6000;
+		let range = maxOps - minOps;
+
+		return minOps + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
+	},
 	
 	clearDeadMemory: function() {
 		if (!isPulse_Main())
@@ -171,7 +177,7 @@ let Hive = {
 				4: Colony operation (regular)
 				5: ... ? scouting? passive defense?
 
-			tgtLevel is the target level of the creep's body (per util.creep)
+			tgtLevel is the target level of the creep's body (per body.js)
 			listRooms is an array of room names that would be acceptable to spawn the request (user defined)
 		*/
 
@@ -182,7 +188,7 @@ let Hive = {
 
 		let listRequests = _.sortBy(Object.keys(_.get(Memory, ["hive", "spawn_requests"])), r => { return _.get(Memory, ["hive", "spawn_requests", r, "priority"]); });
 		let listSpawns = _.filter(Object.keys(Game["spawns"]), s => { return Game["spawns"][s].spawning == null; });
-		let _Creep = require("util.creep");
+		let _Body = require("body");
 		
 		for (let i = 0; i < Object.keys(listRequests).length; i++) {
 			let request = _.get(Memory, ["hive", "spawn_requests", listRequests[i]]);
@@ -199,14 +205,13 @@ let Hive = {
 						_.set(Memory, ["rooms", request.room, "population_balance", "total"],
 							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
 
-						let _Colony = require("util.colony");
 						let level = (_.get(request, ["scale_level"]) == false)
 							? request.level
 							: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
-								_Colony.getRoom_Level(spawn.room)));
+								spawn.room.getLevel()));
 						request.args["level"] = level;
 
-						let body = _Creep.getBody(request.body, level);
+						let body = _Body.getBody(request.body, level);
 						let name = request.name != null ? request.name
 							: request.args["role"].substring(0, 4)
 								+ (request.args["subrole"] == null ? "" : `-${request.args["subrole"].substring(0, 2)}`)
@@ -236,14 +241,13 @@ let Hive = {
 	processSpawnRenewing: function() {
 		_CPU.Start("Hive", "processSpawnRenewing");
 
-		let _Creep = require("util.creep");
 		let listSpawns = Object.keys(Game["spawns"]).filter((a) => 
 			{ return Game.spawns[a].spawning == null && Game.spawns[a].room.energyAvailable > 300; });
 		for (let s in listSpawns) {
 			let spawn = Game["spawns"][listSpawns[s]];
 			let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
 			for (let c in creeps) {
-				if (!creeps[c].isBoosted() && _.get(creeps[c], ["memory", "role"]) != "soldier") {
+				if (!creeps[c].isBoosted()) {
 					if (spawn.renewCreep(creeps[c]) == OK) {
 						break;
 					}

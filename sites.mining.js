@@ -6,35 +6,21 @@ let Hive = require("hive");
 module.exports = {
 
 	Run: function(rmColony, rmHarvest) {
-
 		_CPU.Start(rmColony, "Mining-init");
 
-		if (rmColony == rmHarvest) {
-			let spawns = _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length;
-			if (spawns < 1)
-				return;
-		}
+		// Ensure the room has a spawn... rebuilding? Sacked?
+		if (rmColony == rmHarvest && _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1)
+			return;
 
-		if (Game.rooms[rmColony] == null) {
+		if (Game.rooms[rmColony] == null && Game.time % 10 == 0) {
 			console.log(`Attempt at remote mining failed, ${rmColony} not found in Game.rooms; colony destroyed?`);
 			return;
 		}
 		
-		listSpawnRooms = rmColony == rmHarvest
-			? _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"])
-			: _.get(Memory, ["sites", "mining", rmHarvest, "spawn_assist", "rooms"]);
-
-		listRoute = rmColony == rmHarvest
-			? listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"])
-			: _.get(Memory, ["sites", "mining", rmHarvest, "route"]);
-
-		listPopulation = rmColony == rmHarvest
-			? _.get(Memory, ["rooms", rmColony, "custom_population"])
-			: _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
-
-		hasKeepers = rmColony == rmHarvest 
-			? (_.get(Memory, ["rooms", rmColony, "has_keepers"]) == true ? true : false)
-			: (_.get(Memory, ["sites", "mining", rmHarvest, "has_keepers"]) == true ? true : false);
+		listSpawnRooms = _.get(Memory, ["sites", "mining", rmHarvest, "spawn_assist", "rooms"]);
+		listRoute = _.get(Memory, ["sites", "mining", rmHarvest, "route"]);
+		listPopulation = _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
+		hasKeepers = _.get(Memory, ["sites", "mining", rmHarvest, "has_keepers"], false);
 
 		_CPU.End(rmColony, "Mining-init");
 
@@ -94,7 +80,7 @@ module.exports = {
 			return;
 
 		// Is the room visible? If not, only spawn a scout to check the room out!
-		if (rmColony != rmHarvest && !is_visible) {
+		if (rmColony != rmHarvest && !is_visible && !hasKeepers) {
 			let lScout = _.filter(listCreeps, c => c.memory.role == "scout");
 
 			if (lScout.length < 1) {
@@ -107,21 +93,23 @@ module.exports = {
 		let lPaladin = _.filter(listCreeps, c => c.memory.role == "paladin" && (c.ticksToLive == undefined || c.ticksToLive > 200));
 		let lSoldier = _.filter(listCreeps, c => c.memory.role == "soldier" && (c.ticksToLive == undefined || c.ticksToLive > 200));
 		let lHealer = _.filter(listCreeps, c => c.memory.role == "healer" && (c.ticksToLive == undefined || c.ticksToLive > 100));
+		let lDredger = _.filter(listCreeps, c => c.memory.role == "dredger" && (c.ticksToLive == undefined || c.ticksToLive > 100));
 		let lBurrower = _.filter(listCreeps, c => c.memory.role == "burrower" && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lCarrier = _.filter(listCreeps, c => c.memory.role == "carrier" && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lMiner = _.filter(listCreeps, c => c.memory.role == "miner" && (c.ticksToLive == undefined || c.ticksToLive > 160));
         let lMultirole = _.filter(listCreeps, c => c.memory.role == "multirole" && (c.ticksToLive == undefined || c.ticksToLive > 160));
-        let lReserver = _.filter(listCreeps, c => c.memory.role == "reserver" && c.memory.room == rmHarvest);
-        let lExtractor = _.filter(listCreeps, c => c.memory.role == "extractor" && c.memory.room == rmHarvest);
+        let lReserver = _.filter(listCreeps, c => c.memory.role == "reserver");
+		let lExtractor = _.filter(listCreeps, c => c.memory.role == "extractor");
 
 		if (listPopulation == null) {
 			if (rmColony == rmHarvest)
 				listPopulation = Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level];
-			else {
+			else if (hasKeepers != true) {
 				listPopulation = (is_visible && _.get(Game, ["rooms", rmHarvest]) != null)
 			        ? Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Game.rooms[rmColony].controller.level]
 					: Population_Mining["R1"][Game.rooms[rmColony].controller.level];
-			}	
+			} else if (hasKeepers == true)
+				listPopulation = Population_Mining["SK"];
 		}
 
 		// If remote mining, adjust carrier amount according to average amount of dropped energy over last 1500 ticks
@@ -138,10 +126,9 @@ module.exports = {
 					amount += _.get(array[i], "amount");
 			}
 			
-			let _Creep = require("util.creep");
-			let _Body = require("util.creep.body");
+			let _Body = require("body");
 			let dropped = Math.floor(amount / Memory["sites"]["mining"][rmHarvest]["energy_amounts"].length);
-			let body = _Creep.getBody((listPopulation["carrier"]["body"] || "carrier"), listPopulation["carrier"]["level"]);
+			let body = _Body.getBody((listPopulation["carrier"]["body"] || "carrier"), listPopulation["carrier"]["level"]);
 			let cost = _Body.getBodyCost(body);
 			
 			if (cost < dropped) {				
@@ -150,20 +137,12 @@ module.exports = {
 			}
 		}
 
-        let popTarget =
-              (listPopulation["paladin"] == null ? 0 : listPopulation["paladin"]["amount"])
-			+ (listPopulation["healer"] == null ? 0 : listPopulation["healer"]["amount"])
-			+ (listPopulation["burrower"] == null ? 0 : listPopulation["burrower"]["amount"])
-            + (listPopulation["carrier"] == null ? 0 : listPopulation["carrier"]["amount"])
-            + (listPopulation["miner"] == null ? 0 : listPopulation["miner"]["amount"])
-            + (listPopulation["multirole"] == null ? 0 : listPopulation["multirole"]["amount"])
-            + (listPopulation["reserver"] == null ? 0 : listPopulation["reserver"]["amount"])
-            + (listPopulation["extractor"] == null || !hasMinerals ? 0 : listPopulation["extractor"]["amount"]);
-
-        let popActual = lPaladin.length + lHealer.length + lBurrower.length + lCarrier.length + lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
+		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount"); });
+		let popActual = lPaladin.length + lHealer.length + lDredger.length + lBurrower.length + lCarrier.length 
+			+ lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         Hive.populationTally(rmColony, popTarget, popActual);
 
-        if (listPopulation["paladin"] != null && lPaladin.length < listPopulation["paladin"]["amount"]) {
+		if (listPopulation["paladin"] != null && lPaladin.length < listPopulation["paladin"]["amount"]) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: listPopulation["paladin"]["level"],
 				scale_level: listPopulation["paladin"] == null ? true : listPopulation["paladin"]["scale_level"],
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
@@ -184,7 +163,11 @@ module.exports = {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["miner"]["level"],
 				scale_level: listPopulation["miner"] == null ? true : listPopulation["miner"]["scale_level"],
 				body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
-        }
+		}
+		else if (listPopulation["dredger"] != null && lDredger.length < listPopulation["dredger"]["amount"]) {
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["dredger"]["level"],
+				scale_level: false, body: "dredger", name: null, args: {role: "dredger", room: rmHarvest, colony: rmColony} });
+		}
         else if (listPopulation["burrower"] != null && lBurrower.length < listPopulation["burrower"]["amount"]) {
             if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] && lMiner.length == 0) { 
 				// Possibly colony wiped? Need restart?
@@ -216,7 +199,7 @@ module.exports = {
 				scale_level: listPopulation["reserver"] == null ? true : listPopulation["reserver"]["scale_level"],
 				body: (listPopulation["reserver"]["body"] || "reserver"),
 				name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
-        }
+		}
         else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] && hasMinerals) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["extractor"]["level"],
 				scale_level: listPopulation["extractor"] == null ? true : listPopulation["extractor"]["scale_level"],
@@ -242,6 +225,10 @@ module.exports = {
 					Roles.Mining(creep, is_safe);
 					break;
 				
+				case "dredger":
+					Roles.Dredger(creep);
+					break;
+
 				case "soldier": case "paladin":
 					Roles.Soldier(creep, false, true);
 					break;

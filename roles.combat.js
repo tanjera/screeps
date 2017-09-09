@@ -1,4 +1,3 @@
-let _Creep = require("util.creep");
 let Tasks = require("tasks");
 
 module.exports = {
@@ -8,7 +7,7 @@ module.exports = {
 			if (creep.memory.boost == null && !creep.isBoosted()) {
 				return this.seekBoost(creep);
 			} else if (creep.memory.boost != null && !creep.isBoosted()) {
-				creep.moveTo(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+				creep.travel(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
 				return true;
 			}
 		}
@@ -35,7 +34,7 @@ module.exports = {
 
 	moveToDestination: function(creep, recheck_targets) {
 		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
-			_Creep.moveToRoom(creep, creep.memory.room, true);
+			creep.moveToRoom(creep.memory.room, true);
 			// Evaluates for targets in this room every evaluate_targets ticks...
 			return (recheck_targets == null || Game.time % recheck_targets != 0);
 		}
@@ -133,7 +132,7 @@ module.exports = {
 			if (camp == null)
 				delete creep.memory.camp;
 			else
-				creep.moveTo(camp);				
+				creep.travel(camp);				
 		}
 	}
 }

@@ -415,9 +415,10 @@ module.exports = {
 		};
 		
 		command_list.push("");
-		command_list.push("create_road(rmName, startX, startY, endX, endY)");
+		command_list.push("path.road(rmName, startX, startY, endX, endY)");
+		path = new Object();
 
-		create_road = function(rmName, startX, startY, endX, endY) {
+		path.road = function(rmName, startX, startY, endX, endY) {
 			let room = Game.rooms[rmName];
 			if (room == null)
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${rmName} not found.`;
@@ -431,6 +432,15 @@ module.exports = {
 			room.createConstructionSite(endX, endY, "road");
 			
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
+		};
+
+		command_list.push("path.avoid(avoid_pos)");
+		
+		path.avoid = function(avoid_pos) {
+			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", avoid_pos.roomName]) == null)
+				_.set(Memory, ["hive", "paths", "avoid", "rooms", avoid_pos.roomName], new Array());
+			Memory["hive"]["paths"]["avoid"]["rooms"][avoid_pos.roomName].push(avoid_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Avoid position added to Memory.hive.paths.avoid.rooms.${avoid_pos.roomName}`;
 		};
 
 		command_list.push("set_sign(message, rmName)")
@@ -460,7 +470,7 @@ module.exports = {
 		
 		command_list.push("");
 
-		commands = function() {
+		help = function() {
 			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}<br>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Command list complete";
 		};

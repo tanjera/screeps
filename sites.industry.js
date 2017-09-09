@@ -4,7 +4,6 @@ let Roles = require("roles");
 let Hive = require("hive");
 let Tasks = require("tasks");
 
-let _Creep = require("util.creep");
 let _CPU = require("util.cpu");
 
 let labDefinitions;
@@ -476,8 +475,7 @@ module.exports = {
 			let terminal = Game.rooms[rmColony].terminal;
 
 			// Add low energy level to room's stockpile (to prevent sending to other rooms)
-			let __Colony = require("util.colony");
-			let energy_shortage_level = __Colony.getLowStockpile(_.get(Game, ["rooms", rmColony, "controller", "level"]));
+			let energy_shortage_level = room.getLowEnergy();
 			let energy_stockpile = _.get(Memory, ["rooms", rmColony, "stockpile", "energy"]);
 			if (energy_stockpile == null || energy_stockpile < energy_shortage_level) {				
 				_.set(Memory, ["rooms", rmColony, "stockpile", "energy"],
