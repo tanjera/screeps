@@ -164,9 +164,9 @@ let Blueprint = {
 		}
 
 		// If colonization focused on rapidly building defenses (RCL 3), don't place anything until tower is built
-		if (level <= 3 && _.get(Memory, ["sites", "colonization", room.name, "focus_defense"]) == true) {
+		if (level <= 3 && _.get(Memory, ["rooms", room.name, "focus_defense"]) == true) {
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "tower");
-			if (!this.atMaxStructureCount(room, structures, layout, "tower"))
+			if (level < 3 || !this.atMaxStructureCount(room, structures, layout, "tower"))
 				return;
 		}
 

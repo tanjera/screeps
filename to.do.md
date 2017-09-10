@@ -4,6 +4,10 @@
 
 
 # Implementing...
+- listRoute to creep.memory.paths.list_rooms
+
+- on travelByPath- if tile !isWalkable, if tile.getCreep << new ; trade places
+
 - Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
 	- Copy o4kapuk's behavior; burrow, if a source keeper, keep at distance, attack ranged, heal through
 	

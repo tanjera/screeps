@@ -256,29 +256,30 @@ Creep.prototype.travelByPath = function travelByPath() {
 	}
 };
 
-Creep.prototype.travelToRoom = function travelToRoom (tgtRoom, forwardRoute) {
+Creep.prototype.travelToRoom = function travelToRoom (tgtRoom, forward) {
 	if (this.room.name == tgtRoom)
 		return ERR_NO_PATH;
 
-	if (this.memory.listRoute != null) {
-		if (forwardRoute == true) {
-			for (let i = 1; i < this.memory.listRoute.length; i++) {
-				if (_.get(this.memory ["listRoute", i]) != null && this.room.name == _.get(this.memory, ["listRoute", i - 1])) {
-					let result = this.travelToExitTile(this.memory.listRoute[i]);
+	let list_route = _.get(this, ["memory", "listRoute"]);
+	if (list_route != null) {
+		if (forward == true) {
+			for (let i = 1; i < list_route.length; i++) {
+				if (_.get(list_route, i) != null && this.room.name == _.get(list_route, i - 1)) {
+					let result = this.travelToExitTile(list_route[i]);
 					if (result == OK)
 						return OK;
 					else
-						return this.travel(new RoomPosition(25, 25, this.memory.listRoute[i]));					
+						return this.travel(new RoomPosition(25, 25, list_route[i]));					
 				}
 			}
-		} else if (forwardRoute == false) {
-			for (let i = this.memory.listRoute.length - 2; i >= 0; i--) {
-				if (_.get(this.memory, ["listRoute", i]) != null && this.room.name == _.get(this.memory, ["listRoute", i + 1])) {
-					let result = this.travelToExitTile(this.memory.listRoute[i])
+		} else if (forward == false) {
+			for (let i = list_route.length - 2; i >= 0; i--) {
+				if (_.get(list_route, i) != null && this.room.name == _.get(list_route, i + 1)) {
+					let result = this.travelToExitTile(list_route[i])
 					if (result == OK)
 						return OK;
 					else
-						return this.travel(new RoomPosition(25, 25, this.memory.listRoute[i]));                        					
+						return this.travel(new RoomPosition(25, 25, list_route[i]));                        					
 				}
 			}
 		}
@@ -300,7 +301,7 @@ Creep.prototype.travelToRoom = function travelToRoom (tgtRoom, forwardRoute) {
 			let exit = this.pos.findClosestByPath(_.get(this, ["memory", "path", "route", 0, "exit"]));
 			_.set(this, ["memory", "path", "exit"], exit);
 			if (exit != null)
-				return this.travel(new RoomPosition(exit.x, exit.y, exit.roomName));			
+				return this.travel(new RoomPosition(exit.x, exit.y, exit.roomName));
 		}
 	}
 	
@@ -308,7 +309,7 @@ Creep.prototype.travelToRoom = function travelToRoom (tgtRoom, forwardRoute) {
 };
 
 Creep.prototype.travelToExitTile = function travelToExitTile (target_name) {
-	if (_.get(this, ["memory", "path", "exit_tile", "roomName"]) == this.room.name)
+	if (_.get(this, ["memory", "path", "exit_tile", "roomName"]) == this.room.name) 
 		return this.travel(_.get(this, ["memory", "path", "exit_tile"]));
 
 	let room_exits = Game.map.describeExits(this.room.name);

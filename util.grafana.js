@@ -1,7 +1,8 @@
 module.exports = {
     
 	Run: function() {
-        _.set(Memory, "stats", new Object());
+        if (Game.time % 500 == 0)
+            _.set(Memory, "stats", new Object());
 
         _.set(Memory, ["stats", "cpu", "tick"], Game.time);
         _.set(Memory, ["stats", "cpu", "bucket"], Game.cpu.bucket);
