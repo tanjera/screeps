@@ -204,12 +204,8 @@ module.exports = {
 					creep.signController(creep.room.controller, default_sign);
 			}
 
-			if (Game.time % 5 == 0) {  // Don't park next to a source (and possibly block it!)
-				let sources = creep.pos.findInRange(FIND_SOURCES, 1);
-				if (sources != null && sources.length > 0) {
-					creep.moveFrom(creep, sources[0]);
-				}
-			}
+			if (Game.time % 10 == 0)
+				creep.moveFromSource();
 			return;
 		}
 	},

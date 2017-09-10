@@ -150,6 +150,7 @@ module.exports = {
 				this.giveTask(creep, task);
 				return;
 			} else {
+				creep.moveFromSource();
 				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 				return;
 			}
@@ -200,6 +201,7 @@ module.exports = {
 					return;
 				}
 			} else {
+				creep.moveFromSource();
 				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 				return;
 			}
@@ -250,6 +252,7 @@ module.exports = {
 						creep.memory.state = "delivering";
 						return;
 					} else {
+						creep.moveFromSource();
 						this.giveTask(creep, {type: "wait", subtype: "wait", timer: 5});
 						return;
 					}

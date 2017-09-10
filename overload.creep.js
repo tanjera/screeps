@@ -215,6 +215,7 @@ Creep.prototype.travel = function travel (dest) {
 
 	if (_.get(this, ["memory", "path", "path_list"]) == null || _.get(this, ["memory", "path", "path_list"]).length == 0) {
 		let Hive = require("hive");
+		_.set(this, ["memory", "path", "destination"], pos_dest);
 		_.set(this, ["memory", "path", "path_list"],
 			this.pos.findPathTo(pos_dest, {maxOps: Hive.moveMaxOps(), reusePath: Hive.moveReusePath(),
 				costCallback: function(roomName, costMatrix) {
@@ -232,8 +233,16 @@ Creep.prototype.travel = function travel (dest) {
 
 Creep.prototype.travelByPath = function travelByPath() {
 	let path = _.get(this, ["memory", "path", "path_list"]);
-	if (path == null || path.length == 0 || _.get(path, 0) == null)
+	if (path == null || path.length == 0 || _.get(path, 0) == null) {
+		_.set(this, ["memory", "path"], null)
 		return ERR_NO_PATH;
+	}
+
+	let tile = this.pos.getTileInDirection(_.get(path, [0, "direction"]));
+	if (tile == null || tile.isWalkable(true) == false) {
+		_.set(this, ["memory", "path"], null)
+		return ERR_NO_PATH;
+	}
 
 	let result = this.move(_.get(path, [0, "direction"]));
 	if (result == OK) {
@@ -242,7 +251,7 @@ Creep.prototype.travelByPath = function travelByPath() {
 	} else if (result == ERR_BUSY || result == ERR_TIRED || result == ERR_NO_BODYPART) {
 		return OK;
 	} else {
-		_.set(this, ["memory", "path", "path_list"], null);
+		_.set(this, ["memory", "path"], null);
 		return ERR_NO_PATH;
 	}
 };
@@ -348,3 +357,10 @@ Creep.prototype.moveFrom = function moveFrom (target) {
 
 	return this.move(moveDir);
 };
+
+Creep.prototype.moveFromSource = function moveFromSource() {	
+	let sources = this.pos.findInRange(FIND_SOURCES, 1);
+	if (sources != null && sources.length > 0) {
+		this.moveFrom(sources[0]);
+	}
+}
