@@ -72,24 +72,23 @@ RoomPosition.prototype.getOpenTile_Adjacent = function getOpenTile_Adjacent() {
 	return (this.getOpenTile_Range(1));
 };
 
-RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range) {
+RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range, creeps_block) {
 	for (let x = -range; x <= range; x++) {
 		for (let y = -range; y <= range; y++) {
 			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
 
 			if (newPos.x <= 1 || newPos.x >= 48 || newPos.y <= 1 || newPos.y >= 48)
 				continue;
-
-			if (newPos.lookFor("structure").length == 0 && newPos.lookFor("terrain") != "wall") {
-				return newPos;
-			}
+			
+			if (newPos.isWalkable(creeps_block))
+				return newPos;		
 		}
 	}
 
 	return null;
 };
 
-RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range) {
+RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range, creeps_block) {
 	for (let x = -range; x <= range; x++) {
 		for (let y = -range; y <= range; y++) {
 			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
@@ -97,7 +96,7 @@ RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range) {
 			if (newPos.x <= 1 || newPos.x >= 48 || newPos.y <= 1 || newPos.y >= 48)
 				continue;
 
-			if (newPos.lookFor("structure").length == 0 && newPos.lookFor("terrain") != "wall") {
+			if (newPos.isWalkable(creeps_block)) {
 				let path = this.findPathTo(newPos.x, newPos.y, {maxOps: 200, ignoreCreeps: true, ignoreRoads: true});
 				if (path.length <= 2)
 					return newPos;

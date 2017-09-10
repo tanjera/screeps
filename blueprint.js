@@ -168,6 +168,8 @@ let Blueprint = {
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "tower");
 			if (level < 3 || !this.atMaxStructureCount(room, structures, layout, "tower"))
 				return;
+			else
+				delete Memory["rooms"][room.name]["focus_defense"];
 		}
 
 		// Build the 1st base's spawn alone, as priority!

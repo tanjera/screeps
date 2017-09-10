@@ -108,7 +108,7 @@ module.exports = {
 	},	
 
 	setCamp: function(creep) {
-		if (creep.memory.camp != null || Game.time % 5 != 0)
+		if (creep.memory.camp != null || Game.time % 10 != 0)
 			return;
 
 		if (creep.room.name == creep.memory.room) {
@@ -130,8 +130,8 @@ module.exports = {
 			} 
 
 			let controller = _.head(_.filter(structures, s => { return s.structureType == "controller"}));
-			if (controller != null) {
-				_.set(creep.memory, "camp", controller.id);
+			if (controller != null) {				
+				_.set(creep.memory, "camp", controller.pos.getOpenTile_Range(3, true));
 				return;
 			}
 		}
@@ -143,6 +143,8 @@ module.exports = {
 			if (camp instanceof RoomPosition == true) {
 				creep.travel(camp);
 				return;
+			} else if (_.get(camp, "x") != null && _.get(camp, "y") != null && _.get(camp, "roomName") != null) {
+				creep.travel(new RoomPosition(camp.x, camp.y, camp.roomName));
 			} else {
 				let obj = Game.getObjectById(_.get(creep.memory, "camp"));
 				if (obj == null)

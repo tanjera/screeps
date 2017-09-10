@@ -8,14 +8,19 @@ module.exports = {
 	Run: function(rmColony, rmHarvest) {
 		_CPU.Start(rmColony, "Mining-init");
 
-		// Ensure the room has a spawn... rebuilding? Sacked? Unclaimed?
+		// Ensure the room has a spawn or tower... rebuilding? Sacked? Unclaimed?
 		if (rmColony == rmHarvest) {
 			if (_.get(Game, ["rooms", rmColony, "controller", "my"]) != true) {
 				delete Memory.sites.mining.rmHarvest;
 				return;
 			}
 			
-			if (_.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1)
+			if (_.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1
+					&& _.get(Memory, ["rooms", rmColony, "focus_defense"]) != true)
+				return;
+
+			if (_.get(Memory, ["rooms", rmColony, "focus_defense"]) == true
+					&& _.get(Game, ["rooms", rmColony, "controller", "level"]) < 3)
 				return;
 		}
 			
@@ -28,6 +33,12 @@ module.exports = {
 		listRoute = _.get(Memory, ["sites", "mining", rmHarvest, "route"]);
 		listPopulation = _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
 		hasKeepers = _.get(Memory, ["sites", "mining", rmHarvest, "has_keepers"], false);
+
+		if (rmColony == rmHarvest 
+				&& _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1) {
+			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
+			listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
+		}
 
 		_CPU.End(rmColony, "Mining-init");
 

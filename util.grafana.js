@@ -13,6 +13,8 @@ module.exports = {
             _.set(Memory, ["stats", "gcl", "progress"], Game.gcl.progress);
             _.set(Memory, ["stats", "gcl", "progress_total"], Game.gcl.progressTotal);
             _.set(Memory, ["stats", "gcl", "progress_percent"], (Game.gcl.progress / Game.gcl.progressTotal * 100));
+            
+            _.set(Memory, ["stats", "creeps", "total"], _.keys(Game.creeps).length);
         }
 
         if (Game.time % 50 == 0) {
