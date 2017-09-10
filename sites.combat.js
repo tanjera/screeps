@@ -312,7 +312,7 @@ module.exports = {
 				if (_Combat.seekBoost(creep))
 					return true;
 			} else if (creep.memory.boost != null && !creep.isBoosted()) {
-				creep.travel(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+				creep.travel(new RoomPosition(creep.memory.boost.pos.x, creep.memory.boost.pos.y, creep.memory.boost.pos.roomName));
 				return true;
 			}
 		}
@@ -323,7 +323,7 @@ module.exports = {
 		let posRally = new RoomPosition(rally_pos.x, rally_pos.y, rally_pos.roomName);
 
 		if (creep.room.name != posRally.roomName)
-			creep.moveToRoom(posRally.roomName, true);
+			creep.travelToRoom(posRally.roomName, true);
 		else if (creep.room.name == posRally.roomName) {
 			if (!posRally.inRangeTo(creep.pos, rallyRange)) {
 				creep.moveTo(posRally);

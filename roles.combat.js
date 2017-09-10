@@ -7,7 +7,7 @@ module.exports = {
 			if (creep.memory.boost == null && !creep.isBoosted()) {
 				return this.seekBoost(creep);
 			} else if (creep.memory.boost != null && !creep.isBoosted()) {
-				creep.travel(creep.memory.boost.pos.x, creep.memory.boost.pos.y);
+				creep.travel(new RoomPosition(creep.memory.boost.pos.x, creep.memory.boost.pos.y, creep.memory.boost.pos.roomName));
 				return true;
 			}
 		}
@@ -34,7 +34,7 @@ module.exports = {
 
 	moveToDestination: function(creep, recheck_targets) {
 		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
-			creep.moveToRoom(creep.memory.room, true);
+			creep.travelToRoom(creep.memory.room, true);
 			// Evaluates for targets in this room every evaluate_targets ticks...
 			return (recheck_targets == null || Game.time % recheck_targets != 0);
 		}
@@ -111,28 +111,45 @@ module.exports = {
 		if (creep.memory.camp != null || Game.time % 5 != 0)
 			return;
 
-		if (creep.room.name != creep.memory.room) {
+		if (creep.room.name == creep.memory.room) {
 			let lair = _.head(_.sortBy(_.filter(creep.room.find(FIND_STRUCTURES), 
 				s => { return s.structureType == "keeperLair"; }),
 				s => { return s.ticksToSpawn; }));		
-			if (lair != null)
-				creep.memory.camp = lair.id;
-		} else {
-			let ramparts = _.filter(creep.room.find(FIND_MY_STRUCTURES), 
+			if (lair != null) {
+				_.set(creep.memory, "camp", lair.id);
+				return;
+			} 
+		
+			let structures = creep.room.find(FIND_MY_STRUCTURES);
+			let ramparts = _.filter(structures, 
 				s => { return s.structureType == "rampart" && s.pos.lookFor(LOOK_CREEPS).length == 0; });					
 			let rampart = creep.pos.findClosestByPath(ramparts);
-			if (rampart != null)
-				creep.memory.camp = rampart.id;
+			if (rampart != null) {
+				_.set(creep.memory, "camp", rampart.id);
+				return;
+			} 
+
+			let controller = _.head(_.filter(structures, s => { return s.structureType == "controller"}));
+			if (controller != null) {
+				_.set(creep.memory, "camp", controller.id);
+				return;
+			}
 		}
 	},
 
 	moveToCamp: function(creep) {
-		if (creep.memory.camp != null) {
-			let camp = Game.getObjectById(creep.memory.camp);
-			if (camp == null)
-				delete creep.memory.camp;
-			else
-				creep.travel(camp);				
+		let camp = _.get(creep.memory, "camp");
+		if (camp != null) {
+			if (camp instanceof RoomPosition == true) {
+				creep.travel(camp);
+				return;
+			} else {
+				let obj = Game.getObjectById(_.get(creep.memory, "camp"));
+				if (obj == null)
+					_.set(creep.memory, "camp", null);
+				else
+					creep.travel(obj);
+			}
 		}
 	}
 }

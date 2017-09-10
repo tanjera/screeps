@@ -1,4 +1,4 @@
-RoomPosition.prototype.isWalkable = function isWalkable() {
+RoomPosition.prototype.isWalkable = function isWalkable(creeps_block) {
 	if (this.x < 0 || this.x > 49 || this.y < 0 || this.y > 49)
 		return false;
 	
@@ -10,16 +10,39 @@ RoomPosition.prototype.isWalkable = function isWalkable() {
 	
 	let structures = _.filter(look, l => l.type == "structure");
 	for (let s in structures) {
-		if (structures[s].structure.structureType != "container" && structures[s].structure.structureType != "road")
+		if (structures[s].structure.structureType != "container" && structures[s].structure.structureType != "road"
+			&& (structures[s].structure.structureType != "rampart" || structures[s].structure.my))
+			return false;
+	}
+
+	if (creeps_block) {
+		let creeps = _.filter(look, l => l.type == "creep");
+		if (creeps.length > 0)
 			return false;
 	}
 	
 	return true;
 };
 
+RoomPosition.prototype.getTileInDirection = function getTileInDirection(dir) {
+	switch (dir) {
+		case '0': return this;
+		case '1': return new RoomPosition(this.x,	 	this.y - 1, 	this.roomName);
+		case '2': return new RoomPosition(this.x + 1, 	this.y - 1, 	this.roomName);
+		case '3': return new RoomPosition(this.x + 1, 	this.y,		 	this.roomName);
+		case '4': return new RoomPosition(this.x + 1, 	this.y + 1, 	this.roomName);
+		case '5': return new RoomPosition(this.x,	 	this.y + 1, 	this.roomName);
+		case '6': return new RoomPosition(this.x - 1, 	this.y + 1, 	this.roomName);
+		case '7': return new RoomPosition(this.x - 1, 	this.y,		 	this.roomName);
+		case '8': return new RoomPosition(this.x - 1, 	this.y - 1, 	this.roomName);
+	}
+
+	return null;
+};
+
 RoomPosition.prototype.isEdge = function isEdge() {
 	return (this.x == 0 || this.x == 49 || this.y == 0 || this.y == 49);
-}
+};
 
 RoomPosition.prototype.inRangeToListTargets = function inRangeToListTargets(listTargets, range) {
 	for (let i = 0; i < listTargets.length; i++) {
@@ -28,7 +51,7 @@ RoomPosition.prototype.inRangeToListTargets = function inRangeToListTargets(list
 	}
 
 	return false;
-}
+};
 
 RoomPosition.prototype.getAccessAmount = function getAccessAmount() {
 	let access = 0;
@@ -47,7 +70,7 @@ RoomPosition.prototype.getAccessAmount = function getAccessAmount() {
 
 RoomPosition.prototype.getOpenTile_Adjacent = function getOpenTile_Adjacent() {
 	return (this.getOpenTile_Range(1));
-}
+};
 
 RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range) {
 	for (let x = -range; x <= range; x++) {
@@ -64,7 +87,7 @@ RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range) {
 	}
 
 	return null;
-}
+};
 
 RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range) {
 	for (let x = -range; x <= range; x++) {
@@ -83,4 +106,4 @@ RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range) {
 	}
 
 	return null;
-}
+};

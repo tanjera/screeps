@@ -100,16 +100,14 @@ Creep.prototype.runTask = function runTask() {
 			let obj = Game.getObjectById(this.memory.task["id"]);
 			let pos = new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);
 			let result = this.harvest(obj);
-			if (result == ERR_NOT_IN_RANGE) {
+			if (result == OK || result == ERR_TIRED) {
+				return;
+			} else if (result == ERR_NOT_IN_RANGE) {
 				if (_.filter(pos.look(), n => n.type == "creep").length == 0)
 					this.travel(pos);
 				else
 					this.travel(obj);
-				return;
-			} else if (result == OK || result == ERR_TIRED) {
-				if (!this.pos.isEqualTo(pos))
-					this.travel(pos);
-				return;
+				return;			
 			} else {
 				this.finishedTask();
 				return;
@@ -201,58 +199,136 @@ Creep.prototype.runTask = function runTask() {
 
 
 Creep.prototype.travel = function travel (dest) {
-	let pos_dest = (dest instanceof RoomPosition == true) ? dest : dest.pos;
+	if (this.fatigue > 0)
+		return ERR_TIRED;
 
-	let Hive = require("hive");
-	this.moveTo(pos_dest, {maxOps: Hive.moveMaxOps(), reusePath: Hive.moveReusePath(),
-		costCallback: function(roomName, costMatrix) {
-			_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {
-				new RoomVisual(roomName).text("x", p, {color: "red", stroke: "pink", opacity: 0.1});
-				costMatrix.set(p.x, p.y, 255); });
-		}});
-	return;
+	let pos_dest;
+	if (_.get(dest, "x") != null && _.get(dest, "y") != null && _.get(dest, "roomName") != null)
+		pos_dest = new RoomPosition(dest.x, dest.y, dest.roomName);
+	else if (_.get(dest, "pos") != null)
+		pos_dest = dest.pos;
+	else		
+		return ERR_NO_PATH;
+
+	if (this.pos.getRangeTo(pos_dest) == 0)
+		return OK;
+
+	if (_.get(this, ["memory", "path", "path_list"]) == null || _.get(this, ["memory", "path", "path_list"]).length == 0) {
+		let Hive = require("hive");
+		_.set(this, ["memory", "path", "path_list"],
+			this.pos.findPathTo(pos_dest, {maxOps: Hive.moveMaxOps(), reusePath: Hive.moveReusePath(),
+				costCallback: function(roomName, costMatrix) {
+					_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {				
+						costMatrix.set(p.x, p.y, 1); });
+					
+					_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {				
+						costMatrix.set(p.x, p.y, 255); });
+				}}));
+	}
+
+	return this.travelByPath();
+	
 };
 
-Creep.prototype.moveToRoom = function moveToRoom (tgtRoom, forwardRoute) {
-	if (this.room.name == tgtRoom) {
-		console.log(`Error: trying to move creep ${this.name} to its own room ${tgtRoom}... check logic!!!`);
-		return;
+Creep.prototype.travelByPath = function travelByPath() {
+	let path = _.get(this, ["memory", "path", "path_list"]);
+	if (path == null || path.length == 0 || _.get(path, 0) == null)
+		return ERR_NO_PATH;
+
+	let result = this.move(_.get(path, [0, "direction"]));
+	if (result == OK) {
+		this.memory.path.path_list.splice(0, 1);
+		return OK;
+	} else if (result == ERR_BUSY || result == ERR_TIRED || result == ERR_NO_BODYPART) {
+		return OK;
+	} else {
+		_.set(this, ["memory", "path", "path_list"], null);
+		return ERR_NO_PATH;
 	}
+};
+
+Creep.prototype.travelToRoom = function travelToRoom (tgtRoom, forwardRoute) {
+	if (this.room.name == tgtRoom)
+		return ERR_NO_PATH;
 
 	if (this.memory.listRoute != null) {
 		if (forwardRoute == true) {
 			for (let i = 1; i < this.memory.listRoute.length; i++) {
-				if (this.room.name == this.memory.listRoute[i - 1]) {
-					this.travel(new RoomPosition(25, 25, this.memory.listRoute[i]));
-					return;
+				if (_.get(this.memory ["listRoute", i]) != null && this.room.name == _.get(this.memory, ["listRoute", i - 1])) {
+					let result = this.travelToExitTile(this.memory.listRoute[i]);
+					if (result == OK)
+						return OK;
+					else
+						return this.travel(new RoomPosition(25, 25, this.memory.listRoute[i]));					
 				}
 			}
 		} else if (forwardRoute == false) {
 			for (let i = this.memory.listRoute.length - 2; i >= 0; i--) {
-				if (this.room.name == this.memory.listRoute[i + 1]) {
-					this.travel(new RoomPosition(25, 25, this.memory.listRoute[i]));                        
-					return;
+				if (_.get(this.memory, ["listRoute", i]) != null && this.room.name == _.get(this.memory, ["listRoute", i + 1])) {
+					let result = this.travelToExitTile(this.memory.listRoute[i])
+					if (result == OK)
+						return OK;
+					else
+						return this.travel(new RoomPosition(25, 25, this.memory.listRoute[i]));                        					
 				}
 			}
 		}
 	}
 
-	if (this.memory.route == null || this.memory.route.length == 0 || this.memory.route == ERR_NO_PATH
-			|| this.memory.route[0].room == this.room.name || this.memory.exit == null
-			|| this.memory.exit.roomName != this.room.name) {
-		this.memory.route = Game.map.findRoute(this.room, tgtRoom);
+	if (_.get(this, ["memory", "path", "route"]) != null && _.get(this, ["memory", "path", "route", 0, "room"] == this.room.name))
+		this.memory.path.route.splice(0, 1);
 
-		if (this.memory.route == ERR_NO_PATH) {
-			delete this.memory.route;
-			return;
+	if (_.get(this, ["memory", "path", "route"]) == null || this.memory.path.route.length == 0 || this.memory.path.route == ERR_NO_PATH
+			|| _.get(this, ["memory", "path", "route", 0, "room"]) == this.room.name || _.get(this, ["memory", "path", "exit"]) == null
+			|| _.get(this, ["memory", "path", "exit", "roomName"]) != this.room.name)
+		_.set(this, ["memory", "path", "route"], Game.map.findRoute(this.room, tgtRoom));
+
+	if (_.get(this, ["memory", "path", "route", 0, "room"]) != null) {
+		let result = this.travelToExitTile(_.get(this, ["memory", "path", "route", 0, "room"]));
+		if (result == OK)
+			return OK;
+		else {
+			let exit = this.pos.findClosestByPath(_.get(this, ["memory", "path", "route", 0, "exit"]));
+			_.set(this, ["memory", "path", "exit"], exit);
+			if (exit != null)
+				return this.travel(new RoomPosition(exit.x, exit.y, exit.roomName));			
 		}
-		this.memory.exit = this.pos.findClosestByPath(this.memory.route[0].exit);
 	}
-
-	if (this.memory.exit) {
-		this.travel(new RoomPosition(this.memory.exit.x, this.memory.exit.y, this.memory.exit.roomName));
-	}
+	
+	return ERR_NO_PATH;
 };
+
+Creep.prototype.travelToExitTile = function travelToExitTile (target_name) {
+	if (_.get(this, ["memory", "path", "exit_tile", "roomName"]) == this.room.name)
+		return this.travel(_.get(this, ["memory", "path", "exit_tile"]));
+
+	let room_exits = Game.map.describeExits(this.room.name);
+	for (let i in room_exits) {
+		if (room_exits[i] == target_name) {
+			let exit_tiles = _.get(Memory, ["hive", "paths", "exits", "rooms", this.room.name]);
+			if (exit_tiles == null)
+				return ERR_NO_PATH;
+
+			let tile = null;
+			switch (i) {
+				case '1': tile = _.head(_.sortBy(_.filter(exit_tiles, t => { return t.y == 0; }), t => { return this.pos.getRangeTo(t.x, t.y);})); break;
+				case '3': tile = _.head(_.sortBy(_.filter(exit_tiles, t => { return t.x == 49; }), t => { return this.pos.getRangeTo(t.x, t.y);})); break;
+				case '5': tile = _.head(_.sortBy(_.filter(exit_tiles, t => { return t.y == 49; }), t => { return this.pos.getRangeTo(t.x, t.y);})); break;
+				case '7': tile = _.head(_.sortBy(_.filter(exit_tiles, t => { return t.x == 0; }), t => { return this.pos.getRangeTo(t.x, t.y);})); break;
+			}
+
+			if (tile != null) {				
+				let result = this.travel(new RoomPosition(tile.x, tile.y, tile.roomName));
+				if (result == OK || result == ERR_TIRED) {
+					_.set(this, ["memory", "path", "exit_tile"], tile);
+					return OK;
+				}
+			}
+
+			return ERR_NO_PATH;
+		}
+	}
+}
 
 Creep.prototype.moveFrom = function moveFrom (target) {
 	let tgtDir = this.pos.getDirectionTo(target);

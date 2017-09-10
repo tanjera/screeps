@@ -4,11 +4,6 @@
 
 
 # Implementing...
-- Creep.prototype.travel - path caching
-	- TEST
-	- Creeps will need to be trying to move to room edge... ?
-		- Will need to signify which position is best bridge between rooms?
-	
 - Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
 	- Copy o4kapuk's behavior; burrow, if a source keeper, keep at distance, attack ranged, heal through
 	
@@ -22,6 +17,8 @@
 
 
 # To Implement
+
+- Path caching... in-room paths used a lot
 
 - If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
 	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...

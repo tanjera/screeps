@@ -4,7 +4,7 @@ module.exports = {
 
 	moveToDestination: function(creep) {
 		if (creep.memory.room != null && creep.room.name != creep.memory.room) {
-			creep.moveToRoom(creep.memory.room, true);
+			creep.travelToRoom(creep.memory.room, true);
 			return true;
 		} else
 			return false;
@@ -13,7 +13,7 @@ module.exports = {
 	Scout: function(creep) {
 		if (creep.memory.room != null) {
 			if (creep.room.name != creep.memory.room) {
-				creep.moveToRoom(creep.memory.room, true);
+				creep.travelToRoom(creep.memory.room, true);
 			} else {
 				let controller = _.get(Game, ["rooms", creep.memory.room, "controller"]);
 				if (controller != null && !creep.pos.inRangeTo(controller, 3))

@@ -21,6 +21,7 @@ module.exports.loop = function () {
 	Hive.initMemory();
 	Hive.initTasks();
 	Hive.initLabs();
+	Hive.initVisuals();
 
 
 	/* Auto-sell excess stockpile

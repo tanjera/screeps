@@ -55,7 +55,7 @@ let Hive = {
 	},
 
 	moveMaxOps: function() {
-		let minOps = 3000, maxOps = 6000;
+		let minOps = 2000, maxOps = 4000;
 		let range = maxOps - minOps;
 
 		return minOps + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
@@ -126,6 +126,20 @@ let Hive = {
 
 			_CPU.End("Hive", "initTasks");
 		}
+	},
+
+	initVisuals: function() {
+		_.each(_.keys(_.get(Memory, ["hive", "paths", "prefer", "rooms"])), r => {
+			_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", r]), p => {
+				new RoomVisual(r).circle(p, {fill: "green", stroke: "green", radius: 0.15, opacity: 0.25}); }); });
+		
+		_.each(_.keys(_.get(Memory, ["hive", "paths", "avoid", "rooms"])), r => {
+			_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", r]), p => {
+				new RoomVisual(r).circle(p, {fill: "red", stroke: "red", radius: 0.15, opacity: 0.25}); }); });
+
+		_.each(_.keys(_.get(Memory, ["hive", "paths", "exits", "rooms"])), r => {
+			_.each(_.get(Memory, ["hive", "paths", "exits", "rooms", r]), p => {
+				new RoomVisual(r).circle(p, {fill: "green", radius: 0.4, opacity: 0.25}); }); });
 	},
 
 	endMemory: function() {

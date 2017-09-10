@@ -1,6 +1,7 @@
 module.exports = {
-	
+    
 	Run: function() {
+        _.set(Memory, "stats", new Object());
 
         _.set(Memory, ["stats", "cpu", "tick"], Game.time);
         _.set(Memory, ["stats", "cpu", "bucket"], Game.cpu.bucket);

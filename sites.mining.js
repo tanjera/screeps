@@ -8,10 +8,17 @@ module.exports = {
 	Run: function(rmColony, rmHarvest) {
 		_CPU.Start(rmColony, "Mining-init");
 
-		// Ensure the room has a spawn... rebuilding? Sacked?
-		if (rmColony == rmHarvest && _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1)
-			return;
-
+		// Ensure the room has a spawn... rebuilding? Sacked? Unclaimed?
+		if (rmColony == rmHarvest) {
+			if (_.get(Game, ["rooms", rmColony, "controller", "my"]) != true) {
+				delete Memory.sites.mining.rmHarvest;
+				return;
+			}
+			
+			if (_.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1)
+				return;
+		}
+			
 		if (Game.rooms[rmColony] == null && Game.time % 10 == 0) {
 			console.log(`Attempt at remote mining failed, ${rmColony} not found in Game.rooms; colony destroyed?`);
 			return;
@@ -158,54 +165,57 @@ module.exports = {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["healer"]["level"],
 					scale_level: listPopulation["healer"] == null ? true : listPopulation["healer"]["scale_level"],
 					body: "healer", name: null, args: {role: "healer", room: rmHarvest, colony: rmColony} });
-        }
-        else if (listPopulation["miner"] != null && lMiner.length < listPopulation["miner"]["amount"]) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["miner"]["level"],
-				scale_level: listPopulation["miner"] == null ? true : listPopulation["miner"]["scale_level"],
-				body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
 		}
-		else if (listPopulation["dredger"] != null && lDredger.length < listPopulation["dredger"]["amount"]) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["dredger"]["level"],
-				scale_level: false, body: "dredger", name: null, args: {role: "dredger", room: rmHarvest, colony: rmColony} });
-		}
-        else if (listPopulation["burrower"] != null && lBurrower.length < listPopulation["burrower"]["amount"]) {
-            if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] && lMiner.length == 0) { 
-				// Possibly colony wiped? Need restart?
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
-					scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
-            } else {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["burrower"]["level"],
-					scale_level: listPopulation["burrower"] == null ? true : listPopulation["burrower"]["scale_level"],
-					body: (listPopulation["burrower"]["body"] || "burrower"),
-					name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
-            }
-        }
-        else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] + addCarrier) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["carrier"]["level"],
-				scale_level: listPopulation["carrier"] == null ? true : listPopulation["carrier"]["scale_level"],
-				body: (listPopulation["carrier"]["body"] || "carrier"),
-				name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
-        }
-        else if (listPopulation["multirole"] != null && lMultirole.length < listPopulation["multirole"]["amount"]) {
+		else if (listPopulation["multirole"] != null && lMultirole.length < listPopulation["multirole"]["amount"]) {
             Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["multirole"]["level"],
 				scale_level: listPopulation["multirole"] == null ? true : listPopulation["multirole"]["scale_level"],
 				body: (listPopulation["multirole"]["body"] || (hasKeepers == false ? "multirole" : "worker")),
 				name: null, args: {role: "multirole", room: rmHarvest, colony: rmColony} });
         }
-        else if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]
-                    && Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
-                    && (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["reserver"]["level"],
-				scale_level: listPopulation["reserver"] == null ? true : listPopulation["reserver"]["scale_level"],
-				body: (listPopulation["reserver"]["body"] || "reserver"),
-				name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
+		else if (is_safe) {
+			if (listPopulation["miner"] != null && lMiner.length < listPopulation["miner"]["amount"]) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["miner"]["level"],
+					scale_level: listPopulation["miner"] == null ? true : listPopulation["miner"]["scale_level"],
+					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
+			}
+			else if (listPopulation["dredger"] != null && lDredger.length < listPopulation["dredger"]["amount"]) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: listPopulation["dredger"]["level"],
+					scale_level: false, body: "dredger", name: null, args: {role: "dredger", room: rmHarvest, colony: rmColony} });
+			}
+			else if (listPopulation["burrower"] != null && lBurrower.length < listPopulation["burrower"]["amount"]) {
+				if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] && lMiner.length == 0) { 
+					// Possibly colony wiped? Need restart?
+					Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, level: 1,
+						scale_level: true, body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
+				} else {
+					Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["burrower"]["level"],
+						scale_level: listPopulation["burrower"] == null ? true : listPopulation["burrower"]["scale_level"],
+						body: (listPopulation["burrower"]["body"] || "burrower"),
+						name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
+				}
+			}
+			else if (listPopulation["carrier"] != null && lCarrier.length < listPopulation["carrier"]["amount"] + addCarrier) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["carrier"]["level"],
+					scale_level: listPopulation["carrier"] == null ? true : listPopulation["carrier"]["scale_level"],
+					body: (listPopulation["carrier"]["body"] || "carrier"),
+					name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
+			}
+			
+			else if (listPopulation["reserver"] != null && lReserver.length < listPopulation["reserver"]["amount"]
+						&& Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
+						&& (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, level: listPopulation["reserver"]["level"],
+					scale_level: listPopulation["reserver"] == null ? true : listPopulation["reserver"]["scale_level"],
+					body: (listPopulation["reserver"]["body"] || "reserver"),
+					name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
+			}
+			else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] && hasMinerals) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["extractor"]["level"],
+					scale_level: listPopulation["extractor"] == null ? true : listPopulation["extractor"]["scale_level"],
+					body: (listPopulation["extractor"]["body"] || "extractor"),
+					name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
+			}
 		}
-        else if (listPopulation["extractor"] != null && lExtractor.length < listPopulation["extractor"]["amount"] && hasMinerals) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["extractor"]["level"],
-				scale_level: listPopulation["extractor"] == null ? true : listPopulation["extractor"]["scale_level"],
-				body: (listPopulation["extractor"]["body"] || "extractor"),
-				name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
-        }
 	},
 
 	runCreeps: function(rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {

@@ -434,6 +434,42 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
 		};
 
+		command_list.push("path.exit_tile(exit_pos)");
+		
+		path.exit_tile = function(exit_pos) {
+			// Specifies preferred exit tiles to assist inter-room pathfinding
+			if (!(exit_pos.x == 0 || exit_pos.x == 49 || exit_pos.y == 0 || exit_pos.y == 49)) {
+				return `<font color=\"#D3FFA3\">[Console]</font> Invalid preferred exit tile position; must be an exit tile!`;
+			}
+
+			if (_.get(Memory, ["hive", "paths", "exits", "rooms", exit_pos.roomName]) == null)
+				_.set(Memory, ["hive", "paths", "exits", "rooms", exit_pos.roomName], new Array());
+			Memory["hive"]["paths"]["exits"]["rooms"][exit_pos.roomName].push(exit_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${exit_pos.roomName}`;
+		};
+
+		command_list.push("path.exit_area(roomName, startX, startY, endX, endY)");
+		
+		path.exit_area = function(room_name, start_x, start_y, end_x, end_y) {			
+			for (let x = start_x; x <= end_x; x++) {
+				for (let y = start_y; y <= end_y; y++) {
+					path.exit_tile(new RoomPosition(x, y, room_name));
+				}
+			}
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${exit_pos.roomName}`;
+		};
+
+		command_list.push("path.prefer(prefer_pos)");
+		
+		path.prefer = function(prefer_pos) {
+			// Lowers the cost of specific tiles (e.g. swamp), so creeps take shorter paths through swamps rather than ERR_NO_PATH
+			if (_.get(Memory, ["hive", "paths", "prefer", "rooms", prefer_pos.roomName]) == null)
+				_.set(Memory, ["hive", "paths", "prefer", "rooms", prefer_pos.roomName], new Array());
+			Memory["hive"]["paths"]["prefer"]["rooms"][prefer_pos.roomName].push(prefer_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Preference position added to Memory.hive.paths.prefer.rooms.${prefer_pos.roomName}`;
+		};
+
 		command_list.push("path.avoid(avoid_pos)");
 		
 		path.avoid = function(avoid_pos) {
@@ -459,6 +495,7 @@ module.exports = {
 		};
 
 
+		command_list.push("");
 		command_list.push("set_sign(message, rmName)")
 
 		set_sign = function(message, rmName) {

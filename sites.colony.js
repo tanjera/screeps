@@ -85,13 +85,13 @@ module.exports = {
 		let hostiles = _.filter(room.find(FIND_HOSTILE_CREEPS), c => { 
 			return c.isHostile() && c.owner.username != "Invader"; });
 		let structures = _.filter(room.find(FIND_MY_STRUCTURES), s => {
-			return s.structureType == "spawn" || s.structureType == "storage"
-				|| s.structureType == "tower" || s.structureType == "terminal"
-				|| s.structureType == "nuker"; });
+			return s.structureType == "spawn" || s.structureType == "extension"
+				|| s.structureType == "tower" || s.structureType == "nuker"
+				|| s.structureType == "storage" || s.structureType == "terminal"; });
 
 		_.each(structures, s => {
-			if (s.pos.findInRange(hostiles, 1).length > 0) {
-				if (room.controller.activateSafeMode() == "OK")
+			if (s.pos.findInRange(hostiles, 3).length > 0) {
+				if (room.controller.activateSafeMode() == OK)
 					console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; enemy detected at key base structure!`);
 			}
 		});
