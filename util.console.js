@@ -457,7 +457,7 @@ module.exports = {
 				}
 			}
 			
-			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${exit_pos.roomName}`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${room_name}`;
 		};
 
 		command_list.push("path.prefer(prefer_pos)");
@@ -492,6 +492,14 @@ module.exports = {
 			}
 			
 			return `<font color=\"#D3FFA3\">[Console]</font> Avoid positions added to Memory.hive.paths.avoid.rooms.${room_name}`;
+		};
+
+		command_list.push("path.reset(roomName)");
+		
+		path.reset = function(room_name) {
+			delete Memory["hive"]["paths"]["avoid"]["rooms"][room_name];
+			delete Memory["hive"]["paths"]["prefer"]["rooms"][room_name];
+			delete Memory["hive"]["paths"]["exits"]["rooms"][room_name];
 		};
 
 

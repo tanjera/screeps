@@ -20,7 +20,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-surveyRoom");
 		if (Game.time % 3 == 0) {
 			this.surveyRoom(rmColony);		
-			this.surveySafeMode(rmColony);
+			this.surveySafeMode(rmColony, listCreeps);
 		}
 		_CPU.End(rmColony, "Colony-surveyRoom");
 
@@ -73,7 +73,7 @@ module.exports = {
 		_.set(Memory, ["rooms", rmColony, "downgrade_critical"], (ticks_downgrade > 0 && ticks_downgrade < 3500))
 	},
 
-	surveySafeMode: function(rmColony) {
+	surveySafeMode: function(rmColony, listCreeps) {
 		let room = _.get(Game, ["rooms", rmColony]);
 		let controller = _.get(room, "controller");
 		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);
@@ -89,12 +89,23 @@ module.exports = {
 				|| s.structureType == "tower" || s.structureType == "nuker"
 				|| s.structureType == "storage" || s.structureType == "terminal"; });
 
-		_.each(structures, s => {
-			if (s.pos.findInRange(hostiles, 3).length > 0) {
+		for (let i = 0; i < structures.length; i++) {
+			if (structures[i].pos.findInRange(hostiles, 3).length > 0) {
 				if (room.controller.activateSafeMode() == OK)
 					console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; enemy detected at key base structure!`);
+				return;
 			}
-		});
+		}
+
+		if (structures.length == 0) {
+			for (let i = 0; i < listCreeps.length; i++) {
+				if (listCreeps[i].pos.findInRange(hostiles, 3).length > 0) {
+					if (room.controller.activateSafeMode() == OK)
+						console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; no structures; enemy detected at creeps!`);
+					return;
+				}
+			}
+		}
 	},
 
 	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {

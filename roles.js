@@ -225,6 +225,7 @@ module.exports = {
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "rooms"], [_.get(request, ["from"])]);
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "route"], _.get(request, ["listRoute"]));
 				_.set(Memory, ["rooms", creep.room.name, "layout"], _.get(request, "layout"));
+				_.set(Memory, ["rooms", creep.room.name, "focus_defense"], _.get(request, "focus_defense"));
 				_.set(Memory, ["hive", "pulses", "blueprint", "request"], creep.room.name);
 				creep.suicide();
 			} else if (result != OK) {
