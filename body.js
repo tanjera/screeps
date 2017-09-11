@@ -457,8 +457,8 @@ module.exports = {
                         WORK, WORK, WORK, WORK, 
                         MOVE, MOVE];
             case 3:
-                return [ // 750 energy, 6x WORK, 3x MOVE
-                        WORK, WORK, WORK, WORK, WORK, WORK,
+                return [ // 650 energy, 5x WORK, 3x MOVE
+                        WORK, WORK, WORK, WORK, WORK,
                         MOVE, MOVE, MOVE];
             case 4:
                 return [ // 1050 energy, 8x WORK, 5x MOVE

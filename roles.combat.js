@@ -135,6 +135,12 @@ module.exports = {
 			return;
 
 		if (creep.room.name == creep.memory.room) {
+			let flag = _.get(Game, ["flags", `${creep.room.name}-camp`]);
+			if (flag != null && flag.room.name == creep.room.name) {
+				_.set(creep.memory, "camp", flag.pos.getOpenTile_Range(3, true));
+				return;
+			}
+
 			let lair = _.head(_.sortBy(_.filter(creep.room.find(FIND_STRUCTURES), 
 				s => { return s.structureType == "keeperLair"; }),
 				s => { return s.ticksToSpawn; }));		

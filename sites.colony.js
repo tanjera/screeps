@@ -119,54 +119,59 @@ module.exports = {
 		let energy_critical = _.get(Memory, ["rooms", rmColony, "energy_critical"])
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "downgrade_critical"]);
 
+		let lSoldier = _.filter(listCreeps, c => c.memory.role == "soldier");
+		let lHealer = _.filter(listCreeps, c => c.memory.role == "healer");
 		let lWorker = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == null);
 		let lRepairer = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "repairer");
 		let lUpgrader = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader");
-		let lSoldier = _.filter(listCreeps, c => c.memory.role == "soldier");
+		
 
 		if (listPopulation == null)
 			listPopulation = Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Game.rooms[rmColony].controller.level]; 
 			
 		let popTarget =
-			(listPopulation["worker"] == null ? 0 : listPopulation["worker"]["amount"])
-			+ (listPopulation["repairer"] == null ? 0 : listPopulation["repairer"]["amount"])
-			+ (listPopulation["upgrader"] == null ? 0 : listPopulation["upgrader"]["amount"])
-			+ (listPopulation["soldier"] == null ? 0 : listPopulation["soldier"]["amount"]);
+			_.get(listPopulation, ["soldier", "amount"]) + _.get(listPopulation, ["healer", "amount"])
+			+ _.get(listPopulation, ["worker", "amount"]) + _.get(listPopulation, ["repairer", "amount"])
+			+ _.get(listPopulation, ["upgrader", "amount"]);
 		let popActual = lWorker.length + lRepairer.length + lUpgrader.length + lSoldier.length;
 		Hive.populationTally(rmColony, popTarget, popActual);
 
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
-			&& ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])
+			&& ((lSoldier.length < _.get(listPopulation, ["soldier", "amount"]))
 			|| (lSoldier.length < hostiles.length))) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
-					level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]),
-					scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],
+					level: (listPopulation["soldier"]["level"] == null ? 8 : listPopulation["soldier"]["level"]),
+					scale_level: _.get(listPopulation, ["soldier", "scale_level"], true),
 					body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
-		} else if (listPopulation["worker"] != null 
-			&& lWorker.length < ((is_safe && !energy_critical) ? listPopulation["worker"]["amount"] : 1)) {
+		} else if (lHealer.length < _.get(listPopulation, ["healer", "amount"])) {
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
+				level: listPopulation["healer"]["level"],
+				scale_level: _.get(listPopulation, ["healer", "scale_level"], true),
+				body: "healer", name: null, args: {role: "healer", room: rmColony} });
+		} else if (lWorker.length < ((is_safe && !energy_critical) ? _.get(listPopulation, ["worker", "amount"]) : 1)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
 					level: ((is_safe && !energy_critical) 
 						? listPopulation["worker"]["level"]
 						: Math.max(1, Math.floor(listPopulation["worker"]["level"] / 2))),
 					scale_level: ((!is_safe || energy_critical || energy_low) ? false
-						: (listPopulation["worker"] == null ? true : listPopulation["worker"]["scale_level"])),
-					body: (listPopulation["worker"]["body"] || "worker"),
+						: _.get(listPopulation, ["worker", "scale_level"], true)),
+					body: _.get(listPopulation, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
-		} else if (listPopulation["repairer"] != null && lRepairer.length < listPopulation["repairer"]["amount"]) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["repairer"]["level"],
-					scale_level: listPopulation["repairer"] == null ? true : listPopulation["repairer"]["scale_level"],
-					body: (listPopulation["repairer"]["body"] || "worker"),
+		} else if (lRepairer.length < _.get(listPopulation, ["repairer", "amount"])) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, 
+					level: listPopulation["repairer"]["level"],
+					scale_level: _.get(listPopulation, ["repairer", "scale_level"], true),
+					body: _.get(listPopulation, ["repairer", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
-		} else if (listPopulation["upgrader"] != null 
-			&& lUpgrader.length < ((is_safe && !energy_critical && !energy_low) ? listPopulation["upgrader"]["amount"] : 1)) {
+		} else if (lUpgrader.length < ((is_safe && !energy_critical && !energy_low) ? _.get(listPopulation, ["upgrader", "amount"]) : 1)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: downgrade_critical ? 1 : 4, 
 					level: ((!is_safe || energy_critical) ? 1
 						: (energy_low ? Math.max(1, Math.floor(listPopulation["upgrader"]["level"] / 2)) 
 							: listPopulation["upgrader"]["level"])),
 					scale_level: ((!is_safe || energy_critical || energy_low) ? false
-						: (listPopulation["upgrader"] == null ? true : listPopulation["upgrader"]["scale_level"])),
-					body: (listPopulation["upgrader"]["body"] || "worker"),
+						: _.get(listPopulation, ["upgrader", "scale_level"], true)),
+					body: _.get(listPopulation, ["upgrader", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
 		}
 	},
@@ -180,9 +185,10 @@ module.exports = {
 
 			if (creep.memory.role == "worker") {
 				Roles.Worker(creep);
-			}
-			else if (creep.memory.role == "soldier") {
+			} else if (creep.memory.role == "soldier") {
 				Roles.Soldier(creep, false, true);
+			} else if (creep.memory.role == "healer") {
+				Roles.Healer(creep, false);
 			}
         });
 	},

@@ -169,20 +169,35 @@ module.exports = {
 		/* Dropped resources */
 		
 		if (is_safe) {
-			let piles = room.find(FIND_DROPPED_RESOURCES);
+			let piles = room.find(FIND_DROPPED_RESOURCES);			
 			for (let i in piles) {
+				if (piles[i].resourceType == "energy" && piles[i].amount > carry_capacity[room_level] / 5) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "carry",
 						subtype: "pickup",
-						resource: piles[i].resourceType == "energy" ? "energy" : "mineral",
+						resource: "energy",
 						id: piles[i].id,
 						pos: piles[i].pos,
 						key: `carry:pickup-${piles[i].id}`,
 						timer: 20,
 						creeps: Math.ceil(piles[i].amount / carry_capacity[room_level]),
-						priority: piles[i].resourceType == "energy" ? 2 : 1,
+						priority: 2,
 					});
+				} else if (piles[i].resourceType == "mineral") {
+					_Tasks.addTask(rmName,
+						{   room: rmName,
+							type: "carry",
+							subtype: "pickup",
+							resource: "mineral",
+							id: piles[i].id,
+							pos: piles[i].pos,
+							key: `carry:pickup-${piles[i].id}`,
+							timer: 20,
+							creeps: Math.ceil(piles[i].amount / carry_capacity[room_level]),
+							priority: 1,
+						});
+					}
 			}
 		}
 
@@ -214,7 +229,7 @@ module.exports = {
 						id: sources[i].id,
 						pos: (container != null ? container.pos : sources[i].pos.getOpenTile_Adjacent(false)),
 						key: `mine:harvest-${sources[i].id}`,
-						timer: 60,
+						timer: 30,
 						creeps: access_tiles,
 						priority: 1
 					});

@@ -35,14 +35,14 @@ module.exports = {
 
 		let listPopulation = Population_Colonization;
 
-		let popTarget = (listPopulation["colonizer"] == null ? 0 : listPopulation["colonizer"]["amount"]);
+		let popTarget = _.get(listPopulation, ["colonizer", "amount"]);
 		let popActual = lColonizer.length;
 		Hive.populationTally(rmColony, popTarget, popActual);
 
-		if (listPopulation["colonizer"] != null && lColonizer.length < listPopulation["colonizer"]["amount"]) {
+		if (lColonizer.length < _.get(listPopulation, ["colonizer", "amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, level: listPopulation["colonizer"]["level"],
-				scale_level: listPopulation["colonizer"] == null ? true : listPopulation["colonizer"]["scale_level"],
-				body: (listPopulation["colonizer"]["body"] || "reserver_at"),
+				scale_level: _.get(listPopulation, ["colonizer", "scale_level"], true),
+				body: _.get(listPopulation, ["colonizer", "body"], "reserver_at"),
 				name: null, args: {role: "colonizer", room: rmTarget, colony: rmColony} });
 		}
 	},
