@@ -32,6 +32,7 @@ module.exports = {
             case "archer": return this.getBody_Archer(level);
             case "healer": return this.getBody_Healer(level);            
             case "dismantler": return this.getBody_Burrower(level);
+            case "bulldozer": return this.getBody_Bulldozer(level);
 
             case "multirole": return this.getBody_Multirole(level);
             case "burrower": return this.getBody_Burrower(level);
@@ -166,6 +167,52 @@ module.exports = {
                     TOUGH, TOUGH, TOUGH,
                     MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                     MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+        }
+    },
+
+    getBody_Bulldozer: function(level) {
+        switch (level) {
+            case 1:
+                return [ // 210
+                        TOUGH, WORK,
+                        MOVE, MOVE];
+            case 2:
+                return [ // 480
+                        TOUGH, TOUGH, TOUGH, 
+                        WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 3:
+                return [ // 780
+                        TOUGH, TOUGH, TOUGH, 
+                        WORK, WORK, WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 4:
+                return [ // 1290
+                        TOUGH, TOUGH, TOUGH, TOUGH, 
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE ];
+            case 5:
+                return [ // 1770
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE ];
+            case 6:
+                return [ // 2220
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+            case 7: case 8:
+                return [ // 2850
+                    TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                    WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                    WORK, WORK, WORK, WORK, WORK,
+                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                    MOVE, MOVE, MOVE, MOVE, MOVE ];
         }
     },
     
@@ -312,10 +359,10 @@ module.exports = {
                         CARRY, CARRY,
                         MOVE, MOVE];
             case 2:
-                return [ // 450 energy, 2x WORK, 2x CARRY, 3x MOVE
+                return [ // 500 energy, 2x WORK, 2x CARRY, 4x MOVE
                         WORK, WORK,
                         CARRY, CARRY,
-                        MOVE, MOVE, MOVE];
+                        MOVE, MOVE, MOVE, MOVE];
             case 3:
                 return [ // 700 energy, 3x WORK, 4x CARRY, 4x MOVE
                         WORK, WORK, WORK,
@@ -406,8 +453,9 @@ module.exports = {
                 return [ // 300 energy, 2x WORK, 2x MOVE
                         WORK, MOVE, WORK, MOVE];
             case 2:
-                return [ // 450 energy, 3x WORK, 3x MOVE
-                        WORK, MOVE, WORK, MOVE, WORK, MOVE];
+                return [ // 500 energy, 4x WORK, 2x MOVE
+                        WORK, WORK, WORK, WORK, 
+                        MOVE, MOVE];
             case 3:
                 return [ // 750 energy, 6x WORK, 3x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK,

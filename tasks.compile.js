@@ -4,18 +4,27 @@ module.exports = {
 
 	compileTasks: function (rmName) {
 		let room = Game.rooms[rmName];
-		let roomLvl = (room.controller == null || room.controller.level == 0) ? 8 : room.controller.level;
-		let amOwner = (room.controller == null || room.controller.level == 0) ? false : room.controller.my;
+		let am_owner = _.get(room, ["controller", "my"], false);
+		let room_level = am_owner ? room.controller.level : 0;
 		let is_safe = _.get(Memory, ["rooms", rmName, "is_safe"]);
 		
 		let all_structures = room.find(FIND_STRUCTURES);
 		let my_structures = _.filter(all_structures, s => { return s.my; });
 		
+		let carry_capacity = [ 1000,
+			150,
+			200,
+			400,
+			650,
+			900,
+			1200,
+			1650,
+			1650 ];
 		
 
 		/* Room Controllers (upgrading, signing) */
 		
-		if (amOwner) {
+		if (am_owner) {
 			if (room.controller.ticksToDowngrade < 3500) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
@@ -93,7 +102,7 @@ module.exports = {
 							creeps: 2,
 							priority: 8
 						});
-			} else if (is_safe && (amOwner || repair_maintenance[i].structureType == "road" || repair_maintenance[i].structureType == "container")) {
+			} else if (is_safe && (am_owner || repair_maintenance[i].structureType == "road" || repair_maintenance[i].structureType == "container")) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -110,7 +119,7 @@ module.exports = {
 
 		let repair_critical = room.findRepair_Critical();
 		for (let i in repair_critical) {
-			if (amOwner || repair_critical[i].structureType == "road" || repair_critical[i].structureType == "container") {
+			if (am_owner || repair_critical[i].structureType == "road" || repair_critical[i].structureType == "container") {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -171,7 +180,7 @@ module.exports = {
 						pos: piles[i].pos,
 						key: `carry:pickup-${piles[i].id}`,
 						timer: 20,
-						creeps: Math.ceil(piles[i].amount / 1000),
+						creeps: Math.ceil(piles[i].amount / carry_capacity[room_level]),
 						priority: piles[i].resourceType == "energy" ? 2 : 1,
 					});
 			}
@@ -253,7 +262,7 @@ module.exports = {
 						pos: containers[i].pos,
 						key: `energy:withdraw-energy-${containers[i].id}`,
 						timer: 20,
-						creeps: Math.ceil(containers[i].store["energy"] / (roomLvl * 180)),
+						creeps: Math.ceil(containers[i].store["energy"] / carry_capacity[room_level]),
 						priority: 3
 					});
 			}
@@ -284,7 +293,7 @@ module.exports = {
 						pos: containers[i].pos,
 						key: `energy:withdraw-energy-${containers[i].id}`,
 						timer: 20,
-						creeps: Math.ceil(containers[i].store[res] / (roomLvl * 180)),
+						creeps: Math.ceil(containers[i].store[res] / carry_capacity[room_level]),
 						priority: 2
 					});
 			});
@@ -307,7 +316,7 @@ module.exports = {
 						pos: storage.pos,
 						key: `energy:withdraw-energy-${storage.id}`,
 						timer: 20,
-						creeps: Math.ceil(storage.store["energy"] / (roomLvl * 180)),
+						creeps: Math.ceil(storage.store["energy"] / carry_capacity[room_level]),
 						priority: 3
 					});
 			} else if (storage.store["energy"] > 0) {
@@ -321,7 +330,7 @@ module.exports = {
 						pos: storage.pos,
 						key: `energy:withdraw-energy-${storage.id}`,
 						timer: 20,
-						creeps: Math.ceil(storage.store["energy"] / (roomLvl * 180)),
+						creeps: Math.ceil(storage.store["energy"] / carry_capacity[room_level]),
 						priority: 3
 					});
 			}
@@ -360,7 +369,7 @@ module.exports = {
 
 		/* Links */
 
-		if (amOwner) {
+		if (am_owner) {
 			if (is_safe && Memory["rooms"][rmName]["links"] != null) {
 				_.each(Memory["rooms"][rmName]["links"], l => {
 					let link = Game.getObjectById(l["id"]);
@@ -390,7 +399,7 @@ module.exports = {
 							pos: link.pos,
 							key: `energy:withdraw-link:${l["id"]}-${l["role"]}`,
 							timer: 20,
-							creeps: (roomLvl > 6 ? 1 : 2),
+							creeps: (room_level > 6 ? 1 : 2),
 							priority: 2
 						});
 					}

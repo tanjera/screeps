@@ -74,6 +74,7 @@ module.exports = {
 			: new Array();
 		
 		let is_safe = !visible || rmColony == rmHarvest || hostiles.length == 0;
+		_.set(Memory, ["rooms", rmHarvest, "is_safe"], is_safe);
 		_.set(Memory, ["sites", "mining", rmHarvest, "is_safe"], is_safe);
 		_.set(Memory, ["sites", "mining", rmHarvest, "hostiles"], hostiles);
 

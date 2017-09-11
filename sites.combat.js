@@ -106,7 +106,7 @@ module.exports = {
 	runTactic_Waves: function(combat_id, combat) {
 		let tactic = _.get(combat, "tactic");
 		let state_combat = _.get(combat, "state_combat");
-		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
+		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });		
 		let army = _.get(combat, ["tactic", "army"]);
 		let army_amount = _.sum(army, s => { return s.amount; });
 		
@@ -119,7 +119,7 @@ module.exports = {
                 _.each(listCreeps, creep => {
 					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
 						return;
-					this.creepRally(creep, rally_pos);	
+					this.creepRally(creep, rally_pos, rally_range);	
 				});
 				
 				if (this.checkSpawnComplete_toRally(combat_id, combat, listCreeps, army_amount))
@@ -215,7 +215,7 @@ module.exports = {
 				_.each(listCreeps, creep => {
 					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
 						return;
-					this.creepRally(creep, rally_pos);	
+					this.creepRally(creep, rally_pos, rally_range);	
 				});
 				
 				if (this.checkSpawnComplete_toRally(combat_id, combat, listCreeps, army_amount))
@@ -233,11 +233,23 @@ module.exports = {
 				let pos_drain = new RoomPosition(drain_pos.x, drain_pos.y, drain_pos.roomName);
 
 				_.each(listCreeps, creep => {
-					if (creep.memory.role == "tank") {
-						if (creep.hits < (creep.hitsMax * 0.4))
-							creep.moveTo(pos_rally, { reusePath: 0 });
+					if (creep.memory.role == "tank" || creep.memory.role == "dismantler") {
+						if (creep.hits < (creep.hitsMax * 0.4) 
+								|| (creep.memory.role == "dismantler" && !creep.hasPart("work")))
+							_.set(creep, ["memory", "combat_state"], "rally");
 						else if (creep.hits == creep.hitsMax)
-							creep.moveTo(pos_drain, { reusePath: 0 });						
+							_.set(creep, ["memory", "combat_state"], "drain");
+						
+						if (_.get(creep, ["memory", "combat_state"]) == null)
+							_.set(creep, ["memory", "combat_state"], "rally");
+
+						if (_.get(creep, ["memory", "combat_state"]) == "rally")
+							creep.moveTo(pos_rally, { reusePath: 0 });
+						else if (_.get(creep, ["memory", "combat_state"]) == "drain") {
+							if (creep.memory.role == "dismantler")
+								Roles.Dismantler(creep, true, _.get(tactic, "target_list"));
+							creep.moveTo(pos_drain, { reusePath: 0 });
+						}
 					} else if (creep.memory.role == "healer") {
 						let wounded = _.head(_.filter(listCreeps, 
 							c => { return c.hits < c.hitsMax && c.pos.roomName == pos_rally.roomName 
@@ -250,7 +262,7 @@ module.exports = {
 						} else {
 							if (creep.hits < creep.hitsMax)
 								creep.heal(creep);
-							this.creepRally(creep, rally_pos);
+							this.creepRally(creep, rally_pos, rally_range);
 						}
 					}
 				});
@@ -332,7 +344,16 @@ module.exports = {
 					{ filter: (c) => { return c.isHostile(); }}));
 				if (hostile != null) {
 					creep.rangedAttack(hostile);
-					creep.attack(hostile);								
+					creep.attack(hostile);
+				}
+			} else if (creep.hasPart("heal")) {
+				let wounded = _.head(creep.pos.findInRange(FIND_MY_CREEPS, 3, 
+					{ filter: (c) => { return c.hits < c.hitsMax; }}));
+				if (wounded != null) {
+					if (creep.pos.getRangeTo(wounded) <= 1)
+						creep.heal(wounded);
+					else
+						creep.heal(wounded);
 				}
 			} else if (Game.time % 15 == 0) {
 					creep.moveTo(posRally);	
