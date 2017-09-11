@@ -35,7 +35,7 @@ module.exports = {
 
 		let listPopulation = Population_Colonization;
 
-		let popTarget = _.get(listPopulation, ["colonizer", "amount"]);
+		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
 		let popActual = lColonizer.length;
 		Hive.populationTally(rmColony, popTarget, popActual);
 

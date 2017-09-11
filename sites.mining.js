@@ -160,7 +160,7 @@ module.exports = {
 			}
 		}
 
-		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount"); });
+		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
 		let popActual = lPaladin.length + lHealer.length + lDredger.length + lBurrower.length + lCarrier.length 
 			+ lMiner.length + lMultirole.length + lReserver.length + lExtractor.length;
         Hive.populationTally(rmColony, popTarget, popActual);
