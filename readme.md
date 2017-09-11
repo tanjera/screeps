@@ -44,7 +44,7 @@ Once the colonizer claims the new controller, the code-base will remove the colo
 
 #### Set Custom Room Functions
 
-Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_assist.rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_assist.route). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
+Higher level functions for colonies and spawning are available, such as spawning from an adjacent room (spawn\_assist.rooms), routing creeps through a complex series of rooms to assist another colony with spawning (spawn\_assist.list_route). For more information on this, please read the comments placed in main.js- they offer more instruction on how to set the parameters in your Memory.
 
 Note: If you set a custom room population (as shown in main.js' comments), you _must set the entire room's population_ including mining, industry, etc; if you only include colony workers, you won't spawn any miners to fill the spawn and extensions!
 
@@ -150,7 +150,7 @@ _.each(_.filter(Game.rooms.*room_name*.find(FIND_STRUCTURES)
 
 Invading another room is now possibly by setting an invasion request into Memory using a console command like so:
 
-`invade("room_from", "room_to_invade", occupy?_true_false, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], new RoomPosition(rally_point_x, rally_point_y, "rally_point_room_name"), ["list_route_rooms"])`
+`invade("room_from", "room_to_invade", occupy?_true_false, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], new RoomPosition(rally_point_x, rally_point_y, "rally_point_room_name"), ["list_route"])`
 
 After all invading creeps are killed- either by defenses or by destroying the room then timing out, the invasion will be deemed over (in the near future, I will be working on victory conditions and repeated assaults...). If "occupy" is set to true, then an occupation request will be placed using the same army as the invading force. See "Occupying a Room" for more details.
 
@@ -158,7 +158,7 @@ After all invading creeps are killed- either by defenses or by destroying the ro
 
 Rarely used but useful when needed, you can keep a continuous occupation of a room by adding an occupation\_request to Memory. This is useful if you destroy a player's base and want to keep them from rebuilding, clearing out structures in a room from a previous player, or disrupting an enemy's supply route or remote mining operations, sieging their room in preperation for an attack! Occupation requests can be placed in memory with the following command:
 
-`occupy("room_from", "room_to_occupy, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], ["list_route_rooms"])"`
+`occupy("room_from", "room_to_occupy, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], ["list_route"])"`
 
 ### Console Commands
 

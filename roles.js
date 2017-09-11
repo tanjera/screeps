@@ -223,7 +223,7 @@ module.exports = {
 			if (_.get(request, ["target"]) == creep.room.name && creep.room.controller.my) {
 				delete Memory["sites"]["colonization"][creep.room.name];
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "rooms"], [_.get(request, ["from"])]);
-				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "route"], _.get(request, ["listRoute"]));
+				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "list_route"], _.get(request, ["list_route"]));
 				_.set(Memory, ["rooms", creep.room.name, "layout"], _.get(request, "layout"));
 				_.set(Memory, ["rooms", creep.room.name, "focus_defense"], _.get(request, "focus_defense"));
 				_.set(Memory, ["hive", "pulses", "blueprint", "request"], creep.room.name);
@@ -251,15 +251,26 @@ module.exports = {
 		if (targetStructures) 
 			_Combat.acquireTarget_Structure(creep);
 
-		if (creep.memory.target != null) {
-			let target = Game.getObjectById(creep.memory.target);
+		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			let target = Game.getObjectById(creep.memory.target.id);
 
+			creep.dismantle(target);
 			creep.rangedAttack(target);
 			let result = creep.attack(target);
 
-			if (result == ERR_NOT_IN_RANGE || (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true)) {
-				creep.heal(creep);
+			if (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true) {
 				creep.moveTo(target, { reusePath: 0 });
+			} else if (result == ERR_NOT_IN_RANGE) {
+				creep.heal(creep);
+
+				if (_.get(creep, ["memory", "target", "rampart"]) != null) {
+					let rampart = Game.getObjectById(creep.memory.target.rampart);
+					if (rampart != null)
+						creep.moveTo(rampart, { reusePath: 0 });
+					else
+						creep.moveTo(target, { reusePath: 0 });
+				} else
+					creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK) {
 				return;
@@ -291,12 +302,26 @@ module.exports = {
 		if (targetStructures) 
 			_Combat.acquireTarget_Structure(creep);
 
-		if (creep.memory.target != null) {
-			let target = Game.getObjectById(creep.memory.target);
+		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			let target = Game.getObjectById(creep.memory.target.id);
+						
+			creep.attack(target);
+			creep.dismantle(target);
 			let result = creep.rangedAttack(target);
-			if (result == ERR_NOT_IN_RANGE) {
-				creep.heal(creep);
+
+			if (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true) {
 				creep.moveTo(target, { reusePath: 0 });
+			} else if (result == ERR_NOT_IN_RANGE) {
+				creep.heal(creep);
+
+				if (_.get(creep, ["memory", "target", "rampart"]) != null) {
+					let rampart = Game.getObjectById(creep.memory.target.rampart);
+					if (rampart != null)
+						creep.moveTo(rampart, { reusePath: 0 });
+					else
+						creep.moveTo(target, { reusePath: 0 });
+				} else
+					creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK && creep.pos.getRangeTo(target < 3)) {
 				creep.moveFrom(creep, target);
@@ -311,6 +336,45 @@ module.exports = {
 			creep.heal(creep);
 			_Combat.setCamp(creep);
 			_Combat.moveToCamp(creep);
+			return;
+		}
+	},
+
+	Dismantler: function(creep, targetStructures, listTargets) {
+		let _Combat = require("roles.combat");
+		
+		if (_Combat.acquireBoost(creep))
+			return;
+		if (_Combat.moveToDestination(creep, 10))
+			return;
+		
+		_Combat.checkTarget_Existing(creep);
+		_Combat.acquireTarget_ListTarget(creep, listTargets);
+		
+		if (targetStructures) 
+			_Combat.acquireTarget_Structure(creep);
+
+		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			let target = Game.getObjectById(creep.memory.target.id);
+
+			creep.rangedAttack(target);
+			creep.attack(target);
+			let result = creep.dismantle(target);
+
+			if (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true) {
+				creep.moveTo(target, { reusePath: 0 });
+			} else if (result == ERR_NOT_IN_RANGE) {
+				creep.heal(creep);
+				creep.moveTo(target, { reusePath: 0 });
+				return;
+			} else if (result == OK) {
+				return;
+			} else {
+				creep.heal(creep);
+				return;
+			}
+		} else {
+			creep.heal(creep);
 			return;
 		}
 	},

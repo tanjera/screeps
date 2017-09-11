@@ -30,19 +30,22 @@ module.exports = {
             case "paladin": return this.getBody_Paladin(level);
             case "tank": return this.getBody_Tank(level);
             case "archer": return this.getBody_Archer(level);
-            case "healer": return this.getBody_Healer(level);
+            case "healer": return this.getBody_Healer(level);            
+            case "dismantler": return this.getBody_Burrower(level);
+
             case "multirole": return this.getBody_Multirole(level);
-            case "worker": return this.getBody_Worker(level);
-			case "worker_at": return this.getBody_Worker_AT(level);
             case "burrower": return this.getBody_Burrower(level);
 			case "burrower_at": return this.getBody_Burrower_AT(level);
-			case "extractor": return this.getBody_Extractor(level);
-			case "extractor_rem": return this.getBody_Extractor_REM(level);
-            case "courier":
             case "carrier": return this.getBody_Carrier(level);
             case "carrier_at": return this.getBody_Carrier_AT(level);
+            case "extractor": return this.getBody_Extractor(level);
+            case "extractor_rem": return this.getBody_Extractor_REM(level);
             case "reserver": return this.getBody_Reserver(level);
 			case "reserver_at": return this.getBody_Reserver_AT(level);
+
+            case "worker": return this.getBody_Worker(level);
+			case "worker_at": return this.getBody_Worker_AT(level);            
+            case "courier": return this.getBody_Carrier(level);            
         }
     },
     

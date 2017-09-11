@@ -84,10 +84,10 @@ Population_Mining = {
 	S2: {
 		1: {	miner:	   {level: 1, amount: 1} },
 		2: {	miner:	   {level: 2, amount: 1},
-		        burrower:  {level: 2, amount: 1},
+		        burrower:  {level: 2, amount: 2},
 				carrier:   {level: 2, amount: 1} },
 		3: {	miner:	   {level: 3, amount: 1},
-		        burrower:  {level: 3, amount: 1},
+		        burrower:  {level: 3, amount: 2},
 				carrier:   {level: 3, amount: 2} },
 		4: {	burrower:  {level: 4, amount: 2},
 				carrier:   {level: 4, amount: 2} },
@@ -114,10 +114,10 @@ Population_Mining = {
 
 	R1: {
 		1: {	miner:	   {level: 1, amount: 1} },
-		2: {	burrower:  {level: 2, amount: 1, body: "burrower_at"},
+		2: {	burrower:  {level: 2, amount: 2, body: "burrower_at"},
     	        carrier:   {level: 2, amount: 2, body: "carrier_at"},
     	        multirole: {level: 2, amount: 1} },
-		3: {	burrower:  {level: 3, amount: 1, body: "burrower_at"},
+		3: {	burrower:  {level: 3, amount: 2, body: "burrower_at"},
     	        carrier:   {level: 3, amount: 2, body: "carrier_at"},
     	        multirole: {level: 3, amount: 1},
     	        reserver:  {level: 3, amount: 1, body: "reserver_at"} },
@@ -144,10 +144,10 @@ Population_Mining = {
     	        
     R2: {
 		1: {	miner:	   {level: 1, amount: 1} },
-		2: {	burrower:  {level: 2, amount: 1, body: "burrower_at"},
+		2: {	burrower:  {level: 2, amount: 2, body: "burrower_at"},
     	        carrier:   {level: 2, amount: 3, body: "carrier_at"},
     	        multirole: {level: 2, amount: 1} },
-		3: {	burrower:  {level: 3, amount: 1, body: "burrower_at"},
+		3: {	burrower:  {level: 3, amount: 2, body: "burrower_at"},
     	        carrier:   {level: 3, amount: 3, body: "carrier_at"},
     	        multirole: {level: 3, amount: 1},
     	        reserver:  {level: 3, amount: 1, body: "reserver_at"} },

@@ -30,14 +30,14 @@ module.exports = {
 		}
 		
 		listSpawnRooms = _.get(Memory, ["sites", "mining", rmHarvest, "spawn_assist", "rooms"]);
-		listRoute = _.get(Memory, ["sites", "mining", rmHarvest, "route"]);
+		listRoute = _.get(Memory, ["sites", "mining", rmHarvest, "list_route"]);
 		listPopulation = _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
 		hasKeepers = _.get(Memory, ["sites", "mining", rmHarvest, "has_keepers"], false);
 
 		if (rmColony == rmHarvest 
 				&& _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1) {
 			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
-			listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
+			listRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
 		}
 
 		_CPU.End(rmColony, "Mining-init");
@@ -68,11 +68,14 @@ module.exports = {
 		_.set(Memory, ["sites", "mining", rmHarvest, "has_minerals"],
 			visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
-		let amountHostiles = visible
-			? Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS, { filter: (c) => { return c.isHostile(); }}).length : 0;
-		let is_safe = !visible || rmColony == rmHarvest || amountHostiles == 0;
+		let hostiles = visible 
+			? _.filter(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS), 
+				c => { return c.isHostile() && c.owner.username != "Source Keeper"; })
+			: new Array();
+		
+		let is_safe = !visible || rmColony == rmHarvest || hostiles.length == 0;
 		_.set(Memory, ["sites", "mining", rmHarvest, "is_safe"], is_safe);
-		_.set(Memory, ["sites", "mining", rmHarvest, "amount_hostiles"], amountHostiles);
+		_.set(Memory, ["sites", "mining", rmHarvest, "hostiles"], hostiles);
 
 		if (visible && rmColony != rmHarvest && Game.time % 100 == 0) {
 			// Record amount of dropped energy available (for adjusting carrier amounts)
@@ -89,16 +92,17 @@ module.exports = {
 	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, listPopulation) {
 		let hasMinerals = _.get(Memory, ["sites", "mining", rmHarvest, "has_minerals"]);
 		let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "is_safe"]);
+		let hostiles = _.get(Memory, ["sites", "mining", rmHarvest, "hostiles"], new Array());
+		
 		let is_safe_colony = _.get(Memory, ["rooms", rmColony, "is_safe"]);
 		let is_visible = _.get(Memory, ["sites", "mining", rmHarvest, "visible"]);
-		let amountHostiles = _.get(Memory, ["sites", "mining", rmHarvest, "amount_hostiles"]);
 
 		// If the colony is not safe (under siege?) pause spawning remote mining; frees colony spawns to make soldiers
 		if (rmColony != rmHarvest && !is_safe_colony)
 			return;
 
 		// Is the room visible? If not, only spawn a scout to check the room out!
-		if (rmColony != rmHarvest && !is_visible && !hasKeepers) {
+		if (rmColony != rmHarvest && !is_visible) {
 			let lScout = _.filter(listCreeps, c => c.memory.role == "scout");
 
 			if (lScout.length < 1) {
@@ -165,7 +169,7 @@ module.exports = {
 				scale_level: listPopulation["paladin"] == null ? true : listPopulation["paladin"]["scale_level"],
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
 		}
-		else if ((!hasKeepers && !is_safe && amountHostiles > lSoldier.length + lMultirole.length)
+		else if ((!hasKeepers && !is_safe && hostiles.length > lSoldier.length + lMultirole.length)
 				|| (listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 				level: listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"],
@@ -234,7 +238,7 @@ module.exports = {
 		let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "is_safe"]);
 
         _.each(listCreeps, creep => {
-			creep.memory.listRoute = listRoute;
+			_.set(creep, ["memory", "list_route"], listRoute);
 
 			switch (creep.memory.role) {
 				case "scout": 		Roles.Scout(creep);					break;

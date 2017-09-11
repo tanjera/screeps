@@ -81,8 +81,8 @@ module.exports = {
 					body: (listArmy[role]["body"] == null ? role : listArmy[role]["body"]), 
 					name: null, 
 					args: { role: role, combat_id: combat_id, 
-							room: _.get(combat, "target_room") , colony: rmColony,
-							listRoute: _.get(combat, "list_route") } });
+							room: _.get(combat, "target_room"), colony: rmColony,
+							list_route: _.get(combat, "list_route") } });
 			}
 		}
 	},
@@ -327,7 +327,7 @@ module.exports = {
 		else if (creep.room.name == posRally.roomName) {
 			if (!posRally.inRangeTo(creep.pos, rallyRange)) {
 				creep.moveTo(posRally);
-			} else if (creep.getActiveBodyparts(ATTACK) > 0 || creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
+			} else if (creep.hasPart("attack") || creep.hasPart("ranged_attack")) {
 				let hostile = _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, 
 					{ filter: (c) => { return c.isHostile(); }}));
 				if (hostile != null) {
@@ -346,10 +346,14 @@ module.exports = {
 		let target_list = _.get(tactic, "target_list");
 
 		_.each(listCreeps, creep => {
-			if (creep.memory.role == "soldier") {
+			if (creep.memory.role == "soldier" 
+					|| creep.memory.role == "brawler" 
+					|| creep.memory.role == "paladin") {
 				Roles.Soldier(creep, target_structures, target_creeps, target_list);
 			} else if (creep.memory.role == "archer") {
 				Roles.Archer(creep, target_structures, target_creeps, target_list);
+			} else if (creep.memory.role == "dismantler") {
+				Roles.Dismantler(creep, target_structures, target_list);
 			} else if (creep.memory.role == "healer") {
 				Roles.Healer(creep, true);
 			}

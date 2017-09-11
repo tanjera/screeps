@@ -9,7 +9,7 @@ module.exports = {
 
 		_CPU.Start(rmColony, "Colony-init");
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
-		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "route"]);
+		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
 		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
 		_CPU.End(rmColony, "Colony-init");
 
@@ -54,13 +54,13 @@ module.exports = {
 		_.set(Memory, ["rooms", rmColony, "has_minerals"],
 			visible ? Game.rooms[rmColony].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
-		let amountHostiles = visible
-			? Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS, { filter: 
-				(c) => { return c.isHostile(); }}).length 
-			: 0;
-		let isSafe = !visible || amountHostiles == 0;
-		_.set(Memory, ["rooms", rmColony, "is_safe"], isSafe);
-		_.set(Memory, ["rooms", rmColony, "amount_hostiles"], amountHostiles);
+		let hostiles = visible 
+			? _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); })
+			: new Array();
+		_.set(Memory, ["rooms", rmColony, "hostiles"], hostiles);
+			
+		let is_safe = !visible || hostiles.length == 0;
+		_.set(Memory, ["rooms", rmColony, "is_safe"], is_safe);
 
 		let storage = _.get(Game, ["rooms", rmColony, "storage"]);
 		
@@ -82,15 +82,17 @@ module.exports = {
 				|| controller.safeModeCooldown > 0 || controller.safeModeAvailable == 0)
 			return;
 
-		let hostiles = _.filter(room.find(FIND_HOSTILE_CREEPS), c => { 
-			return c.isHostile() && c.owner.username != "Invader"; });
+		let hostiles = _.get(Memory, ["rooms", rmColony, "hostiles"]);
+		let threats = _.filter(hostiles, c => { 
+			return c.isHostile() && c.owner.username != "Invader" 
+				&& (c.hasPart("attack") || c.hasPart("ranged_attack") || c.hasPart("work")); });
 		let structures = _.filter(room.find(FIND_MY_STRUCTURES), s => {
 			return s.structureType == "spawn" || s.structureType == "extension"
 				|| s.structureType == "tower" || s.structureType == "nuker"
 				|| s.structureType == "storage" || s.structureType == "terminal"; });
 
 		for (let i = 0; i < structures.length; i++) {
-			if (structures[i].pos.findInRange(hostiles, 3).length > 0) {
+			if (structures[i].pos.findInRange(threats, 3).length > 0) {
 				if (room.controller.activateSafeMode() == OK)
 					console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; enemy detected at key base structure!`);
 				return;
@@ -99,7 +101,7 @@ module.exports = {
 
 		if (structures.length == 0) {
 			for (let i = 0; i < listCreeps.length; i++) {
-				if (listCreeps[i].pos.findInRange(hostiles, 3).length > 0) {
+				if (listCreeps[i].pos.findInRange(threats, 3).length > 0) {
 					if (room.controller.activateSafeMode() == OK)
 						console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; no structures; enemy detected at creeps!`);
 					return;
@@ -112,6 +114,7 @@ module.exports = {
 		let roomLvl = _.get(Game, ["rooms", rmColony, "controller", "level"]);
 
 		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);
+		let hostiles = _.get(Memory, ["rooms", rmColony, "hostiles"], new Array());
 		let energy_low = _.get(Memory, ["rooms", rmColony, "energy_low"])
 		let energy_critical = _.get(Memory, ["rooms", rmColony, "energy_critical"])
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "downgrade_critical"]);
@@ -134,7 +137,7 @@ module.exports = {
 
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
 			&& ((listPopulation["soldier"] != null && lSoldier.length < listPopulation["soldier"]["amount"])
-			|| (lSoldier.length < _.get(Memory, ["rooms", rmColony, "amount_hostiles"])))) {
+			|| (lSoldier.length < hostiles.length))) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 					level: (listPopulation["soldier"] == null ? 8 : listPopulation["soldier"]["level"]),
 					scale_level: listPopulation["soldier"] == null ? true : listPopulation["soldier"]["scale_level"],
@@ -173,7 +176,7 @@ module.exports = {
 		let Roles = require("roles");
 
 		_.each(listCreeps, creep => {
-			creep.memory.listRoute = listSpawnRoute;
+			_.set(creep, ["memory", "list_route"], listSpawnRoute);
 
 			if (creep.memory.role == "worker") {
 				Roles.Worker(creep);
@@ -186,7 +189,7 @@ module.exports = {
 
 
 	runTowers: function (rmColony) {
-		let is_safe = (_.get(Memory, ["rooms", rmColony, "amount_hostiles"]) == 0);
+		let is_safe = (_.get(Memory, ["rooms", rmColony, "hostiles"], new Array()).length == 0);
 
 		if (!is_safe) {
 		    _.set(Memory, ["rooms", rmColony, "target_heal"], null);
@@ -234,7 +237,7 @@ module.exports = {
 			target = _.head(_.sortBy(_.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS),
 				c => { return !c.isAlly() && (c.pos.inRangeToListTargets(base_structures, 10) 
 						|| (c.owner.username == "Invader" && c.pos.inRangeToListTargets(my_creeps, 3))); }),
-				c => { return (c.getActiveBodyparts(HEAL) > 0
+				c => { return (c.hasPart("heal") > 0
 					? -100 + new RoomPosition(originX, originY, rmColony).getRangeTo(c.pos.x, c.pos.y)
 					: new RoomPosition(originX, originY, rmColony).getRangeTo(c.pos.x, c.pos.y)); }));
 			_.set(Memory, ["rooms", rmColony, "target_attack"], (target == null ? null : target.id));

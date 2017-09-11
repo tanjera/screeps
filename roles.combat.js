@@ -33,7 +33,8 @@ module.exports = {
 	},
 
 	moveToDestination: function(creep, recheck_targets) {
-		if (creep.memory.room != null && creep.memory.target == null && creep.room.name != creep.memory.room) {
+		if (creep.memory.room != null && _.get(creep, ["memory", "target", "id"]) == null 
+				&& creep.room.name != creep.memory.room) {
 			creep.travelToRoom(creep.memory.room, true);
 			// Evaluates for targets in this room every evaluate_targets ticks...
 			return (recheck_targets == null || Game.time % recheck_targets != 0);
@@ -42,8 +43,8 @@ module.exports = {
 	},
 
 	checkTarget_Existing: function(creep) {
-		if (creep.memory.target != null) {
-			let target = Game.getObjectById(creep.memory.target);
+		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			let target = Game.getObjectById(creep.memory.target.id);
 			// Refresh target every 10 ticks...
 			if (target == null || target.room.name != creep.room.name || Game.time % 10 == 0)
 				delete creep.memory.target;
@@ -51,11 +52,11 @@ module.exports = {
 	},
 
 	acquireTarget_ListTarget: function(creep, listTargets) {
-		if (creep.memory.target == null) {
+		if (_.get(creep, ["memory", "target", "id"]) == null) {
 			for (let t in listTargets) {
 				let target = Game.getObjectById(listTargets[t]);
 				if (target != null && creep.moveTo(target) != ERR_NO_PATH) {
-					creep.memory.target = target.id;
+					_.set(creep, ["memory", "target", "id"], target.id);
 					return;
 				}
 			}
@@ -63,30 +64,36 @@ module.exports = {
 	},
 	
 	acquireTarget_Creep: function(creep) {
-		if (creep.memory.target == null) {
+		if (_.get(creep, ["memory", "target", "id"]) == null) {
 			if (_.get(Memory, ["rooms", creep.room.name, "target_attack"]) != null) {
-				creep.memory.target = _.get(Memory, ["rooms", creep.room.name, "target_attack"]);
+				_.set(creep, ["memory", "target", "id"], _.get(Memory, ["rooms", creep.room.name, "target_attack"]));
+				this.acquireRampart_Adjacent(creep);
 				return;
 			}
 
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_HOSTILE_CREEPS, 
 				{ filter: (c) => { return c.isHostile(); }}),				
-				c => { return -(c.getActiveBodyparts(ATTACK) + c.getActiveBodyparts(RANGED_ATTACK) 
-					+ c.getActiveBodyparts(HEAL)) + c.getActiveBodyparts(WORK); })),
+				c => { return -(c.hasPart("attack") + c.hasPart("ranged_attack") 
+					+ c.hasPart("heal")) + c.hasPart("work"); })),
 				c => { return c.pos.getRangeTo(creep.pos); }),
 				c => { return c.owner.username == "Source Keeper"; });				
 			if (target != null) {
-				creep.memory.target = target.id;
+				_.set(creep, ["memory", "target", "id"], target.id);
+				this.acquireRampart_Adjacent(creep);
 				return;
 			}
 		}
 	},
 	
-	acquireTarget_Structure: function(creep) {
-		if (creep.memory.target == null) {			
+	acquireTarget_Structure: function(creep) {		
+		if (creep.room.name != creep.memory.room)
+			return;
+
+		if (_.get(creep, ["memory", "target", "id"]) == null) {			
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
 				s => { return s.hits != null && s.hits > 0
-					&& (s.owner != null && !s.my && _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
+					&& (s.owner != null && !s.my && s.owner != "Source Keeper" 
+					&& _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 				s => { return creep.pos.getRangeTo(s.pos); } ),
 				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
 				s => { switch (s.structureType) {
@@ -103,12 +110,28 @@ module.exports = {
 					s => { return creep.pos.getRangeTo(s.pos); } ));
 				
 			if (target != null)
-				creep.memory.target = target.id;
+			_.set(creep, ["memory", "target", "id"], target.id);
 		}
-	},	
+	},
+
+	acquireRampart_Adjacent: function(creep) {
+		if (_.get(creep, ["memory", "target", "id"]) != null && _.get(creep, ["room", "controller", "my"])) {
+			let target = Game.getObjectById(creep.memory.target.id);
+			if (target instanceof Creep == false)
+				return;
+
+			let range = creep.hasPart("attack") ? 1 : 3;
+			let rampart = _.head(_.sortBy(_.filter(creep.room.find(FIND_MY_STRUCTURES), 
+				s => { return s.structureType == "rampart" && s.pos.inRangeTo(target, range) && s.pos.isWalkable(true); }),
+				s => { return s.pos.getRangeTo(creep); }))			
+			_.set(creep, ["memory", "target", "rampart"], _.get(rampart, "id"));
+		} else {
+			_.set(creep, ["memory", "target", "rampart"], null);
+		}
+	},
 
 	setCamp: function(creep) {
-		if (creep.memory.camp != null || Game.time % 10 != 0)
+		if (creep.memory.camp != null || Game.time % 5 != 0)
 			return;
 
 		if (creep.room.name == creep.memory.room) {

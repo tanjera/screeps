@@ -22,19 +22,19 @@ module.exports = {
 						type: "work",
 						subtype: "upgrade",
 						id: room.controller.id,
-						pos: room.controller.pos,
+						pos: room.controller.pos.getOpenTile_Range(2, true),
 						key: `work:upgrade-${room.controller.id}`,
 						timer: 30,
 						creeps: 15,
 						priority: 1
 					});
-			} else if (_.get(Memory, ["hive", "pulses", "pause_upgrading", rmName]) == null) {
+			} else if (is_safe) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
 						subtype: "upgrade",
 						id: room.controller.id,
-						pos: room.controller.pos,
+						pos: room.controller.pos.getOpenTile_Range(2, true),
 						key: `work:upgrade-${room.controller.id}`,
 						timer: 30,
 						creeps: 20,
@@ -44,7 +44,7 @@ module.exports = {
 
 			let room_sign = _.get(Memory, ["hive", "signs", rmName]);
 			let default_sign = _.get(Memory, ["hive", "signs", "default"]);
-			if (room_sign != null && _.get(room, ["controller", "sign", "text"]) != room_sign) {
+			if (is_safe && room_sign != null && _.get(room, ["controller", "sign", "text"]) != room_sign) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -57,7 +57,7 @@ module.exports = {
 						creeps: 1,
 						priority: 2
 					});
-			} else if (room_sign == null && default_sign != null && _.get(room, ["controller", "sign", "text"]) != default_sign) {
+			} else if (is_safe && room_sign == null && default_sign != null && _.get(room, ["controller", "sign", "text"]) != default_sign) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -93,7 +93,7 @@ module.exports = {
 							creeps: 2,
 							priority: 8
 						});
-			} else if (amOwner || repair_maintenance[i].structureType == "road" || repair_maintenance[i].structureType == "container") {
+			} else if (is_safe && (amOwner || repair_maintenance[i].structureType == "road" || repair_maintenance[i].structureType == "container")) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "work",
@@ -159,75 +159,80 @@ module.exports = {
 		
 		/* Dropped resources */
 		
-		let piles = room.find(FIND_DROPPED_RESOURCES);
-		for (let i in piles) {
-			_Tasks.addTask(rmName,
-				{   room: rmName,
-					type: "carry",
-					subtype: "pickup",
-					resource: piles[i].resourceType == "energy" ? "energy" : "mineral",
-					id: piles[i].id,
-					pos: piles[i].pos,
-					key: `carry:pickup-${piles[i].id}`,
-					timer: 20,
-					creeps: Math.ceil(piles[i].amount / 1000),
-					priority: piles[i].resourceType == "energy" ? 2 : 1,
-				});
+		if (is_safe) {
+			let piles = room.find(FIND_DROPPED_RESOURCES);
+			for (let i in piles) {
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "carry",
+						subtype: "pickup",
+						resource: piles[i].resourceType == "energy" ? "energy" : "mineral",
+						id: piles[i].id,
+						pos: piles[i].pos,
+						key: `carry:pickup-${piles[i].id}`,
+						timer: 20,
+						creeps: Math.ceil(piles[i].amount / 1000),
+						priority: piles[i].resourceType == "energy" ? 2 : 1,
+					});
+			}
 		}
 
 
 		/* Source mining */
 
-		let sources = room.find(FIND_SOURCES, { filter: s => { return s.energy > 0; }});
-		for (let i in sources) {
-			let container = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "container"]);
-			container = (container == null) ? null : Game.getObjectById(container);
-			if (container == null) {
-				container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:
-					s => { return s.structureType == "container"; } }));
-				_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "container"], container == null ? null : container.id);
-			}
+		if (is_safe) {
+			let sources = room.find(FIND_SOURCES, { filter: s => { return s.energy > 0; }});
+			for (let i in sources) {
+				let container = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "container"]);
+				container = (container == null) ? null : Game.getObjectById(container);
+				if (container == null) {
+					container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:
+						s => { return s.structureType == "container"; } }));
+					_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "container"], container == null ? null : container.id);
+				}
 
-			let access_tiles = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"]);
-			if (access_tiles == null) {
-				access_tiles = sources[i].pos.getAccessAmount();
-				_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"], access_tiles);
-			}
+				let access_tiles = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"]);
+				if (access_tiles == null) {
+					access_tiles = sources[i].pos.getAccessAmount();
+					_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"], access_tiles);
+				}
 
-			_Tasks.addTask(rmName,
-				{   room: rmName,
-					type: "mine",
-					subtype: "harvest",
-					resource: "energy",
-					id: sources[i].id,
-					pos: (container != null ? container.pos : sources[i].pos),
-					key: `mine:harvest-${sources[i].id}`,
-					timer: 60,
-					creeps: access_tiles,
-					priority: 1
-				});
+				_Tasks.addTask(rmName,
+					{   room: rmName,
+						type: "mine",
+						subtype: "harvest",
+						resource: "energy",
+						id: sources[i].id,
+						pos: (container != null ? container.pos : sources[i].pos.getOpenTile_Adjacent(false)),
+						key: `mine:harvest-${sources[i].id}`,
+						timer: 60,
+						creeps: access_tiles,
+						priority: 1
+					});
+			}
 		}
-
 
 		/* Mineral extraction */
 
-		let minerals = room.find(FIND_MINERALS, { filter: m => { return m.mineralAmount > 0; }});
-		for (let i in minerals) {
-			let look = minerals[i].pos.look();
-			for (let l = 0; l < look.length; l++) {
-				if (look[l].structure != null && look[l].structure.structureType == "extractor") {
-					_Tasks.addTask(rmName,
-						{   room: rmName,
-							type: "mine",
-							subtype: "harvest",
-							resource: "mineral",
-							id: minerals[i].id,
-							pos: minerals[i].pos,
-							key: `mine:harvest-${minerals[i].id}`,
-							timer: 30,
-							creeps: 2,
-							priority: 2
-						});
+		if (is_safe) {
+			let minerals = room.find(FIND_MINERALS, { filter: m => { return m.mineralAmount > 0; }});
+			for (let i in minerals) {
+				let look = minerals[i].pos.look();
+				for (let l = 0; l < look.length; l++) {
+					if (look[l].structure != null && look[l].structure.structureType == "extractor") {
+						_Tasks.addTask(rmName,
+							{   room: rmName,
+								type: "mine",
+								subtype: "harvest",
+								resource: "mineral",
+								id: minerals[i].id,
+								pos: minerals[i].pos,
+								key: `mine:harvest-${minerals[i].id}`,
+								timer: 30,
+								creeps: 2,
+								priority: 2
+							});
+					}
 				}
 			}
 		}
@@ -356,7 +361,7 @@ module.exports = {
 		/* Links */
 
 		if (amOwner) {
-			if (Memory["rooms"][rmName]["links"] != null) {
+			if (is_safe && Memory["rooms"][rmName]["links"] != null) {
 				_.each(Memory["rooms"][rmName]["links"], l => {
 					let link = Game.getObjectById(l["id"]);
 					if (l["dir"] == "send" && link != null && link.energy < link.energyCapacity * 0.9) {

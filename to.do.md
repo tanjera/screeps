@@ -1,53 +1,30 @@
 # Implemented, Needs Debugging/Testing	
 - Sites.Combat: use_boosts
-- Tower filling RCL 3 pre-spawn?
 
 
 # Implementing...
-- listRoute to creep.memory.paths.list_rooms
-
-- Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
+- Center sector mining
+	- Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
 	- Copy o4kapuk's behavior; burrow, if a source keeper, keep at distance, attack ranged, heal through
-	
-- Implement dismantler role (copy soldier role?)
 
-- If a soldier's target has an adjacent rampart, stand on the rampart.
-
-- If room has hostiles (not invaders), turn off all mining
-	- Disable remote mining (all), local (burrowers, extractors), and stop carrier tasks from containers!
-	
 
 
 # To Implement
-- on travelByPath- if tile !isWalkable, if tile.getCreep << new ; trade places?
-- Path caching... in-room paths used a lot
-
-- If ANY colony has hostiles (that are not Invaders), pause upgrading in ALL rooms (frees up energy to transfer...)
-	- Just set field to Memory on surveyRoom (sites.colony) and remove upgrading from tasks.compile.js- easiest way...
-
-- log.labs show active boosts? Or add a log.boosts...
-
-- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
-	- Needs to define central labs as supply to reach all reactors
-
 
 - Industry
+	- log.labs show active boosts? Or add a log.boosts...
+
+	- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
+	- Needs to define central labs as supply to reach all reactors
+
 	* when defining reactions, splice out labs already defined in boosts!!!!!!! but not empty...
 	- @ sites.industry() line ~141: if no reaction available to be assigned, check if any labs need emptying
 		- and empty them!
 	- refactor industry functions; Refactor industry... write out steps for industry and try to refactor to it
 	- In defining labs, if no reaction or boost, if not empty, then empty
 
-- Log to show all boosts in action... or add to log.labs()
+	- Log to show all boosts in action... or add to log.labs()
 
-
-- Refactor spawning code in sites.colony() sites.mining(); 
-	- Just iterate listPopulation and request each in spawning 
-		- Use more priority #s to "sort"
-
-- Colony function
-	- Creep ability to request another creep to move/swap spaces
-		- If burrower blocked from source, request blocking creep to swap spaces
 
 - Remote Mining
 	- Creates a road from source to colony

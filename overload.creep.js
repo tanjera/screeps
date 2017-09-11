@@ -18,6 +18,10 @@ Creep.prototype.isHostile = function isHostile() {
 	return !this.my && (allyList == null || allyList.indexOf(this.owner.username) < 0);
 };
 
+Creep.prototype.hasPart = function hasPart(part) {
+	return this.getActiveBodyparts(part) > 0;
+}
+
 
 Creep.prototype.finishedTask = function finishedTask() {
 	let task = this.memory.task;
@@ -65,7 +69,7 @@ Creep.prototype.runTask = function runTask() {
 		case "boost": {
 			let lab = Game.getObjectById(this.memory.task["id"]);
 			if (!this.pos.inRangeTo(lab, 1)) {
-				this.travel(lab);
+				this.travelTask(lab);
 				return;
 			} else {    // Wait out timer- should be boosted by then.
 				return;
@@ -75,7 +79,7 @@ Creep.prototype.runTask = function runTask() {
 		case "pickup": {
 			let obj = Game.getObjectById(this.memory.task["id"]);
 			if (this.pickup(obj) == ERR_NOT_IN_RANGE) {
-				this.travel(obj);
+				this.travelTask(obj);
 				return;
 			} else {    // Action takes one tick... task complete... delete task...
 				this.finishedTask();
@@ -88,7 +92,7 @@ Creep.prototype.runTask = function runTask() {
 			if (this.withdraw(obj, this.memory.task["resource"],
 					(this.memory.task["amount"] > this.carryCapacity - _.sum(this.carry) ? null : this.memory.task["amount"]))
 					== ERR_NOT_IN_RANGE) {
-				this.travel(obj);
+				this.travelTask(obj);
 				return;
 			} else {    // Action takes one tick... task complete... delete task...
 				this.finishedTask();
@@ -98,15 +102,11 @@ Creep.prototype.runTask = function runTask() {
 
 		case "harvest": {
 			let obj = Game.getObjectById(this.memory.task["id"]);
-			let pos = new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);
 			let result = this.harvest(obj);
 			if (result == OK || result == ERR_TIRED) {
 				return;
 			} else if (result == ERR_NOT_IN_RANGE) {
-				if (_.filter(pos.look(), n => n.type == "creep").length == 0)
-					this.travel(pos);
-				else
-					this.travel(obj);
+				this.travelTask(obj);
 				return;			
 			} else {
 				this.finishedTask();
@@ -118,7 +118,7 @@ Creep.prototype.runTask = function runTask() {
 			let controller = Game.getObjectById(this.memory.task["id"]);
 			let result = this.upgradeController(controller);
 			if (result == ERR_NOT_IN_RANGE) {
-				this.travel(controller);
+				this.travelTask(controller);
 				return;
 			} else if (result != OK) {
 				this.finishedTask();
@@ -131,7 +131,7 @@ Creep.prototype.runTask = function runTask() {
 			let message = this.memory.task["message"];
 			let result = this.signController(controller, message);
 			if (result == ERR_NOT_IN_RANGE) {
-				this.travel(controller);
+				this.travelTask(controller);
 				return;
 			} else if (result != OK) {
 				this.finishedTask();
@@ -143,7 +143,7 @@ Creep.prototype.runTask = function runTask() {
 			let structure = Game.getObjectById(this.memory.task["id"]);
 			let result = this.repair(structure);
 			if (result == ERR_NOT_IN_RANGE) {
-				this.travel(structure);
+				this.travelTask(structure);
 				return;
 			} else if (result != OK || structure.hits == structure.hitsMax) {
 				this.finishedTask();
@@ -155,7 +155,7 @@ Creep.prototype.runTask = function runTask() {
 			let structure = Game.getObjectById(this.memory.task["id"]);
 			let result = this.build(structure);
 			if (result == ERR_NOT_IN_RANGE) {
-				this.travel(structure);
+				this.travelTask(structure);
 				return;
 			} else if (result != OK) {
 				this.finishedTask();
@@ -170,7 +170,7 @@ Creep.prototype.runTask = function runTask() {
 				default:
 				case "energy":
 					if (target != null && this.transfer(target, this.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
-						this.travel(target);
+						this.travelTask(target);
 						return;
 					} else {
 						this.finishedTask();
@@ -184,7 +184,7 @@ Creep.prototype.runTask = function runTask() {
 						if (resourceType == "energy") {
 							continue;
 						} else if (target != null && this.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-							this.travel(target);
+							this.travelTask(target);
 							return;
 						} else {
 							this.finishedTask();
@@ -197,8 +197,17 @@ Creep.prototype.runTask = function runTask() {
 	}
 };
 
+Creep.prototype.travelTask = function travelTask (dest) {
+	let pos = _.get(this, ["memory", "task", "pos"]) == null ? null 
+		: new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);	
+	if (pos != null)
+		return this.travel(pos);
+	else
+		return this.travel(dest);
+}
 
-Creep.prototype.travel = function travel (dest) {
+
+Creep.prototype.travel = function travel (dest, ignore_creeps) {
 	if (this.fatigue > 0)
 		return ERR_TIRED;
 
@@ -213,12 +222,13 @@ Creep.prototype.travel = function travel (dest) {
 	if (this.pos.getRangeTo(pos_dest) == 0)
 		return OK;
 
-	if (_.get(this, ["memory", "path", "path_list"]) == null || _.get(this, ["memory", "path", "path_list"]).length == 0) {
+	if (_.get(this, ["memory", "path", "path_list"]) == null || _.get(this, ["memory", "path", "path_list"]).length == 0
+			|| _.get(this, ["memory", "path", "destination"]) != pos_dest) {
 		let Hive = require("hive");
 		_.set(this, ["memory", "path", "destination"], pos_dest);
 		_.set(this, ["memory", "path", "path_list"],
 			this.pos.findPathTo(pos_dest, {maxOps: Hive.moveMaxOps(), reusePath: Hive.moveReusePath(),
-				costCallback: function(roomName, costMatrix) {
+				ignoreCreeps: ignore_creeps, costCallback: function(roomName, costMatrix) {
 					_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {				
 						costMatrix.set(p.x, p.y, 1); });
 					
@@ -240,8 +250,15 @@ Creep.prototype.travelByPath = function travelByPath() {
 
 	let tile = this.pos.getTileInDirection(_.get(path, [0, "direction"]));
 	if (tile == null || tile.isWalkable(true) == false) {
+		if (tile.isValid())	{
+			let creep = _.get(_.head(_.filter(tile.look(), l => l.type == "creep")), "creep");
+			if (creep != null && creep.my && this.travelSwap(creep) == OK) {
+				return OK;
+			}
+		}
+
 		_.set(this, ["memory", "path"], null)
-		return ERR_NO_PATH;
+		return ERR_NO_PATH;		
 	}
 
 	let result = this.move(_.get(path, [0, "direction"]));
@@ -260,7 +277,7 @@ Creep.prototype.travelToRoom = function travelToRoom (tgtRoom, forward) {
 	if (this.room.name == tgtRoom)
 		return ERR_NO_PATH;
 
-	let list_route = _.get(this, ["memory", "listRoute"]);
+	let list_route = _.get(this, ["memory", "list_route"]);
 	if (list_route != null) {
 		if (forward == true) {
 			for (let i = 1; i < list_route.length; i++) {
@@ -338,6 +355,23 @@ Creep.prototype.travelToExitTile = function travelToExitTile (target_name) {
 			return ERR_NO_PATH;
 		}
 	}
+}
+
+Creep.prototype.travelSwap = function travelSwap (target) {
+	// Swap tiles with another creep
+	// Priorities to prevent endless loops: Burrowers 1st, larger creeps 2nd
+	if (_.get(target, ["memory", "role"]) == "burrower" 
+		|| (target == null || (_.get(this, ["memory", "role"]) != "burrower" && this.body.length <= target.body.length)))
+		return ERR_NO_PATH;
+
+	if (_.get(this, ["path", "destination"]) == _.get(target, "pos"))
+		return OK;
+
+	if (this.pos.getRangeTo(target) > 1)
+		return OK;
+
+	this.move(this.pos.getDirectionTo(target));
+	target.move(target.pos.getDirectionTo(this));
 }
 
 Creep.prototype.moveFrom = function moveFrom (target) {

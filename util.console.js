@@ -379,9 +379,9 @@ module.exports = {
 		command_list.push("");
 		command_list.push("colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, focusDefense, [listRoute])");
 
-		colonize = function(rmFrom, rmTarget, layout, focus_defense, listRoute) {
-			_.set(Memory, ["sites", "colonization", rmTarget], { from: rmFrom, target: rmTarget, layout: layout, focus_defense: focus_defense, listRoute: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${rmTarget} ... to cancel, delete the entry.`;
+		colonize = function(from, target, layout, focus_defense, list_route) {
+			_.set(Memory, ["sites", "colonization", target], { from: from, target: target, layout: layout, focus_defense: focus_defense, list_route: list_route });
+			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${target} ... to cancel, delete the entry.`;
 		};
 
 		command_list.push("combat(combatID, rmColony, rmTarget, useBoosts, listSpawnRooms, listRoute, tactic)");
@@ -400,9 +400,9 @@ module.exports = {
 		
 		command_list.push("");
 		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");
-		spawn_assist = function(rmToAssist, listRooms, listRoute) {
-			_.set(Memory, ["rooms", rmToAssist, "spawn_assist"], { rooms: listRooms, route: listRoute });
-			return `<font color=\"#D3FFA3\">[Console]</font> Spawn assist added to Memory.rooms.${rmToAssist}.spawn_assist ... to cancel, delete the entry.`;
+		spawn_assist = function(room_assist, list_rooms, list_route) {
+			_.set(Memory, ["rooms", room_assist, "spawn_assist"], { rooms: list_rooms, list_route: list_route });
+			return `<font color=\"#D3FFA3\">[Console]</font> Spawn assist added to Memory.rooms.${room_assist}.spawn_assist ... to cancel, delete the entry.`;
 		};
 
 		command_list.push("remote_mining(rmColony, rmHarvest, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
@@ -410,7 +410,7 @@ module.exports = {
 			if (rmColony == null || rmHarvest == null) 
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, invalid entry for remote_mining()`;
 			
-			_.set(Memory, ["sites", "mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
+			_.set(Memory, ["sites", "mining", rmHarvest], { colony: rmColony, has_keepers: hasKeepers, list_route: listRoute, spawn_assist: listSpawnAssistRooms, population: listPopulation});
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		
@@ -500,6 +500,7 @@ module.exports = {
 			delete Memory["hive"]["paths"]["avoid"]["rooms"][room_name];
 			delete Memory["hive"]["paths"]["prefer"]["rooms"][room_name];
 			delete Memory["hive"]["paths"]["exits"]["rooms"][room_name];
+			return `<font color=\"#D3FFA3\">[Console]</font> Path modifiers reset for ${room_name}`;
 		};
 
 

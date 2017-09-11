@@ -12,7 +12,7 @@ module.exports = {
 			return;
 
 		_CPU.Start(rmColony, `Colonization-${rmTarget}-init`);
-		listRoute = _.get(Memory, ["sites", "colonization", rmTarget, "listRoute"]);
+		listRoute = _.get(Memory, ["sites", "colonization", rmTarget, "list_route"]);
 		_CPU.End(rmColony, `Colonization-${rmTarget}-init`);
 
 		_CPU.Start(rmColony, `Colonization-${rmTarget}-listCreeps`);
@@ -51,7 +51,7 @@ module.exports = {
 		let Roles = require("roles");
 
 		_.each(listCreeps, creep => {
-			creep.memory.listRoute = listRoute;
+			_.set(creep, ["memory", "list_route"], listRoute);
 
 			if (creep.memory.role == "colonizer") {
 				Roles.Colonizer(creep);

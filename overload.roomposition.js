@@ -1,5 +1,8 @@
+RoomPosition.prototype.isValid = function isValid() {	
+	return !(this.x < 0 || this.x > 49 || this.y < 0 || this.y > 49);
+}
 RoomPosition.prototype.isWalkable = function isWalkable(creeps_block) {
-	if (this.x < 0 || this.x > 49 || this.y < 0 || this.y > 49)
+	if (!this.isValid())
 		return false;
 	
 	let look = this.look();
@@ -68,8 +71,8 @@ RoomPosition.prototype.getAccessAmount = function getAccessAmount() {
 	return access;
 };
 
-RoomPosition.prototype.getOpenTile_Adjacent = function getOpenTile_Adjacent() {
-	return (this.getOpenTile_Range(1));
+RoomPosition.prototype.getOpenTile_Adjacent = function getOpenTile_Adjacent(creeps_block) {
+	return (this.getOpenTile_Range(1, creeps_block));
 };
 
 RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range, creeps_block) {
@@ -77,7 +80,7 @@ RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range, cre
 		for (let y = -range; y <= range; y++) {
 			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
 
-			if (newPos.x <= 1 || newPos.x >= 48 || newPos.y <= 1 || newPos.y >= 48)
+			if (!newPos.isValid())
 				continue;
 			
 			if (newPos.isWalkable(creeps_block))
@@ -93,7 +96,7 @@ RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range, creep
 		for (let y = -range; y <= range; y++) {
 			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
 
-			if (newPos.x <= 1 || newPos.x >= 48 || newPos.y <= 1 || newPos.y >= 48)
+			if (!newPos.isValid())
 				continue;
 
 			if (newPos.isWalkable(creeps_block)) {
