@@ -143,7 +143,7 @@ module.exports = {
 		} else
 			listPopulation = _.clone(listPopulation)
 
-		// If remote mining, adjust carrier amount according to average amount of dropped energy over last 1500 ticks		
+		// Remote mining: adjust carrier amount according to average amount of dropped energy over last 1500 ticks		
 		if (rmHarvest != rmColony && _.get(listPopulation, ["carrier"]) != null
 				&& _.get(Memory, ["sites", "mining", rmHarvest, "energy_amounts"]) != null) {
 			let amount = 0;
@@ -161,8 +161,8 @@ module.exports = {
 			_.set(listPopulation, ["carrier", "amount"], _.get(listPopulation, ["carrier", "amount"], 0) + Math.round(dropped / carry_lifetime[room_level]));
 		}
 
-		// Adjust soldier levels based on threat level
-		if (threat_level != NONE) {						
+		// Remote mining: adjust soldier levels based on threat level
+		if (rmHarvest != rmColony && threat_level != NONE) {						
 			if (threat_level == LOW || threat_level == null) {
 				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(1, Math.round(room_level / 5)));
 				if (is_safe)
