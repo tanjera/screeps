@@ -10,16 +10,7 @@ module.exports = {
 		
 		let all_structures = room.find(FIND_STRUCTURES);
 		let my_structures = _.filter(all_structures, s => { return s.my; });
-		
-		let carry_capacity = [ 1000,
-			150,
-			200,
-			400,
-			650,
-			900,
-			1200,
-			1650,
-			1650 ];
+		let carry_capacity = [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ];
 		
 
 		/* Room Controllers (upgrading, signing) */

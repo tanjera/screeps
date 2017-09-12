@@ -11,6 +11,9 @@ module.exports = {
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
 		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
 		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+
+		if (_.get(Memory, ["rooms", rmColony, "threat_level"]) == null)
+			_.set(Memory, ["rooms", rmColony, "threat_level"], MEDIUM);
 		_CPU.End(rmColony, "Colony-init");
 
 		_CPU.Start(rmColony, "Colony-listCreeps");
@@ -137,6 +140,7 @@ module.exports = {
 			} else if (threat_level == MEDIUM) {
 				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(3, Math.round(room_level / 2)));
 				_.set(listPopulation, ["healer", "amount"], _.get(listPopulation, ["healer", "amount"], 0) + Math.max(1, Math.floor(room_level / 3)));
+				_.set(listPopulation, ["healer", "level"], room_level - 1)
 			} else if (threat_level == HIGH) {
 				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(5, room_level));
 				_.set(listPopulation, ["healer", "amount"], _.get(listPopulation, ["healer", "amount"], 0) + Math.max(2, Math.floor(room_level / 2)));
@@ -156,12 +160,16 @@ module.exports = {
 					level: _.get(listPopulation, ["soldier", "level"], room_level),
 					scale_level: _.get(listPopulation, ["soldier", "scale_level"], true),
 					body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
-		} else if (lHealer.length < _.get(listPopulation, ["healer", "amount"])) {
+		} 
+		
+		if (lHealer.length < _.get(listPopulation, ["healer", "amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
 				level: listPopulation["healer"]["level"],
 				scale_level: _.get(listPopulation, ["healer", "scale_level"], true),
 				body: "healer", name: null, args: {role: "healer", room: rmColony} });
-		} else if (lWorker.length < ((is_safe && !energy_critical) ? _.get(listPopulation, ["worker", "amount"]) : 1)) {
+		} 
+		
+		if (lWorker.length < ((is_safe && !energy_critical) ? _.get(listPopulation, ["worker", "amount"]) : 1)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
 					level: ((is_safe && !energy_critical) 
 						? listPopulation["worker"]["level"]
@@ -170,13 +178,17 @@ module.exports = {
 						: _.get(listPopulation, ["worker", "scale_level"], true)),
 					body: _.get(listPopulation, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
-		} else if (lRepairer.length < _.get(listPopulation, ["repairer", "amount"])) {
+		} 
+		
+		if (lRepairer.length < _.get(listPopulation, ["repairer", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, 
 					level: listPopulation["repairer"]["level"],
 					scale_level: _.get(listPopulation, ["repairer", "scale_level"], true),
 					body: _.get(listPopulation, ["repairer", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
-		} else if (lUpgrader.length < ((is_safe && !energy_critical && !energy_low) ? _.get(listPopulation, ["upgrader", "amount"]) : 1)) {
+		} 
+		
+		if (lUpgrader.length < ((is_safe && !energy_critical && !energy_low) ? _.get(listPopulation, ["upgrader", "amount"]) : 1)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: downgrade_critical ? 1 : 4, 
 					level: ((!is_safe || energy_critical) ? 1
@@ -211,13 +223,26 @@ module.exports = {
 		let is_safe = (_.get(Memory, ["rooms", rmColony, "hostiles"], new Array()).length == 0);
 
 		if (!is_safe) {
-		    _.set(Memory, ["rooms", rmColony, "target_heal"], null);
+			_.set(Memory, ["rooms", rmColony, "target_heal"], null);
+			_.set(Memory, ["rooms", rmColony, "target_repair"], null);
+			
 			this.towerAcquireAttack(rmColony);
 			this.towerRunAttack(rmColony);
+			return;
 		} else {
 		    _.set(Memory, ["rooms", rmColony, "target_attack"], null);
+			
 			this.towerAcquireHeal(rmColony);
-			this.towerRunHeal(rmColony);
+			if (_.get(Memory, ["rooms", rmColony, "target_heal"]) != null) {
+				this.towerRunHeal(rmColony);
+				return;
+			}
+
+			this.towerAcquireRepair(rmColony);
+			if (_.get(Memory, ["rooms", rmColony, "target_repair"]) != null) {
+				this.towerRunRepair(rmColony);
+				return;
+			}
 		}
 	},
 
@@ -259,7 +284,7 @@ module.exports = {
 				c => { return (c.hasPart("heal") > 0
 					? -100 + new RoomPosition(originX, originY, rmColony).getRangeTo(c.pos.x, c.pos.y)
 					: new RoomPosition(originX, originY, rmColony).getRangeTo(c.pos.x, c.pos.y)); }));
-			_.set(Memory, ["rooms", rmColony, "target_attack"], (target == null ? null : target.id));
+			_.set(Memory, ["rooms", rmColony, "target_attack"], _.get(target, "id"));
 		}
 	},
 
@@ -281,7 +306,7 @@ module.exports = {
 		if (Game.time % 15 == 0 && _.get(Game, ["rooms", rmColony]) != null) {
 			let injured = _.head(_.filter(Game.rooms[rmColony].find(FIND_MY_CREEPS), 
 				c => { return c.hits < c.hitsMax; }));
-			_.set(Memory, ["rooms", rmColony, "target_heal"], (injured == null ? null :injured.id));
+			_.set(Memory, ["rooms", rmColony, "target_heal"], _.get(injured, "id"));
 		}
 	},
 
@@ -293,12 +318,42 @@ module.exports = {
 				_.set(Memory, ["rooms", rmColony, "target_heal"], null);
 			} else {
 				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => {
-					return s.structureType == STRUCTURE_TOWER && s.energy > s.energyCapacity * 0.5; }}),
+					return s.structureType == "tower" && s.energy > s.energyCapacity * 0.5; }}),
 					t => { t.heal(injured) });				
 			}
 		}
 	},
 
+	towerAcquireRepair: function (rmColony) {
+		if (_.get(Memory, ["rooms", rmColony, "energy_low"]) 
+				|| _.get(Memory, ["rooms", rmColony, "energy_critical"])) {
+			_.set(Memory, ["rooms", rmColony, "target_repair"], null);
+			return;
+		}
+		
+		if (Game.time % 15 == 0 && _.get(Game, ["rooms", rmColony]) != null) {
+			let room = Game["rooms"][rmColony];
+
+			let repair = _.head(_.filter(room.findRepair_Maintenance(), 
+				r => { return (r.hits / room.getWallTarget() < 0.8
+					&& (r.structureType == "rampart" || r.structureType == "constructedWall")); }));
+			_.set(Memory, ["rooms", rmColony, "target_repair"], _.get(repair, "id"));
+		}
+	},
+
+	towerRunRepair: function (rmColony) {
+		let repair_id = _.get(Memory, ["rooms", rmColony, "target_repair"]);
+		if (repair_id != null) {
+			let repair = Game.getObjectById(repair_id);
+			if (repair == null) {
+				_.set(Memory, ["rooms", rmColony, "target_repair"], null);
+			} else {
+				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => {
+					return s.structureType == "tower" && s.energy > s.energyCapacity * 0.75; }}),
+					t => { t.repair(repair) });				
+			}
+		}
+	},
 
 	defineLinks: function(rmColony) {
 		let link_defs = _.get(Memory, ["rooms", rmColony, "links"]);
