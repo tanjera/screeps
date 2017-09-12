@@ -142,7 +142,7 @@ module.exports = {
 			if (_.get(Memory, ["rooms", creep.room.name, "camp"]) != null) {
 				let camp = _.get(Memory, ["rooms", creep.room.name, "camp"]);
 				let pos = new RoomPosition(_.get(camp, "x"), _.get(camp, "y"), _.get(camp, "roomName"));
-				_.set(creep.memory, "camp", pos.getOpenTile_Range(3, true));
+				_.set(creep.memory, "camp", pos.getOpenTile_Range(2, true));
 				return;
 			}
 			

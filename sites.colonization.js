@@ -31,9 +31,9 @@ module.exports = {
 	},
 
 	runPopulation: function(rmColony, rmTarget, listCreeps) {
-		let lColonizer  = _.filter(listCreeps, c => c.memory.role == "colonizer" && (c.ticksToLive == undefined || c.ticksToLive > 0));
+		let lColonizer  = _.filter(listCreeps, c => c.memory.role == "colonizer");
 
-		let listPopulation = Population_Colonization;
+		let listPopulation = _.clone(Population_Colonization);
 
 		// Tally population levels for level scaling
 		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
@@ -41,7 +41,8 @@ module.exports = {
 		Hive.populationTally(rmColony, popTarget, popActual);
 
 		if (lColonizer.length < _.get(listPopulation, ["colonizer", "amount"])) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, level: listPopulation["colonizer"]["level"],
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, 
+				level: listPopulation["colonizer"]["level"],
 				scale_level: _.get(listPopulation, ["colonizer", "scale_level"], true),
 				body: _.get(listPopulation, ["colonizer", "body"], "reserver_at"),
 				name: null, args: {role: "colonizer", room: rmTarget, colony: rmColony} });

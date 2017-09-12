@@ -61,7 +61,9 @@ module.exports = {
 		let lCourier  = _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80));
 
 		if (listPopulation == null)
-			listPopulation = Population_Industry;
+			listPopulation = _.clone(Population_Industry);
+		else
+			listPopulation = _.clone(listPopulation)
 
 		// Tally population levels for level scaling
 		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });

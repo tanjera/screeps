@@ -127,6 +127,8 @@ module.exports = {
 		
 		if (listPopulation == null)
 			listPopulation = _.clone(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][room_level]); 
+		else
+			listPopulation = _.clone(listPopulation)
 			
 		// Adjust soldier levels based on threat level
 		if (threat_level != NONE) {						

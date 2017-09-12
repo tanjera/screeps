@@ -140,7 +140,8 @@ module.exports = {
 					: _.clone(Population_Mining["R1"][Game.rooms[rmColony].controller.level]);
 			} else if (hasKeepers == true)
 				listPopulation = _.clone(Population_Mining["SK"]);
-		}
+		} else
+			listPopulation = _.clone(listPopulation)
 
 		// If remote mining, adjust carrier amount according to average amount of dropped energy over last 1500 ticks		
 		if (rmHarvest != rmColony && _.get(listPopulation, ["carrier"]) != null

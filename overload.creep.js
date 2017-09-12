@@ -359,19 +359,22 @@ Creep.prototype.travelToExitTile = function travelToExitTile (target_name) {
 
 Creep.prototype.travelSwap = function travelSwap (target) {
 	// Swap tiles with another creep
-	// Priorities to prevent endless loops: Burrowers 1st, larger creeps 2nd
-	if (_.get(target, ["memory", "role"]) == "burrower" 
-		|| (target == null || (_.get(this, ["memory", "role"]) != "burrower" && this.body.length <= target.body.length)))
+	// Priorities to prevent endless loops: Burrowers 1st, target task is null 2nd
+	
+	if ((_.get(this, ["memory", "role"]) == "burrower" && _.get(target, ["memory", "role"]) != "burrower")
+		|| (_.get(this, ["memory", "task"]) != null 
+			&& (_.get(target, ["memory", "task"]) == null || _.get(target, ["memory", "task", "type"]) == "wait"))) {
+		if (_.get(this, ["path", "destination"]) == _.get(target, "pos"))
+			return OK;
+
+		if (this.pos.getRangeTo(target) > 1)
+			return OK;
+
+		this.move(this.pos.getDirectionTo(target));
+		target.move(target.pos.getDirectionTo(this));
+	} else {
 		return ERR_NO_PATH;
-
-	if (_.get(this, ["path", "destination"]) == _.get(target, "pos"))
-		return OK;
-
-	if (this.pos.getRangeTo(target) > 1)
-		return OK;
-
-	this.move(this.pos.getDirectionTo(target));
-	target.move(target.pos.getDirectionTo(this));
+	}
 }
 
 Creep.prototype.moveFrom = function moveFrom (target) {
