@@ -140,6 +140,12 @@ let Hive = {
 		_.each(_.keys(_.get(Memory, ["hive", "paths", "exits", "rooms"])), r => {
 			_.each(_.get(Memory, ["hive", "paths", "exits", "rooms", r]), p => {
 				new RoomVisual(r).circle(p, {fill: "green", radius: 0.4, opacity: 0.25}); }); });
+
+		_.each(_.keys(Memory.rooms), r => {
+			if (_.get(Memory, ["rooms", r, "camp"]) != null)
+				new RoomVisual(r).circle(_.get(Memory, ["rooms", r, "camp"]), 
+					{fill: "orange", stroke: "pink", radius: 0.3, opacity: 0.25});
+		});
 	},
 
 	endMemory: function() {
@@ -221,7 +227,7 @@ let Hive = {
 
 						let level = (_.get(request, ["scale_level"]) == false)
 							? request.level
-							: Math.max(1, Math.min(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
+							: Math.max(1, Math.round(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
 								spawn.room.getLevel()));
 						request.args["level"] = level;
 

@@ -111,10 +111,10 @@ module.exports = {
 	},
 
 	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
-		let roomLvl = _.get(Game, ["rooms", rmColony, "controller", "level"]);
-
-		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);
+		let room_level = Game["rooms"][rmColony].getLevel();
+		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);		
 		let hostiles = _.get(Memory, ["rooms", rmColony, "hostiles"], new Array());
+		let threat_level = _.get(Memory, ["rooms", rmColony, "threat_level"]);
 		let energy_low = _.get(Memory, ["rooms", rmColony, "energy_low"])
 		let energy_critical = _.get(Memory, ["rooms", rmColony, "energy_critical"])
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "downgrade_critical"]);
@@ -125,10 +125,24 @@ module.exports = {
 		let lRepairer = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "repairer");
 		let lUpgrader = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader");
 		
-
 		if (listPopulation == null)
-			listPopulation = Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Game.rooms[rmColony].controller.level]; 
+			listPopulation = _.clone(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][room_level]); 
 			
+		// Adjust soldier levels based on threat level
+		if (threat_level != NONE) {						
+			if (threat_level == LOW || threat_level == null) {
+				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(1, Math.round(room_level / 3)));
+			} else if (threat_level == MEDIUM) {
+				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(3, Math.round(room_level / 2)));
+				_.set(listPopulation, ["healer", "amount"], _.get(listPopulation, ["healer", "amount"], 0) + Math.max(1, Math.floor(room_level / 3)));
+			} else if (threat_level == HIGH) {
+				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(5, room_level));
+				_.set(listPopulation, ["healer", "amount"], _.get(listPopulation, ["healer", "amount"], 0) + Math.max(2, Math.floor(room_level / 2)));
+			}				
+		}
+
+
+		// Tally population levels for level scaling
 		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
 		let popActual = lSoldier.length + lHealer.length + lWorker.length + lRepairer.length + lUpgrader.length;
 		Hive.populationTally(rmColony, popTarget, popActual);
@@ -137,7 +151,7 @@ module.exports = {
 			&& ((lSoldier.length < _.get(listPopulation, ["soldier", "amount"]))
 			|| (lSoldier.length < hostiles.length))) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
-					level: _.get(listPopulation, ["soldier", "level"], 8),
+					level: _.get(listPopulation, ["soldier", "level"], room_level),
 					scale_level: _.get(listPopulation, ["soldier", "scale_level"], true),
 					body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
 		} else if (lHealer.length < _.get(listPopulation, ["healer", "amount"])) {

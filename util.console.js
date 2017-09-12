@@ -396,7 +396,20 @@ module.exports = {
 					list_route: list_route, tactic: tactic });
 			return `<font color=\"#D3FFA3\">[Console]</font> Combat request added to Memory.sites.combat.${combat_id} ... to cancel, delete the entry.`;
 		};
+
+		command_list.push("threat_level(level)  ... NONE, LOW, MEDIUM, HIGH")
+		threat_level = function(level) {
+			for (let i in Memory.rooms) { 
+				_.set(Memory, ["rooms", i, "threat_level"], level); 
+			}
+			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for all rooms set.`;
+		};
 		
+		command_list.push("set_camp(room_pos)")
+		set_camp = function(room_pos) {
+			_.set(Memory, ["rooms", room_pos.roomName, "camp"], room_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Defensive camp set for room ${room_pos.roomName}.`;
+		};
 		
 		command_list.push("");
 		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");
@@ -505,6 +518,7 @@ module.exports = {
 
 
 		command_list.push("");
+
 		command_list.push("set_sign(message, rmName)")
 
 		set_sign = function(message, rmName) {

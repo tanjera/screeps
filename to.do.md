@@ -11,6 +11,10 @@
 
 # To Implement
 
+- Memory refactor
+	- Memory.sites.colonies?
+	- Memory.sites.colonies.defense (for is_safe, threat_level, target_attack, target_heal, etc.)
+
 - Industry
 	- log.labs show active boosts? Or add a log.boosts...
 

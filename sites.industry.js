@@ -63,6 +63,7 @@ module.exports = {
 		if (listPopulation == null)
 			listPopulation = Population_Industry;
 
+		// Tally population levels for level scaling
 		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
         let popActual = lCourier.length;
         Hive.populationTally(rmColony, popTarget, popActual);

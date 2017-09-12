@@ -396,7 +396,7 @@ module.exports = {
 		}
 
 		if (creep.hits < creep.hitsMax)
-			creep.heal(creep)	
+			creep.heal(creep)
 
 		if (to_partner) {
 			if (_.get(creep, ["memory", "partner"]) == null) {
@@ -413,6 +413,11 @@ module.exports = {
 				else if (creep.pos.getRangeTo(p) > 1)
 					creep.moveTo(p, { reusePath: 0 });
 			}
+		}
+		
+		if (_.get(creep, ["memory", "partner"]) == null) {			
+			_Combat.setCamp(creep);
+			_Combat.moveToCamp(creep);
 		}
 	},
 };

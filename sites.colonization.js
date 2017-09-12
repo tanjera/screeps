@@ -35,6 +35,7 @@ module.exports = {
 
 		let listPopulation = Population_Colonization;
 
+		// Tally population levels for level scaling
 		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
 		let popActual = lColonizer.length;
 		Hive.populationTally(rmColony, popTarget, popActual);

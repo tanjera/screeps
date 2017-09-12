@@ -52,7 +52,7 @@ module.exports = {
 	},
 
 	acquireTarget_ListTarget: function(creep, listTargets) {
-		if (_.get(creep, ["memory", "target", "id"]) == null) {
+		if (_.get(creep, ["memory", "target", "id"]) == null && listTargets != null) {
 			for (let t in listTargets) {
 				let target = Game.getObjectById(listTargets[t]);
 				if (target != null && creep.moveTo(target) != ERR_NO_PATH) {
@@ -64,6 +64,10 @@ module.exports = {
 	},
 	
 	acquireTarget_Creep: function(creep) {
+		let is_safe = _.get(Memory, ["rooms", creep.room.name, "is_safe"], true);
+		if ((is_safe && Game.time % 15 != 0) || (!is_safe && Game.time % 3 != 0))
+			return;
+
 		if (_.get(creep, ["memory", "target", "id"]) == null) {
 			if (_.get(Memory, ["rooms", creep.room.name, "target_attack"]) != null) {
 				_.set(creep, ["memory", "target", "id"], _.get(Memory, ["rooms", creep.room.name, "target_attack"]));
@@ -85,8 +89,8 @@ module.exports = {
 		}
 	},
 	
-	acquireTarget_Structure: function(creep) {		
-		if (creep.room.name != creep.memory.room)
+	acquireTarget_Structure: function(creep) {
+		if (creep.room.name != creep.memory.room || Game.time % 5 != 0)
 			return;
 
 		if (_.get(creep, ["memory", "target", "id"]) == null) {			
@@ -131,16 +135,17 @@ module.exports = {
 	},
 
 	setCamp: function(creep) {
-		if (creep.memory.camp != null || Game.time % 5 != 0)
+		if (creep.memory.camp != null || Game.time % 10 != 0)
 			return;
 
 		if (creep.room.name == creep.memory.room) {
-			let flag = _.get(Game, ["flags", `${creep.room.name}-camp`]);
-			if (flag != null && flag.room.name == creep.room.name) {
-				_.set(creep.memory, "camp", flag.pos.getOpenTile_Range(3, true));
+			if (_.get(Memory, ["rooms", creep.room.name, "camp"]) != null) {
+				let camp = _.get(Memory, ["rooms", creep.room.name, "camp"]);
+				let pos = new RoomPosition(_.get(camp, "x"), _.get(camp, "y"), _.get(camp, "roomName"));
+				_.set(creep.memory, "camp", pos.getOpenTile_Range(3, true));
 				return;
 			}
-
+			
 			let lair = _.head(_.sortBy(_.filter(creep.room.find(FIND_STRUCTURES), 
 				s => { return s.structureType == "keeperLair"; }),
 				s => { return s.ticksToSpawn; }));		
@@ -158,7 +163,7 @@ module.exports = {
 				return;
 			} 
 
-			let controller = _.head(_.filter(structures, s => { return s.structureType == "controller"}));
+			let controller = _.get(Game, ["rooms", creep.room.name, "controller"]);
 			if (controller != null) {				
 				_.set(creep.memory, "camp", controller.pos.getOpenTile_Range(3, true));
 				return;

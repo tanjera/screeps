@@ -1,3 +1,12 @@
+{	/* Constants */
+	
+	// Defensive alert states
+	NONE = 10;
+	LOW = 11;
+	MEDIUM = 12;
+    HIGH = 13;    
+}
+
 isPulse_Main = function () {
 	return _.get(Memory, ["hive", "pulses", "main", "active"], true);
 };
