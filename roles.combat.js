@@ -186,6 +186,8 @@ module.exports = {
 				else
 					creep.travel(obj);
 			}
+		} else {
+			creep.travel(new RoomPosition(25, 25, creep.room.name));
 		}
 	}
 }

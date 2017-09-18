@@ -157,7 +157,8 @@ let Hive = {
 		_.each(Game.rooms, room => {
 			if (room.controller != null && room.controller.my) {
 				Sites.Colony(room.name);
-				_.set(Memory, ["sites", "mining", room.name], { colony: room.name, has_keepers: false });
+				if (_.get(Memory, ["sites", "mining", room.name]) == null)
+					_.set(Memory, ["sites", "mining", room.name], { colony: room.name, has_keepers: false });
 
 				if (room.controller.level >= 6)
 					Sites.Industry(room.name);
@@ -190,12 +191,14 @@ let Hive = {
 
 	processSpawnRequests: function() {
 		/*  lvlPriority is an integer rating priority, e.g.:
-				0: Defense (active, imminent danger)
-				1: Mining operations (critical)
-				2: Mining operations (regular)
-				3: Colony operation (critical)
-				4: Colony operation (regular)
-				5: ... ? scouting? passive defense?
+				0: Defense (active attack)
+				1: Mining (critical; miner, burrower)
+				2-3: Defense (passive defense)
+				3: Mining (regular), Colonization
+				4: Industry
+				5: Colony (critical)
+				6: Colony (regular)
+				
 
 			tgtLevel is the target level of the creep's body (per body.js)
 			listRooms is an array of room names that would be acceptable to spawn the request (user defined)
@@ -206,12 +209,19 @@ let Hive = {
 
 		_CPU.Start("Hive", "processSpawnRequests");
 
-		let listRequests = _.sortBy(Object.keys(_.get(Memory, ["hive", "spawn_requests"])), r => { return _.get(Memory, ["hive", "spawn_requests", r, "priority"]); });
+		let requests_group = _.groupBy(_.get(Memory, ["hive", "spawn_requests"]), 
+			r => { return _.get(r, "room"); });
+		let listRequests = new Array();
+		
+		_.each(requests_group, r => { 
+			listRequests.push(_.head(_.sortBy(r, req => { return _.get(req, "priority"); })))
+		});
+		
 		let listSpawns = _.filter(Object.keys(Game["spawns"]), s => { return Game["spawns"][s].spawning == null; });
 		let _Body = require("body");
 		
-		for (let i = 0; i < Object.keys(listRequests).length; i++) {
-			let request = _.get(Memory, ["hive", "spawn_requests", listRequests[i]]);
+		for (let i = 0; i < listRequests.length; i++) {
+			let request = listRequests[i];
 			
 			_.each(_.sortBy(Object.keys(listSpawns),
 					s => { return request != null && _.get(Game, ["spawns", listSpawns[s], "room", "name"]) == _.get(request, ["room"]); }),
@@ -219,15 +229,14 @@ let Hive = {
 
 				if (listSpawns[s] != null && listRequests[i] != null) {
 					let spawn = Game["spawns"][listSpawns[s]];
-
 					if (spawn.room.name == request.room || (request.listRooms != null && _.find(request.listRooms, r => { return r == spawn.room.name; }) != null)) {
 
 						_.set(Memory, ["rooms", request.room, "population_balance", "total"],
 							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
 
 						let level = (_.get(request, ["scale_level"]) == false)
-							? request.level
-							: Math.max(1, Math.round(Math.ceil(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
+							? Math.min(request.level, spawn.room.getLevel())
+							: Math.max(1, Math.min(Math.round(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
 								spawn.room.getLevel()));
 						request.args["level"] = level;
 

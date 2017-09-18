@@ -10,7 +10,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-init");
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
 		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
-		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+		popTarget = _.get(Memory, ["rooms", rmColony, "custom_population"]);
 
 		if (_.get(Memory, ["rooms", rmColony, "threat_level"]) == null)
 			_.set(Memory, ["rooms", rmColony, "threat_level"], MEDIUM);
@@ -29,7 +29,7 @@ module.exports = {
 
 		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Colony-runPopulation");
-			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
+			this.runPopulation(rmColony, listCreeps, listSpawnRooms, popTarget);
 			_CPU.End(rmColony, "Colony-runPopulation");
 		}
 
@@ -113,7 +113,7 @@ module.exports = {
 		}
 	},
 
-	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
+	runPopulation: function(rmColony, listCreeps, listSpawnRooms, popTarget) {
 		let room_level = Game["rooms"][rmColony].getLevel();
 		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);		
 		let hostiles = _.get(Memory, ["rooms", rmColony, "hostiles"], new Array());
@@ -121,82 +121,92 @@ module.exports = {
 		let energy_low = _.get(Memory, ["rooms", rmColony, "energy_low"])
 		let energy_critical = _.get(Memory, ["rooms", rmColony, "energy_critical"])
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "downgrade_critical"]);
-
-		let lSoldier = _.filter(listCreeps, c => c.memory.role == "soldier");
-		let lHealer = _.filter(listCreeps, c => c.memory.role == "healer");
-		let lWorker = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == null);
-		let lRepairer = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "repairer");
-		let lUpgrader = _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader");
 		
-		if (listPopulation == null)
-			listPopulation = _.clone(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][room_level]); 
+		let popActual = new Object();
+		_.set(popActual, "soldier", _.filter(listCreeps, c => c.memory.role == "soldier").length);
+		_.set(popActual, "healer", _.filter(listCreeps, c => c.memory.role == "healer").length);
+		_.set(popActual, "worker", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == null).length);
+		_.set(popActual, "repairer", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "repairer").length);
+		_.set(popActual, "upgrader", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader").length);
+		
+		if (popTarget == null)
+			popTarget = _.clone(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][room_level]); 
 		else
-			listPopulation = _.clone(listPopulation)
+			popTarget = _.clone(popTarget)
 			
 		// Adjust soldier levels based on threat level
 		if (threat_level != NONE) {						
 			if (threat_level == LOW || threat_level == null) {
-				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(1, Math.round(room_level / 3)));
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(2, Math.round(room_level / 3)));
 			} else if (threat_level == MEDIUM) {
-				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(3, Math.round(room_level / 2)));
-				_.set(listPopulation, ["healer", "amount"], _.get(listPopulation, ["healer", "amount"], 0) + Math.max(1, Math.floor(room_level / 3)));
-				_.set(listPopulation, ["healer", "level"], room_level - 1)
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(3, Math.round(room_level / 2)));
+				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(1, Math.floor(room_level / 3)));
+				_.set(popTarget, ["healer", "level"], room_level - 1)
 			} else if (threat_level == HIGH) {
-				_.set(listPopulation, ["soldier", "amount"], _.get(listPopulation, ["soldier", "amount"], 0) + Math.max(5, room_level));
-				_.set(listPopulation, ["healer", "amount"], _.get(listPopulation, ["healer", "amount"], 0) + Math.max(2, Math.floor(room_level / 2)));
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(5, room_level));
+				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(2, Math.floor(room_level / 2)));
 			}				
 		}
 
+		// Tally population levels for level scaling and statistics
+		Hive.populationTally(rmColony, 
+			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
+			_.sum(popActual));
+		
+		let Grafana = require("util.grafana");
+		Grafana.populationTally(rmColony, popTarget, popActual);
 
-		// Tally population levels for level scaling
-		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
-		let popActual = lSoldier.length + lHealer.length + lWorker.length + lRepairer.length + lUpgrader.length;
-		Hive.populationTally(rmColony, popTarget, popActual);
 
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
-			&& ((lSoldier.length < _.get(listPopulation, ["soldier", "amount"]))
-			|| (lSoldier.length < hostiles.length))) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
-					level: _.get(listPopulation, ["soldier", "level"], room_level),
-					scale_level: _.get(listPopulation, ["soldier", "scale_level"], true),
+			&& ((_.get(popActual, "soldier") < _.get(popTarget, ["soldier", "amount"]))
+			|| (_.get(popActual, "soldier") < hostiles.length))) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+					priority: (is_safe ? 2 : 0),
+					level: _.get(popTarget, ["soldier", "level"], room_level),
+					scale_level: _.get(popTarget, ["soldier", "scale_level"], true),
 					body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
 		} 
 		
-		if (lHealer.length < _.get(listPopulation, ["healer", "amount"])) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0,
-				level: listPopulation["healer"]["level"],
-				scale_level: _.get(listPopulation, ["healer", "scale_level"], true),
+		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
+			&& _.get(popActual, "healer") < _.get(popTarget, ["healer", "amount"])) {
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+				priority: (is_safe ? 3 : 1),
+				level: _.get(popTarget, ["healer", "level"], 1),
+				scale_level: _.get(popTarget, ["healer", "scale_level"], true),
 				body: "healer", name: null, args: {role: "healer", room: rmColony} });
 		} 
 		
-		if (lWorker.length < ((is_safe && !energy_critical) ? _.get(listPopulation, ["worker", "amount"]) : 1)) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
+		if (_.get(popActual, "worker") < ((is_safe && !energy_critical) ? _.get(popTarget, ["worker", "amount"]) : 1)) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+					priority: 5, 
 					level: ((is_safe && !energy_critical) 
-						? listPopulation["worker"]["level"]
-						: Math.max(1, Math.floor(listPopulation["worker"]["level"] / 2))),
+						? _.get(popTarget, ["worker", "level"], 1)
+						: Math.max(1, Math.floor(_.get(popTarget, ["worker", "level"]) / 2))),
 					scale_level: ((!is_safe || energy_critical || energy_low) ? false
-						: _.get(listPopulation, ["worker", "scale_level"], true)),
-					body: _.get(listPopulation, ["worker", "body"], "worker"),
+						: _.get(popTarget, ["worker", "scale_level"], true)),
+					body: _.get(popTarget, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
 		} 
 		
-		if (lRepairer.length < _.get(listPopulation, ["repairer", "amount"])) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, 
-					level: listPopulation["repairer"]["level"],
-					scale_level: _.get(listPopulation, ["repairer", "scale_level"], true),
-					body: _.get(listPopulation, ["repairer", "body"], "worker"),
+		if (_.get(popActual, "repairer") < _.get(popTarget, ["repairer", "amount"])) {
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+					priority: 6, 
+					level: _.get(popTarget, ["repairer", "level"], 1),
+					scale_level: _.get(popTarget, ["repairer", "scale_level"], true),
+					body: _.get(popTarget, ["repairer", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
 		} 
 		
-		if (lUpgrader.length < ((is_safe && !energy_critical && !energy_low) ? _.get(listPopulation, ["upgrader", "amount"]) : 1)) {
+		if (_.get(popActual, "upgrader") < 
+			((is_safe && !energy_critical && !energy_low) ? _.get(popTarget, ["upgrader", "amount"]) : 1)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-					priority: downgrade_critical ? 1 : 4, 
+					priority: downgrade_critical ? 1 : 6, 
 					level: ((!is_safe || energy_critical) ? 1
-						: (energy_low ? Math.max(1, Math.floor(listPopulation["upgrader"]["level"] / 2)) 
-							: listPopulation["upgrader"]["level"])),
+						: (energy_low ? Math.max(1, Math.floor(_.get(popTarget, ["upgrader", "level"], 1) / 2)) 
+							: popTarget["upgrader"]["level"])),
 					scale_level: ((!is_safe || energy_critical || energy_low) ? false
-						: _.get(listPopulation, ["upgrader", "scale_level"], true)),
-					body: _.get(listPopulation, ["upgrader", "body"], "worker"),
+						: _.get(popTarget, ["upgrader", "scale_level"], true)),
+					body: _.get(popTarget, ["upgrader", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
 		}
 	},
@@ -334,9 +344,18 @@ module.exports = {
 		if (Game.time % 15 == 0 && _.get(Game, ["rooms", rmColony]) != null) {
 			let room = Game["rooms"][rmColony];
 
-			let repair = _.head(_.filter(room.findRepair_Maintenance(), 
+			let repair = _.head(_.sortBy(_.filter(room.findRepair_Maintenance(), 
 				r => { return (r.hits / room.getWallTarget() < 0.8
-					&& (r.structureType == "rampart" || r.structureType == "constructedWall")); }));
+					&& (r.structureType == "rampart" || r.structureType == "constructedWall"
+						|| r.structureType == "container" || r.structureType == "road")); }),					
+				r => { 
+					switch (r.structureType) {
+						case "rampart": 
+						case "constructedWall":		return 1;
+						case "container":			return 2; 
+						case "road":				return 3;
+					}}));
+					
 			_.set(Memory, ["rooms", rmColony, "target_repair"], _.get(repair, "id"));
 		}
 	},

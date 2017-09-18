@@ -14,7 +14,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Industry-init");
 		labDefinitions = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
-		listPopulation = _.get(Memory, ["rooms", rmColony, "custom_population"]);		
+		popTarget = _.get(Memory, ["rooms", rmColony, "custom_population"]);		
 		_CPU.End(rmColony, "Industry-init");
 
 		_CPU.Start(rmColony, "Industry-listCreeps");
@@ -23,7 +23,7 @@ module.exports = {
 
 		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Industry-runPopulation");
-			this.runPopulation(rmColony, listCreeps, listSpawnRooms, listPopulation);
+			this.runPopulation(rmColony, listCreeps, listSpawnRooms, popTarget);
 			_CPU.End(rmColony, "Industry-runPopulation");
 		}
 
@@ -57,22 +57,27 @@ module.exports = {
 	},
 
 
-	runPopulation: function(rmColony, listCreeps, listSpawnRooms, listPopulation) {
-		let lCourier  = _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80));
+	runPopulation: function(rmColony, listCreeps, listSpawnRooms, popTarget) {
+		let popActual = new Object();
+		_.set(popActual, "courier", _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80)).length);
 
-		if (listPopulation == null)
-			listPopulation = _.clone(Population_Industry);
+		if (popTarget == null)
+			popTarget = _.clone(Population_Industry);
 		else
-			listPopulation = _.clone(listPopulation)
+			popTarget = _.clone(popTarget)
 
-		// Tally population levels for level scaling
-		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
-        let popActual = lCourier.length;
-        Hive.populationTally(rmColony, popTarget, popActual);
+		// Tally population levels for level scaling and statistics
+		Hive.populationTally(rmColony, 
+			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
+			_.sum(popActual));
+			
+		let Grafana = require("util.grafana");
+		Grafana.populationTally(rmColony, popTarget, popActual);
 
-        if (listPopulation["courier"] != null && lCourier.length < listPopulation["courier"]["amount"]) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, level: listPopulation["courier"]["level"],
-				scale_level: listPopulation["courier"] == null ? true : listPopulation["courier"]["scale_level"],
+        if (popTarget["courier"] != null && _.get(popActual, "courier") < popTarget["courier"]["amount"]) {
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+				priority: 4, level: popTarget["courier"]["level"],
+				scale_level: popTarget["courier"] == null ? true : popTarget["courier"]["scale_level"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
 	},

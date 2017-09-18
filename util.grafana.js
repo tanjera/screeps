@@ -1,8 +1,18 @@
 module.exports = {
     
+    Init: function() {
+        if (isPulse_Spawn) {
+            _.each(Game.rooms, room => {
+                if (room.controller != null && room.controller.my)
+                    _.set(Memory, ["stats", "colonies", room.name, "population"], new Object()); });
+        }
+    },
+
 	Run: function() {
+        // Periodically reset to remove unused keys
         if (Game.time % 500 == 0)
             _.set(Memory, "stats", new Object());
+
 
         _.set(Memory, ["stats", "cpu", "tick"], Game.time);
         _.set(Memory, ["stats", "cpu", "bucket"], Game.cpu.bucket);
@@ -15,6 +25,11 @@ module.exports = {
             _.set(Memory, ["stats", "gcl", "progress_percent"], (Game.gcl.progress / Game.gcl.progressTotal * 100));
             
             _.set(Memory, ["stats", "creeps", "total"], _.keys(Game.creeps).length);
+
+            _.each(_.get(Game, "spawns"), s => { 
+                _.set(Memory, ["stats", "colonies", s.room.name, "spawns", s.name], 
+                    s.spawning == null ? 0 : 1); 
+            });
         }
 
         if (Game.time % 50 == 0) {
@@ -38,6 +53,19 @@ module.exports = {
                             + _.get(terminal, ["store", res], 0));
                 }
             });
+        }
+    },
+
+    populationTally: function(room_name, pop_target, pop_actual) {
+        for (let i in pop_target) {
+            _.set(Memory, ["stats", "colonies", room_name, "population", "target", i], 
+                _.get(pop_target, [i, "amount"]) + _.get(Memory, ["stats", "colonies", room_name, "population", "target", i], 0));
+            _.set(Memory, ["stats", "colonies", room_name, "population", "actual", i], 
+                _.get(pop_actual, [i]) + _.get(Memory, ["stats", "colonies", room_name, "population", "actual", i], 0));
+
+            _.set(Memory, ["stats", "colonies", room_name, "population", "percent", i],
+                _.get(Memory, ["stats", "colonies", room_name, "population", "actual", i], 0)
+                / _.get(Memory, ["stats", "colonies", room_name, "population", "target", i], 1))
         }
     }
 };

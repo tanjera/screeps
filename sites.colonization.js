@@ -31,20 +31,24 @@ module.exports = {
 	},
 
 	runPopulation: function(rmColony, rmTarget, listCreeps) {
-		let lColonizer  = _.filter(listCreeps, c => c.memory.role == "colonizer");
+		let popActual = new Object();
+		_.set(popActual, "colonizer", _.filter(listCreeps, c => c.memory.role == "colonizer").length);
 
-		let listPopulation = _.clone(Population_Colonization);
+		let popTarget = _.clone(Population_Colonization);
 
-		// Tally population levels for level scaling
-		let popTarget = _.sum(listPopulation, p => { return _.get(p, "amount", 0); });
-		let popActual = lColonizer.length;
-		Hive.populationTally(rmColony, popTarget, popActual);
+		// Tally population levels for level scaling and statistics
+		Hive.populationTally(rmColony, 
+			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
+			_.sum(popActual));
+			
+		let Grafana = require("util.grafana");
+		Grafana.populationTally(rmColony, popTarget, popActual);
 
-		if (lColonizer.length < _.get(listPopulation, ["colonizer", "amount"])) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, 
-				level: listPopulation["colonizer"]["level"],
-				scale_level: _.get(listPopulation, ["colonizer", "scale_level"], true),
-				body: _.get(listPopulation, ["colonizer", "body"], "reserver_at"),
+		if (_.get(popActual, "colonizer") < _.get(popTarget, ["colonizer", "amount"])) {
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, 
+				level: popTarget["colonizer"]["level"],
+				scale_level: _.get(popTarget, ["colonizer", "scale_level"], true),
+				body: _.get(popTarget, ["colonizer", "body"], "reserver_at"),
 				name: null, args: {role: "colonizer", room: rmTarget, colony: rmColony} });
 		}
 	},
