@@ -15,7 +15,6 @@ module.exports.loop = function () {
 
 	/* Init functions */
 	CPU.Init();
-	Grafana.Init();
 	Blueprint.Init();
 
 	Hive.clearDeadMemory();

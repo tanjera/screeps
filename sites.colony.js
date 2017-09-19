@@ -135,7 +135,7 @@ module.exports = {
 			popTarget = _.clone(popTarget)
 			
 		// Adjust soldier levels based on threat level
-		if (threat_level != NONE) {						
+		if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {						
 			if (threat_level == LOW || threat_level == null) {
 				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(2, Math.round(room_level / 3)));
 			} else if (threat_level == MEDIUM) {

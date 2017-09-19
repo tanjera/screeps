@@ -289,8 +289,8 @@ module.exports = {
 	},
 
 	buildContainers: function(rmColony, rmHarvest) {
-		if (Game.time % 1500 != 0)
-			return;
+		if (Game.time % 1500 != 0 || rmColony == rmHarvest)
+			return;		// Blueprint builds containers in colony rooms
 
 		let room = Game["rooms"][rmHarvest];
 		if (room == null)

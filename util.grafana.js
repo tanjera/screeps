@@ -1,17 +1,16 @@
 module.exports = {
-    
-    Init: function() {
-        if (isPulse_Spawn) {
-            _.each(Game.rooms, room => {
-                if (room.controller != null && room.controller.my)
-                    _.set(Memory, ["stats", "colonies", room.name, "population"], new Object()); });
-        }
-    },
 
 	Run: function() {
-        // Periodically reset to remove unused keys
-        if (Game.time % 500 == 0)
+        // Periodically reset to remove unused keys or interval data
+        if (Game.time % 100 == 0) {
+        _.each(Game.rooms, room => {
+            if (room.controller != null && room.controller.my)
+                _.set(Memory, ["stats", "colonies", room.name, "population"], new Object()); });
+        }
+        
+        if (Game.time % 500 == 0) {
             _.set(Memory, "stats", new Object());
+        }
 
 
         _.set(Memory, ["stats", "cpu", "tick"], Game.time);
