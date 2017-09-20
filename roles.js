@@ -193,8 +193,9 @@ module.exports = {
 		if (result == ERR_NOT_IN_RANGE) {
 			creep.moveTo(creep.room.controller)
 			return;
+		} else if (result == ERR_NO_BODYPART) {
+			return;		// Reservers and colonizers with no "claim" parts prevent null body spawn locking
 		} else if (result == OK) {
-
 			if (Game.time % 50 == 0) {
 				let room_sign = _.get(Memory, ["hive", "signs", creep.room.name]);
 				let default_sign = _.get(Memory, ["hive", "signs", "default"]);
@@ -203,7 +204,6 @@ module.exports = {
 				else if (room_sign == null && default_sign != null && _.get(creep, ["room", "controller", "sign", "text"]) != default_sign)
 					creep.signController(creep.room.controller, default_sign);
 			}
-
 			if (Game.time % 10 == 0)
 				creep.moveFromSource();
 			return;
@@ -218,6 +218,8 @@ module.exports = {
 		if (result == ERR_NOT_IN_RANGE) {
 			creep.moveTo(creep.room.controller)
 			return;
+		} else if (result == ERR_NO_BODYPART) {
+			return;		// Reservers and colonizers with no "claim" parts prevent null body spawn locking
 		} else {
 			let request = _.get(Memory, ["sites", "colonization", creep.memory.room]);			
 			if (_.get(request, ["target"]) == creep.room.name && creep.room.controller.my) {

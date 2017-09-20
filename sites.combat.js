@@ -77,7 +77,7 @@ module.exports = {
 					listRooms: listSpawnRooms, 
 					priority: 0, 
 					level: _.get(listArmy, [role, "level"], rmLevel),
-					scale_level: false,
+					scale: false,
 					body: _.get(listArmy, [role, "body"], role), 
 					name: null, 
 					args: { role: role, combat_id: combat_id, 

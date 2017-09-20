@@ -104,7 +104,7 @@ module.exports = {
 
 			if (lScout.length < 1) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, level: 1,
-				scale_level: false, body: "scout", name: null, args: {role: "scout", room: rmHarvest, colony: rmColony} });
+				scale: false, body: "scout", name: null, args: {role: "scout", room: rmHarvest, colony: rmColony} });
 			}
 			return;
 		}
@@ -123,11 +123,11 @@ module.exports = {
 
 		if (popTarget == null) {
 			if (rmColony == rmHarvest)
-				popTarget = _.clone(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][room_level]);
+				popTarget = _.clone(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)]);
 			else if (hasKeepers != true) {
 				popTarget = (is_visible && _.get(Game, ["rooms", rmHarvest]) != null)
-			        ? _.clone(Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][room_level])
-					: _.clone(Population_Mining["R1"][room_level]);
+			        ? _.clone(Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)])
+					: _.clone(Population_Mining["R1"][Math.max(1, room_level)]);
 			} else if (hasKeepers == true)
 				popTarget = _.clone(Population_Mining["SK"]);
 		} else
@@ -163,7 +163,7 @@ module.exports = {
 		if (_.get(popActual, "paladin") < _.get(popTarget, ["paladin", "amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, 
 				level: popTarget["paladin"]["level"],
-				scale_level: _.get(popTarget, ["paladin", "scale_level"], true),
+				scale: _.get(popTarget, ["paladin", "scale"], true),
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
 		}
 		
@@ -172,7 +172,7 @@ module.exports = {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: (is_safe ? 2 : 0),
 				level: _.get(popTarget, ["soldier", "level"], room_level),
-				scale_level: _.get(popTarget, ["soldier", "scale_level"], true),
+				scale: _.get(popTarget, ["soldier", "scale"], true),
 				body: "soldier", name: null, args: {role: "soldier", room: rmHarvest, colony: rmColony} });
 		}
 		
@@ -180,14 +180,14 @@ module.exports = {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: (is_safe ? 3 : 1), 
 				level: popTarget["healer"]["level"],
-				scale_level: _.get(popTarget, ["healer", "scale_level"], true),
+				scale: _.get(popTarget, ["healer", "scale"], true),
 				body: "healer", name: null, args: {role: "healer", room: rmHarvest, colony: rmColony} });
 		}
 		
 		if (_.get(popActual, "multirole") < _.get(popTarget, ["multirole", "amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
 				level: popTarget["multirole"]["level"],
-				scale_level: _.get(popTarget, ["multirole", "scale_level"], true),
+				scale: _.get(popTarget, ["multirole", "scale"], true),
 				body: _.get(popTarget, ["multirole", "body"], (hasKeepers ? "worker" : "multirole")),
 				name: null, args: {role: "multirole", room: rmHarvest, colony: rmColony} });
         }
@@ -199,28 +199,28 @@ module.exports = {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: (rmColony == rmHarvest ? 0 : 1), 
 					level: Math.max(1, _.get(popActual, "miner")),
-					scale_level: true, body: "worker", 
+					scale: true, body: "worker", 
 					name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
 			}
 
 			if (_.get(popActual, "miner") < _.get(popTarget, ["miner", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, 
 					level: _.get(popTarget, ["miner", "level"], 1),
-					scale_level: _.get(popTarget, ["miner", "scale_level"], true),
+					scale: _.get(popTarget, ["miner", "scale"], true),
 					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
 			}
 			
 			if (_.get(popActual, "dredger") < _.get(popTarget, ["dredger", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, 
 					level: _.get(popTarget, ["dredger", "level"], 1),
-					scale_level: _.get(popTarget, ["dredger", "scale_level"], true), 
+					scale: _.get(popTarget, ["dredger", "scale"], true), 
 					body: "dredger", name: null, args: {role: "dredger", room: rmHarvest, colony: rmColony} });
 			}
 			
 			if (_.get(popActual, "burrower") < _.get(popTarget, ["burrower", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, 
 					level: _.get(popTarget, ["burrower", "level"], 1),
-					scale_level: _.get(popTarget, ["burrower", "scale_level"], true),
+					scale: _.get(popTarget, ["burrower", "scale"], true),
 					body: _.get(popTarget, ["burrower", "body"], "burrower"),
 					name: null, args: {role: "burrower", room: rmHarvest, colony: rmColony} });
 			}
@@ -228,7 +228,7 @@ module.exports = {
 			if (_.get(popActual, "carrier") < _.get(popTarget, ["carrier", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, 
 					level: _.get(popTarget, ["carrier", "level"], 1),
-					scale_level: _.get(popTarget, ["carrier", "scale_level"], true),
+					scale: _.get(popTarget, ["carrier", "scale"], true),
 					body: _.get(popTarget, ["carrier", "body"], "carrier"),
 					name: null, args: {role: "carrier", room: rmHarvest, colony: rmColony} });
 			}			
@@ -238,7 +238,7 @@ module.exports = {
 						&& (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 2, 
 					level: _.get(popTarget, ["reserver", "level"], 1),
-					scale_level: _.get(popTarget, ["reserver", "scale_level"], true),
+					scale: _.get(popTarget, ["reserver", "scale"], true),
 					body: _.get(popTarget, ["reserver", "body"], "reserver"),
 					name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
 			}
@@ -246,7 +246,7 @@ module.exports = {
 			if (_.get(popActual, "extractor") < _.get(popTarget, ["extractor", "amount"]) && has_minerals) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
 					level: _.get(popTarget, ["extractor", "level"], 1),
-					scale_level: _.get(popTarget, ["extractor", "scale_level"], true),
+					scale: _.get(popTarget, ["extractor", "scale"], true),
 					body: _.get(popTarget, ["extractor", "body"], "extractor"),
 					name: null, args: {role: "extractor", room: rmHarvest, colony: rmColony} });
 			}

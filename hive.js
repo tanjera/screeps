@@ -234,7 +234,7 @@ let Hive = {
 						_.set(Memory, ["rooms", request.room, "population_balance", "total"],
 							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
 
-						let level = (_.get(request, ["scale_level"]) == false)
+						let level = (_.get(request, ["scale"], true) == false)
 							? Math.min(request.level, spawn.room.getLevel())
 							: Math.max(1, Math.min(Math.round(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
 								spawn.room.getLevel()));

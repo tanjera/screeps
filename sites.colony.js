@@ -130,7 +130,7 @@ module.exports = {
 		_.set(popActual, "upgrader", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader").length);
 		
 		if (popTarget == null)
-			popTarget = _.clone(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][room_level]); 
+			popTarget = _.clone(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]); 
 		else
 			popTarget = _.clone(popTarget)
 			
@@ -163,7 +163,7 @@ module.exports = {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: (is_safe ? 2 : 0),
 					level: _.get(popTarget, ["soldier", "level"], room_level),
-					scale_level: _.get(popTarget, ["soldier", "scale_level"], true),
+					scale: _.get(popTarget, ["soldier", "scale"], true),
 					body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
 		} 
 		
@@ -172,7 +172,7 @@ module.exports = {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: (is_safe ? 3 : 1),
 				level: _.get(popTarget, ["healer", "level"], 1),
-				scale_level: _.get(popTarget, ["healer", "scale_level"], true),
+				scale: _.get(popTarget, ["healer", "scale"], true),
 				body: "healer", name: null, args: {role: "healer", room: rmColony} });
 		} 
 		
@@ -182,8 +182,8 @@ module.exports = {
 					level: ((is_safe && !energy_critical) 
 						? _.get(popTarget, ["worker", "level"], 1)
 						: Math.max(1, Math.floor(_.get(popTarget, ["worker", "level"]) / 2))),
-					scale_level: ((!is_safe || energy_critical || energy_low) ? false
-						: _.get(popTarget, ["worker", "scale_level"], true)),
+					scale: ((!is_safe || energy_critical || energy_low) ? false
+						: _.get(popTarget, ["worker", "scale"], true)),
 					body: _.get(popTarget, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
 		} 
@@ -192,7 +192,7 @@ module.exports = {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: 6, 
 					level: _.get(popTarget, ["repairer", "level"], 1),
-					scale_level: _.get(popTarget, ["repairer", "scale_level"], true),
+					scale: _.get(popTarget, ["repairer", "scale"], true),
 					body: _.get(popTarget, ["repairer", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
 		} 
@@ -204,8 +204,8 @@ module.exports = {
 					level: ((!is_safe || energy_critical) ? 1
 						: (energy_low ? Math.max(1, Math.floor(_.get(popTarget, ["upgrader", "level"], 1) / 2)) 
 							: popTarget["upgrader"]["level"])),
-					scale_level: ((!is_safe || energy_critical || energy_low) ? false
-						: _.get(popTarget, ["upgrader", "scale_level"], true)),
+					scale: ((!is_safe || energy_critical || energy_low) ? false
+						: _.get(popTarget, ["upgrader", "scale"], true)),
 					body: _.get(popTarget, ["upgrader", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
 		}

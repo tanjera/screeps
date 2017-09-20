@@ -2,11 +2,8 @@
 Population_Industry =
 { courier:   {level: 6, amount: 1} };
 
-Population_Reservation =
-{ reserver:  {level: 6, amount: 1, body: "reserver_at"} };
-
 Population_Colonization =
-{ colonizer:  {level: 6, amount: 1, body: "reserver_at"} };
+{ colonizer:  {level: 6, amount: 1, body: "reserver_at", scale: false} };
 
 
 Population_Colony = {
@@ -27,7 +24,7 @@ Standalone: {
 	7: {    worker:   {level: 7, amount: 2},
 			repairer: {level: 6, amount: 2},
 			upgrader: {level: 7, amount: 2} },
-	8: {	worker:   {level: 7, amount: 1, scale_level: false},
+	8: {	worker:   {level: 7, amount: 1},
 			repairer: {level: 7, amount: 2} } },
 
 Assisted: {
@@ -47,7 +44,7 @@ Assisted: {
 	7: {    worker:   {level: 7, amount: 2},
 			repairer: {level: 5, amount: 2},
 			upgrader: {level: 7, amount: 2} },
-	8: {	worker:   {level: 7, amount: 1, scale_level: false},
+	8: {	worker:   {level: 7, amount: 1},
 			repairer: {level: 6, amount: 2} } }
 };
 
@@ -113,8 +110,7 @@ R1: {
 			multirole: {level: 2, amount: 1} },
 	3: {	burrower:  {level: 2, amount: 2, body: "burrower_at"},
 			carrier:   {level: 2, amount: 3, body: "carrier_at"},
-			multirole: {level: 2, amount: 1},
-			reserver:  {level: 2, amount: 1, body: "reserver_at"} },
+			multirole: {level: 2, amount: 1} },
 	4: {	burrower:  {level: 3, amount: 1, body: "burrower_at"},
 			carrier:   {level: 3, amount: 3, body: "carrier_at"},
 			multirole: {level: 3, amount: 1},
@@ -143,8 +139,7 @@ R2: {
 			multirole: {level: 2, amount: 1} },
 	3: {	burrower:  {level: 2, amount: 2, body: "burrower_at"},
 			carrier:   {level: 2, amount: 5, body: "carrier_at"},
-			multirole: {level: 2, amount: 1},
-			reserver:  {level: 2, amount: 1, body: "reserver_at"} },
+			multirole: {level: 2, amount: 1} },
 	4: {	burrower:  {level: 3, amount: 1, body: "burrower_at"},
 			carrier:   {level: 3, amount: 5, body: "carrier_at"},
 			multirole: {level: 3, amount: 1},
@@ -166,6 +161,6 @@ R2: {
 			multirole: {level: 6, amount: 1},
 			reserver:  {level: 6, amount: 1, body: "reserver_at"} } },
 			
-SK: {		dredger:   {level: 8, amount: 4, body: "dredger"},
+SK: {		dredger:   {level: 8, amount: 4, body: "dredger", scale: false},
 			carrier:   {level: 8, amount: 5, body: "carrier_at"} }
 };

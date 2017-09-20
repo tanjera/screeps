@@ -77,7 +77,7 @@ module.exports = {
         if (popTarget["courier"] != null && _.get(popActual, "courier") < popTarget["courier"]["amount"]) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: 4, level: popTarget["courier"]["level"],
-				scale_level: popTarget["courier"] == null ? true : popTarget["courier"]["scale_level"],
+				scale: popTarget["courier"] == null ? true : popTarget["courier"]["scale"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
 	},

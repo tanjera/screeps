@@ -735,7 +735,8 @@ module.exports = {
     getBody_Reserver: function(level) {
         switch (level) {
             case 1: case 2:
-                return null;
+                return [ // Prevent spawn locking with null body
+                        MOVE];
             case 3: case 4:
                 return [ // 650 energy, 1x CLAIM, 1x MOVE
                         CLAIM, MOVE];
@@ -748,7 +749,8 @@ module.exports = {
     getBody_Reserver_AT: function(level) {
         switch (level) {
             case 1: case 2:
-                return null;
+            return [ // Prevent spawn locking with null body
+                MOVE];
             case 3:
 				return [ // 750 energy, 1x CLAIM, 3x MOVE
                         CLAIM, MOVE, MOVE, MOVE];

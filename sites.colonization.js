@@ -46,8 +46,8 @@ module.exports = {
 
 		if (_.get(popActual, "colonizer") < _.get(popTarget, ["colonizer", "amount"])) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, 
-				level: popTarget["colonizer"]["level"],
-				scale_level: _.get(popTarget, ["colonizer", "scale_level"], true),
+				level: _.get(popTarget, ["colonizer", "level"], 6),
+				scale: _.get(popTarget, ["colonizer", "scale"], false),
 				body: _.get(popTarget, ["colonizer", "body"], "reserver_at"),
 				name: null, args: {role: "colonizer", room: rmTarget, colony: rmColony} });
 		}
