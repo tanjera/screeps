@@ -3,7 +3,6 @@
 
 
 # Implementing...
-
 - Spawn priority defined as a range for some roles (e.g. 2-4)
 	- Lerp the range based on (current / (target - 1)) ;; target - 1 necessary for exercising full range
 

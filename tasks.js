@@ -218,7 +218,12 @@ module.exports = {
 			if (creep.memory.role == "burrower") {
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
 						t => { return t.type == "mine" && t.resource == "energy" && _.get(t, "creeps") > 0; }),
-						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }));
+						t => { 
+							if (_.get(t, "burrower") == null || _.get(t, "burrower") == creep.id)
+								return -1;
+							else
+								return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); 
+						}));
 				if (task != null) {
 					this.giveTask(creep, task);
 					return;

@@ -3,18 +3,33 @@ let _CPU = require("util.cpu");
 
 let Hive = {
 
-	setPulse_Main: function() {
+	setPulse_Short: function() {
 		let minTicks = 5, maxTicks = 60;
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["hive", "pulses", "main", "last_tick"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", "short", "last_tick"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| (Game.time - lastTick) >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["hive", "pulses", "main", "last_tick"], Game.time);
-			_.set(Memory, ["hive", "pulses", "main", "active"], true);
+			_.set(Memory, ["hive", "pulses", "short", "last_tick"], Game.time);
+			_.set(Memory, ["hive", "pulses", "short", "active"], true);
 		} else {
-			_.set(Memory, ["hive", "pulses", "main", "active"], false);
+			_.set(Memory, ["hive", "pulses", "short", "active"], false);
+		}
+	},
+
+	setPulse_Mid: function() {
+		let minTicks = 50, maxTicks = 200;
+		let range = maxTicks - minTicks;
+		let lastTick = _.get(Memory, ["hive", "pulses", "mid", "last_tick"]);
+
+		if (lastTick == null
+				|| Game.time == lastTick
+				|| (Game.time - lastTick) >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
+			_.set(Memory, ["hive", "pulses", "mid", "last_tick"], Game.time);
+			_.set(Memory, ["hive", "pulses", "mid", "active"], true);
+		} else {
+			_.set(Memory, ["hive", "pulses", "mid", "active"], false);
 		}
 	},
 
@@ -62,7 +77,7 @@ let Hive = {
 	},
 	
 	clearDeadMemory: function() {
-		if (!isPulse_Main())
+		if (!isPulse_Short())
 			return;
 
 		if (Memory.creeps != null) {
@@ -88,7 +103,8 @@ let Hive = {
 	initMemory: function() {
 		_CPU.Start("Hive", "initMemory");
 
-		this.setPulse_Main();
+		this.setPulse_Short();
+		this.setPulse_Mid();
 		this.setPulse_Spawn();
 		this.setPulse_Lab();
 		
@@ -114,7 +130,7 @@ let Hive = {
 	},
 
 	initTasks: function() {
-		if (isPulse_Main()) {
+		if (isPulse_Short()) {
 			_CPU.Start("Hive", "initTasks");
 
 			let _Compile = require("tasks.compile");
@@ -129,23 +145,8 @@ let Hive = {
 	},
 
 	initVisuals: function() {
-		_.each(_.keys(_.get(Memory, ["hive", "paths", "prefer", "rooms"])), r => {
-			_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", r]), p => {
-				new RoomVisual(r).circle(p, {fill: "green", stroke: "green", radius: 0.15, opacity: 0.25}); }); });
-		
-		_.each(_.keys(_.get(Memory, ["hive", "paths", "avoid", "rooms"])), r => {
-			_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", r]), p => {
-				new RoomVisual(r).circle(p, {fill: "red", stroke: "red", radius: 0.15, opacity: 0.25}); }); });
-
-		_.each(_.keys(_.get(Memory, ["hive", "paths", "exits", "rooms"])), r => {
-			_.each(_.get(Memory, ["hive", "paths", "exits", "rooms", r]), p => {
-				new RoomVisual(r).circle(p, {fill: "green", radius: 0.4, opacity: 0.25}); }); });
-
-		_.each(_.keys(Memory.rooms), r => {
-			if (_.get(Memory, ["rooms", r, "camp"]) != null)
-				new RoomVisual(r).circle(_.get(Memory, ["rooms", r, "camp"]), 
-					{fill: "orange", stroke: "pink", radius: 0.3, opacity: 0.25});
-		});
+		let _Visuals = require("util.visuals");
+		_Visuals.Init();
 	},
 
 	endMemory: function() {
@@ -289,7 +290,7 @@ let Hive = {
 
 	
 	sellExcessResources: function() {
-		if (!isPulse_Main())
+		if (!isPulse_Short())
 			return;
 
 		_CPU.Start("Hive", "sellExcessResources");
@@ -330,7 +331,7 @@ let Hive = {
 	},
 
 	moveExcessEnergy: function() {
-		if (!isPulse_Main())
+		if (!isPulse_Short())
 			return;
 
 		_CPU.Start("Hive", "moveExcessEnergy");

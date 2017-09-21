@@ -5,7 +5,10 @@ module.exports = {
 	compileTasks: function (rmName) {
 		let room = Game.rooms[rmName];
 		let am_owner = _.get(room, ["controller", "my"], false);
-		let room_level = am_owner ? room.controller.level : 0;
+		let mining_colony = _.get(Memory, ["sites", "mining", rmName, "colony"]);
+		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
+			? (am_owner ? room.controller.level : 0)
+			: Game.rooms[mining_colony].getLevel();
 		let is_safe = _.get(Memory, ["rooms", rmName, "is_safe"]);
 		
 		let all_structures = room.find(FIND_STRUCTURES);
@@ -200,6 +203,7 @@ module.exports = {
 			for (let i in sources) {
 				let container = _.get(Memory, ["rooms", rmName, "sources", sources[i].id, "container"]);
 				container = (container == null) ? null : Game.getObjectById(container);
+				
 				if (container == null) {
 					container = _.head(sources[i].pos.findInRange(FIND_STRUCTURES, 1, { filter:
 						s => { return s.structureType == "container"; } }));
@@ -212,16 +216,24 @@ module.exports = {
 					_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"], access_tiles);
 				}
 
+				let position = (container != null ? container.pos : sources[i].pos.getOpenTile_Adjacent(true));
+				if (position == null)
+					position = sources[i].pos.getOpenTile_Adjacent(false);
+
+				let burrower = _.head(_.filter(sources[i].pos.findInRange(FIND_MY_CREEPS, 1), 
+					c => { return c.memory.role == "burrower"; }))
+
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "mine",
 						subtype: "harvest",
 						resource: "energy",
 						id: sources[i].id,
-						pos: (container != null ? container.pos : sources[i].pos.getOpenTile_Adjacent(false)),
+						pos: position,
 						key: `mine:harvest-${sources[i].id}`,
 						timer: 30,
 						creeps: access_tiles,
+						burrower: _.get(burrower, "id", null),
 						priority: 1
 					});
 			}

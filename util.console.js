@@ -1,13 +1,37 @@
 module.exports = {
 	Init: function() {
-		let command_list = new Array();
+		let help_main = new Array();
+		let help_profiler = new Array();
+		let help_allies = new Array();
+		let help_blueprint = new Array();
+		let help_empire = new Array();
+		let help_labs = new Array();
+		let help_logs = new Array();
+		let help_resources = new Array();
+		let help_path = new Array();
+		let help_visuals = new Array();
+		
 
-		command_list.push("profiler.run(cycles)");
-		command_list.push("profiler.stop()");
+		/* Main help() list */
+		help_main.push("List of help() arguments, e.g. help(blueprint):");		
+		help_main.push(`- "allies" \t Manage ally list`);
+		help_main.push(`- "blueprint" \t Settings for automatic base building`);
+		help_main.push(`- "empire" \t Miscellaneous empire and colony management`);
+		help_main.push(`- "labs" \t Management of lab functions/reactions`);
+		help_main.push(`- "logs" \t Logs for statistical output`);
+		help_main.push(`- "path" \t Utilities for enhancing creep pathfinding abilities`);
+		help_main.push(`- "profiler" \t Built-in CPU profiler`);
+		help_main.push(`- "resources" \t Management of resources, empire-wide sharing and/or selling to market`);
+		help_main.push(`- "visuals" \t Manage visual objects (RoomVisual class)`);
+		help_main.push("");
+
+
+		help_profiler.push("profiler.run(cycles)");
+		help_profiler.push("profiler.stop()");
 		
+
 		
-		command_list.push("");
-		command_list.push("allies.add(ally)");
+		help_allies.push("allies.add(ally)");
 		
 		allies = new Object()
 		allies.add = function(ally) {
@@ -16,14 +40,14 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Player ${ally} added to ally list.`
 		};
 
-		command_list.push("allies.add_list([ally1, ally2, ...])");
+		help_allies.push("allies.add_list([ally1, ally2, ...])");
 
 		allies.add_list = function(allyList) {
 			Array.prototype.push.apply(Memory["hive"]["allies"], allyList);
 			return `<font color=\"#D3FFA3\">[Console]</font> Players added to ally list.`
 		};
 
-		command_list.push("allies.remove(ally)");
+		help_allies.push("allies.remove(ally)");
 		
 		allies.remove = function(ally) {
 			let index = _.get(Memory, ["hive", "allies"]).indexOf(ally);
@@ -35,7 +59,7 @@ module.exports = {
 			}
 		};
 
-		command_list.push("allies.clear()");
+		help_allies.push("allies.clear()");
 		allies.clear = function() {
 			_.set(Memory, ["hive", "allies"], []);
 			return `<font color=\"#D3FFA3\">[Console]</font> Ally list cleared.`
@@ -43,16 +67,14 @@ module.exports = {
 
 
 		blueprint = new Object();
-		command_list.push("");
-
-		command_list.push("blueprint.set_layout(rmName, originX, originY, layoutName)");
+		help_blueprint.push("blueprint.set_layout(rmName, originX, originY, layoutName)");
 
 		blueprint.set_layout = function(rmName, originX, originY, layoutName) {
 			_.set(Memory, ["rooms", rmName, "layout"], { origin: {x: originX, y: originY}, name: layoutName });
 			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint layout set for ${rmName}.`;
 		};
 
-		command_list.push("blueprint.block_area(rmName, startX, startY, endX, endY)");
+		help_blueprint.push("blueprint.block_area(rmName, startX, startY, endX, endY)");
 
 		blueprint.block_area = function(rmName, startX, startY, endX, endY) {
 			if (endX == null)
@@ -67,20 +89,20 @@ module.exports = {
 		};
 
 
-		command_list.push("blueprint.request(rmName)");
+		help_blueprint.push("blueprint.request(rmName)");
 
 		blueprint.request = function(rmName) {
 			_.set(Memory, ["hive", "pulses", "blueprint", "request"], rmName);
 			return `<font color=\"#D3FFA3\">[Console]</font> Setting Blueprint() request for ${rmName}; Blueprint() will run this request next tick.`;
 		};
 
-		command_list.push("blueprint.reset()");
+		help_blueprint.push("blueprint.reset()");
 		blueprint.reset = function() {
 			delete Memory["hive", "pulses"]["blueprint"];
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting Blueprint() cycles; Blueprint() will initiate next tick.`;
 		};
 
-		command_list.push("blueprint.redefine_links()");
+		help_blueprint.push("blueprint.redefine_links()");
 		blueprint.redefine_links = function() {
 			_.each(_.filter(Game.rooms, r => { return (r.controller != null && r.controller.my); }), r => {
 				if (_.has(Memory, ["rooms", r.name, "links"]))
@@ -93,6 +115,9 @@ module.exports = {
 
 		
 		log = new Object();
+		
+		help_logs.push("log.all()");
+
 		log.all = function() {
 			this.nukers();
 			this.labs();
@@ -101,8 +126,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Main logs printed.`;
 		}
 
-		command_list.push("");
-		command_list.push("log.can_build()");
+		help_logs.push("log.can_build()");
 		
 		log.can_build = function() {
 			let rooms = _.filter(Game.rooms, n => { return n.controller != null && n.controller.my; });
@@ -124,7 +148,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.controllers()");
+		help_logs.push("log.controllers()");
 		
 		log.controllers = function() {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
@@ -141,7 +165,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.labs()");
+		help_logs.push("log.labs()");
 
 		log.labs = function() {
 			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
@@ -173,7 +197,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 		
-		command_list.push("log.resources()");
+		help_logs.push("log.resources()");
 		
 		log.resources = function(resource = null, limit = 1) {
 			let resource_list = resource != null ? [ resource ] : RESOURCES_ALL;
@@ -200,7 +224,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.remote_mining()");
+		help_logs.push("log.remote_mining()");
 		
 		log.remote_mining = function() {
 			let output = "";
@@ -216,7 +240,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.storage()");
+		help_logs.push("log.storage()");
 
 		log.storage = function() {
 			console.log(`<font color=\"#D3FFA3">log-storage</font>`);
@@ -252,7 +276,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		command_list.push("log.nukers()");
+		help_logs.push("log.nukers()");
 
 		log.nukers = function() {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Nukers:");
@@ -271,9 +295,8 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-
-		command_list.push("");
-		command_list.push("labs.set_reaction(mineral, amount, priority)");
+		
+		help_labs.push("labs.set_reaction(mineral, amount, priority)");
 
 		labs = new Object();
 		labs.set_reaction = function(mineral, amount, priority) {
@@ -281,7 +304,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} reaction target set to ${amount} (priority ${priority}).`;
 		};
 
-		command_list.push("labs.set_boost(labID, mineral, role, subrole)");	
+		help_labs.push("labs.set_boost(labID, mineral, role, subrole)");	
 	
 		labs.set_boost = function(labID, mineral, role, subrole) {
 			let lab = Game.getObjectById(labID);
@@ -300,7 +323,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
 		};
 
-		command_list.push("labs.clear_reactions()");
+		help_labs.push("labs.clear_reactions()");
 		
 		labs.clear_reactions = function() {
 			_.set(Memory, ["resources", "labs", "targets"], new Object());	
@@ -308,7 +331,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> All lab mineral targets cleared.`;
 		};
 
-		command_list.push("labs.clear_boosts(rmName)");	
+		help_labs.push("labs.clear_boosts(rmName)");	
 		
 		labs.clear_boosts = function(rmName) {
 			delete Memory["rooms"][rmName]["lab_definitions"];
@@ -316,7 +339,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> All boosts cleared for ${rmName}`;
 		};
 
-		command_list.push("labs.renew_assignments()");
+		help_labs.push("labs.renew_assignments()");
 		
 		labs.renew_assignments = function() {
 			delete Memory["hive"]["pulses"]["lab"];			
@@ -324,8 +347,8 @@ module.exports = {
 		};
 		
 
-		command_list.push("");
-		command_list.push("resources.overflow_cap(capAmount)");
+		
+		help_resources.push("resources.overflow_cap(capAmount)");
 
 		resources = new Object();
 		resources.overflow_cap = function(amount) {
@@ -333,42 +356,42 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Energy overflow cap set to ${amount}.`;
 		};
 
-		command_list.push("resources.market_cap(resource, capAmount)");
+		help_resources.push("resources.market_cap(resource, capAmount)");
 
 		resources.market_cap = function(resource, amount) {
 			_.set(Memory, ["resources", "to_market", resource], amount);
 			return `<font color=\"#D3FFA3\">[Console]</font> ${resource} market overflow set to ${amount}.`;
 		};		
 
-		command_list.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
+		help_resources.push("resources.send(orderName, rmFrom, rmTo, resource, amount)");
 
 		resources.send = function(orderName, rmFrom, rmTo, resource, amount) {
 			_.set(Memory, ["resources", "terminal_orders", orderName], { room: rmTo, from: rmFrom, resource: resource, amount: amount, priority: 1});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources"]["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
-		command_list.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
+		help_resources.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
 
 		resources.market_sell = function(orderName, marketOrderID, rmFrom, amount) {
 			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources"]["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
-		command_list.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
+		help_resources.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
 
 		resources.market_buy = function(orderName, marketOrderID, rmTo, amount) {
 			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources", "terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
-		command_list.push("resources.clear_market_cap()");
+		help_resources.push("resources.clear_market_cap()");
 		
 		resources.clear_market_cap = function() {
 			_.set(Memory, ["resources", "to_market"], new Object());			
 			return `<font color=\"#D3FFA3\">[Console]</font> Market overflow limits deleted; existing transactions can be deleted with resources.clear_transactions().`;
 		};
 
-		command_list.push("resources.clear_transactions()");
+		help_resources.push("resources.clear_transactions()");
 		
 		resources.clear_transactions = function() {
 			_.set(Memory, ["resources", "terminal_orders"], new Object());
@@ -376,50 +399,52 @@ module.exports = {
 		};
 
 		
-		command_list.push("");
-		command_list.push("colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, focusDefense, [listRoute])");
+		empire = new Object();
 
-		colonize = function(from, target, layout, focus_defense, list_route) {
-			_.set(Memory, ["sites", "colonization", target], { from: from, target: target, layout: layout, focus_defense: focus_defense, list_route: list_route });
-			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${target} ... to cancel, delete the entry.`;
-		};
-
-		command_list.push("combat(combatID, rmColony, rmTarget, useBoosts, listSpawnRooms, listRoute, tactic)");
-		command_list.push(" - tactic 'waves': { type: 'waves', spawn_repeat: t/f, rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
-		command_list.push(" - tactic 'trickle': { type: 'trickle', target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
-		command_list.push(" - tactic 'occupy': { type: 'occupy', target_creeps: t/f, target_structures: t/f, target_list: [] }");
-		command_list.push(" - tactic 'tower_drain': { type: 'tower_drain', rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), drain_pos: new RoomPosition(drainX, drainY, drainRoom) }");
+		help_empire.push("empire.combat(combatID, rmColony, rmTarget, useBoosts, listSpawnRooms, listRoute, tactic)");
+		help_empire.push(" - tactic 'waves': { type: 'waves', spawn_repeat: t/f, rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
+		help_empire.push(" - tactic 'trickle': { type: 'trickle', target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
+		help_empire.push(" - tactic 'occupy': { type: 'occupy', target_creeps: t/f, target_structures: t/f, target_list: [] }");
+		help_empire.push(" - tactic 'tower_drain': { type: 'tower_drain', rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), drain_pos: new RoomPosition(drainX, drainY, drainRoom) }");
 		
-		combat = function(combat_id, colony, target_room, use_boosts, list_spawns, list_route, tactic) {
+		empire.combat = function(combat_id, colony, target_room, use_boosts, list_spawns, list_route, tactic) {
 			_.set(Memory, ["sites", "combat", combat_id], 
 				{ colony: colony, target_room: target_room, use_boosts: use_boosts, list_spawns: list_spawns, 
 					list_route: list_route, tactic: tactic });
 			return `<font color=\"#D3FFA3\">[Console]</font> Combat request added to Memory.sites.combat.${combat_id} ... to cancel, delete the entry.`;
 		};
 
-		command_list.push("threat_level(level)  ... NONE, LOW, MEDIUM, HIGH")
-		threat_level = function(level) {
+		help_empire.push("");
+		help_empire.push("empire.threat_level(level)  ... NONE, LOW, MEDIUM, HIGH")
+		empire.threat_level = function(level) {
 			for (let i in Memory.rooms) { 
 				_.set(Memory, ["rooms", i, "threat_level"], level); 
 			}
 			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for all rooms set.`;
 		};
 		
-		command_list.push("set_camp(room_pos)")
-		set_camp = function(room_pos) {
+		help_empire.push("empire.set_camp(room_pos)")
+		empire.set_camp = function(room_pos) {
 			_.set(Memory, ["rooms", room_pos.roomName, "camp"], room_pos);
 			return `<font color=\"#D3FFA3\">[Console]</font> Defensive camp set for room ${room_pos.roomName}.`;
 		};
 		
-		command_list.push("");
-		command_list.push("spawn_assist(rmToAssist, [listRooms], [listRoute])");
-		spawn_assist = function(room_assist, list_rooms, list_route) {
+		help_empire.push("");
+		help_empire.push("empire.colonize(rmFrom, rmTarget, {origin: {x: baseX, y: baseY}, name: layoutName}, focusDefense, [listRoute])");
+		
+		empire.colonize = function(from, target, layout, focus_defense, list_route) {
+			_.set(Memory, ["sites", "colonization", target], { from: from, target: target, layout: layout, focus_defense: focus_defense, list_route: list_route });
+			return `<font color=\"#D3FFA3\">[Console]</font> Colonization request added to Memory.sites.colonization.${target} ... to cancel, delete the entry.`;
+		};
+
+		help_empire.push("empire.spawn_assist(rmToAssist, [listRooms], [listRoute])");
+		empire.spawn_assist = function(room_assist, list_rooms, list_route) {
 			_.set(Memory, ["rooms", room_assist, "spawn_assist"], { rooms: list_rooms, list_route: list_route });
 			return `<font color=\"#D3FFA3\">[Console]</font> Spawn assist added to Memory.rooms.${room_assist}.spawn_assist ... to cancel, delete the entry.`;
 		};
 
-		command_list.push("remote_mining(rmColony, rmHarvest, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
-		remote_mining = function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
+		help_empire.push("empire.remote_mining(rmColony, rmHarvest, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation])");
+		empire.remote_mining = function(rmColony, rmHarvest, hasKeepers, listRoute, listSpawnAssistRooms, listPopulation) {
 			if (rmColony == null || rmHarvest == null) 
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, invalid entry for remote_mining()`;
 			
@@ -427,104 +452,13 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		
-		command_list.push("");
-		command_list.push("path.road(rmName, startX, startY, endX, endY)");
-		path = new Object();
-
-		path.road = function(rmName, startX, startY, endX, endY) {
-			let room = Game.rooms[rmName];
-			if (room == null)
-				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${rmName} not found.`;
-			
-			let from = new RoomPosition(startX, startY, rmName);
-			let to = new RoomPosition(endX, endY, rmName);
-			let path = room.findPath(from, to, {ignoreCreeps: true});			
-			for (let i = 0; i < path.length; i++)
-				room.createConstructionSite(path[i].x, path[i].y, "road");
-			room.createConstructionSite(startX, startY, "road");
-			room.createConstructionSite(endX, endY, "road");
-			
-			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
-		};
-
-		command_list.push("path.exit_tile(exit_pos)");
+		help_empire.push("");
+		help_empire.push("empire.set_sign(message, rmName)")
 		
-		path.exit_tile = function(exit_pos) {
-			// Specifies preferred exit tiles to assist inter-room pathfinding
-			if (!(exit_pos.x == 0 || exit_pos.x == 49 || exit_pos.y == 0 || exit_pos.y == 49)) {
-				return `<font color=\"#D3FFA3\">[Console]</font> Invalid preferred exit tile position; must be an exit tile!`;
-			}
-
-			if (_.get(Memory, ["hive", "paths", "exits", "rooms", exit_pos.roomName]) == null)
-				_.set(Memory, ["hive", "paths", "exits", "rooms", exit_pos.roomName], new Array());
-			Memory["hive"]["paths"]["exits"]["rooms"][exit_pos.roomName].push(exit_pos);
-			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${exit_pos.roomName}`;
-		};
-
-		command_list.push("path.exit_area(roomName, startX, startY, endX, endY)");
-		
-		path.exit_area = function(room_name, start_x, start_y, end_x, end_y) {			
-			for (let x = start_x; x <= end_x; x++) {
-				for (let y = start_y; y <= end_y; y++) {
-					path.exit_tile(new RoomPosition(x, y, room_name));
-				}
-			}
-			
-			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${room_name}`;
-		};
-
-		command_list.push("path.prefer(prefer_pos)");
-		
-		path.prefer = function(prefer_pos) {
-			// Lowers the cost of specific tiles (e.g. swamp), so creeps take shorter paths through swamps rather than ERR_NO_PATH
-			if (_.get(Memory, ["hive", "paths", "prefer", "rooms", prefer_pos.roomName]) == null)
-				_.set(Memory, ["hive", "paths", "prefer", "rooms", prefer_pos.roomName], new Array());
-			Memory["hive"]["paths"]["prefer"]["rooms"][prefer_pos.roomName].push(prefer_pos);
-			return `<font color=\"#D3FFA3\">[Console]</font> Preference position added to Memory.hive.paths.prefer.rooms.${prefer_pos.roomName}`;
-		};
-
-		command_list.push("path.avoid(avoid_pos)");
-		
-		path.avoid = function(avoid_pos) {
-			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", avoid_pos.roomName]) == null)
-				_.set(Memory, ["hive", "paths", "avoid", "rooms", avoid_pos.roomName], new Array());
-			Memory["hive"]["paths"]["avoid"]["rooms"][avoid_pos.roomName].push(avoid_pos);
-			return `<font color=\"#D3FFA3\">[Console]</font> Avoid position added to Memory.hive.paths.avoid.rooms.${avoid_pos.roomName}`;
-		};
-
-		command_list.push("path.avoid_area(roomName, startX, startY, endX, endY)");
-
-		path.avoid_area = function(room_name, start_x, start_y, end_x, end_y) {
-			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", room_name]) == null)
-				_.set(Memory, ["hive", "paths", "avoid", "rooms", room_name], new Array());
-			
-			for (let x = start_x; x <= end_x; x++) {
-				for (let y = start_y; y <= end_y; y++) {
-					Memory["hive"]["paths"]["avoid"]["rooms"][room_name].push(new RoomPosition(x, y, room_name));
-				}
-			}
-			
-			return `<font color=\"#D3FFA3\">[Console]</font> Avoid positions added to Memory.hive.paths.avoid.rooms.${room_name}`;
-		};
-
-		command_list.push("path.reset(roomName)");
-		
-		path.reset = function(room_name) {
-			delete Memory["hive"]["paths"]["avoid"]["rooms"][room_name];
-			delete Memory["hive"]["paths"]["prefer"]["rooms"][room_name];
-			delete Memory["hive"]["paths"]["exits"]["rooms"][room_name];
-			return `<font color=\"#D3FFA3\">[Console]</font> Path modifiers reset for ${room_name}`;
-		};
-
-
-		command_list.push("");
-
-		command_list.push("set_sign(message, rmName)")
-
-		set_sign = function(message, rmName) {
+		empire.set_sign = function(message, rmName) {
 			/* Sorting algorithm for left -> right, top -> bottom (in SW sector!! Reverse sortBy() for other sectors...
-			 * Ensure quote.length == room.length!! Place in main.js
-			 			 			
+				* Ensure quote.length == room.length!! Place in main.js
+										
 				let quote = [];
 				let rooms = _.sortBy(_.sortBy(_.filter(Game.rooms, 
 					r => {return r.controller != null && r.controller.my}), 
@@ -544,11 +478,127 @@ module.exports = {
 			}
 		}
 		
-		command_list.push("");
 
-		help = function() {
-			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${command_list.join("<br>")}<br>`);
-			return "<font color=\"#D3FFA3\">[Console]</font> Command list complete";
+		path = new Object();
+		help_path.push("path.road(rmName, startX, startY, endX, endY)");
+
+		path.road = function(rmName, startX, startY, endX, endY) {
+			let room = Game.rooms[rmName];
+			if (room == null)
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${rmName} not found.`;
+			
+			let from = new RoomPosition(startX, startY, rmName);
+			let to = new RoomPosition(endX, endY, rmName);
+			let path = room.findPath(from, to, {ignoreCreeps: true});			
+			for (let i = 0; i < path.length; i++)
+				room.createConstructionSite(path[i].x, path[i].y, "road");
+			room.createConstructionSite(startX, startY, "road");
+			room.createConstructionSite(endX, endY, "road");
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
+		};
+
+		help_path.push("path.exit_tile(exit_pos)");
+		
+		path.exit_tile = function(exit_pos) {
+			// Specifies preferred exit tiles to assist inter-room pathfinding
+			if (!(exit_pos.x == 0 || exit_pos.x == 49 || exit_pos.y == 0 || exit_pos.y == 49)) {
+				return `<font color=\"#D3FFA3\">[Console]</font> Invalid preferred exit tile position; must be an exit tile!`;
+			}
+
+			if (_.get(Memory, ["hive", "paths", "exits", "rooms", exit_pos.roomName]) == null)
+				_.set(Memory, ["hive", "paths", "exits", "rooms", exit_pos.roomName], new Array());
+			Memory["hive"]["paths"]["exits"]["rooms"][exit_pos.roomName].push(exit_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${exit_pos.roomName}`;
+		};
+
+		help_path.push("path.exit_area(roomName, startX, startY, endX, endY)");
+		
+		path.exit_area = function(room_name, start_x, start_y, end_x, end_y) {			
+			for (let x = start_x; x <= end_x; x++) {
+				for (let y = start_y; y <= end_y; y++) {
+					path.exit_tile(new RoomPosition(x, y, room_name));
+				}
+			}
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Preferred exit tile position added to Memory.hive.paths.exits.rooms.${room_name}`;
+		};
+
+		help_path.push("path.prefer(prefer_pos)");
+		
+		path.prefer = function(prefer_pos) {
+			// Lowers the cost of specific tiles (e.g. swamp), so creeps take shorter paths through swamps rather than ERR_NO_PATH
+			if (_.get(Memory, ["hive", "paths", "prefer", "rooms", prefer_pos.roomName]) == null)
+				_.set(Memory, ["hive", "paths", "prefer", "rooms", prefer_pos.roomName], new Array());
+			Memory["hive"]["paths"]["prefer"]["rooms"][prefer_pos.roomName].push(prefer_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Preference position added to Memory.hive.paths.prefer.rooms.${prefer_pos.roomName}`;
+		};
+
+		help_path.push("path.avoid(avoid_pos)");
+		
+		path.avoid = function(avoid_pos) {
+			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", avoid_pos.roomName]) == null)
+				_.set(Memory, ["hive", "paths", "avoid", "rooms", avoid_pos.roomName], new Array());
+			Memory["hive"]["paths"]["avoid"]["rooms"][avoid_pos.roomName].push(avoid_pos);
+			return `<font color=\"#D3FFA3\">[Console]</font> Avoid position added to Memory.hive.paths.avoid.rooms.${avoid_pos.roomName}`;
+		};
+
+		help_path.push("path.avoid_area(roomName, startX, startY, endX, endY)");
+
+		path.avoid_area = function(room_name, start_x, start_y, end_x, end_y) {
+			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", room_name]) == null)
+				_.set(Memory, ["hive", "paths", "avoid", "rooms", room_name], new Array());
+			
+			for (let x = start_x; x <= end_x; x++) {
+				for (let y = start_y; y <= end_y; y++) {
+					Memory["hive"]["paths"]["avoid"]["rooms"][room_name].push(new RoomPosition(x, y, room_name));
+				}
+			}
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Avoid positions added to Memory.hive.paths.avoid.rooms.${room_name}`;
+		};
+
+		help_path.push("path.reset(roomName)");
+		
+		path.reset = function(room_name) {
+			delete Memory["hive"]["paths"]["avoid"]["rooms"][room_name];
+			delete Memory["hive"]["paths"]["prefer"]["rooms"][room_name];
+			delete Memory["hive"]["paths"]["exits"]["rooms"][room_name];
+			return `<font color=\"#D3FFA3\">[Console]</font> Path modifiers reset for ${room_name}`;
+		};
+		
+
+		visuals = new Object();
+		help_visuals.push("visuals.toggle()");
+
+		visuals.toggle = function() {
+			if (_.get(Memory, ["hive", "visuals", "show"], false) == true)
+				_.set(Memory, ["hive", "visuals", "show"], false)
+			else
+				_.set(Memory, ["hive", "visuals", "show"], true)
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Visuals toggled to be shown: ${_.get(Memory, ["hive", "visuals", "show"], false)}`;
+		};
+
+
+
+		help = function(submenu) {			
+			let menu = new Array()			
+			switch (submenu) {
+				default: 			menu = help_main;			break;
+				case "allies":		menu = help_allies;			break;
+				case "blueprint":	menu = help_blueprint;		break;
+				case "empire":		menu = help_empire;			break;
+				case "labs":		menu = help_labs;			break;
+				case "logs":		menu = help_logs;			break;
+				case "path":		menu = help_path;			break;
+				case "profiler":	menu = help_profiler;		break;
+				case "resources":	menu = help_resources;		break;
+				case "visuals":		menu = help_visuals;		break;
+			}
+			
+			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${menu.join("<br>")}<br><br>`);
+			return `<font color=\"#D3FFA3\">[Console]</font> Help("${submenu}") list complete`;
 		};
 	}
 };
