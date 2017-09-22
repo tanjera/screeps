@@ -216,9 +216,11 @@ module.exports = {
 					_.set(Memory, ["rooms", rmName, "sources", sources[i].id, "access_tiles"], access_tiles);
 				}
 
-				let position = (container != null ? container.pos : sources[i].pos.getOpenTile_Adjacent(true));
+				let position = sources[i].pos.getOpenTile_Adjacent(true);
 				if (position == null)
 					position = sources[i].pos.getOpenTile_Adjacent(false);
+				if (position == null)
+					position = sources[i].pos;
 
 				let burrower = _.head(_.filter(sources[i].pos.findInRange(FIND_MY_CREEPS, 1), 
 					c => { return c.memory.role == "burrower"; }))
@@ -231,8 +233,9 @@ module.exports = {
 						id: sources[i].id,
 						pos: position,
 						key: `mine:harvest-${sources[i].id}`,
-						timer: 30,
+						timer: 60,
 						creeps: access_tiles,
+						container: _.get(container, "id", null), 
 						burrower: _.get(burrower, "id", null),
 						priority: 1
 					});

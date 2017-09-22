@@ -41,6 +41,7 @@ module.exports = {
 			case "trickle":			army = _.clone(Population_Combat__Trickle);			break;
 			case "occupy":			army = _.clone(Population_Combat__Occupy);			break;
 			case "tower_drain":		army = _.clone(Population_Combat__Tower_Drain);		break;
+			case "controller":		army = _.clone(Population_Combat__Controller);		break;
 		}
 
 		for (let each in army) {
@@ -100,6 +101,7 @@ module.exports = {
 			// Occupy tactic same as Trickle tactic using different army population.
 			case "occupy":			this.runTactic_Trickle(combat_id, combat);				break;
 			case "tower_drain":		this.runTactic_Tower_Drain(combat_id, combat);			break;
+			case "controller":		this.runTactic_Controller(combat_id, combat);			break;
 		}
 	},
 
@@ -291,6 +293,48 @@ module.exports = {
 				return;
 		}
 	},
+
+	runTactic_Controller: function(combat_id, combat) {
+		let tactic = _.get(combat, "tactic");
+		let state_combat = _.get(combat, "state_combat");
+		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
+		let target_room = Game["rooms"][_.get(combat, "target_room")];
+		
+		switch (state_combat) {	
+			// Controller tactic is a constant state of spawning and moving to trickle into destination room
+			case "spawning":
+                _.each(listCreeps, creep => {
+					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
+						return;
+				});
+				
+				if (target_room == null || target_room.controller.upgradeBlocked > 200)
+					_.set(Memory, ["sites", "combat", combat_id, "tactic", "army"], 
+						{ scout:  {amount: 1, level: 1} });
+				else 
+					_.set(Memory, ["sites", "combat", combat_id, "tactic", "army"], 
+						{ reserver:  {amount: 1, level: 3, body: "reserver_at"} });
+				
+				// Run the creeps' base roles!
+				this.creepRoles(listCreeps, tactic);
+
+				// Evaluate victory
+				if (Game.time % 10 == 0) {
+					if (target_room != null) {
+						if (this.evaluateVictory_Controller(combat_id, combat))
+							return;
+					}
+				}
+				return;
+				
+			case "complete":
+				if (_.get(combat, ["tactic", "to_occupy"]))
+					this.setOccupation(combat_id, combat, tactic);
+				delete Memory["sites"]["combat"][combat_id];	
+				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
+				return;
+		}
+	},
 		
 	checkSpawnComplete_toRally: function(combat_id, combat, listCreeps, army_amount) {
 		if (_.get(combat, "state_combat") == "spawning" && army_amount > 0 && listCreeps.length == army_amount) {
@@ -367,7 +411,9 @@ module.exports = {
 		let target_list = _.get(tactic, "target_list");
 
 		_.each(listCreeps, creep => {
-			if (creep.memory.role == "soldier" 
+			if (creep.memory.role == "scout") {
+				Roles.Scout(creep);
+			} else if (creep.memory.role == "soldier" 
 					|| creep.memory.role == "brawler" 
 					|| creep.memory.role == "paladin") {
 				Roles.Soldier(creep, target_structures, target_creeps, target_list);
@@ -377,6 +423,8 @@ module.exports = {
 				Roles.Dismantler(creep, target_structures, target_list);
 			} else if (creep.memory.role == "healer") {
 				Roles.Healer(creep, true);
+			} else if (creep.memory.role == "reserver") {
+				Roles.Reserver(creep);
 			}
 		});
 	},
@@ -419,6 +467,11 @@ module.exports = {
 			}
 		}
 		return false;
+	},
+
+	evaluateVictory_Controller: function(combat_id, combat) {
+		return (_.get(Game, ["rooms", _.get(combat, "target_room")]) != null
+			&& _.get(Game, ["rooms", _.get(combat, "target_room"), "controller", "owner"]) == null);
 	},
 
 	setOccupation: function(combat_id, combat, tactic) {

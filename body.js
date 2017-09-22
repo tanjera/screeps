@@ -31,7 +31,7 @@ module.exports = {
             case "tank": return this.getBody_Tank(level);
             case "archer": return this.getBody_Archer(level);
             case "healer": return this.getBody_Healer(level);            
-            case "dismantler": return this.getBody_Burrower(level);
+            case "dismantler": return this.getBody_Dismantler(level);
             case "bulldozer": return this.getBody_Bulldozer(level);
 
             case "multirole": return this.getBody_Multirole(level);
@@ -554,7 +554,7 @@ module.exports = {
     getBody_Dismantler: function(level) {
         switch (level) {
             default: 
-                return getBody_Burrower_AT(level);
+                return this.getBody_Burrower_AT(level);
             case 7: case 8:
                 return [ // 3100 energy, 10x TOUGH, 20x WORK, 20x MOVE
                         TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,

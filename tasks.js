@@ -215,9 +215,9 @@ module.exports = {
 			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
 
-			if (creep.memory.role == "burrower") {
+			if (creep.memory.role == "burrower") {	// Burrowers should take mining task, regardless of creep amount
 				task = _.head(_.sortBy(_.filter(Memory["rooms"][creep.room.name]["tasks"],
-						t => { return t.type == "mine" && t.resource == "energy" && _.get(t, "creeps") > 0; }),
+						t => { return t.type == "mine" && t.resource == "energy"; }),
 						t => { 
 							if (_.get(t, "burrower") == null || _.get(t, "burrower") == creep.id)
 								return -1;

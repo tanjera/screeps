@@ -3,10 +3,7 @@
 
 
 # Implementing...
-- Spawn priority defined as a range for some roles (e.g. 2-4)
-	- Lerp the range based on (current / (target - 1)) ;; target - 1 necessary for exercising full range
-
-- is_safe for empire-wide status; attack by other player in any room triggers increase in defense spawn priority
+- Observer -> adjust threat_level
 
 - Center sector mining
 	- Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)

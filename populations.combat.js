@@ -23,3 +23,7 @@ Population_Combat__Tower_Drain = {
     tank:       {amount: 3},
     healer:     {amount: 3}
 };
+
+Population_Combat__Controller = {
+    reserver:  {amount: 1, level: 3, body: "reserver_at"}
+};

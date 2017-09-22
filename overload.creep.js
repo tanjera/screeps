@@ -46,13 +46,6 @@ Creep.prototype.runTaskTimer = function runTaskTimer() {
 		let task = this.memory.task;
 		task["timer"] = task["timer"] - 1;
 		if (task["timer"] <= 0) {
-
-			// Prevent burrower from losing task on task refresh, getting blocked by workers
-			if (this.memory.role == "burrower" && task.subtype == "harvest" && task.resource == "energy"
-					&& Game.getObjectById(task.id).energy > 0) {
-				return true;
-			}
-
 			this.returnTask(this);
 			return false;
 		}
@@ -104,6 +97,8 @@ Creep.prototype.runTask = function runTask() {
 			let obj = Game.getObjectById(this.memory.task["id"]);
 			let result = this.harvest(obj);
 			if (result == OK || result == ERR_TIRED) {
+				if (Game.time % 10 == 0)
+					this.travelTask(obj);
 				return;
 			} else if (result == ERR_NOT_IN_RANGE) {
 				this.travelTask(obj);
@@ -198,13 +193,36 @@ Creep.prototype.runTask = function runTask() {
 };
 
 Creep.prototype.travelTask = function travelTask (dest) {
+	if (this.memory.task["subtype"] == "harvest" && this.memory.role == "burrower")
+		return this.travelTask_Burrower();
+	
 	let pos = _.get(this, ["memory", "task", "pos"]) == null ? null 
 		: new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);	
 	if (pos != null)
 		return this.travel(pos);
 	else
 		return this.travel(dest);
-}
+};
+
+Creep.prototype.travelTask_Burrower = function travelTask_Burrower () {
+	if (_.get(this.memory.task, "container") != null) {
+		let container = Game.getObjectById(this.memory.task["container"]);
+		if (container != null) {
+			let cont_cr = _.head(container.pos.lookFor(LOOK_CREEPS));
+			if (_.get(cont_cr, ["memory", "role"]) != "burrower")
+				return this.travel(container.pos);
+		}
+	} else {
+		let position = new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);
+		let pos_cr = _.head(position.lookFor(LOOK_CREEPS));
+		if (_.get(pos_cr, ["memory", "role"]) != "burrower")
+			return this.travel(position);
+		else {
+			let source = Game.getObjectById(this.memory.task["id"]);
+			return this.travel(source.pos);
+		}
+	}
+};
 
 
 Creep.prototype.travel = function travel (dest, ignore_creeps) {

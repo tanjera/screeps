@@ -189,7 +189,12 @@ module.exports = {
 		if (this.moveToDestination(creep))
 			return;
 
-		let result = creep.reserveController(creep.room.controller);
+		let result;
+		if (_.get(creep.room, ["controller", "owner"]) != null && !creep.room.controller.my)
+			result = creep.attackController(creep.room.controller);
+		else
+			result = creep.reserveController(creep.room.controller);
+
 		if (result == ERR_NOT_IN_RANGE) {
 			creep.moveTo(creep.room.controller)
 			return;
