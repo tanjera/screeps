@@ -4,7 +4,7 @@ module.exports = {
         if (_.get(Memory, ["hive", "visuals", "show"], false) == true)
             this.Show();
 
-        if (!isPulse_Mid())
+        if (!isPulse_Long())
             this.Compile();
     },
 

@@ -45,7 +45,7 @@ module.exports = {
 		Grafana.populationTally(rmColony, popTarget, popActual);
 
 		if (_.get(popActual, "colonizer") < _.get(popTarget, ["colonizer", "amount"])) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 3, 
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, 
 				level: _.get(popTarget, ["colonizer", "level"], 6),
 				scale: _.get(popTarget, ["colonizer", "scale"], false),
 				body: _.get(popTarget, ["colonizer", "body"], "reserver_at"),

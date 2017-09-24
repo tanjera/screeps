@@ -37,7 +37,7 @@ module.exports = {
 		this.runLabs(rmColony);
 		_CPU.End(rmColony, "Industry-runLabs");
 
-		if (isPulse_Short()) {
+		if (isPulse_Mid()) {
 			_CPU.Start(rmColony, "Industry-loadNukers");
 			this.loadNukers(rmColony);
 			_CPU.End(rmColony, "Industry-loadNukers");

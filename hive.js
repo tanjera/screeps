@@ -3,76 +3,29 @@ let _CPU = require("util.cpu");
 
 let Hive = {
 
-	setPulse_Short: function() {
-		let minTicks = 5, maxTicks = 60;
+	setPulse: function(key, minTicks, maxTicks) {
 		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["hive", "pulses", "short", "last_tick"]);
+		let lastTick = _.get(Memory, ["hive", "pulses", key, "last_tick"]);
 
 		if (lastTick == null
 				|| Game.time == lastTick
 				|| (Game.time - lastTick) >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["hive", "pulses", "short", "last_tick"], Game.time);
-			_.set(Memory, ["hive", "pulses", "short", "active"], true);
+			_.set(Memory, ["hive", "pulses", key, "last_tick"], Game.time);
+			_.set(Memory, ["hive", "pulses", key, "active"], true);
 		} else {
-			_.set(Memory, ["hive", "pulses", "short", "active"], false);
-		}
-	},
-
-	setPulse_Mid: function() {
-		let minTicks = 50, maxTicks = 200;
-		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["hive", "pulses", "mid", "last_tick"]);
-
-		if (lastTick == null
-				|| Game.time == lastTick
-				|| (Game.time - lastTick) >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["hive", "pulses", "mid", "last_tick"], Game.time);
-			_.set(Memory, ["hive", "pulses", "mid", "active"], true);
-		} else {
-			_.set(Memory, ["hive", "pulses", "mid", "active"], false);
-		}
-	},
-
-	setPulse_Spawn: function() {
-		let minTicks = 10, maxTicks = 20;
-		let range = maxTicks - minTicks;
-		let lastTick = _.get(Memory, ["hive", "pulses", "spawn", "last_tick"]);
-
-		if (lastTick == null
-				|| Game.time == lastTick
-				|| Game.time - lastTick >= (minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range))) {
-			_.set(Memory, ["hive", "pulses", "spawn", "last_tick"], Game.time);
-			_.set(Memory, ["hive", "pulses", "spawn", "active"], true);
-		} else {
-			_.set(Memory, ["hive", "pulses", "spawn", "active"], false);
-		}
-	},
-	
-	setPulse_Lab: function() {
-		let ticks = 2000;		
-		let lastTick = _.get(Memory, ["hive", "pulses", "lab", "last_tick"]);
-
-		if (lastTick == null
-				|| Game.time == lastTick
-				|| Game.time - lastTick >= ticks) {
-			_.set(Memory, ["hive", "pulses", "lab", "last_tick"], Game.time);
-			_.set(Memory, ["hive", "pulses", "lab", "active"], true);
-		} else {
-			_.set(Memory, ["hive", "pulses", "lab", "active"], false);
+			_.set(Memory, ["hive", "pulses", key, "active"], false);
 		}
 	},
 
 	moveReusePath: function() {
-		let minTicks = 10, maxTicks = 60;
+		let minTicks = 15, maxTicks = 60;
 		let range = maxTicks - minTicks;
-
 		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 	},
 
 	moveMaxOps: function() {
-		let minOps = 2000, maxOps = 4000;
+		let minOps = 2000, maxOps = 3000;
 		let range = maxOps - minOps;
-
 		return minOps + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 	},
 	
@@ -103,11 +56,12 @@ let Hive = {
 	initMemory: function() {
 		_CPU.Start("Hive", "initMemory");
 
-		this.setPulse_Short();
-		this.setPulse_Mid();
-		this.setPulse_Spawn();
-		this.setPulse_Lab();
-		
+		this.setPulse("short", 10, 60);
+		this.setPulse("mid", 20, 90);
+		this.setPulse("long", 50, 200);
+		this.setPulse("spawn", 15, 30);
+		this.setPulse("lab", 2000, 2000);
+			
 		if (_.get(Memory, ["rooms"]) == null) _.set(Memory, ["rooms"], new Object());
 		if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory, ["hive", "allies"], new Array());
 		if (_.get(Memory, ["hive", "pulses"]) == null) _.set(Memory, ["hive", "pulses"], new Object());
@@ -130,7 +84,7 @@ let Hive = {
 	},
 
 	initTasks: function() {
-		if (isPulse_Short()) {
+		if (isPulse_Mid()) {
 			_CPU.Start("Hive", "initTasks");
 
 			let _Compile = require("tasks.compile");
@@ -290,7 +244,7 @@ let Hive = {
 
 	
 	sellExcessResources: function() {
-		if (!isPulse_Short())
+		if (!isPulse_Mid())
 			return;
 
 		_CPU.Start("Hive", "sellExcessResources");
@@ -331,7 +285,7 @@ let Hive = {
 	},
 
 	moveExcessEnergy: function() {
-		if (!isPulse_Short())
+		if (!isPulse_Mid())
 			return;
 
 		_CPU.Start("Hive", "moveExcessEnergy");

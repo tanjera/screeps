@@ -8,11 +8,15 @@
 }
 
 isPulse_Short = function () {
-	return _.get(Memory, ["hive", "pulses", "main", "active"], true);
+	return _.get(Memory, ["hive", "pulses", "short", "active"], true);
 };
 
 isPulse_Mid = function () {
 	return _.get(Memory, ["hive", "pulses", "mid", "active"], true);
+};
+
+isPulse_Long = function () {
+	return _.get(Memory, ["hive", "pulses", "long", "active"], true);
 };
 
 isPulse_Spawn = function () {

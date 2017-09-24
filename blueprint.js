@@ -320,7 +320,8 @@ let Blueprint = {
 		if (sites >= sites_per_room)
 			return sites;
 		
-		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] 
+		let iterate_error = 0;
+		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] + iterate_error 
 				&& layout[structureType] != null && i < layout[structureType].length; i++) {
 			let x = origin.x + layout[structureType][i].x;
 			let y = origin.y + layout[structureType][i].y;
@@ -347,9 +348,18 @@ let Blueprint = {
 					+ `(${origin.x + layout[structureType][i].x}, ${origin.y + layout[structureType][i].y})`);
 				sites += 1;
 			} else if (result == ERR_INVALID_TARGET) {
-				let lookAt = room.lookForAt("structure", x, y);
-				if (lookAt.length > 0 && _.findIndex(lookAt, s => { return s.structureType == structureType }) < 0)
-					_.head(lookAt).destroy();
+				let lookTerrain = room.lookForAt("terrain", x, y);
+				if (lookTerrain == "wall") {
+					iterate_error += 1;
+					continue;
+				}
+
+				let lookStructure = room.lookForAt("structure", x, y);
+				if (lookStructure.length > 0 && _.findIndex(lookStructure, s => { return s.structureType == structureType }) < 0) {
+					_.head(lookStructure).destroy();
+					i -= 1;
+					continue;
+				}
 			}
 		}
 

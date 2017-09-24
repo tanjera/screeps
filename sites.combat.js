@@ -470,8 +470,12 @@ module.exports = {
 	},
 
 	evaluateVictory_Controller: function(combat_id, combat) {
-		return (_.get(Game, ["rooms", _.get(combat, "target_room")]) != null
-			&& _.get(Game, ["rooms", _.get(combat, "target_room"), "controller", "owner"]) == null);
+		if (_.get(Game, ["rooms", _.get(combat, "target_room")]) != null
+			&& _.get(Game, ["rooms", _.get(combat, "target_room"), "controller", "owner"]) == null) {
+				_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
+				return true;
+		}
+		return false;
 	},
 
 	setOccupation: function(combat_id, combat, tactic) {

@@ -134,7 +134,7 @@ module.exports = {
 		else
 			popTarget = _.clone(popTarget)
 			
-		// Adjust soldier levels based on threat level
+		// Adjust soldier amounts & levels based on threat level
 		if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {						
 			if (threat_level == LOW || threat_level == null) {
 				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(2, Math.round(room_level / 3)));
@@ -146,6 +146,16 @@ module.exports = {
 				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(5, room_level));
 				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(2, Math.floor(room_level / 2)));
 			}				
+		}
+
+		// Adjust worker amounts based on is_safe, energy_low, energy_critical
+		if (!is_safe || energy_low) {
+			if (energy_critical) {
+				_.set(popTarget, ["upgrader", "amount"], 0)
+				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) / 2)))				
+			} else {
+				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) / 2)))
+			}
 		}
 
 		// Tally population levels for level scaling and statistics
@@ -176,7 +186,7 @@ module.exports = {
 				body: "healer", name: null, args: {role: "healer", room: rmColony} });
 		} 
 		
-		if (_.get(popActual, "worker") < ((is_safe && !energy_critical) ? _.get(popTarget, ["worker", "amount"]) : 1)) {
+		if (_.get(popActual, "worker") < _.get(popTarget, ["worker", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: 5, 
 					level: ((is_safe && !energy_critical) 
@@ -197,8 +207,7 @@ module.exports = {
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
 		} 
 		
-		if (_.get(popActual, "upgrader") < 
-			((is_safe && !energy_critical && !energy_low) ? _.get(popTarget, ["upgrader", "amount"]) : 1)) {
+		if (_.get(popActual, "upgrader") < _.get(popTarget, ["upgrader", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: downgrade_critical ? 1 : 6, 
 					level: ((!is_safe || energy_critical) ? 1
@@ -350,9 +359,9 @@ module.exports = {
 						|| r.structureType == "container" || r.structureType == "road")); }),					
 				r => { 
 					switch (r.structureType) {
+						case "container":			return 1; 
 						case "rampart": 
-						case "constructedWall":		return 1;
-						case "container":			return 2; 
+						case "constructedWall":		return 2;
 						case "road":				return 3;
 					}}));
 					
