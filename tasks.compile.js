@@ -155,7 +155,7 @@ module.exports = {
 					key: `work:build-${sites[i].id}`,
 					timer: 30,
 					creeps: 10,
-					priority: _.clone(priority)
+					priority: _.cloneDeep(priority)
 				});
 		}
 

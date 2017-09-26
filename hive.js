@@ -229,13 +229,11 @@ let Hive = {
 			{ return Game.spawns[a].spawning == null && Game.spawns[a].room.energyAvailable > 300; });
 		for (let s in listSpawns) {
 			let spawn = Game["spawns"][listSpawns[s]];
-			let creeps = spawn.pos.findInRange(FIND_MY_CREEPS, 1);
+			let creeps = _.filter(spawn.pos.findInRange(FIND_MY_CREEPS, 1),
+				c => { return !c.isBoosted() && _.get(c, ["memory", "spawn_renew"], true); });
 			for (let c in creeps) {
-				if (!creeps[c].isBoosted()) {
-					if (spawn.renewCreep(creeps[c]) == OK) {
-						break;
-					}
-				}
+				if (spawn.renewCreep(creeps[c]) == OK)
+					break;
 			}
 		}
 

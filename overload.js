@@ -42,3 +42,12 @@ getReagents = function (mineral) {
 Math.clamp = function (number, lower, upper) {
 	return Math.max(lower, Math.min(number, upper));
 };
+
+Math.lerp = function (v1, v2, t) {
+	t = Math.clamp(t, 0, 1);
+	return v1 + (v2 - v1) * t;
+};
+
+Math.lerpSpawnPriority = function(lowPriority, highPriority, popActual, popTarget) {
+	return Math.floor(Math.lerp(lowPriority, highPriority, popActual / Math.max(1, popTarget - 1)));
+};

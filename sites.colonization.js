@@ -34,7 +34,7 @@ module.exports = {
 		let popActual = new Object();
 		_.set(popActual, "colonizer", _.filter(listCreeps, c => c.memory.role == "colonizer").length);
 
-		let popTarget = _.clone(Population_Colonization);
+		let popTarget = _.cloneDeep(Population_Colonization);
 
 		// Tally population levels for level scaling and statistics
 		Hive.populationTally(rmColony, 

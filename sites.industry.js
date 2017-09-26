@@ -57,14 +57,14 @@ module.exports = {
 	},
 
 
-	runPopulation: function(rmColony, listCreeps, listSpawnRooms, popTarget) {
+	runPopulation: function(rmColony, listCreeps, listSpawnRooms, populationTarget) {
 		let popActual = new Object();
 		_.set(popActual, "courier", _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80)).length);
 
 		if (popTarget == null)
-			popTarget = _.clone(Population_Industry);
+			popTarget = _.cloneDeep(Population_Industry);
 		else
-			popTarget = _.clone(popTarget)
+			popTarget = _.cloneDeep(populationTarget)
 
 		// Tally population levels for level scaling and statistics
 		Hive.populationTally(rmColony, 

@@ -37,11 +37,11 @@ module.exports = {
 
 		switch(tacticType) {
 			default:
-			case "waves":			army = _.clone(Population_Combat__Waves);			break;
-			case "trickle":			army = _.clone(Population_Combat__Trickle);			break;
-			case "occupy":			army = _.clone(Population_Combat__Occupy);			break;
-			case "tower_drain":		army = _.clone(Population_Combat__Tower_Drain);		break;
-			case "controller":		army = _.clone(Population_Combat__Controller);		break;
+			case "waves":			army = _.cloneDeep(Population_Combat__Waves);			break;
+			case "trickle":			army = _.cloneDeep(Population_Combat__Trickle);			break;
+			case "occupy":			army = _.cloneDeep(Population_Combat__Occupy);			break;
+			case "tower_drain":		army = _.cloneDeep(Population_Combat__Tower_Drain);		break;
+			case "controller":		army = _.cloneDeep(Population_Combat__Controller);		break;
 		}
 
 		for (let each in army) {
@@ -49,7 +49,7 @@ module.exports = {
 				_.set(army[each], "level", rmLevel);
 		}
 
-		_.set(Memory, ["sites", "combat", combat_id, "tactic", "army"], _.clone(army));
+		_.set(Memory, ["sites", "combat", combat_id, "tactic", "army"], _.cloneDeep(army));
 	},
 	
 	runPopulation: function(combat_id) {				

@@ -84,7 +84,7 @@ module.exports = {
 		_.set(Memory, ["sites", "mining", rmHarvest, "hostiles"], hostiles);
 	},
 
-	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, popTarget) {
+	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, populationTarget) {
 		let room_level = Game["rooms"][rmColony].getLevel();
 		let has_minerals = _.get(Memory, ["sites", "mining", rmHarvest, "has_minerals"]);
 		let threat_level = _.get(Memory, ["rooms", rmColony, "threat_level"]);
@@ -123,15 +123,15 @@ module.exports = {
 
 		if (popTarget == null) {
 			if (rmColony == rmHarvest)
-				popTarget = _.clone(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)]);
+				popTarget = _.cloneDeep(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)]);
 			else if (hasKeepers != true) {
 				popTarget = (is_visible && _.get(Game, ["rooms", rmHarvest]) != null)
-			        ? _.clone(Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)])
-					: _.clone(Population_Mining["R1"][Math.max(1, room_level)]);
+			        ? _.cloneDeep(Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)])
+					: _.cloneDeep(Population_Mining["R1"][Math.max(1, room_level)]);
 			} else if (hasKeepers == true)
-				popTarget = _.clone(Population_Mining["SK"]);
+				popTarget = _.cloneDeep(Population_Mining["SK"]);
 		} else
-			popTarget = _.clone(popTarget)
+			popTarget = _.cloneDeep(populationTarget)
 
 		// Remote mining: adjust soldier levels based on threat level
 		if (rmHarvest != rmColony && threat_level != NONE) {						
@@ -167,7 +167,7 @@ module.exports = {
 				body: "paladin", name: null, args: {role: "paladin", room: rmHarvest, colony: rmColony} });
 		}
 		
-		if ((!hasKeepers && !is_safe && hostiles.length > _.get(popActual, "soldier") + _.get(popActual, "multirole"))
+		if ((!hasKeepers && !is_safe && hostiles.length > _.get(popActual, "soldier"))
 				|| (_.get(popActual, "soldier") < _.get(popTarget, ["soldier", "amount"]))) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: (is_safe ? 2 : 0),
@@ -185,7 +185,7 @@ module.exports = {
 		}
 		
 		if (_.get(popActual, "multirole") < _.get(popTarget, ["multirole", "amount"])) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, 
 				level: popTarget["multirole"]["level"],
 				scale: _.get(popTarget, ["multirole", "scale"], true),
 				body: _.get(popTarget, ["multirole", "body"], (hasKeepers ? "worker" : "multirole")),
@@ -198,9 +198,9 @@ module.exports = {
 					|| (_.get(popActual, "miner") == 0 && _.get(popTarget, ["miner", "amount"]) != null))) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: (rmColony == rmHarvest ? 0 : 1), 
-					level: Math.max(1, _.get(popActual, "miner")),
+					level: Math.max(1, Math.round(_.get(popActual, "miner") * 1.5)),
 					scale: true, body: "worker", 
-					name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
+					name: null, args: {role: "miner", room: rmHarvest, colony: rmColony, spawn_renew: false} });
 			}
 
 			if (_.get(popActual, "miner") < _.get(popTarget, ["miner", "amount"])) {

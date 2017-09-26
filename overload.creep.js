@@ -112,7 +112,11 @@ Creep.prototype.runTask = function runTask() {
 		case "upgrade": {
 			let controller = Game.getObjectById(this.memory.task["id"]);
 			let result = this.upgradeController(controller);
-			if (result == ERR_NOT_IN_RANGE) {
+			if (result == OK) {
+				if (Game.time % 10 == 0)
+					this.moveTo(controller);
+				return;
+			} else if (result == ERR_NOT_IN_RANGE) {
 				this.travelTask(controller);
 				return;
 			} else if (result != OK) {
