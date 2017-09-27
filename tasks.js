@@ -124,6 +124,10 @@ module.exports = {
 			if (task != null) {
 				this.giveTask(creep, task);
 				return;
+			} else {
+				creep.moveFromSource();
+				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+				return;
 			}
 		} else {
 			if (this.goToRoom(creep, creep.memory.room, isRefueling))
@@ -253,12 +257,12 @@ module.exports = {
 
 				if (creep.memory.task == null) {
 					// If there is no energy to get... deliver or wait.
-					if (_.sum(creep.carry) > creep.carryCapacity * 0.85) {
+					if (_.sum(creep.carry) > creep.carryCapacity * 0.5) {
 						creep.memory.state = "delivering";
 						return;
 					} else {
 						creep.moveFromSource();
-						this.giveTask(creep, {type: "wait", subtype: "wait", timer: 5});
+						this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 						return;
 					}
 				}
@@ -281,6 +285,9 @@ module.exports = {
 			}
 			if (task != null) {
 				this.giveTask(creep, task);
+				return;
+			} else {
+				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 				return;
 			}
 		}
@@ -308,8 +315,10 @@ module.exports = {
 			if (task != null) {
 				this.giveTask(creep, task);
 				return;
+			} else {
+				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+				return;
 			}
-
 		} else {
 			if (this.goToRoom(creep, creep.memory.colony, isRefueling))
 				return;
@@ -320,6 +329,9 @@ module.exports = {
 				"priority"));
 			if (task != null) {
 				this.giveTask(creep, task);
+				return;
+			} else {
+				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
 				return;
 			}
 		}

@@ -23,6 +23,12 @@ let Hive = {
 		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 	},
 
+	moveRequestPath: function() {
+		let minTicks = 5, maxTicks = 30;
+		let range = maxTicks - minTicks;
+		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
+	},
+
 	moveMaxOps: function() {
 		let minOps = 2000, maxOps = 3000;
 		let range = maxOps - minOps;

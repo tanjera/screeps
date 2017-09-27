@@ -114,7 +114,7 @@ Creep.prototype.runTask = function runTask() {
 			let result = this.upgradeController(controller);
 			if (result == OK) {
 				if (Game.time % 10 == 0)
-					this.moveTo(controller);
+					this.travel(controller);
 				return;
 			} else if (result == ERR_NOT_IN_RANGE) {
 				this.travelTask(controller);
@@ -244,9 +244,15 @@ Creep.prototype.travel = function travel (dest, ignore_creeps) {
 	if (this.pos.getRangeTo(pos_dest) == 0)
 		return OK;
 
+	// Only request a new path every X ticks (different from reusePath... this may be different task even)
+	let Hive = require("hive");
+	if (_.get(this, ["memory", "path", "travel_req"], 0) > (Game.time - Hive.moveRequestPath()))
+		return this.travelByPath();
+	else
+		_.set(this, ["memory", "path", "travel_req"], Game.time);
+
 	if (_.get(this, ["memory", "path", "path_list"]) == null || _.get(this, ["memory", "path", "path_list"]).length == 0
 			|| _.get(this, ["memory", "path", "destination"]) != pos_dest) {
-		let Hive = require("hive");
 		_.set(this, ["memory", "path", "destination"], pos_dest);
 		_.set(this, ["memory", "path", "path_list"],
 			this.pos.findPathTo(pos_dest, {maxOps: Hive.moveMaxOps(), reusePath: Hive.moveReusePath(),
