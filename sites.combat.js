@@ -399,9 +399,11 @@ module.exports = {
 					else
 						creep.heal(wounded);
 				}
-			} else if (Game.time % 15 == 0) {
-					creep.moveTo(posRally);	
-			}		
+			} 
+			
+			if (Game.time % 15 == 0 && posRally.inRangeTo(creep.pos, rallyRange)) {
+				creep.moveTo(posRally);	
+			}
 		}
 	},
 

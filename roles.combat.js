@@ -96,8 +96,9 @@ module.exports = {
 		if (_.get(creep, ["memory", "target", "id"]) == null) {			
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
 				s => { return s.hits != null && s.hits > 0
-					&& (s.owner != null && !s.my && s.owner != "Source Keeper" 
-					&& _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
+					&& (s.owner == null
+					|| (s.owner != null && !s.my && s.owner != "Source Keeper" 
+						&& _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0)); }}),
 				s => { return creep.pos.getRangeTo(s.pos); } ),
 				s => { return s.hits; } ),	// Sort by hits to prevent attacking massive ramparts/walls forever
 				s => { switch (s.structureType) {
