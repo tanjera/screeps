@@ -57,6 +57,7 @@ Creep.prototype.runTaskTimer = function runTaskTimer() {
 Creep.prototype.runTask = function runTask() {
 	switch (this.memory.task["subtype"]) {
 		case "wait":
+			this.travelTask(null);
 			return;
 
 		case "boost": {
@@ -204,8 +205,15 @@ Creep.prototype.travelTask = function travelTask (dest) {
 		: new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);	
 	if (pos != null)
 		return this.travel(pos);
-	else
+	else if (dest != null)
 		return this.travel(dest);
+	else if (_.get(this, ["memory", "task", "area", "pos"]) != null) {
+		let area = new RoomPosition(this.memory.task.area["pos"].x, this.memory.task.area["pos"].y, this.memory.task.area["pos"].roomName);	
+		if (!this.pos.inRangeTo(area, _.get(this, ["memory", "task", "area", "range"], 1)))
+			return this.travel(area);
+		else
+			return OK;
+	}
 };
 
 Creep.prototype.travelTask_Burrower = function travelTask_Burrower () {
@@ -266,13 +274,12 @@ Creep.prototype.travel = function travel (dest, ignore_creeps) {
 	}
 
 	return this.travelByPath();
-	
 };
 
 Creep.prototype.travelByPath = function travelByPath() {
 	let path = _.get(this, ["memory", "path", "path_list"]);
 	if (path == null || path.length == 0 || _.get(path, 0) == null) {
-		_.set(this, ["memory", "path"], null)
+		this.travelClear();
 		return ERR_NO_PATH;
 	}
 
@@ -285,7 +292,7 @@ Creep.prototype.travelByPath = function travelByPath() {
 			}
 		}
 
-		_.set(this, ["memory", "path"], null)
+		this.travelClear();
 		return ERR_NO_PATH;		
 	}
 
@@ -296,7 +303,7 @@ Creep.prototype.travelByPath = function travelByPath() {
 	} else if (result == ERR_BUSY || result == ERR_TIRED || result == ERR_NO_BODYPART) {
 		return OK;
 	} else {
-		_.set(this, ["memory", "path"], null);
+		this.travelClear();
 		return ERR_NO_PATH;
 	}
 };
@@ -404,6 +411,13 @@ Creep.prototype.travelSwap = function travelSwap (target) {
 		return ERR_NO_PATH;
 	}
 }
+
+Creep.prototype.travelClear = function travelClear() {
+	_.set(this, ["memory", "path", "destination"], null);
+	_.set(this, ["memory", "path", "route"], null);
+	_.set(this, ["memory", "path", "exit"], null);
+	_.set(this, ["memory", "path", "path_list"], null);
+};
 
 Creep.prototype.moveFrom = function moveFrom (target) {
 	let tgtDir = this.pos.getDirectionTo(target);

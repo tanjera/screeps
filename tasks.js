@@ -261,8 +261,8 @@ module.exports = {
 						creep.memory.state = "delivering";
 						return;
 					} else {
-						creep.moveFromSource();
-						this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+						this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10, 
+							area: {range: 1, pos: _.head(creep.room.find(FIND_SOURCES)).pos.getOpenTile_Range(5, true) } });
 						return;
 					}
 				}

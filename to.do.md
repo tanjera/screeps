@@ -16,6 +16,9 @@
 
 # To Implement
 
+- spawnCreep: Sort extensions to array (on blueprint tick?) per room
+	- Switch createCreep to spawnCreep and specify energyStructures argument
+
 - Memory refactor
 	- Memory.sites.colonies?
 	- Memory.sites.colonies.defense (for is_safe, threat_level, target_attack, target_heal, etc.)

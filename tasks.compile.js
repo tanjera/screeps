@@ -7,13 +7,15 @@ module.exports = {
 		let am_owner = _.get(room, ["controller", "my"], false);
 		let mining_colony = _.get(Memory, ["sites", "mining", rmName, "colony"]);
 		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
-			? (am_owner ? room.controller.level : 0)
+			? (am_owner ? room.controller.getLevel() : 0)
 			: Game.rooms[mining_colony].getLevel();
 		let is_safe = _.get(Memory, ["rooms", rmName, "is_safe"]);
 		
 		let all_structures = room.find(FIND_STRUCTURES);
 		let my_structures = _.filter(all_structures, s => { return s.my; });
-		let carry_capacity = [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ];
+		let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
+			? [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ]
+			: [ 1000, 150, 200, 300, 500, 700, 900, 1250, 1250 ];
 		
 
 		/* Room Controllers (upgrading, signing) */
