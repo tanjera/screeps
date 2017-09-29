@@ -47,12 +47,13 @@ module.exports = {
 			let target = Game.getObjectById(creep.memory.target.id);
 			// Refresh target every 10 ticks...
 			if (target == null || target.room.name != creep.room.name || Game.time % 10 == 0)
-				delete creep.memory.target;
+				_.set(creep, ["memory", "target", "id"], null);
 		}
 	},
 
 	acquireTarget_ListTarget: function(creep, listTargets) {
-		if (_.get(creep, ["memory", "target", "id"]) == null && listTargets != null) {
+		if (_.get(creep, ["memory", "target", "id"]) == null && listTargets != null
+				&& _.get(creep, ["memory", "target", "notarget_list"], 0) < Game.time - 10) {
 			for (let t in listTargets) {
 				let target = Game.getObjectById(listTargets[t]);
 				if (target != null && creep.moveTo(target) != ERR_NO_PATH) {
@@ -60,15 +61,15 @@ module.exports = {
 					return;
 				}
 			}
+
+			if (_.get(creep, ["memory", "target", "id"]) != null)
+				_.set(creep, ["memory", "target", "notarget_list"], Game.time);
 		}
 	},
 	
 	acquireTarget_Creep: function(creep) {
-		let is_safe = _.get(Memory, ["rooms", creep.room.name, "is_safe"], true);
-		if ((is_safe && Game.time % 15 != 0) || (!is_safe && Game.time % 3 != 0))
-			return;
-
-		if (_.get(creep, ["memory", "target", "id"]) == null) {
+		if (_.get(creep, ["memory", "target", "id"]) == null 
+				&& _.get(creep, ["memory", "target", "notarget_creep"], 0) < Game.time - 10) {
 			if (_.get(Memory, ["rooms", creep.room.name, "target_attack"]) != null) {
 				_.set(creep, ["memory", "target", "id"], _.get(Memory, ["rooms", creep.room.name, "target_attack"]));
 				this.acquireRampart_Adjacent(creep);
@@ -85,15 +86,15 @@ module.exports = {
 				_.set(creep, ["memory", "target", "id"], target.id);
 				this.acquireRampart_Adjacent(creep);
 				return;
+			} else {
+				_.set(creep, ["memory", "target", "notarget_creep"], Game.time);
 			}
 		}
 	},
 	
 	acquireTarget_Structure: function(creep) {
-		if (creep.room.name != creep.memory.room || Game.time % 5 != 0)
-			return;
-
-		if (_.get(creep, ["memory", "target", "id"]) == null) {			
+		if (_.get(creep, ["memory", "target", "id"]) == null
+		&& _.get(creep, ["memory", "target", "notarget_structure"], 0) < Game.time - 10) {
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
 				s => { return s.hits != null && s.hits > 0
 					&& (s.owner == null
@@ -114,8 +115,11 @@ module.exports = {
 					s => { return s.owner == null || (!s.my && _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0); }}),
 					s => { return creep.pos.getRangeTo(s.pos); } ));
 				
-			if (target != null)
-			_.set(creep, ["memory", "target", "id"], target.id);
+			if (target != null) {
+				_.set(creep, ["memory", "target", "id"], target.id);
+			} else {
+				_.set(creep, ["memory", "target", "notarget_structure"], Game.time);
+			}
 		}
 	},
 
