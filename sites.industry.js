@@ -74,7 +74,9 @@ module.exports = {
 		let Grafana = require("util.grafana");
 		Grafana.populationTally(rmColony, popTarget, popActual);
 
-        if (popTarget["courier"] != null && _.get(popActual, "courier") < popTarget["courier"]["amount"]) {
+		if (popTarget["courier"] != null && _.get(popActual, "courier") < popTarget["courier"]["amount"]
+		&& (_.get(Game, ["rooms", "E23N35", "terminal"]) != null || _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), 
+				s => { return s.structureType == "lab"}).length > 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: 4, level: popTarget["courier"]["level"],
 				scale: popTarget["courier"] == null ? true : popTarget["courier"]["scale"],

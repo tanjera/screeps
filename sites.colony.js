@@ -160,7 +160,9 @@ module.exports = {
 				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) / 2)))
 			}
 		} else if (is_safe && energy_excess && room_level != 8) {
-			_.set(popTarget, ["upgrader", "amount"], Math.round(_.get(popTarget, ["upgrader", "amount"]) * 1.5));
+			let storage = _.get(Game, ["rooms", rmColony, "storage"]);
+			_.set(popTarget, ["upgrader", "amount"], Math.round(_.get(popTarget, ["upgrader", "amount"]) * 
+				(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
 		}
 
 		// Tally population levels for level scaling and statistics

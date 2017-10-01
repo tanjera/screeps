@@ -243,7 +243,9 @@ module.exports = {
 					name: null, args: {role: "reserver", room: rmHarvest, colony: rmColony} });
 			}
 			
-			if (_.get(popActual, "extractor") < _.get(popTarget, ["extractor", "amount"]) && has_minerals) {
+			if (_.get(popActual, "extractor") < _.get(popTarget, ["extractor", "amount"]) && has_minerals
+			&& (rmColony != rmHarvest || _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), 
+					s => { return s.structureType == "extractor"}).length > 0 )) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 3, 
 					level: _.get(popTarget, ["extractor", "level"], 1),
 					scale: _.get(popTarget, ["extractor", "scale"], true),

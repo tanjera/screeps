@@ -208,14 +208,20 @@ let Hive = {
 								+ ":xxxx".replace(/[xy]/g, (c) => {
 										let r = Math.random()*16|0, v = c == "x" ? r : (r&0x3|0x8);
 										return v.toString(16); });
+						let storage = _.get(spawn.room, "storage");
+						let energies = storage == null ? null : _.sortBy(_.filter(spawn.room.find(FIND_MY_STRUCTURES), 
+							s => { return s.isActive() && (s.structureType == "extension" || s.structureType == "spawn"); }),
+							s => { return s.pos.getRangeTo(storage); });
+						let result = energies == null 
+							? spawn.spawnCreep(body, name, {memory: request.args})
+							: spawn.spawnCreep(body, name, {memory: request.args, energyStructures: energies});
 
-						let result = spawn.createCreep(body, name, request.args);
-
-						if (_.isString(result)) {
-							console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning lvl ${level} / ${request.level} ${request.body}, `
-								+ (spawn.room.name == request.room ? `${request.room}, ` : `${spawn.room.name} -> ${request.room}, `)
-								+ `${result} (${request.args["role"]}`
-								+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]})`);
+						if (result == OK) {
+							console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning `
+								+ (spawn.room.name == request.room ? `${request.room}  ` : `${spawn.room.name} -> ${request.room}  `)
+								+ `${level} / ${request.level}  ${name} : ${request.args["role"]}`
+								+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]} `
+								+ `(${request.body})`);
 
 							listSpawns[s] = null;
 							listRequests[i] = null;

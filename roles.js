@@ -196,7 +196,7 @@ module.exports = {
 			result = creep.reserveController(creep.room.controller);
 
 		if (result == ERR_NOT_IN_RANGE) {
-			creep.moveTo(creep.room.controller)
+			creep.travel(creep.room.controller)
 			return;
 		} else if (result == ERR_NO_BODYPART) {
 			return;		// Reservers and colonizers with no "claim" parts prevent null body spawn locking
