@@ -255,7 +255,7 @@ module.exports = {
 		
 		if (targetCreeps)
 			_Combat.acquireTarget_Creep(creep);		
-		if (targetStructures) 
+		if (targetStructures && creep.room.name == creep.memory.room) 
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
@@ -306,7 +306,7 @@ module.exports = {
 		
 		if (targetCreeps)
 			_Combat.acquireTarget_Creep(creep);		
-		if (targetStructures) 
+		if (targetStructures && creep.room.name == creep.memory.room) 
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
@@ -352,13 +352,13 @@ module.exports = {
 		
 		if (_Combat.acquireBoost(creep))
 			return;
-		if (_Combat.moveToDestination(creep, 10))
+		if (_Combat.moveToDestination(creep, null))
 			return;
 		
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);
 		
-		if (targetStructures) 
+		if (targetStructures && creep.room.name == creep.memory.room) 
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
