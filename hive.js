@@ -154,9 +154,9 @@ let Hive = {
 		/*  lvlPriority is an integer rating priority, e.g.:
 				0: Defense (active attack)
 				1: Mining (critical; miner, burrower)
+				1-4: Industry (can bring in critical energy!)
 				2-3: Defense (passive defense)
 				3: Mining (regular), Colonization
-				4: Industry
 				5: Colony (critical)
 				6: Colony (regular)
 				

@@ -78,7 +78,8 @@ module.exports = {
 		&& (_.get(Game, ["rooms", "E23N35", "terminal"]) != null || _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), 
 				s => { return s.structureType == "lab"}).length > 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-				priority: 4, level: popTarget["courier"]["level"],
+				priority:  Math.lerpSpawnPriority(1, 4, _.get(popActual, "courier"), _.get(popTarget, ["courier", "amount"])),
+				level: popTarget["courier"]["level"],
 				scale: popTarget["courier"] == null ? true : popTarget["courier"]["scale"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });
         }
