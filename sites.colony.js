@@ -140,16 +140,19 @@ module.exports = {
 		// Adjust soldier amounts & levels based on threat level
 		if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {						
 			if (threat_level == LOW || threat_level == null) {
-				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(2, Math.round(room_level / 3)));
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 2);
 				if (is_safe)
 					_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 2));
 			} else if (threat_level == MEDIUM) {
-				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(3, Math.round(room_level / 2)));
-				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(1, Math.floor(room_level / 3)));
-				_.set(popTarget, ["healer", "level"], room_level - 1)
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 3);
+				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 1);
+				if (is_safe) {
+					_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 1));
+					_.set(popTarget, ["healer", "level"], Math.max(2, room_level - 1));
+				}
 			} else if (threat_level == HIGH) {
-				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(5, room_level));
-				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(2, Math.floor(room_level / 2)));
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 6);
+				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 2);
 			}				
 		}
 

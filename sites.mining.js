@@ -136,20 +136,20 @@ module.exports = {
 		// Remote mining: adjust soldier levels based on threat level
 		if (rmHarvest != rmColony && threat_level != NONE) {						
 			if (threat_level == LOW || threat_level == null) {
-				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(2, Math.round(room_level / 3)));
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
 				if (is_safe)
 					_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 2));
 			} else if (threat_level == MEDIUM) {
-				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(2, Math.round(room_level / 2)));
-				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(1, Math.floor(room_level / 5)));
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 2);
+				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 1);
 				if (is_safe) {
 					_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 1));
 					_.set(popTarget, ["healer", "level"], Math.max(2, room_level - 1));
-				}				
+				}
 			} else if (threat_level == HIGH) {
-				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + Math.max(5, room_level));
-				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + Math.max(2, Math.round(room_level / 3)));
-			}				
+				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 4);
+				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 1);
+			}
 		}
 
 		// Tally population levels for level scaling
