@@ -33,8 +33,9 @@
 	- Log to show all boosts in action... or add to log.labs()
 
 
-- Remote Mining
-	- Creates a road from source to colony
+- Roads
+	- Roads in colonies- from sources, extractor, and controller to ... ramparts?
+	- Roads in remote_mining rooms- from sources to exit tiles
 
 - Alliance
 	- Sites.Support, help an ally build

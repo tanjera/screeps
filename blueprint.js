@@ -215,6 +215,7 @@ let Blueprint = {
 		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "observer"))
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "powerSpawn");
 
+		/* TODO: Revisit this code... it builds too many redundant roads, and clogs bases if source/controller are within ramparts
 		if (level >= 4) {
 			// Create roads leading from the base to sources, room controller
 			if (sites < sites_per_room) {
@@ -231,6 +232,7 @@ let Blueprint = {
 				}
 			});
 		}
+		*/
 
 		if (level >= 5) {
 			// Only build roads at level 5 to allow extensions, tower, and walls to be built
@@ -276,6 +278,7 @@ let Blueprint = {
 				}
 			}
 
+			/* TODO: Revisit this code... if extractor is within ramparts, clogs bases; also, finds circuitous paths
 			// Create roads leading from the base to extractor
 			if (sites < sites_per_room) {
 				let extractor = _.head(_.filter(structures, s => { return s.structureType == "extractor"; }));
@@ -285,6 +288,7 @@ let Blueprint = {
 						sites = this.createRoad(room, sites, sites_per_room, extractor.pos, target.pos)
 				}
 			}
+			*/
 		}
 
 		if (level >= 7) {
@@ -367,7 +371,6 @@ let Blueprint = {
 	},
 
 	createRoad: function(room, sites, sites_per_room, from, to) {
-
 		if (from == null || to == null)
 			return;
 
