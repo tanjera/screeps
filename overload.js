@@ -27,6 +27,9 @@ isPulse_Lab = function () {
 	return _.get(Memory, ["hive", "pulses", "lab", "active"], true);
 };
 
+isPulse_Blueprint = function () {
+	return _.get(Memory, ["hive", "pulses", "blueprint", "active"], true);
+};
 
 getReagents = function (mineral) {
 	for (let r1 in REACTIONS) {
