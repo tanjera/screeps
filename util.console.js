@@ -346,6 +346,12 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Labs will renew definitions and reaction assignments next tick.`;
 		};
 		
+		help_labs.push("labs.clear_assignments()");
+		
+		labs.clear_assignments = function() {
+			delete Memory["resources"]["labs"]["reactions"];
+			return `<font color=\"#D3FFA3\">[Console]</font> Lab reaction assignments cleared- will reassign next lab pulse.`;
+		};
 
 		
 		help_resources.push("resources.overflow_cap(capAmount)");
