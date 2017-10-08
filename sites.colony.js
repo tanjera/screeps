@@ -157,19 +157,23 @@ module.exports = {
 		}
 
 		// Adjust worker amounts based on is_safe, energy_excess, energy_low, energy_critical
-		if (!is_safe || energy_low) {
-			if (energy_critical) {
+		if (!is_safe) {				
+			_.set(popTarget, ["upgrader", "amount"], 0)
+			_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.5)))
+		} else if (is_safe) {
+			if (energy_low) {
+				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) * 0.5)))
+			} else if (energy_critical) {
 				_.set(popTarget, ["upgrader", "amount"], 0)
-				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) / 2)))				
-			} else {
-				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) / 2)))
+				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.66)))
+				_.set(popTarget, ["repairer", "level"], Math.max(1, Math.round(_.get(popTarget, ["repairer", "level"]) * 0.66)))
+			} else if (energy_excess && room_level != 8) {
+				let storage = _.get(Game, ["rooms", rmColony, "storage"]);
+				_.set(popTarget, ["upgrader", "amount"], Math.round(_.get(popTarget, ["upgrader", "amount"]) * 
+					(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
 			}
-		} else if (is_safe && energy_excess && room_level != 8) {
-			let storage = _.get(Game, ["rooms", rmColony, "storage"]);
-			_.set(popTarget, ["upgrader", "amount"], Math.round(_.get(popTarget, ["upgrader", "amount"]) * 
-				(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
 		}
-
+		
 		// Tally population levels for level scaling and statistics
 		Hive.populationTally(rmColony, 
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 

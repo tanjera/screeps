@@ -23,7 +23,26 @@ Room.prototype.getLevel = function getLevel() {
 	else											  // lvl 8, 12900 energy
 		return 8;
 },
-	
+
+Room.prototype.getLevel_Available = function getLevel() {
+	if (this.energyAvailable < 550)
+		return 1;
+	else if (this.energyAvailable < 800)
+		return 2;
+	else if (this.energyAvailable < 1300)
+		return 3;
+	else if (this.energyAvailable < 1800)
+		return 4;
+	else if (this.energyAvailable < 2300)
+		return 5;
+	else if (this.energyAvailable < 5600)
+		return 6;
+	else if (this.energyAvailable < 12900)
+		return 7;
+	else
+		return 8;
+},
+
 Room.prototype.getWallTarget = function getWallTarget() {
 	let level = this.getLevel();		
 	let t = [ 0,

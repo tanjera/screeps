@@ -24,9 +24,11 @@ let Hive = {
 	},
 
 	moveRequestPath: function() {
-		let minTicks = 5, maxTicks = 30;
+		// Note: needs to return odd number to traverse edge tiles
+		let minTicks = 3, maxTicks = 15;
 		let range = maxTicks - minTicks;
-		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
+		let value = minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
+		return (value % 2 != 0 ? value : value + 1);
 	},
 
 	moveMaxOps: function() {

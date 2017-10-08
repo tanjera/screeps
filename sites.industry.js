@@ -159,14 +159,12 @@ module.exports = {
 		if (labDefinitions != null) {
 			for (let i = labDefinitions.length - 1; i >= 0; i--) {
 				if (_.get(labDefinitions[i], "action") == "boost") {
-					for (let j = labDefinitions.length - 1; j >= 0; j--) {
-						if (i == j)
-							continue;
+					if (_.get(labDefinitions[i], "expire") != null && _.get(labDefinitions[i], "expire") < Game.time)					
+						labDefinitions.splice(i, 1);
 
-						if (_.get(labDefinitions[i], "lab") == _.get(labDefinitions[j], "lab")) {
-							labDefinitions.splice(i, 1)
-							continue;
-						}
+					for (let j = labDefinitions.length - 1; j >= 0; j--) {
+						if (i != j && _.get(labDefinitions[i], "lab") == _.get(labDefinitions[j], "lab"))
+							labDefinitions.splice(i, 1);
 					}
 				} else if (_.get(labDefinitions[i], "action") == "empty") {
 					let labs = _.get(labDefinitions[i], "labs");
@@ -263,7 +261,7 @@ module.exports = {
 				case "boost":
 					let lab = Game.getObjectById(listing["lab"]);
 					
-					if (lab == null)
+					if (lab == null || (_.get(listing, "expire") != null && _.get(listing, "expire") < Game.time))
 						break;
 
 					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, { filter: (c) => { 
