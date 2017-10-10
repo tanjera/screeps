@@ -67,13 +67,16 @@ module.exports = {
 
 		let storage = _.get(Game, ["rooms", rmColony, "storage"]);
 		
-		_.set(Memory, ["rooms", rmColony, "energy_excess"], 
-			(visible && storage != null && storage.store["energy"] > (Game["rooms"][rmColony].getLowEnergy() * 2)));
-		_.set(Memory, ["rooms", rmColony, "energy_low"], 
-			(visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getLowEnergy()));
-		_.set(Memory, ["rooms", rmColony, "energy_critical"], 
-			(visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getCriticalEnergy()));
-		
+		if (visible && storage != null && storage.store["energy"] > (Game["rooms"][rmColony].getLowEnergy() * 2)) {
+			_.set(Memory, ["rooms", rmColony, "energy_level"], EXCESS);
+		} else if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getCriticalEnergy()) {
+			_.set(Memory, ["rooms", rmColony, "energy_level"], CRITICAL);
+		} else if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getLowEnergy()) {
+			_.set(Memory, ["rooms", rmColony, "energy_level"], LOW);
+		} else {
+			_.set(Memory, ["rooms", rmColony, "energy_level"], NORMAL);
+		}
+
 		let ticks_downgrade = _.get(Game, ["rooms", rmColony, "controller", "ticksToDowngrade"]);
 		_.set(Memory, ["rooms", rmColony, "downgrade_critical"], (ticks_downgrade > 0 && ticks_downgrade < 3500))
 	},
@@ -120,9 +123,7 @@ module.exports = {
 		let is_safe = _.get(Memory, ["rooms", rmColony, "is_safe"]);		
 		let hostiles = _.get(Memory, ["rooms", rmColony, "hostiles"], new Array());
 		let threat_level = _.get(Memory, ["rooms", rmColony, "threat_level"]);
-		let energy_low = _.get(Memory, ["rooms", rmColony, "energy_low"]);
-		let energy_critical = _.get(Memory, ["rooms", rmColony, "energy_critical"]);
-		let energy_excess = _.get(Memory, ["rooms", rmColony, "energy_excess"]);
+		let energy_level = _.get(Memory, ["rooms", rmColony, "energy_level"]);
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "downgrade_critical"]);
 		
 		let popActual = new Object();
@@ -156,18 +157,19 @@ module.exports = {
 			}				
 		}
 
-		// Adjust worker amounts based on is_safe, energy_excess, energy_low, energy_critical
+		// Adjust worker amounts based on is_safe, energy_level
 		if (!is_safe) {				
 			_.set(popTarget, ["upgrader", "amount"], 0)
 			_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.5)))
 		} else if (is_safe) {
-			if (energy_low) {
-				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) * 0.5)))
-			} else if (energy_critical) {
+			if (energy_level == CRITICAL) {
 				_.set(popTarget, ["upgrader", "amount"], 0)
-				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.66)))
+				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.33)))
 				_.set(popTarget, ["repairer", "level"], Math.max(1, Math.round(_.get(popTarget, ["repairer", "level"]) * 0.66)))
-			} else if (energy_excess && room_level != 8) {
+			} else if (energy_level == LOW) {				
+				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) * 0.33)))
+				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.66)))
+			} else if (energy_level == EXCESS && room_level < 8) {
 				let storage = _.get(Game, ["rooms", rmColony, "storage"]);
 				_.set(popTarget, ["upgrader", "amount"], Math.round(_.get(popTarget, ["upgrader", "amount"]) * 
 					(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
@@ -205,11 +207,8 @@ module.exports = {
 		if (_.get(popActual, "worker") < _.get(popTarget, ["worker", "amount"])) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: Math.lerpSpawnPriority(3, 5, _.get(popActual, "worker"), _.get(popTarget, ["worker", "amount"])),
-					level: ((is_safe && !energy_critical) 
-						? _.get(popTarget, ["worker", "level"], 1)
-						: Math.max(1, Math.floor(_.get(popTarget, ["worker", "level"]) / 2))),
-					scale: ((!is_safe || energy_critical || energy_low) ? false
-						: _.get(popTarget, ["worker", "scale"], true)),
+					level: _.get(popTarget, ["worker", "level"], 1),
+					scale: _.get(popTarget, ["worker", "scale"], true),
 					body: _.get(popTarget, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
 		} 
@@ -227,11 +226,8 @@ module.exports = {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: downgrade_critical ? 1 
 						: Math.lerpSpawnPriority(5, 6, _.get(popActual, "upgrader"), _.get(popTarget, ["upgrader", "amount"])),
-					level: ((!is_safe || energy_critical) ? 1
-						: (energy_low ? Math.max(1, Math.floor(_.get(popTarget, ["upgrader", "level"], 1) / 2)) 
-							: popTarget["upgrader"]["level"])),
-					scale: ((!is_safe || energy_critical || energy_low) ? false
-						: _.get(popTarget, ["upgrader", "scale"], true)),
+					level: _.get(popTarget, ["upgrader", "level"], 1),
+					scale: _.get(popTarget, ["upgrader", "scale"], true),
 					body: _.get(popTarget, ["upgrader", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
 		}
@@ -361,8 +357,8 @@ module.exports = {
 	},
 
 	towerAcquireRepair: function (rmColony) {
-		if (_.get(Memory, ["rooms", rmColony, "energy_low"]) 
-				|| _.get(Memory, ["rooms", rmColony, "energy_critical"])) {
+		let energy_level = _.get(Memory, ["rooms", rmColony, "energy_level"]);
+		if (energy_level == LOW || energy_level == CRITICAL) {
 			_.set(Memory, ["rooms", rmColony, "target_repair"], null);
 			return;
 		}

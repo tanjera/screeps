@@ -4,7 +4,13 @@
 	NONE = 10;
 	LOW = 11;
 	MEDIUM = 12;
-    HIGH = 13;    
+	HIGH = 13;
+	
+	// Energy level states
+	CRITICAL = 10;
+	LOW = 11;
+	NORMAL = 12;
+    EXCESS = 13;
 }
 
 isPulse_Short = function () {

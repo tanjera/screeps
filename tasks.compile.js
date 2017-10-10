@@ -328,7 +328,7 @@ module.exports = {
 
 		let storage = _.head(_.filter(my_structures, s => { return s.structureType == "storage"; }));
 		if (storage != null) {
-			if (storage.store["energy"] > 0 && _.get(Memory, ["rooms", rmName, "energy_critical"]) == true) {
+			if (storage.store["energy"] > 0 && _.get(Memory, ["rooms", rmName, "energy_level"]) == CRITICAL) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "energy-critical",
