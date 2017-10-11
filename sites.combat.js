@@ -119,7 +119,7 @@ module.exports = {
 				let rally_pos = _.get(tactic, "rally_pos");
 
                 _.each(listCreeps, creep => {
-					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
+					if (_.get(combat, "use_boosts") && this.creepBoost(creep, combat))
 						return;
 					this.creepRally(creep, rally_pos, rally_range);	
 				});
@@ -172,7 +172,7 @@ module.exports = {
 			// Trickle tactic is a constant state of spawning and moving to trickle into destination room
 			case "spawning":
                 _.each(listCreeps, creep => {
-					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
+					if (_.get(combat, "use_boosts") && this.creepBoost(creep, combat))
 						return;
 				});
 				
@@ -215,7 +215,7 @@ module.exports = {
 			case "spawning":
 			case "rallying":
 				_.each(listCreeps, creep => {
-					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
+					if (_.get(combat, "use_boosts") && this.creepBoost(creep, combat))
 						return;
 					this.creepRally(creep, rally_pos, rally_range);	
 				});
@@ -304,7 +304,7 @@ module.exports = {
 			// Controller tactic is a constant state of spawning and moving to trickle into destination room
 			case "spawning":
                 _.each(listCreeps, creep => {
-					if (_.get(combat, "use_boosts") && this.creepBoost(creep))
+					if (_.get(combat, "use_boosts") && this.creepBoost(creep, combat))
 						return;
 				});
 				
@@ -361,7 +361,8 @@ module.exports = {
 		return false;
 	},
 	
-	creepBoost: function(creep) {
+	creepBoost: function(creep, combat) {
+		let rmColony = _.get(combat, ["colony"]);
 		let _Combat = require("roles.combat");
 		if (creep.room.name == rmColony) {						
 			if (creep.memory.boost == null && !creep.isBoosted()) {

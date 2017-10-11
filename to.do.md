@@ -1,26 +1,20 @@
 # Implemented, Needs Debugging/Testing	
 
-- Sites.Combat: use_boosts
-
 
 
 # Implementing...
+- log.boosts...
+
+
+
+# To Implement
 - Observer -> adjust threat_level
 
 - Center sector mining
 	- Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
 	- Copy o4kapuk's behavior; burrow, if a source keeper, keep at distance, attack ranged, heal through
 
-
-
-# To Implement
-- Memory refactor
-	- Memory.sites.colonies?
-	- Memory.sites.colonies.defense (for is_safe, threat_level, target_attack, target_heal, etc.)
-
 - Industry
-	- log.labs show active boosts? Or add a log.boosts...
-
 	- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs
 	- Needs to define central labs as supply to reach all reactors
 

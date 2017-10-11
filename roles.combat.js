@@ -17,7 +17,7 @@ module.exports = {
 		if (creep.isBoosted())
 			return false;
 		else {
-			let task = _.head(_.filter(Memory["rooms"][creep.room.name]["tasks"],
+			let task = _.head(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
 				t => { 
 				return t.type == "boost" 
 					&& t.role == creep.memory.role 
@@ -70,8 +70,8 @@ module.exports = {
 	acquireTarget_Creep: function(creep) {
 		if (_.get(creep, ["memory", "target", "id"]) == null 
 				&& _.get(creep, ["memory", "target", "notarget_creep"], 0) < Game.time - 10) {
-			if (_.get(Memory, ["rooms", creep.room.name, "target_attack"]) != null) {
-				_.set(creep, ["memory", "target", "id"], _.get(Memory, ["rooms", creep.room.name, "target_attack"]));
+			if (_.get(Memory, ["rooms", creep.room.name, "defense", "targets", "attack"]) != null) {
+				_.set(creep, ["memory", "target", "id"], _.get(Memory, ["rooms", creep.room.name, "defense", "targets", "attack"]));
 				this.acquireRampart_Adjacent(creep);
 				return;
 			}

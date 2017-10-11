@@ -12,7 +12,7 @@ module.exports = {
 
 	Run: function(rmColony) {
 		_CPU.Start(rmColony, "Industry-init");
-		labDefinitions = _.get(Memory, ["rooms", rmColony, "lab_definitions"]);
+		labDefinitions = _.get(Memory, ["rooms", rmColony, "labs", "definitions"]);
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
 		popTarget = _.get(Memory, ["rooms", rmColony, "custom_population"]);		
 		_CPU.End(rmColony, "Industry-init");
@@ -180,7 +180,7 @@ module.exports = {
 						_.set(labDefinitions[i], "labs", labs);
 				}
 			}
-			_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
+			_.set(Memory, ["rooms", rmColony, "labs", "definitions"], labDefinitions);
 		}	
 
 		// Get labs able to process reactions (exclude labs defined to boost)
@@ -202,7 +202,7 @@ module.exports = {
 				}			
 			}
 
-			_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
+			_.set(Memory, ["rooms", rmColony, "labs", "definitions"], labDefinitions);
 			return;
 		}
 
@@ -228,14 +228,14 @@ module.exports = {
 		} 
 
 		labDefinitions.push({ action: "reaction", supply1: supply1, supply2: supply2, reactors: reactors });
-		_.set(Memory, ["rooms", rmColony, "lab_definitions"], labDefinitions);
+		_.set(Memory, ["rooms", rmColony, "labs", "definitions"], labDefinitions);
 		console.log(`<font color=\"#A17BFF\">[Labs]</font> Labs defined for ${rmColony}.`);
 	},
 
 	runLabs: function(rmColony) {
 		/* Arguments for labDefinitions:
 
-			Memory["rooms"][rmColony]["lab_definitions"]
+			Memory["rooms"][rmColony]["labs"]["definitions"]
 
 			[ { action: "reaction", supply1: "5827cdeb16de9e4869377e4a", supply2: "5827f4b3a0ed8e9f6bf5ae3c",
 				reactors: [ "5827988a4f975a7d696dba90", "5828280b74d604b04955e2f6", "58283338cc371cf674426315", "5827fcc4d448f67249f48185",

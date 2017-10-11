@@ -309,16 +309,17 @@ module.exports = {
 		labs.set_boost = function(labID, mineral, role, subrole, ticks) {
 			let lab = Game.getObjectById(labID);
 			let rmName = lab.pos.roomName;
-			let labDefinitions = _.get(Memory, ["rooms", rmName, "lab_definitions"]);
+			let labDefinitions = _.get(Memory, ["rooms", rmName, "labs", "definitions"]);
 			if (lab == null) return;
 
 			if (labDefinitions == null)
 				labDefinitions = [];
 
 			labDefinitions.push(
-				{ action: "boost", mineral: mineral, lab: labID, role: role, subrole: subrole, expire: (Game.time + ticks) });
+				{ action: "boost", mineral: mineral, lab: labID, role: role, subrole: subrole, 
+					expire: (ticks == null ? null : Game.time + ticks) });
 				
-			_.set(Memory, ["rooms", rmName, "lab_definitions"], labDefinitions);
+			_.set(Memory, ["rooms", rmName, "labs", "definitions"], labDefinitions);
 			delete Memory["hive"]["pulses"]["lab"];	
 			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
 		};
@@ -334,7 +335,7 @@ module.exports = {
 		help_labs.push("labs.clear_boosts(rmName)");	
 		
 		labs.clear_boosts = function(rmName) {
-			delete Memory["rooms"][rmName]["lab_definitions"];
+			delete Memory["rooms"][rmName]["labs"]["definitions"];
 			delete Memory["hive"]["pulses"]["lab"];	
 			return `<font color=\"#D3FFA3\">[Console]</font> All boosts cleared for ${rmName}`;
 		};
@@ -425,7 +426,7 @@ module.exports = {
 		help_empire.push("empire.threat_level(level)  ... NONE, LOW, MEDIUM, HIGH")
 		empire.threat_level = function(level) {
 			for (let i in Memory.rooms) { 
-				_.set(Memory, ["rooms", i, "threat_level"], level); 
+				_.set(Memory, ["rooms", i, "defense", "threat_level"], level); 
 			}
 			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for all rooms set.`;
 		};

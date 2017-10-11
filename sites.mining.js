@@ -69,8 +69,8 @@ module.exports = {
 
 	surveyRoom: function(rmColony, rmHarvest) {
 		let visible = _.keys(Game.rooms).includes(rmHarvest);
-		_.set(Memory, ["sites", "mining", rmHarvest, "visible"], visible);
-		_.set(Memory, ["sites", "mining", rmHarvest, "has_minerals"],
+		_.set(Memory, ["sites", "mining", rmHarvest, "survey", "visible"], visible);
+		_.set(Memory, ["sites", "mining", rmHarvest, "survey", "has_minerals"],
 			visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
 		let hostiles = visible 
@@ -79,20 +79,20 @@ module.exports = {
 			: new Array();
 		
 		let is_safe = !visible || rmColony == rmHarvest || hostiles.length == 0;
-		_.set(Memory, ["rooms", rmHarvest, "is_safe"], is_safe);
-		_.set(Memory, ["sites", "mining", rmHarvest, "is_safe"], is_safe);
-		_.set(Memory, ["sites", "mining", rmHarvest, "hostiles"], hostiles);
+		_.set(Memory, ["rooms", rmHarvest, "defense", "is_safe"], is_safe);
+		_.set(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"], is_safe);
+		_.set(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], hostiles);
 	},
 
 	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, populationTarget) {
 		let room_level = Game["rooms"][rmColony].getLevel();
-		let has_minerals = _.get(Memory, ["sites", "mining", rmHarvest, "has_minerals"]);
-		let threat_level = _.get(Memory, ["rooms", rmColony, "threat_level"]);
-		let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "is_safe"]);		
-		let hostiles = _.get(Memory, ["sites", "mining", rmHarvest, "hostiles"], new Array());
+		let has_minerals = _.get(Memory, ["sites", "mining", rmHarvest, "survey", "has_minerals"]);
+		let threat_level = _.get(Memory, ["rooms", rmColony, "defense", "threat_level"]);
+		let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"]);		
+		let hostiles = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], new Array());
 		
-		let is_safe_colony = _.get(Memory, ["rooms", rmColony, "is_safe"], true);
-		let is_visible = _.get(Memory, ["sites", "mining", rmHarvest, "visible"], true);
+		let is_safe_colony = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"], true);
+		let is_visible = _.get(Memory, ["sites", "mining", rmHarvest, "survey", "visible"], true);
 
 		// If the colony is not safe (under siege?) pause spawning remote mining; frees colony spawns to make soldiers
 		if (rmColony != rmHarvest && !is_safe_colony)
@@ -259,7 +259,7 @@ module.exports = {
 
 	runCreeps: function(rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {
 		let Roles = require("roles");
-		let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "is_safe"]);
+		let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"]);
 
         _.each(listCreeps, creep => {
 			_.set(creep, ["memory", "list_route"], listRoute);

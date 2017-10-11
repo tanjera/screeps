@@ -9,7 +9,7 @@ module.exports = {
 		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
 			? (am_owner ? room.controller.getLevel() : 0)
 			: Game.rooms[mining_colony].getLevel();
-		let is_safe = _.get(Memory, ["rooms", rmName, "is_safe"]);
+		let is_safe = _.get(Memory, ["rooms", rmName, "defense", "is_safe"]);
 		
 		let all_structures = room.find(FIND_STRUCTURES);
 		let my_structures = _.filter(all_structures, s => { return s.my; });
@@ -286,7 +286,7 @@ module.exports = {
 						key: `energy:withdraw-energy-${containers[i].id}`,
 						timer: 20,
 						creeps: Math.ceil(containers[i].store["energy"] / carry_capacity[room_level]),
-						priority: 3
+						priority: 3		// Hard-coded for carriers as priority - 0.5 for carrier preference.
 					});
 			}
 			if (_.sum(containers[i].store) < containers[i].storeCapacity) {
@@ -328,7 +328,7 @@ module.exports = {
 
 		let storage = _.head(_.filter(my_structures, s => { return s.structureType == "storage"; }));
 		if (storage != null) {
-			if (storage.store["energy"] > 0 && _.get(Memory, ["rooms", rmName, "energy_level"]) == CRITICAL) {
+			if (storage.store["energy"] > 0 && _.get(Memory, ["rooms", rmName, "survey", "energy_level"]) == CRITICAL) {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
 						type: "energy-critical",
@@ -408,7 +408,7 @@ module.exports = {
 							key: `carry:deposit-link:${l["id"]}`,
 							timer: 20,
 							creeps: 1,
-							priority: (l["role"] == "miner" ? 2 : 3)
+							priority: 3
 						 });
 					} else if (l["dir"] == "receive" && link != null && link.energy > 0) {
 						_Tasks.addTask(rmName,
@@ -423,7 +423,7 @@ module.exports = {
 							key: `energy:withdraw-link:${l["id"]}-${l["role"]}`,
 							timer: 20,
 							creeps: (room_level > 6 ? 1 : 2),
-							priority: 2
+							priority: 3
 						});
 					}
 				});

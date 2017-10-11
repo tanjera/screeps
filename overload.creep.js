@@ -25,15 +25,15 @@ Creep.prototype.hasPart = function hasPart(part) {
 
 Creep.prototype.finishedTask = function finishedTask() {
 	let task = this.memory.task;
-	if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
-		delete Memory["rooms"][task.room]["tasks_running"][task.key][this.name];
+	if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
+		delete Memory["rooms"][task.room]["tasks"]["running"][task.key][this.name];
 	delete this.memory.task;
 };
 
 Creep.prototype.returnTask = function returnTask() {
 	let task = this.memory.task;
-	if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
-		delete Memory["rooms"][task.room]["tasks_running"][task.key][this.name];
+	if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
+		delete Memory["rooms"][task.room]["tasks"]["running"][task.key][this.name];
 	task.creeps += 1;
 	delete this.memory.task;
 };

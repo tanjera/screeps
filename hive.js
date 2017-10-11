@@ -47,8 +47,8 @@ let Hive = {
 				c => {
 					if (Memory.creeps[c]["task"] != null) {
 						let task = Memory.creeps[c]["task"];
-						if (_.has(Memory, ["rooms", task.room, "tasks_running", task.key]))
-							delete Memory["rooms"][task.room]["tasks_running"][task.key][c];
+						if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
+							delete Memory["rooms"][task.room]["tasks"]["running"][task.key][c];
 					}
 					delete Memory.creeps[c];
 				});
@@ -81,7 +81,7 @@ let Hive = {
 		for (let r in Game["rooms"]) {
 			if (_.get(Memory, ["rooms", r]) == null) _.set(Memory, ["rooms", r], new Object());
 			if (_.get(Memory, ["rooms", r, "tasks"]) == null) _.set(Memory, ["rooms", r, "tasks"], new Object());
-			_.set(Memory, ["rooms", r, "population_balance"], null);
+			_.set(Memory, ["rooms", r, "population"], null);
 		}
 
 		_.set(Memory, ["hive", "spawn_requests"], new Array());
@@ -98,9 +98,9 @@ let Hive = {
 
 			let _Compile = require("tasks.compile");
 			for (let r in Game["rooms"]) {
-				Memory["rooms"][r]["tasks"] = {};
-				_Compile.compileTasks(r);
-				Memory["rooms"][r]["tasks_running"] = {};
+				_.set(Memory, ["rooms", r, "tasks", "list"], new Object());
+				_.set(Memory, ["rooms", r, "tasks", "running"], new Object());				
+				_Compile.compileTasks(r);				
 			}
 
 			_CPU.End("Hive", "initTasks");
@@ -149,8 +149,8 @@ let Hive = {
 	
 	populationTally: function(rmName, popTarget, popActual) {
 		// Tallies the target population for a colony, to be used for spawn load balancing
-		_.set(Memory, ["rooms", rmName, "population_balance", "target"], _.get(Memory, ["rooms", rmName, "population_balance", "target"], 0) + popTarget);
-		_.set(Memory, ["rooms", rmName, "population_balance", "actual"], _.get(Memory, ["rooms", rmName, "population_balance", "actual"], 0) + popActual);
+		_.set(Memory, ["rooms", rmName, "population", "target"], _.get(Memory, ["rooms", rmName, "population", "target"], 0) + popTarget);
+		_.set(Memory, ["rooms", rmName, "population", "actual"], _.get(Memory, ["rooms", rmName, "population", "actual"], 0) + popActual);
 	},
 
 	processSpawnRequests: function() {
@@ -195,12 +195,12 @@ let Hive = {
 					let spawn = Game["spawns"][listSpawns[s]];
 					if (spawn.room.name == request.room || (request.listRooms != null && _.find(request.listRooms, r => { return r == spawn.room.name; }) != null)) {
 
-						_.set(Memory, ["rooms", request.room, "population_balance", "total"],
-							(_.get(Memory, ["rooms", request.room, "population_balance", "actual"]) / _.get(Memory, ["rooms", request.room, "population_balance", "target"])));
+						_.set(Memory, ["rooms", request.room, "population", "total"],
+							(_.get(Memory, ["rooms", request.room, "population", "actual"]) / _.get(Memory, ["rooms", request.room, "population", "target"])));
 
 						let level = (_.get(request, ["scale"], true) == false)
 							? Math.min(request.level, spawn.room.getLevel())
-							: Math.max(1, Math.min(Math.round(Memory["rooms"][request.room]["population_balance"]["total"] * request.level),
+							: Math.max(1, Math.min(Math.round(Memory["rooms"][request.room]["population"]["total"] * request.level),
 								spawn.room.getLevel()));
 						request.args["level"] = level;
 
