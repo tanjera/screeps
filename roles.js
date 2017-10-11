@@ -154,7 +154,8 @@ module.exports = {
 			switch (creep.memory.state) {
 				default:
 				case "get_minerals":
-					if (_.sum(creep.carry) == creep.carryCapacity) {
+					if (_.sum(creep.carry) == creep.carryCapacity
+							|| _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true) == false) {
 						creep.memory.state = "deliver";
 						Tasks.returnTask(creep);
 						return;
@@ -167,7 +168,8 @@ module.exports = {
 				return;
 
 				case "deliver":
-					if (_.sum(creep.carry) == 0) {
+					if (_.sum(creep.carry) == 0 
+							&& _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true)) {
 						creep.memory.state = "get_minerals";
 						Tasks.returnTask(creep);
 						return;

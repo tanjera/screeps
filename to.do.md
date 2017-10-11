@@ -1,5 +1,5 @@
 # Implemented, Needs Debugging/Testing	
-
+- test extractor state machine functioning properly (unable to test after delivery bugfix... all minerals empty)
 
 
 # Implementing...

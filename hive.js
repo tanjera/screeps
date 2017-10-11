@@ -23,9 +23,22 @@ let Hive = {
 		return minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 	},
 
-	moveRequestPath: function() {
+	moveRequestPath: function(creep) {
 		// Note: needs to return odd number to traverse edge tiles
+		// Also: Fluctuating tick amounts gets creeps stuck on edge tiles
 		let minTicks = 3, maxTicks = 15;
+		let role = _.get(creep, ["memory", "role"]);
+
+		if (creep.pos.isEdge()) {
+			minTicks = 3;
+			maxTicks = 3;
+		} else if ((role == "carrier" || role == "miner" || role == "burrower")
+				&& (creep.room.name != _.get(creep, ["memory", "colony"], creep.room.name))) {
+			// Remote mining operations outside of colony have increased wait time (CPU optimization)
+			minTicks = 9;
+			maxTicks = 25;
+		}
+
 		let range = maxTicks - minTicks;
 		let value = minTicks + Math.floor((1 - (Game.cpu.bucket / 10000)) * range);
 		return (value % 2 != 0 ? value : value + 1);

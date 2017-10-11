@@ -1,6 +1,7 @@
 RoomPosition.prototype.isValid = function isValid() {	
 	return !(this.x < 0 || this.x > 49 || this.y < 0 || this.y > 49);
 }
+
 RoomPosition.prototype.isWalkable = function isWalkable(creeps_block) {
 	if (!this.isValid())
 		return false;

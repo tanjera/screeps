@@ -254,7 +254,7 @@ Creep.prototype.travel = function travel (dest, ignore_creeps) {
 
 	// Only request a new path every X ticks (different from reusePath... this may be different task even)
 	let Hive = require("hive");
-	if (_.get(this, ["memory", "path", "travel_req"], 0) > (Game.time - Hive.moveRequestPath()))
+	if (_.get(this, ["memory", "path", "travel_req"], 0) > (Game.time - Hive.moveRequestPath(this)))
 		return this.travelByPath();
 	else
 		_.set(this, ["memory", "path", "travel_req"], Game.time);
