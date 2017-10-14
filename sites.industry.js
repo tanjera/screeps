@@ -482,14 +482,8 @@ module.exports = {
 			let room = Game.rooms[rmColony];
 			let storage = Game.rooms[rmColony].storage;
 			let terminal = Game.rooms[rmColony].terminal;
-
-			// Add low energy level to room's stockpile (to prevent sending to other rooms)
-			let energy_shortage_level = room.getLowEnergy();
-			let energy_stockpile = _.get(Memory, ["rooms", rmColony, "stockpile", "energy"]);
-			if (energy_stockpile == null || energy_stockpile < energy_shortage_level) {				
-				_.set(Memory, ["rooms", rmColony, "stockpile", "energy"],
-					energy_stockpile == null ? energy_shortage_level : energy_stockpile + energy_shortage_level);
-			}
+			let energy_level = room.store("energy");
+			let energy_critical = room.getCriticalEnergy();
 
 			// Create orders to request resources to meet per-room stockpile
 			for (let res in _.get(Memory, ["rooms", rmColony, "stockpile"])) {
@@ -500,10 +494,13 @@ module.exports = {
 						{ room: rmColony, resource: res, amount: shortage[res], automated: true, priority: 2 });
 			}
 
-			// Create high priority order to fix critical shortage of energy in this room (and start early, aim high, include margins for error!)
-			let room_energy_level = _.get(storage, ["store", "energy"]) + _.get(terminal, ["store", "energy"]);
-			if (room_energy_level < (energy_shortage_level * 1.1)) {
-				let amount = Math.max((energy_shortage_level * 1.25) - room_energy_level, 1000);
+			// Set critical energy threshold to room's stockpile (to prevent sending to other rooms)
+			if (_.get(Memory, ["rooms", rmColony, "stockpile", "energy"], 0) < energy_critical)			
+				_.set(Memory, ["rooms", rmColony, "stockpile", "energy"], energy_critical);
+
+			// Create high priority order to fix critical shortage of energy in this room (include margins for error)
+			if (energy_level < energy_critical) {
+				let amount = Math.max((energy_critical * 1.25) - energy_level, 1000);
 
 				if (amount > 0) {
 					// Prevent spamming "new energy order creted" if it's just modifying the amount on an existing order...
@@ -512,6 +509,8 @@ module.exports = {
 					_.set(Memory, ["resources", "terminal_orders", `${rmColony}-energy_critical`], 
 						{ room: rmColony, resource: "energy", amount: amount, automated: true, priority: 1 });
 					
+					// Prevent double energy orders (one for critical, one for regular stockpile)
+					delete Memory["resources"]["terminal_orders"][`${rmColony}-energy`];
 				}
 			} else {
 				delete Memory["resources"]["terminal_orders"][`${rmColony}-energy_critical`];

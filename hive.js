@@ -93,7 +93,6 @@ let Hive = {
 
 		for (let r in Game["rooms"]) {
 			if (_.get(Memory, ["rooms", r]) == null) _.set(Memory, ["rooms", r], new Object());
-			if (_.get(Memory, ["rooms", r, "tasks"]) == null) _.set(Memory, ["rooms", r, "tasks"], new Object());
 			_.set(Memory, ["rooms", r, "population"], null);
 		}
 
@@ -106,18 +105,31 @@ let Hive = {
 	},
 
 	initTasks: function() {
-		if (isPulse_Mid()) {
-			_CPU.Start("Hive", "initTasks");
+		_CPU.Start("Hive", "initTasks");
+		let _Compile = require("tasks.compile");
 
-			let _Compile = require("tasks.compile");
-			for (let r in Game["rooms"]) {
-				_.set(Memory, ["rooms", r, "tasks", "list"], new Object());
-				_.set(Memory, ["rooms", r, "tasks", "running"], new Object());				
-				_Compile.compileTasks(r);				
-			}
+		// Initiates cycle structure if non-existant (between last finish and new start)
+		if (_.get(Memory, ["hive", "pulses", "tasks", "cycle"]) == null)
+			_.set(Memory, ["hive", "pulses", "tasks", "cycle"], {room_iter: 0, room_list: Object.keys(Game.rooms) });
 
-			_CPU.End("Hive", "initTasks");
-		}
+		let room_list = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "room_list"]);
+		let room_iter = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "room_iter"]);
+
+		let room_name = _.get(room_list, room_iter);
+		_.set(Memory, ["rooms", room_name, "tasks", "list"], new Object());
+		_.set(Memory, ["rooms", room_name, "tasks", "running"], new Object());				
+		if (room_name != null && _.get(Game, ["rooms", room_name]) != null)
+			_Compile.compileTasks(room_name);
+
+		// Iterate, then check if iteration is complete (and reset cycles)
+		room_iter += 1;		
+		if (room_iter == room_list.length)
+			delete Memory["hive"]["pulses"]["tasks"]["cycle"];			
+		else
+			_.set(Memory, ["hive", "pulses", "tasks", "cycle", "room_iter"], room_iter);
+
+		_CPU.End("Hive", "initTasks");
+	
 	},
 
 	initVisuals: function() {

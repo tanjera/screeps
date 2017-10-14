@@ -271,8 +271,8 @@ module.exports = {
 
 			if (_.get(creep, ["carry", "energy"], 0) > 0) {
 				task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
-						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy"							
-							&& _.get(t, "creeps") > 0; }),
+						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && _.get(t, "creeps") > 0 
+							&& (_.get(t, "structure") != "link" || creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])) <= 5 ); }),
 						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
 						"priority"));
 			} else if (_.sum(creep.carry) > 0 && _.get(creep, ["carry", "energy"], 0) == 0) {

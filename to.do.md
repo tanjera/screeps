@@ -6,7 +6,6 @@
 - log.boosts...
 
 
-
 # To Implement
 - Observer -> adjust threat_level
 

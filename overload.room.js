@@ -56,20 +56,6 @@ Room.prototype.getWallTarget = function getWallTarget() {
 				30000000 ];
 	return t[level];
 },
-		
-Room.prototype.getCriticalEnergy = function getCriticalEnergy() {
-	let level = this.getLevel();
-	let energy = [ 0,
-		0,
-		0,
-		0,
-		10000,
-		30000,
-		50000,
-		75000,
-		100000 ];
-	return energy[level];
-},
 	
 Room.prototype.getLowEnergy = function getLowEnergy() {
 	let level = this.getLevel();
@@ -83,6 +69,14 @@ Room.prototype.getLowEnergy = function getLowEnergy() {
 		150000,
 		200000 ];
 	return energy[level];
+},
+
+Room.prototype.getCriticalEnergy = function getCriticalEnergy() {
+	return this.getLowEnergy / 2;
+},
+
+Room.prototype.getExcessEnergy = function getExcessEnergy() {
+	return this.getLowEnergy * 2;
 },
 	
 Room.prototype.findRepair_Critical = function findRepair_Critical() {

@@ -16,7 +16,7 @@ module.exports = {
 		let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
 			? [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ]
 			: [ 1000, 150, 200, 300, 500, 700, 900, 1250, 1250 ];
-		
+			
 
 		/* Room Controllers (upgrading, signing) */
 		
@@ -29,8 +29,8 @@ module.exports = {
 						id: room.controller.id,
 						pos: room.controller.pos.getOpenTile_Range(2, true),
 						key: `work:upgrade-${room.controller.id}`,
-						timer: 30,
-						creeps: 15,
+						timer: 60,
+						creeps: 60,
 						priority: 1
 					});
 			} else if (is_safe) {
@@ -41,8 +41,8 @@ module.exports = {
 						id: room.controller.id,
 						pos: room.controller.pos.getOpenTile_Range(2, true),
 						key: `work:upgrade-${room.controller.id}`,
-						timer: 30,
-						creeps: 20,
+						timer: 60,
+						creeps: 60,
 						priority: 9
 					});
 			}
@@ -58,7 +58,7 @@ module.exports = {
 						id: room.controller.id,
 						pos: room.controller.pos,
 						key: `sign-${room.controller.id}`,
-						timer: 30,
+						timer: 60,
 						creeps: 1,
 						priority: 2
 					});
@@ -71,7 +71,7 @@ module.exports = {
 						id: room.controller.id,
 						pos: room.controller.pos,
 						key: `sign-${room.controller.id}`,
-						timer: 30,
+						timer: 60,
 						creeps: 1,
 						priority: 2
 					});
@@ -94,7 +94,7 @@ module.exports = {
 							id: repair_maintenance[i].id,
 							pos: repair_maintenance[i].pos,
 							key: `work:repair-${repair_maintenance[i].id}`,
-							timer: 20,
+							timer: 60,
 							creeps: 2,
 							priority: 8
 						});
@@ -106,7 +106,7 @@ module.exports = {
 						id: repair_maintenance[i].id,
 						pos: repair_maintenance[i].pos,
 						key: `work:repair-${repair_maintenance[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: 2,
 						priority: 10
 					});
@@ -123,7 +123,7 @@ module.exports = {
 						id: repair_critical[i].id,
 						pos: repair_critical[i].pos,
 						key: `work:repair-${repair_critical[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: 2,
 						priority: 5
 					});
@@ -155,7 +155,7 @@ module.exports = {
 					id: sites[i].id,
 					pos: sites[i].pos,
 					key: `work:build-${sites[i].id}`,
-					timer: 30,
+					timer: 60,
 					creeps: 10,
 					priority: _.cloneDeep(priority)
 				});
@@ -176,7 +176,7 @@ module.exports = {
 						id: piles[i].id,
 						pos: piles[i].pos,
 						key: `carry:pickup-${piles[i].id}`,
-						timer: 20,
+						timer: 30,
 						creeps: Math.ceil(piles[i].amount / carry_capacity[room_level]),
 						priority: 2,
 					});
@@ -189,7 +189,7 @@ module.exports = {
 							id: piles[i].id,
 							pos: piles[i].pos,
 							key: `carry:pickup-${piles[i].id}`,
-							timer: 20,
+							timer: 30,
 							creeps: Math.ceil(piles[i].amount / carry_capacity[room_level]),
 							priority: 1,
 						});
@@ -260,7 +260,7 @@ module.exports = {
 								id: minerals[i].id,
 								pos: minerals[i].pos,
 								key: `mine:harvest-${minerals[i].id}`,
-								timer: 30,
+								timer: 60,
 								creeps: 2,
 								priority: 2
 							});
@@ -284,7 +284,7 @@ module.exports = {
 						id: containers[i].id,
 						pos: containers[i].pos,
 						key: `energy:withdraw-energy-${containers[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: Math.ceil(containers[i].store["energy"] / carry_capacity[room_level]),
 						priority: 3		// Hard-coded for carriers as priority - 0.5 for carrier preference.
 					});
@@ -299,7 +299,7 @@ module.exports = {
 						id: containers[i].id,
 						pos: containers[i].pos,
 						key: `carry:deposit-energy-${containers[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: 10,
 						priority: 9
 					});
@@ -315,7 +315,7 @@ module.exports = {
 						id: containers[i].id,
 						pos: containers[i].pos,
 						key: `energy:withdraw-energy-${containers[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: Math.ceil(containers[i].store[res] / carry_capacity[room_level]),
 						priority: 2
 					});
@@ -338,7 +338,7 @@ module.exports = {
 						id: storage.id,
 						pos: storage.pos,
 						key: `energy:withdraw-energy-${storage.id}`,
-						timer: 20,
+						timer: 60,
 						creeps: Math.ceil(storage.store["energy"] / carry_capacity[room_level]),
 						priority: 3
 					});
@@ -352,7 +352,7 @@ module.exports = {
 						id: storage.id,
 						pos: storage.pos,
 						key: `energy:withdraw-energy-${storage.id}`,
-						timer: 20,
+						timer: 60,
 						creeps: Math.ceil(storage.store["energy"] / carry_capacity[room_level]),
 						priority: 3
 					});
@@ -367,8 +367,8 @@ module.exports = {
 						id: storage.id,
 						pos: storage.pos,
 						key: `carry:deposit-energy-${storage.id}`,
-						timer: 20,
-						creeps: 10,
+						timer: 60,
+						creeps: 60,
 						priority: 8
 					});
 			}
@@ -382,7 +382,7 @@ module.exports = {
 					id: storage.id,
 					pos: storage.pos,
 					key: `carry:deposit-mineral-${storage.id}`,
-					timer: 20,
+					timer: 60,
 					creeps: 10,
 					priority: 9
 				});
@@ -406,7 +406,7 @@ module.exports = {
 							id: l["id"],
 							pos: link.pos,
 							key: `carry:deposit-link:${l["id"]}`,
-							timer: 20,
+							timer: 60,
 							creeps: 1,
 							priority: 3
 						 });
@@ -421,7 +421,7 @@ module.exports = {
 							id: l["id"],
 							pos: link.pos,
 							key: `energy:withdraw-link:${l["id"]}-${l["role"]}`,
-							timer: 20,
+							timer: 60,
 							creeps: (room_level > 6 ? 1 : 2),
 							priority: 3
 						});
@@ -445,7 +445,7 @@ module.exports = {
 						id: towers[i].id,
 						pos: towers[i].pos,
 						key: `carry:deposit-${towers[i].id}`,
-						timer: 30,
+						timer: 60,
 						creeps: 1,
 						priority: 2
 					});
@@ -459,7 +459,7 @@ module.exports = {
 						id: towers[i].id,
 						pos: towers[i].pos,
 						key: `carry:deposit-${towers[i].id}`,
-						timer: 30,
+						timer: 60,
 						creeps: 1,
 						priority: 4
 					});
@@ -484,7 +484,7 @@ module.exports = {
 						id: spawns_exts[i].id,
 						pos: spawns_exts[i].pos,
 						key: `carry:deposit-${spawns_exts[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: 1,
 						priority: 1
 					});
@@ -500,7 +500,7 @@ module.exports = {
 						id: spawns_exts[i].id,
 						pos: spawns_exts[i].pos,
 						key: `carry:deposit-${spawns_exts[i].id}`,
-						timer: 20,
+						timer: 60,
 						creeps: 1,
 						priority: 3
 					});

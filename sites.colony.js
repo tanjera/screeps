@@ -67,12 +67,13 @@ module.exports = {
 
 		let storage = _.get(Game, ["rooms", rmColony, "storage"]);
 		
-		if (visible && storage != null && storage.store["energy"] > (Game["rooms"][rmColony].getLowEnergy() * 2)) {
-			_.set(Memory, ["rooms", rmColony, "survey", "energy_level"], EXCESS);
-		} else if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getCriticalEnergy()) {
+		
+		if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getCriticalEnergy()) {
 			_.set(Memory, ["rooms", rmColony, "survey", "energy_level"], CRITICAL);
 		} else if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getLowEnergy()) {
 			_.set(Memory, ["rooms", rmColony, "survey", "energy_level"], LOW);
+		} else if (visible && storage != null && storage.store["energy"] > Game["rooms"][rmColony].getExcessEnergy()) {
+			_.set(Memory, ["rooms", rmColony, "survey", "energy_level"], EXCESS);
 		} else {
 			_.set(Memory, ["rooms", rmColony, "survey", "energy_level"], NORMAL);
 		}
