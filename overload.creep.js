@@ -103,16 +103,27 @@ Creep.prototype.runTask = function runTask() {
 					this.travelTask(obj);
 				}
 
-				if (Game.time % 5 == 0) {
-					// Burrower fill adjacent link if possible
+				if (Game.time % 3 == 0) {
+					// Burrower fill adjacent link if possible; also fill adjacent container
 					if (this.memory.role == "burrower" && this.carry["energy"] > 0) {
 						let link = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "link"; }}));
-						if (link != null)
+						if (link != null) {
 							this.transfer(link, "energy");
+							return;
+						}
+
+						let container = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "container"; }}));
+						if (container != null) {
+							this.transfer(container, "energy");
+							return;
+						}
 					}
 				}
+				
 				return;
 			} else if (result == ERR_NOT_IN_RANGE) {
+				if (this.memory.role == "burrower" && this.carry["energy"] > 0)
+					this.drop("energy");
 				this.travelTask(obj);
 				return;			
 			} else {
@@ -239,12 +250,11 @@ Creep.prototype.travelTask_Burrower = function travelTask_Burrower () {
 		let position = new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);
 		let pos_cr = _.head(position.lookFor(LOOK_CREEPS));
 		if (_.get(pos_cr, ["memory", "role"]) != "burrower")
-			return this.travel(position);
-		else {
-			let source = Game.getObjectById(this.memory.task["id"]);
-			return this.travel(source.pos);
-		}
+			return this.travel(position);		
 	}
+
+	let source = Game.getObjectById(this.memory.task["id"]);
+	return this.travel(source.pos);
 };
 
 
