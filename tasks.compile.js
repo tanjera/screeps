@@ -235,7 +235,7 @@ module.exports = {
 						id: sources[i].id,
 						pos: position,
 						key: `mine:harvest-${sources[i].id}`,
-						timer: 60,
+						timer: 120,
 						creeps: access_tiles,
 						container: _.get(container, "id", null), 
 						burrower: _.get(burrower, "id", null),
@@ -252,6 +252,12 @@ module.exports = {
 				let look = minerals[i].pos.look();
 				for (let l = 0; l < look.length; l++) {
 					if (look[l].structure != null && look[l].structure.structureType == "extractor") {
+						let access_tiles = _.get(Memory, ["rooms", rmName, "minerals", minerals[i].id, "access_tiles"]);
+						if (access_tiles == null) {
+							access_tiles = minerals[i].pos.getAccessAmount();
+							_.set(Memory, ["rooms", rmName, "minerals", minerals[i].id, "access_tiles"], access_tiles);
+						}
+
 						_Tasks.addTask(rmName,
 							{   room: rmName,
 								type: "mine",
@@ -261,7 +267,7 @@ module.exports = {
 								pos: minerals[i].pos,
 								key: `mine:harvest-${minerals[i].id}`,
 								timer: 60,
-								creeps: 2,
+								creeps: access_tiles,
 								priority: 2
 							});
 					}
@@ -408,7 +414,7 @@ module.exports = {
 							key: `carry:deposit-link:${l["id"]}`,
 							timer: 60,
 							creeps: 1,
-							priority: 3
+							priority: 5
 						 });
 					} else if (l["dir"] == "receive" && link != null && link.energy > 0) {
 						_Tasks.addTask(rmName,

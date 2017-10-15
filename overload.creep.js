@@ -95,11 +95,22 @@ Creep.prototype.runTask = function runTask() {
 		}
 
 		case "harvest": {
-			let obj = Game.getObjectById(this.memory.task["id"]);
+			let obj = Game.getObjectById(this.memory.task["id"]);			
+			
 			let result = this.harvest(obj);
 			if (result == OK || result == ERR_TIRED) {
-				if (Game.time % 10 == 0)
+				if (Game.time % 10 == 0) {
 					this.travelTask(obj);
+				}
+
+				if (Game.time % 5 == 0) {
+					// Burrower fill adjacent link if possible
+					if (this.memory.role == "burrower" && this.carry["energy"] > 0) {
+						let link = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "link"; }}));
+						if (link != null)
+							this.transfer(link, "energy");
+					}
+				}
 				return;
 			} else if (result == ERR_NOT_IN_RANGE) {
 				this.travelTask(obj);

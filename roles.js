@@ -73,7 +73,8 @@ module.exports = {
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
-				if (creep.carryCapacity > 0 && _.sum(creep.carry) == creep.carryCapacity) {
+				if (creep.memory.role != "burrower" 
+						&& creep.carryCapacity > 0 && _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
 					Tasks.returnTask(creep);
 					return;

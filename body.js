@@ -461,31 +461,36 @@ module.exports = {
                         WORK, WORK, WORK, WORK, WORK,
                         MOVE, MOVE, MOVE];
             case 4:
-                return [ // 1050 energy, 8x WORK, 5x MOVE
+                return [ // 1100 energy, 8x WORK, 1x CARRY, 5x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE];
             case 5:
-                return [ // 1500 energy, 12x WORK, 7x MOVE
+                return [ // 1550 energy, 12x WORK, 1x CARRY, 7x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK,
+                        WORK, WORK, 
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 6:
-                return [ // 1800 energy, 14x WORK, 8x MOVE
+                return [ // 1850 energy, 14x WORK, 1x CARRY, 8x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, 
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 7:
-                return [ // 2700 energy, 21x WORK, 12x MOVE
+                return [ // 2750 energy, 21x WORK, 1x CARRY, 12x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK,
+                        WORK, 
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE];
             case 8:
-                return [ // 4000 energy, 30x WORK, 20x MOVE
+                return [ // 3970 energy, 29x WORK, 1x CARRY, 20x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
         }
