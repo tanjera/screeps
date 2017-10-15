@@ -363,8 +363,8 @@ let Hive = {
 		_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 		
 		// Reset automated terminal orders
-		_.each(_.filter(_.keys(Memory["resources", "terminal_orders"]),
-			o => { return _.get(Memory, ["terminal_orders", o, "automated"]) == true; }),
+		_.each(_.filter(_.keys(_.get(Memory, ["resources", "terminal_orders"])),
+			o => { return _.get(Memory, ["resources", "terminal_orders", o, "automated"]) == true; }),
 			o => { delete Memory["resources"]["terminal_orders"][o]; });
 		
 		// Reset reagent targets, prevents accidental reagent pileup

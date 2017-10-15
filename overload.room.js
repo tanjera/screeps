@@ -72,11 +72,11 @@ Room.prototype.getLowEnergy = function getLowEnergy() {
 },
 
 Room.prototype.getCriticalEnergy = function getCriticalEnergy() {
-	return this.getLowEnergy / 2;
+	return this.getLowEnergy() / 2;
 },
 
 Room.prototype.getExcessEnergy = function getExcessEnergy() {
-	return this.getLowEnergy * 2;
+	return this.getLowEnergy() * 2;
 },
 	
 Room.prototype.findRepair_Critical = function findRepair_Critical() {
