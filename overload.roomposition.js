@@ -28,6 +28,26 @@ RoomPosition.prototype.isWalkable = function isWalkable(creeps_block) {
 	return true;
 };
 
+RoomPosition.prototype.isBuildable = function isBuildable() {
+	if (!this.isValid())
+		return false;
+	
+	let look = this.look();
+	
+	let terrain = _.head(_.filter(look, l => l.type == "terrain"))["terrain"];
+	if (terrain == "wall")
+		return false;
+	
+	let structures = _.filter(look, l => l.type == "structure");
+	for (let s in structures) {
+		if (structures[s].structure.structureType != "road"
+			&& (structures[s].structure.structureType != "rampart" || !structures[s].structure.my))
+			return false;
+	}
+	
+	return true;
+};
+
 RoomPosition.prototype.getTileInDirection = function getTileInDirection(dir) {
 	switch (dir) {
 		case 0: return this;
@@ -76,6 +96,10 @@ RoomPosition.prototype.getOpenTile_Adjacent = function getOpenTile_Adjacent(cree
 	return (this.getOpenTile_Range(1, creeps_block));
 };
 
+RoomPosition.prototype.getBuildableTile_Adjacent = function getBuildableTile_Adjacent() {
+	return (this.getBuildableTile_Range(1));
+};
+
 RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range, creeps_block) {
 	for (let x = -range; x <= range; x++) {
 		for (let y = -range; y <= range; y++) {
@@ -85,6 +109,22 @@ RoomPosition.prototype.getOpenTile_Range = function getOpenTile_Range(range, cre
 				continue;
 			
 			if (newPos.isWalkable(creeps_block))
+				return newPos;		
+		}
+	}
+
+	return null;
+};
+
+RoomPosition.prototype.getBuildableTile_Range = function getBuildableTile_Range(range) {
+	for (let x = -range; x <= range; x++) {
+		for (let y = -range; y <= range; y++) {
+			let newPos = new RoomPosition(this.x + x, this.y + y, this.roomName);
+
+			if (!newPos.isValid())
+				continue;
+			
+			if (newPos.isBuildable())
 				return newPos;		
 		}
 	}

@@ -457,8 +457,9 @@ module.exports = {
                         WORK, WORK, WORK, WORK, 
                         MOVE, MOVE];
             case 3:
-                return [ // 650 energy, 5x WORK, 3x MOVE
-                        WORK, WORK, WORK, WORK, WORK,
+                return [ // 600 energy, 4x WORK, 1 CARRY, 3x MOVE
+                        WORK, WORK, WORK, WORK,
+                        CARRY,
                         MOVE, MOVE, MOVE];
             case 4:
                 return [ // 1100 energy, 8x WORK, 1x CARRY, 5x MOVE
@@ -478,19 +479,18 @@ module.exports = {
                         CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 7:
-                return [ // 2750 energy, 21x WORK, 1x CARRY, 12x MOVE
+                return [ // 2700 energy, 20x WORK, 2x CARRY, 12x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, 
-                        CARRY,
+                        CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE];
             case 8:
-                return [ // 3970 energy, 29x WORK, 1x CARRY, 20x MOVE
+                return [ // 3900 energy, 28x WORK, 2x CARRY, 20x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
-                        CARRY,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
         }
@@ -509,32 +509,36 @@ module.exports = {
                         WORK, WORK, WORK, WORK,
                         MOVE, MOVE, MOVE, MOVE];
             case 4:
-                return [ // 1200 energy, 8x WORK, 8x MOVE
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+                return [ // 1150 energy, 7x WORK, 1x CARRY, 8x MOVE
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 5:
-                return [ // 1650 energy, 11x WORK, 11x MOVE
+                return [ // 1600 energy, 10x WORK, 1x CARRY, 11x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, 
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE];
             case 6:
-                return [ // 2100 energy, 14x WORK, 14x MOVE
+                return [ // 2050 energy, 13x WORK, 1x CARRY 14x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK, 
+                        WORK, WORK, WORK,
+                        CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE];
             case 7:
-                return [ // 3000 energy, 20x WORK, 20x MOVE
+                return [ // 2900 energy, 18x WORK, 2x CARRY, 20x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, 
+                        CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
             case 8:
-                return [ // 3750 energy, 25x WORK, 25x MOVE
+                return [ // 3650 energy, 23x WORK, 2x CARRY, 25x MOVE
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                         WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                        WORK, WORK, WORK, WORK, WORK,
+                        WORK, WORK, WORK, 
+                        CARRY, CARRY,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
 						MOVE, MOVE, MOVE, MOVE, MOVE];

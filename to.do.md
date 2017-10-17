@@ -2,10 +2,12 @@
 
 
 # Implementing...
-- log.boosts...
 
 
 # To Implement
+** Task.compile(): ensure each room's tasks are compiled q 50 ticks; if more than 50 rooms, run 2-3 rooms/tick
+* log.boosts: list all active boosts
+
 - Observer -> adjust threat_level
 
 - Center sector mining

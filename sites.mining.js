@@ -304,8 +304,8 @@ module.exports = {
 		let sources = room.find(FIND_SOURCES);
 		let containers = _.filter(room.find(FIND_STRUCTURES), s => { return s.structureType == "container"; });				
 		_.each(sources, source => {
-			if (source.pos.findInRange(containers, 1).length == 0) {
-				let adj = source.pos.getOpenTile_Adjacent();
+			if (source.pos.findInRange(containers, 1).length < 2) {
+				let adj = source.pos.getBuildableTile_Adjacent();
 				if (adj != null && adj.createConstructionSite("container") == OK)
 					console.log(`<font color=\"#6065FF\">[Mining]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);					
 			}

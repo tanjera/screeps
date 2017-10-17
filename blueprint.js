@@ -140,17 +140,17 @@ let Blueprint = {
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "extension");
 		
 		if (level >= 3) {
-			// Iterate sources, create one container adjacent to each source
+			// Iterate sources, create two containers adjacent to each source
 			if (sites < sites_per_room) {
 				let containers = _.filter(all_structures, s => { return s.structureType == "container"; });				
 				_.each(sources, source => {
-					if (sites < sites_per_room && source.pos.findInRange(containers, 1).length == 0) {
-						let adj = source.pos.getOpenTile_Adjacent();
+					if (sites < sites_per_room && source.pos.findInRange(containers, 1).length < 2) {
+						let adj = source.pos.getBuildableTile_Adjacent();
 						if (adj != null && adj.createConstructionSite("container") == OK) {							
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);
 							sites += 1;
 						}
-					}						
+					}
 				});
 			}
 			

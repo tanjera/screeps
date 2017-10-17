@@ -103,27 +103,39 @@ Creep.prototype.runTask = function runTask() {
 					this.travelTask(obj);
 				}
 
-				if (Game.time % 3 == 0) {
+				let interval = 3;
+				if (Game.time % interval == 0) {
 					// Burrower fill adjacent link if possible; also fill adjacent container
 					if (this.memory.role == "burrower" && this.carry["energy"] > 0) {
 						
-						let link = Game.getObjectById(_.get(this.memory, ["task", "dump_link"]));
-						if (link == null || this.pos.getRangeTo(link) > 1)
-							link = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "link"; }}));
-						if (link != null) {
-							_.set(this.memory, ["task", "dump_link"], _.get(link, "id"));
-							this.transfer(link, "energy");
-							return;
+						let link_id = _.get(this.memory, ["task", "dump_link"]);
+						if (link_id != "unavailable" || Game.time % (interval * 5) == 0) {
+							let link = Game.getObjectById(link_id);
+							if (link == null || this.pos.getRangeTo(link) > 1 || link.energy == link.energyCapacity)
+								link = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "link"; }}));
+							if (link != null) {
+								_.set(this.memory, ["task", "dump_link"], _.get(link, "id"));
+								this.transfer(link, "energy");
+								return;
+							} else {
+								_.set(this.memory, ["task", "dump_link"], "unavailable");
+							}
 						}
-
-						let container = Game.getObjectById(_.get(this.memory, ["task", "dump_container"]));
-						if (container == null || this.pos.getRangeTo(container) > 1)
-							container = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "container"; }}));
-						if (container != null) {
-							_.set(this.memory, ["task", "dump_container"], _.get(container, "id"));
-							this.transfer(container, "energy");
-							return;
+						
+						let container_id = _.get(this.memory, ["task", "dump_container"]);
+						if (container_id != "unavailable" || Game.time % (interval * 5) == 0) {
+							let container = Game.getObjectById(container_id);
+							if (container == null || this.pos.getRangeTo(container) > 1 || _.sum(container.store) == container.storeCapacity)
+								container = _.head(this.pos.findInRange(FIND_STRUCTURES, 1, { filter: (s) => { return s.structureType == "container"; }}));
+							if (container != null) {
+								_.set(this.memory, ["task", "dump_container"], _.get(container, "id"));
+								this.transfer(container, "energy");
+								return;
+							} else {
+								_.set(this.memory, ["task", "dump_container"], "unavailable");
+							}
 						}
+						
 					}
 				}
 				
