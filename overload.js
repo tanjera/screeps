@@ -13,6 +13,10 @@
     EXCESS = 13;
 }
 
+hasCPU = function () {
+	return Game.cpu.getUsed() < Game.cpu.limit;
+}
+
 isPulse_Short = function () {
 	return _.get(Memory, ["hive", "pulses", "short", "active"], true);
 };

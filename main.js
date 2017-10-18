@@ -13,9 +13,7 @@ let Grafana = require("util.grafana");
 
 module.exports.loop = function () {
 
-	/* Init functions */
 	CPU.Init();
-	Blueprint.Init();
 
 	Hive.clearDeadMemory();
 	Hive.initMemory();
@@ -23,38 +21,24 @@ module.exports.loop = function () {
 	Hive.initLabs();
 	Hive.initVisuals();
 
-
-	/* Auto-sell excess stockpile
-	 * Fields in Memory.resources.[to_market, to_overflow]
-	 * to_market: Object {} of resources and at what limit all colonies start overflowing stockpile to market 
-	 * 		e.g. {energy: 10000, GH: 5000}
-	 * to_overflow: Limit # of energy at which one room should start sending overflow to another room with 
-	 * 		less energy e.g. to_overflow: 100000
-	 * */
-	Hive.sellExcessResources();
-	Hive.moveExcessEnergy();
-
-
-	/* Run all colonies, incl. local mining and industry
-	 * Fields for colonies are in Memory.rooms.<roomname>.spawn_assist.[rooms, list_route] and Memory.rooms.<roomname>.[custom_population, link_definitions]
-	 * spawn_assist.rooms: List [] of rooms to assist spawning from for the specified room e.g. ["W5S5", "W4S3"]
-	 * spawn_assist.list_route: List [] of rooms to try to travel through for spawn_assist.rooms e.g. ["W5S5", "W4S5", "W4S4" "W4S3"]
-	 * custom_population: Object {} to define a custom types/level/amount of creeps to populate a room with; see 
-	 * 		populations.js for format; WARNING: If set, this field must include ALL POPULATION TYPES including colony, mining, and industry!!!
-	 * */
 	Hive.runColonies();
 	Hive.runColonizations();
 	Hive.runCombat();
 
-
-	/* Run end-tick Hive functions */
 	Hive.processSpawnRequests();
 	Hive.processSpawnRenewing();
-	Hive.endMemory();
 
-	/* Output stats to Grafana */
+	if (hasCPU()) {
+		Hive.sellExcessResources();
+		Hive.moveExcessEnergy();
+	}
+
+	if (hasCPU()) {
+		Blueprint.Init();
+	}
+
+	Hive.endMemory();
 	Grafana.Run();
 
-	/* Finish the profiler cycle */
 	CPU.Finish();
 };
