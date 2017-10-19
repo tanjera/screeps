@@ -363,28 +363,35 @@ let Hive = {
 		_.each(Memory["rooms"], r => { _.set(r, ["stockpile"], new Object()); });
 		
 		// Reset automated terminal orders
-		_.each(_.filter(_.keys(_.get(Memory, ["resources", "terminal_orders"])),
-			o => { return _.get(Memory, ["resources", "terminal_orders", o, "automated"]) == true; }),
-			o => { delete Memory["resources"]["terminal_orders"][o]; });
+		_.each(_.keys(_.get(Memory, ["resources", "terminal_orders"])), o => { 
+			if (_.get(Memory, ["resources", "terminal_orders", o, "automated"]))
+				delete Memory["resources"]["terminal_orders"][o]; 
+		});
 		
 		// Reset reagent targets, prevents accidental reagent pileup
-		_.each(_.filter(_.keys(_.get(Memory, ["resources", "labs", "targets"])), 
-			t => { return _.get(Memory, ["resources", "labs", "targets", t, "is_reagent"]) == true; }), 
-			t => delete Memory["resources"]["labs"]["targets"][t]);
+		_.each(_.keys(_.get(Memory, ["resources", "labs", "targets"])), t => { 			
+			if (_.get(Memory, ["resources", "labs", "targets", t, "is_reagent"]))
+				delete Memory["resources"]["labs"]["targets"][t];
+		});
 		
-		let targets = _.filter(_.get(Memory, ["resources", "labs", "targets"]), 
-			t => {
-				if (_.get(t, "amount") < 0)
-					return true;
-				
-				let amount = 0;
-				_.each(_.filter(Game.rooms, 
-					r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); }), 
-					r => { amount += r.store(_.get(t, "mineral")); });
-				return amount < _.get(t, "amount");				
-			});
+		// Create new reagent targets
+		_.each(_.get(Memory, ["resources", "labs", "targets"]), t => {
+			if (_.get(t, "amount") < 0) {
+				this.createReagentTargets(t);
+				return;
+			}
 			
-		_.each(targets, target => this.createReagentTargets(target));
+			let amount = 0;
+			_.each(Game.rooms, r => { 
+				if (r.controller != null && r.controller.my && (r.storage || r.terminal))
+					amount += r.store(_.get(t, "mineral"));
+			});
+
+			if (amount < _.get(t, "amount")) {
+				this.createReagentTargets(t);
+				return;
+			}
+		});			
 	},
 	
 	createReagentTargets: function(target) {		

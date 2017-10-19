@@ -70,13 +70,9 @@ module.exports = {
 		Hive.populationTally(rmColony, 
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
 			_.sum(popActual));
-			
-		let Grafana = require("util.grafana");
-		Grafana.populationTally(rmColony, popTarget, popActual);
 
-		if (popTarget["courier"] != null && _.get(popActual, "courier") < popTarget["courier"]["amount"]
-		&& (_.get(Game, ["rooms", "E23N35", "terminal"]) != null || _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), 
-				s => { return s.structureType == "lab"}).length > 0)) {
+		if (_.get(Game, ["rooms", rmColony, "terminal"])
+			&& _.get(popActual, "courier", 0) < _.get(popTarget, ["courier"]["amount"], 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority:  Math.lerpSpawnPriority(1, 4, _.get(popActual, "courier"), _.get(popTarget, ["courier", "amount"])),
 				level: popTarget["courier"]["level"],
@@ -575,8 +571,9 @@ module.exports = {
 					order["resource"] = sync.resourceType;
 				} else {
 					let replacement = _.head(_.sortBy(Game.market.getAllOrders(
-						obj => { return obj.resourceType == order["market_item"].resourceType
-							&& obj.type == order["market_item"].type && obj.price == order["market_item"].price; }),
+						obj => { return _.get(obj, "resourceType") == _.get(order, ["market_item", "resourceType"])
+							&& _.get(obj, "type") == _.get(order, ["market_item", "type"]) 
+							&& _.get(obj, "price") == _.get(order, ["market_item", "price"]); }),
 						obj => { return Game.map.getRoomLinearDistance(rmColony, obj.roomName); }));
 
 					if (replacement != null) {

@@ -53,18 +53,5 @@ module.exports = {
                 }
             });
         }
-    },
-
-    populationTally: function(room_name, pop_target, pop_actual) {
-        for (let i in pop_target) {
-            _.set(Memory, ["stats", "colonies", room_name, "population", "target", i], 
-                _.get(pop_target, [i, "amount"]) + _.get(Memory, ["stats", "colonies", room_name, "population", "target", i], 0));
-            _.set(Memory, ["stats", "colonies", room_name, "population", "actual", i], 
-                _.get(pop_actual, [i]) + _.get(Memory, ["stats", "colonies", room_name, "population", "actual", i], 0));
-
-            _.set(Memory, ["stats", "colonies", room_name, "population", "percent", i],
-                _.get(Memory, ["stats", "colonies", room_name, "population", "actual", i], 0)
-                / _.get(Memory, ["stats", "colonies", room_name, "population", "target", i], 1))
-        }
     }
 };

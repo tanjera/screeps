@@ -14,12 +14,11 @@ module.exports = {
 
 		if (_.get(Memory, ["rooms", rmColony, "defense", "threat_level"]) == null)
 			_.set(Memory, ["rooms", rmColony, "defense", "threat_level"], MEDIUM);
+
+		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Colony-init");
 
-		_CPU.Start(rmColony, "Colony-listCreeps");
-		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
-		_CPU.End(rmColony, "Colony-listCreeps");
-
+		
 		_CPU.Start(rmColony, "Colony-surveyRoom");
 		if (Game.time % 3 == 0) {
 			this.surveyRoom(rmColony);		
@@ -128,11 +127,24 @@ module.exports = {
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "survey", "downgrade_critical"]);
 		
 		let popActual = new Object();
-		_.set(popActual, "soldier", _.filter(listCreeps, c => c.memory.role == "soldier").length);
-		_.set(popActual, "healer", _.filter(listCreeps, c => c.memory.role == "healer").length);
-		_.set(popActual, "worker", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == null).length);
-		_.set(popActual, "repairer", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "repairer").length);
-		_.set(popActual, "upgrader", _.filter(listCreeps, c => c.memory.role == "worker" && c.memory.subrole == "upgrader").length);
+		_.each(listCreeps, c => {
+			switch(_.get(c, ["memory", "role"])) {
+				default: break;
+				case "soldier": popActual["soldier"] = _.get(popActual, "soldier", 0) + 1; break;
+				case "healer": popActual["healer"] = _.get(popActual, "healer", 0) + 1; break;
+				case "worker": 
+					if (c.memory.subrole == null) {
+						popActual["worker"] = _.get(popActual, "worker", 0) + 1;
+						break;
+					} else if (c.memory.subrole == "repairer") {
+						popActual["repairer"] = _.get(popActual, "repairer", 0) + 1;
+						break;
+					} else if (c.memory.subrole == "upgrader") {
+						popActual["upgrader"] = _.get(popActual, "upgrader", 0) + 1;
+						break;
+					} break;				
+			}
+		});
 		
 		if (popTarget == null)
 			popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]); 
@@ -182,13 +194,9 @@ module.exports = {
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
 			_.sum(popActual));
 		
-		let Grafana = require("util.grafana");
-		Grafana.populationTally(rmColony, popTarget, popActual);
-
-
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
-			&& ((_.get(popActual, "soldier") < _.get(popTarget, ["soldier", "amount"]))
-			|| (_.get(popActual, "soldier") < hostiles.length))) {
+			&& ((_.get(popActual, "soldier", 0) < _.get(popTarget, ["soldier", "amount"], 0))
+			|| (_.get(popActual, "soldier", 0) < hostiles.length))) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: (is_safe ? 2 : 0),
 					level: _.get(popTarget, ["soldier", "level"], room_level),
@@ -197,7 +205,7 @@ module.exports = {
 		} 
 		
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
-			&& _.get(popActual, "healer") < _.get(popTarget, ["healer", "amount"])) {
+			&& _.get(popActual, "healer", 0) < _.get(popTarget, ["healer", "amount"], 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 				priority: (is_safe ? 3 : 1),
 				level: _.get(popTarget, ["healer", "level"], 1),
@@ -205,28 +213,28 @@ module.exports = {
 				body: "healer", name: null, args: {role: "healer", room: rmColony} });
 		} 
 		
-		if (_.get(popActual, "worker") < _.get(popTarget, ["worker", "amount"])) {
+		if (_.get(popActual, "worker", 0) < _.get(popTarget, ["worker", "amount"], 0)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-					priority: Math.lerpSpawnPriority(3, 5, _.get(popActual, "worker"), _.get(popTarget, ["worker", "amount"])),
+					priority: Math.lerpSpawnPriority(3, 5, _.get(popActual, "worker", 0), _.get(popTarget, ["worker", "amount"], 0)),
 					level: _.get(popTarget, ["worker", "level"], 1),
 					scale: _.get(popTarget, ["worker", "scale"], true),
 					body: _.get(popTarget, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
 		} 
 		
-		if (_.get(popActual, "repairer") < _.get(popTarget, ["repairer", "amount"])) {
+		if (_.get(popActual, "repairer", 0) < _.get(popTarget, ["repairer", "amount"], 0)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-					priority: Math.lerpSpawnPriority(4, 6, _.get(popActual, "repairer"), _.get(popTarget, ["repairer", "amount"])), 
+					priority: Math.lerpSpawnPriority(4, 6, _.get(popActual, "repairer", 0), _.get(popTarget, ["repairer", "amount"], 0)), 
 					level: _.get(popTarget, ["repairer", "level"], 1),
 					scale: _.get(popTarget, ["repairer", "scale"], true),
 					body: _.get(popTarget, ["repairer", "body"], "worker"),
 					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
 		} 
 		
-		if (_.get(popActual, "upgrader") < _.get(popTarget, ["upgrader", "amount"])) {
+		if (_.get(popActual, "upgrader", 0) < _.get(popTarget, ["upgrader", "amount"], 0)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: downgrade_critical ? 1 
-						: Math.lerpSpawnPriority(5, 6, _.get(popActual, "upgrader"), _.get(popTarget, ["upgrader", "amount"])),
+						: Math.lerpSpawnPriority(5, 6, _.get(popActual, "upgrader", 0), _.get(popTarget, ["upgrader", "amount"], 0)),
 					level: _.get(popTarget, ["upgrader", "level"], 1),
 					scale: _.get(popTarget, ["upgrader", "scale"], true),
 					body: _.get(popTarget, ["upgrader", "body"], "worker"),

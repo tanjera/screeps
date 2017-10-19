@@ -41,10 +41,7 @@ module.exports = {
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
 			_.sum(popActual));
 			
-		let Grafana = require("util.grafana");
-		Grafana.populationTally(rmColony, popTarget, popActual);
-
-		if (_.get(popActual, "colonizer") < _.get(popTarget, ["colonizer", "amount"])) {
+		if (_.get(popActual, "colonizer", 0) < _.get(popTarget, ["colonizer", "amount"], 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: null, priority: 1, 
 				level: _.get(popTarget, ["colonizer", "level"], 6),
 				scale: _.get(popTarget, ["colonizer", "scale"], false),
