@@ -189,7 +189,7 @@ module.exports = {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 4, 
 				level: popTarget["multirole"]["level"],
 				scale: _.get(popTarget, ["multirole", "scale"], true),
-				body: _.get(popTarget, ["multirole", "body"], (hasKeepers ? "worker" : "multirole")),
+				body: _.get(popTarget, ["multirole", "body"], "worker"),
 				name: null, args: {role: "multirole", room: rmHarvest, colony: rmColony} });
         }
 		
@@ -226,14 +226,16 @@ module.exports = {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 0, 
 					level: _.get(popTarget, ["miner", "level"], 1),
 					scale: _.get(popTarget, ["miner", "scale"], true),
-					body: "worker", name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
+					body: _.get(popTarget, ["miner", "body"], "worker"),
+					name: null, args: {role: "miner", room: rmHarvest, colony: rmColony} });
 			}
 			
 			if (_.get(popActual, "dredger", 0) < _.get(popTarget, ["dredger", "amount"], 0)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, priority: 1, 
 					level: _.get(popTarget, ["dredger", "level"], 1),
 					scale: _.get(popTarget, ["dredger", "scale"], true), 
-					body: "dredger", name: null, args: {role: "dredger", room: rmHarvest, colony: rmColony} });
+					body: _.get(popTarget, ["dredger", "body"], "dredger"),
+					name: null, args: {role: "dredger", room: rmHarvest, colony: rmColony} });
 			}
 
 			if (_.get(popActual, "reserver", 0) < _.get(popTarget, ["reserver", "amount"], 0)
