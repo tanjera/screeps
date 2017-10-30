@@ -3,6 +3,15 @@ let _CPU = require("util.cpu");
 
 let Hive = {
 
+	refillBucket: function() {
+		if (Game.cpu.bucket >= 10000) {
+			_.set(Memory, ["hive", "pulses", "bucket"], false);
+			console.log(`<font color=\"#D3FFA3\">[Console]</font> Bucket full, resuming main.js.`);
+		}
+
+		return _.get(Memory, ["hive", "pulses", "bucket"], false);
+	},
+
 	setPulse: function(key, minTicks, maxTicks) {
 		let range = maxTicks - minTicks;
 		let lastTick = _.get(Memory, ["hive", "pulses", key, "last_tick"]);
@@ -54,29 +63,26 @@ let Hive = {
 		if (!isPulse_Short())
 			return;
 
-		if (Memory.creeps != null) {
-			_.each(_.filter(Object.keys(Memory.creeps),
-				c => { return !_.has(Game, ["creeps", c]); }),
-				c => {
-					if (Memory.creeps[c]["task"] != null) {
-						let task = Memory.creeps[c]["task"];
-						if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
-							delete Memory["rooms"][task.room]["tasks"]["running"][task.key][c];
-					}
-					delete Memory.creeps[c];
-				});
-		}
+		_.each(Object.keys(Memory.creeps), c => {
+			if (!_.has(Game, ["creeps", c])) {
+				if (Memory.creeps[c]["task"] != null) {
+					let task = Memory.creeps[c]["task"];
+					if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
+						delete Memory["rooms"][task.room]["tasks"]["running"][task.key][c];
+				}
+				delete Memory.creeps[c];
+		}});
 
-		if (Memory.rooms != null) {
-			_.each(_.filter(Object.keys(Memory.rooms),
-				r => { return !_.has(Game, ["rooms", r]); }),
-				r => { delete Memory.rooms[r]; });
-		}
+		_.each(Object.keys(Memory.rooms), r => { 
+			if (!_.has(Game, ["rooms", r]))
+				delete Memory.rooms[r]; 
+		});
 	},
 
 	initMemory: function() {
 		_CPU.Start("Hive", "initMemory");
 
+		this.setPulse("defense", 4, 8);
 		this.setPulse("short", 10, 60);
 		this.setPulse("mid", 20, 90);
 		this.setPulse("long", 50, 200);
@@ -91,11 +97,8 @@ let Hive = {
 		if (_.get(Memory, ["sites", "colonization"]) == null) _.set(Memory, ["sites", "colonization"], new Object());
 		if (_.get(Memory, ["sites", "combat"]) == null) _.set(Memory, ["sites", "combat"], new Object());
 
-		for (let r in Game["rooms"]) {
-			if (_.get(Memory, ["rooms", r]) == null) _.set(Memory, ["rooms", r], new Object());
+		for (let r in Game["rooms"])
 			_.set(Memory, ["rooms", r, "population"], null);
-		}
-
 		_.set(Memory, ["hive", "spawn_requests"], new Array());
 
 		let _Console = require("util.console");
@@ -138,7 +141,8 @@ let Hive = {
 	},
 
 	endMemory: function() {
-		if (_.has(Memory, ["hive", "pulses", "reset_links"])) delete Memory["hive"]["pulses"]["reset_links"];
+		if (_.has(Memory, ["hive", "pulses", "reset_links"])) 
+			delete Memory["hive"]["pulses"]["reset_links"];
 	},
 
 
@@ -180,13 +184,20 @@ let Hive = {
 
 	processSpawnRequests: function() {
 		/*  lvlPriority is an integer rating priority, e.g.:
-				0: Defense (active attack)
-				1: Mining (critical; miner, burrower)
-				1-4: Industry (can bring in critical energy!)
-				2-3: Defense (passive defense)
-				3: Mining (regular), Colonization
-				5: Colony (critical)
-				6: Colony (regular)
+				01 - 10: Defense
+				11 - 20: Mining, Industry
+				21 - 30: Colony
+
+				00: Active Defense
+
+				11: Mining (critical; miner, burrower)
+				14: Mining (carriers)
+				14-16: Industry (can bring in critical energy!)
+				
+				20: Passive Defense
+				21: Colonization
+				22: Colony (critical)
+				25: Colony (regular)
 				
 
 			tgtLevel is the target level of the creep's body (per body.js)
@@ -267,10 +278,12 @@ let Hive = {
 
 		let listSpawns = Object.keys(Game["spawns"]).filter((a) => 
 			{ return Game.spawns[a].spawning == null && Game.spawns[a].room.energyAvailable > 300; });
+		
 		for (let s in listSpawns) {
 			let spawn = Game["spawns"][listSpawns[s]];
 			let creeps = _.filter(spawn.pos.findInRange(FIND_MY_CREEPS, 1),
 				c => { return !c.isBoosted() && _.get(c, ["memory", "spawn_renew"], true); });
+			
 			for (let c in creeps) {
 				if (spawn.renewCreep(creeps[c]) == OK)
 					break;

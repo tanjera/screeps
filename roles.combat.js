@@ -51,6 +51,15 @@ module.exports = {
 		}
 	},
 
+	checkPartner_Existing: function(creep) {
+		if (_.get(creep, ["memory", "partner", "id"]) != null) {
+			let target = Game.getObjectById(creep.memory.partner.id);
+			// Refresh target every 10 ticks...
+			if (target == null || target.room.name != creep.room.name || Game.time % 10 == 0)
+				_.set(creep, ["memory", "partner", "id"], null);
+		}
+	},
+
 	acquireTarget_ListTarget: function(creep, listTargets) {
 		if (_.get(creep, ["memory", "target", "id"]) == null && listTargets != null
 				&& _.get(creep, ["memory", "target", "notarget_list"], 0) < Game.time - 10) {
@@ -119,6 +128,36 @@ module.exports = {
 				_.set(creep, ["memory", "target", "id"], target.id);
 			} else {
 				_.set(creep, ["memory", "target", "notarget_structure"], Game.time);
+			}
+		}
+	},
+
+	acquireTarget_Heal: function(creep) {
+		if (_.get(creep, ["memory", "target", "id"]) == null
+				&& _.get(creep, ["memory", "target", "notarget_heal"], 0) < Game.time - 3) {				
+			let target = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter:
+				c => { return c.hits < c.hitsMax; }});
+
+			if (target != null) {
+				_.set(creep, ["memory", "target", "id"], target.id);
+			} else {
+				_.set(creep, ["memory", "target", "notarget_heal"], Game.time);
+			}
+		}
+	},
+
+	acquireTarget_Partner: function(creep) {
+		if (_.get(creep, ["memory", "partner", "id"]) == null
+				&& _.get(creep, ["memory", "partner", "notarget_partner"], 0) < Game.time - 10) {			
+			let target = _.head(_.sortBy(_.filter(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
+				c => c.memory.healer != null),
+				c => c.pos.getRangeTo(creep)));
+
+			if (target != null) {
+				_.set(creep, ["memory", "partner", "id"], target.id);
+				_.set(target, ["memory", "healer"], creep.id);
+			} else {
+				_.set(creep, ["memory", "partner", "notarget_partner"], Game.time);
 			}
 		}
 	},

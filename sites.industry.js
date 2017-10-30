@@ -74,7 +74,7 @@ module.exports = {
 		if (_.get(Game, ["rooms", rmColony, "terminal"])
 			&& _.get(popActual, "courier", 0) < _.get(popTarget, ["courier", "amount"], 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-				priority:  Math.lerpSpawnPriority(1, 4, _.get(popActual, "courier"), _.get(popTarget, ["courier", "amount"])),
+				priority:  Math.lerpSpawnPriority(14, 16, _.get(popActual, "courier"), _.get(popTarget, ["courier", "amount"])),
 				level: popTarget["courier"]["level"],
 				scale: popTarget["courier"] == null ? true : popTarget["courier"]["scale"],
 				body: "courier", name: null, args: {role: "courier", room: rmColony} });

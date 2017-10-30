@@ -397,35 +397,41 @@ module.exports = {
 		if (_Combat.moveToDestination(creep, 10))
 			return;
 
-		let wounded = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter:
-			c => { return c.hits < c.hitsMax; }});
-		if (wounded != null && creep.heal(wounded) == ERR_NOT_IN_RANGE) {
-			creep.rangedHeal(wounded);
-			creep.moveTo(wounded);
-			return;
-		}
-
-		if (creep.hits < creep.hitsMax)
-			creep.heal(creep)
-
-		if (to_partner) {
-			if (_.get(creep, ["memory", "partner"]) == null) {
-				let p = _.head(_.sortBy(_.filter(creep.pos.findInRange(FIND_MY_CREEPS, 5, { filter: c => { return c.memory.role != "healer" }}),
-					c => c.memory.healer != null),
-					c => c.pos.getRangeTo(creep)));
-
-				creep.memory.partner = _.get(p, "id", null);
-				_.set(p, ["memory", "healer"], creep.id);
-			} else {
-				let p = Game.getObjectById(_.get(creep, ["memory", "partner"]));
-				if (p == null)
-					_.set(creep, ["memory", "partner"], null);
-				else if (creep.pos.getRangeTo(p) > 1)
-					creep.moveTo(p, { reusePath: 0 });
+		_Combat.checkTarget_Existing(creep);
+		_Combat.acquireTarget_Heal(creep);
+		
+		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			let target = Game.getObjectById(creep.memory.target.id);
+			let result = creep.heal(target);
+			if (target == null || target.hits == target.hitsMax) {
+				_.set(creep, ["memory", "target", "id"], null);
+				return;
+			} else if (result == OK) {
+				return;
+			} else if (result == ERR_NOT_IN_RANGE) {
+				creep.rangedHeal(target);
+				creep.moveTo(target);
+				return;
 			}
 		}
 		
-		if (_.get(creep, ["memory", "partner"]) == null) {			
+		if (to_partner) {
+			_Combat.checkPartner_Existing(creep);
+			_Combat.acquirePartner(creep);
+
+			if (_.get(creep, ["memory", "partner", "id"]) != null) {
+				let target = Game.getObjectById(creep.memory.partner.id);
+			
+				if (target == null) {
+					_.set(creep, ["memory", "target", "id"], null);
+					_Combat.setCamp(creep);
+					_Combat.moveToCamp(creep);
+				} else if (creep.pos.getRangeTo(p) > 1) {
+					creep.moveTo(p, { reusePath: 0 });
+					return;
+				}
+			}
+		} else {
 			_Combat.setCamp(creep);
 			_Combat.moveToCamp(creep);
 		}

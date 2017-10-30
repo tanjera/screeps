@@ -15,7 +15,11 @@
 
 hasCPU = function () {
 	return Game.cpu.getUsed() < Game.cpu.limit;
-}
+};
+
+isPulse_Defense = function () {
+	return _.get(Memory, ["hive", "pulses", "defense", "active"], true);
+};
 
 isPulse_Short = function () {
 	return _.get(Memory, ["hive", "pulses", "short", "active"], true);

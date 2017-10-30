@@ -33,7 +33,7 @@ module.exports = {
 		
 		help_allies.push("allies.add(ally)");
 		
-		allies = new Object()
+		allies = new Object();
 		allies.add = function(ally) {
 			if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory["hive", "allies"], []);
 			Memory["hive"]["allies"].push(ally);
@@ -461,8 +461,13 @@ module.exports = {
 		};
 		
 		help_empire.push("");
+		help_empire.push("empire.refill_bucket()")		
+		empire.refill_bucket = function() {
+			_.set(Memory, ["hive", "pulses", "bucket"], true);
+			return `<font color=\"#D3FFA3\">[Console]</font> Pausing main.js to refill bucket.`;
+		};
+
 		help_empire.push("empire.set_sign(message, rmName)")
-		
 		empire.set_sign = function(message, rmName) {
 			/* Sorting algorithm for left -> right, top -> bottom (in SW sector!! Reverse sortBy() for other sectors...
 				* Ensure quote.length == room.length!! Place in main.js

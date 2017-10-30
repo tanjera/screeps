@@ -82,7 +82,8 @@ module.exports = {
 		/* Repairing- critical and maintenance */
 
 		let repair_maintenance = room.findRepair_Maintenance();
-		for (let i in repair_maintenance) {
+		// Only creating tasks for top priority maintenance; optimizes CPU and Memory
+		for (let i = 0; i < 10 && i < repair_maintenance.length; i++) {
 			// Hits < 80% target, workers will assist repairers before upgrading;
 			// Hit point cut-off prevents continual disruption to upgrading
 			if (((repair_maintenance[i].hits / room.getWallTarget()) < 0.8)
@@ -114,7 +115,8 @@ module.exports = {
 		}
 
 		let repair_critical = room.findRepair_Critical();
-		for (let i in repair_critical) {
+		// Only creating tasks for top priority maintenance; optimizes CPU and Memory
+		for (let i = 0; i < 10 && i < repair_critical.length; i++) {
 			if (am_owner || repair_critical[i].structureType == "road" || repair_critical[i].structureType == "container") {
 				_Tasks.addTask(rmName,
 					{   room: rmName,
@@ -130,11 +132,11 @@ module.exports = {
 			}
 		}
 
+		
 		/* Construction sites */
 
 		let sites = room.find(FIND_CONSTRUCTION_SITES, { filter: s => { return s.my; }});
 		for (let i in sites) {
-
 			let priority = 0;
 			switch (sites[i].structureType) {
 				case "spawn":		priority = 2; 	break;

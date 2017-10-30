@@ -15,6 +15,10 @@ module.exports.loop = function () {
 
 	CPU.Init();
 
+	if (Hive.refillBucket()) {
+		return;
+	}
+
 	Hive.clearDeadMemory();
 	Hive.initMemory();
 	Hive.initTasks();

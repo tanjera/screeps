@@ -2,7 +2,8 @@
 
 
 # Implementing...
-
+... fixed miner overpop d/t stall bounceback?
+*** guardian room soldiers/healers- only check for targets isPulse_Defense()
 
 # To Implement
 ** Task.compile(): ensure each room's tasks are compiled q 50 ticks; if more than 50 rooms, run 2-3 rooms/tick

@@ -1,11 +1,13 @@
 module.exports = {
 
 	Init: function() {
-        if (_.get(Memory, ["hive", "visuals", "show"], false) == true)
+        if (_.get(Memory, ["hive", "visuals", "show"], false) == true) {
             this.Show();
-
-        if (!isPulse_Long())
-            this.Compile();
+            if (isPulse_Long() || _.keys(Memory.hive.visuals.repair_levels).length == 0)
+                this.Compile();
+        } else {
+            _.set(Memory, ["hive", "visuals", "repair_levels"], null);
+        }
     },
 
     Show: function() {
