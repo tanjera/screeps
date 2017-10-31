@@ -110,9 +110,12 @@ Terminals also process manually entered terminal orders, which you can use to se
 	
 * For manual market trading (fulfilling existing buy/sell orders from other players):
 
+Buying from market (Sell Orders) = `resources.market_sell`
+Selling to market (Buy Orders) = `resources.market_buy`
+
 ```
-resources.market_sell(order_name, market_order_id, room_from, amount)
-resources.market_buy(order_name, market_order_id, room_to, amount)
+resources.market_sell(order_name, market_order_id, room_to, amount)
+resources.market_buy(order_name, market_order_id, room_from, amount)
 ```
 
 and your courier will to load/unload the terminal, and send/receive minerals and energy to fulfill all terminal orders!

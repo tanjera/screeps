@@ -287,7 +287,7 @@ module.exports = {
 				this.giveTask(creep, task);
 				return;
 			} else {    // If no tasks, then wait
-				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 10});
+				this.giveTask(creep, {type: "wait", subtype: "wait", timer: 2});	//TODO: Temp fix for tasks.Compile()
 				return;
 			}
 		} else {
