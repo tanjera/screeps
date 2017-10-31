@@ -88,7 +88,7 @@ module.exports = {
 					output += `<tr><td>(${parseFloat(used).toFixed(2)} / ${cycles})</td><td>${parseFloat(used / cycles).toFixed(2)}</td><td>${n}</td></tr>`;
 					
 					room_used += used;
-					if (typeof(room_cycles) != Number)
+					if (typeof(room_cycles) != "number")
 						room_cycles = 0;					
 					room_cycles = Math.max(room_cycles, cycles);
 				}

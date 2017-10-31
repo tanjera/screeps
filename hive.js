@@ -4,7 +4,7 @@ let _CPU = require("util.cpu");
 let Hive = {
 
 	refillBucket: function() {
-		if (Game.cpu.bucket >= 10000) {
+		if (Game.cpu.bucket >= 10000 && _.get(Memory, ["hive", "pulses", "bucket"], false)) {
 			_.set(Memory, ["hive", "pulses", "bucket"], false);
 			console.log(`<font color=\"#D3FFA3\">[Console]</font> Bucket full, resuming main.js.`);
 		}
@@ -112,27 +112,35 @@ let Hive = {
 		let _Compile = require("tasks.compile");
 
 		// Initiates cycle structure if non-existant (between last finish and new start)
-		if (_.get(Memory, ["hive", "pulses", "tasks", "cycle"]) == null)
-			_.set(Memory, ["hive", "pulses", "tasks", "cycle"], {room_iter: 0, room_list: Object.keys(Game.rooms) });
+		if (!_.get(Memory, ["hive", "pulses", "tasks", "cycle"])
+				|| !_.get(Memory, ["hive", "pulses", "tasks", "cycle", "list"]))
+			_.set(Memory, ["hive", "pulses", "tasks", "cycle"], {
+				iterate: 0, 
+				batch: Math.max(1, Math.round(_.keys(Game.rooms).length / 50)),
+				list: _.keys(Game.rooms)
+		});
 
-		let room_list = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "room_list"]);
-		let room_iter = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "room_iter"]);
-
-		let room_name = _.get(room_list, room_iter);
-		_.set(Memory, ["rooms", room_name, "tasks", "list"], new Object());
-		_.set(Memory, ["rooms", room_name, "tasks", "running"], new Object());				
-		if (room_name != null && _.get(Game, ["rooms", room_name]) != null)
-			_Compile.compileTasks(room_name);
-
+		let list = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "list"]);
+		let batch = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "batch"], 1);
+		let iterate = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "iterate"], 0);
+		
+		for (let i = 0; i < batch && (iterate + i) < list.length; i++) {
+			let room = _.get(list, iterate + i);
+			if (room != null && _.get(Game, ["rooms", room]) != null) {
+				_.set(Memory, ["rooms", room, "tasks", "list"], new Object());
+				_.set(Memory, ["rooms", room, "tasks", "running"], new Object());
+				_Compile.compileTasks(room);
+			}
+		}
+		
 		// Iterate, then check if iteration is complete (and reset cycles)
-		room_iter += 1;		
-		if (room_iter == room_list.length)
-			delete Memory["hive"]["pulses"]["tasks"]["cycle"];			
+		iterate += batch;
+		if (iterate >= list.length)
+			delete Memory["hive"]["pulses"]["tasks"]["cycle"];
 		else
-			_.set(Memory, ["hive", "pulses", "tasks", "cycle", "room_iter"], room_iter);
+			_.set(Memory, ["hive", "pulses", "tasks", "cycle", "iterate"], iterate);
 
 		_CPU.End("Hive", "initTasks");
-	
 	},
 
 	initVisuals: function() {

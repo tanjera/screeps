@@ -50,15 +50,15 @@ RoomPosition.prototype.isBuildable = function isBuildable() {
 
 RoomPosition.prototype.getTileInDirection = function getTileInDirection(dir) {
 	switch (dir) {
-		case 0: return this;
-		case 1: return new RoomPosition(this.x,	 		this.y - 1, 	this.roomName);
-		case 2: return new RoomPosition(this.x + 1, 	this.y - 1, 	this.roomName);
-		case 3: return new RoomPosition(this.x + 1, 	this.y,		 	this.roomName);
-		case 4: return new RoomPosition(this.x + 1, 	this.y + 1, 	this.roomName);
-		case 5: return new RoomPosition(this.x,	 		this.y + 1, 	this.roomName);
-		case 6: return new RoomPosition(this.x - 1, 	this.y + 1, 	this.roomName);
-		case 7: return new RoomPosition(this.x - 1, 	this.y,		 	this.roomName);
-		case 8: return new RoomPosition(this.x - 1, 	this.y - 1, 	this.roomName);
+		case 0: case "0": return this;
+		case 1: case "1": return new RoomPosition(this.x,	 		this.y - 1, 	this.roomName);
+		case 2: case "2": return new RoomPosition(this.x + 1, 	this.y - 1, 	this.roomName);
+		case 3: case "3": return new RoomPosition(this.x + 1, 	this.y,		 	this.roomName);
+		case 4: case "4": return new RoomPosition(this.x + 1, 	this.y + 1, 	this.roomName);
+		case 5: case "5": return new RoomPosition(this.x,	 		this.y + 1, 	this.roomName);
+		case 6: case "6": return new RoomPosition(this.x - 1, 	this.y + 1, 	this.roomName);
+		case 7: case "7": return new RoomPosition(this.x - 1, 	this.y,		 	this.roomName);
+		case 8: case "8": return new RoomPosition(this.x - 1, 	this.y - 1, 	this.roomName);
 	}
 
 	return null;
