@@ -27,10 +27,16 @@ module.exports = {
 			return;
 		}
 
-		if (_.get(Memory, ["rooms", rmName, "tasks", "running", incTask.key]) != null)
-			_.set(incTask, "creeps", Math.max(0, _.get(incTask, "creeps") - _.keys(Memory["rooms"][rmName]["tasks"]["running"][incTask.key]).length));
-
-		_.set(Memory, ["rooms", rmName, "tasks", "list", incTask.key], incTask);
+		if (_.get(incTask, "type") == "industry") {
+			// Industry tasks and general room tasks cannot mix; they refresh on separate timers!
+			_.set(Memory, ["rooms", rmName, "industry", "tasks", "list", incTask.key], incTask);
+			if (_.get(Memory, ["rooms", rmName, "industry", "tasks", "running", incTask.key]) != null)
+				_.set(incTask, "creeps", Math.max(0, _.get(incTask, "creeps") - _.keys(Memory["rooms"][rmName]["industry"]["tasks"]["running"][incTask.key]).length));
+		} else {
+			_.set(Memory, ["rooms", rmName, "tasks", "list", incTask.key], incTask);
+			if (_.get(Memory, ["rooms", rmName, "tasks", "running", incTask.key]) != null)
+				_.set(incTask, "creeps", Math.max(0, _.get(incTask, "creeps") - _.keys(Memory["rooms"][rmName]["tasks"]["running"][incTask.key]).length));
+		}
 	},
 
 	giveTask: function(creep, task) {
@@ -39,7 +45,11 @@ module.exports = {
 		task.room = task.room || creep.room.name;
 		task.key = task.key || this.randomName();
 
-		_.set(Memory, ["rooms", task.room, "tasks", "running", task.key, creep.name], true);
+		if (_.get(task, "type") == "industry") {
+			_.set(Memory, ["rooms", task.room, "industry", "tasks", "running", task.key, creep.name], true);
+		} else {
+			_.set(Memory, ["rooms", task.room, "tasks", "running", task.key, creep.name], true);
+		}
 
 		if (task["creeps"] != null)
 			task["creeps"] -= 1;
@@ -53,8 +63,14 @@ module.exports = {
 		if (task == null)
 		    return;
 
-		if (_.get(Memory, ["rooms", task.room, "tasks", "running", task.key]))
-			delete Memory["rooms"][task.room]["tasks"]["running"][task.key][creep.name];
+		if (_.get(task, "type") == "industry") {
+			if (_.get(Memory, ["rooms", task.room, "industry", "tasks", "running", task.key]))
+				delete Memory["rooms"][task.room]["industry"]["tasks"]["running"][task.key][creep.name];
+		} else  {
+			if (_.get(Memory, ["rooms", task.room, "tasks", "running", task.key]))
+				delete Memory["rooms"][task.room]["tasks"]["running"][task.key][creep.name];
+		}
+
 		task.creeps += 1;
 		delete creep.memory.task;
 	},
@@ -276,10 +292,11 @@ module.exports = {
 	},
 
 	assignTask_Industry: function(creep, isRefueling) {
+		// Remember: Industry tasks are not mixed with general tasks due to different refresh timers
 		let task;
 
 		if (isRefueling) {
-			task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+			task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "industry", "tasks", "list"]),
 					t => { return t.type == "industry" && t.subtype == "withdraw" && _.get(t, "creeps") > 0; }),
 					t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
 					"priority"));
@@ -292,7 +309,7 @@ module.exports = {
 			}
 		} else {
 			let res = _.head(_.sortBy(Object.keys(creep.carry), (c) => { return -creep.carry[c]; }));
-			task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+			task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "industry", "tasks", "list"]),
 					t => { return t.type == "industry" && t.subtype == "deposit" && t.resource == res && _.get(t, "creeps") > 0; }),
 					t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
 					"priority"));
@@ -303,7 +320,7 @@ module.exports = {
 
 			// If stuck without a task... drop off energy/minerals in storage... or wait...
 			if (_.get(creep, ["carry", "energy"], 0) > 0) {
-				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "industry", "tasks", "list"]),
 						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "energy" && _.get(t, "creeps") > 0; }),
 						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }));
 				if (task != null) {
@@ -314,7 +331,7 @@ module.exports = {
 					return;
 				}
 			} else if (_.sum(creep.carry) > 0 && _.get(creep, ["carry", "energy"], 0) == 0) {
-				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "industry", "tasks", "list"]),
 						t => { return t.type == "carry" && t.subtype == "deposit" && t.resource == "mineral" && _.get(t, "creeps") > 0; }),
 						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }));
 				if (task != null) {
