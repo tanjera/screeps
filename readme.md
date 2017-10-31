@@ -108,12 +108,10 @@ Terminals also process manually entered terminal orders, which you can use to se
 
 `resources.send(order_name, room_from, room_to, resource, amount)`
 	
-* For manual market trading (fulfilling existing buy/sell orders from other players):
+* For manual market trading (fulfilling existing buy/sell orders from other players), use the following commands. Note that if you want to buy a mineral, you are purchasing from another player's "sell" order, but since you are buying, you will use `market_buy()`, specifying your room *to* which you want the minerals sent during the purchase (and the 'from' room will be pulled automatically from the player's "sell" order on the market in the server's database). Similarly, if you are selling, you will use `market_sell()` to sell to another player's "buy" order. To do all this, use the following commands:
 
-```
-resources.market_sell(order_name, market_order_id, room_from, amount)
-resources.market_buy(order_name, market_order_id, room_to, amount)
-```
+`resources.market_sell(order_name, market_order_id, room_from, amount)` << to sell your existing minerals/energy
+`resources.market_buy(order_name, market_order_id, room_to, amount)` << to buy new minerals/energy
 
 and your courier will to load/unload the terminal, and send/receive minerals and energy to fulfill all terminal orders!
 
