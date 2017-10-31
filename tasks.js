@@ -133,29 +133,10 @@ module.exports = {
 			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
 
-			if (creep.memory.subrole == "repairer") {
-				task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
-						t => { return t.type == "work" && t.subtype == "repair" && _.get(t, "creeps") > 0; }),
-						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
-						"priority"));
-
-				if (task == null) {
-					task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
-						t => { return t.type == "work" && _.get(t, "creeps") > 0; }),
-						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
-						"priority"));
-				}
-			} else if (creep.memory.subrole == "upgrader") {
-				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
-						t => { return t.type == "work" && (t.subtype == "upgrade" || t.subtype == "sign") 
-						&& _.get(t, "creeps") > 0; }),
-						"priority"));
-			} else {
-				task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
-						t => { return t.type == "work" && _.get(t, "creeps") > 0; }),
-						t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
-						"priority"));
-			}
+			task = _.head(_.sortBy(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+					t => { return t.type == "work" && _.get(t, "creeps") > 0; }),
+					t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }),
+					"priority"));
 
 			if (task != null) {
 				this.giveTask(creep, task);

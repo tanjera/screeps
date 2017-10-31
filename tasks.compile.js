@@ -84,10 +84,7 @@ module.exports = {
 		let repair_maintenance = room.findRepair_Maintenance();
 		// Only creating tasks for top priority maintenance; optimizes CPU and Memory
 		for (let i = 0; i < 10 && i < repair_maintenance.length; i++) {
-			// Hits < 80% target, workers will assist repairers before upgrading;
-			// Hit point cut-off prevents continual disruption to upgrading
-			if (((repair_maintenance[i].hits / room.getWallTarget()) < 0.8)
-				&& (repair_maintenance[i].structureType == "rampart" || repair_maintenance[i].structureType == "constructedWall")) {
+			if (repair_maintenance[i].structureType == "rampart" || repair_maintenance[i].structureType == "constructedWall") {
 					_Tasks.addTask(rmName,
 						{   room: rmName,
 							type: "work",

@@ -131,17 +131,7 @@ module.exports = {
 				default: break;
 				case "soldier": popActual["soldier"] = _.get(popActual, "soldier", 0) + 1; break;
 				case "healer": popActual["healer"] = _.get(popActual, "healer", 0) + 1; break;
-				case "worker": 
-					if (c.memory.subrole == null) {
-						popActual["worker"] = _.get(popActual, "worker", 0) + 1;
-						break;
-					} else if (c.memory.subrole == "repairer") {
-						popActual["repairer"] = _.get(popActual, "repairer", 0) + 1;
-						break;
-					} else if (c.memory.subrole == "upgrader") {
-						popActual["upgrader"] = _.get(popActual, "upgrader", 0) + 1;
-						break;
-					} break;				
+				case "worker": popActual["worker"] = _.get(popActual, "worker", 0) + 1; break;
 			}
 		});
 		
@@ -170,20 +160,16 @@ module.exports = {
 		}
 
 		// Adjust worker amounts based on is_safe, energy_level
-		if (!is_safe) {				
-			_.set(popTarget, ["upgrader", "amount"], 0)
+		if (!is_safe) {
 			_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.5)))
 		} else if (is_safe) {
 			if (energy_level == CRITICAL) {
-				_.set(popTarget, ["upgrader", "amount"], 0)
 				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.33)))
-				_.set(popTarget, ["repairer", "level"], Math.max(1, Math.round(_.get(popTarget, ["repairer", "level"]) * 0.66)))
-			} else if (energy_level == LOW) {				
-				_.set(popTarget, ["upgrader", "level"], Math.max(1, Math.round(_.get(popTarget, ["upgrader", "level"]) * 0.33)))
+			} else if (energy_level == LOW) {
 				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.66)))
 			} else if (energy_level == EXCESS && room_level < 8) {
 				let storage = _.get(Game, ["rooms", rmColony, "storage"]);
-				_.set(popTarget, ["upgrader", "amount"], Math.round(_.get(popTarget, ["upgrader", "amount"]) * 
+				_.set(popTarget, ["worker", "amount"], Math.round(_.get(popTarget, ["worker", "amount"]) * 
 					(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
 			}
 		}
@@ -220,25 +206,6 @@ module.exports = {
 					body: _.get(popTarget, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
 		} 
-		
-		if (_.get(popActual, "repairer", 0) < _.get(popTarget, ["repairer", "amount"], 0)) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-					priority: Math.lerpSpawnPriority(24, 26, _.get(popActual, "repairer", 0), _.get(popTarget, ["repairer", "amount"], 0)), 
-					level: _.get(popTarget, ["repairer", "level"], 1),
-					scale: _.get(popTarget, ["repairer", "scale"], true),
-					body: _.get(popTarget, ["repairer", "body"], "worker"),
-					name: null, args: {role: "worker", subrole: "repairer", room: rmColony} });
-		} 
-		
-		if (_.get(popActual, "upgrader", 0) < _.get(popTarget, ["upgrader", "amount"], 0)) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
-					priority: downgrade_critical ? 1 
-						: Math.lerpSpawnPriority(25, 26, _.get(popActual, "upgrader", 0), _.get(popTarget, ["upgrader", "amount"], 0)),
-					level: _.get(popTarget, ["upgrader", "level"], 1),
-					scale: _.get(popTarget, ["upgrader", "scale"], true),
-					body: _.get(popTarget, ["upgrader", "body"], "worker"),
-					name: null, args: {role: "worker", subrole: "upgrader", room: rmColony} });
-		}
 	},
 
 
