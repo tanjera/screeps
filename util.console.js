@@ -377,17 +377,17 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources"]["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
-		help_resources.push("resources.market_sell(orderName, marketOrderID, rmFrom, amount)");
+		help_resources.push("resources.market_sell(orderName, marketOrderID, rmTo, amount)");
 
-		resources.market_sell = function(orderName, marketOrderID, rmFrom, amount) {
-			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4});
+		resources.market_sell = function(orderName, marketOrderID, rmTo, amount) {
+			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources"]["terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
-		help_resources.push("resources.market_buy(orderName, marketOrderID, rmTo, amount)");
+		help_resources.push("resources.market_buy(orderName, marketOrderID, rmFrom, amount)");
 
-		resources.market_buy = function(orderName, marketOrderID, rmTo, amount) {
-			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, to: rmTo, priority: 4});
+		resources.market_buy = function(orderName, marketOrderID, rmFrom, amount) {
+			_.set(Memory, ["resources", "terminal_orders", orderName], { market_id: marketOrderID, amount: amount, from: rmFrom, priority: 4});
 			return `<font color=\"#D3FFA3\">[Console]</font> Order set at Memory["resources", "terminal_orders"][${orderName}]; delete from Memory to cancel.`;
 		};
 
