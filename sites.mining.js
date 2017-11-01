@@ -137,7 +137,7 @@ module.exports = {
 			popTarget = _.cloneDeep(populationTarget);
 
 		// Remote mining: adjust soldier levels based on threat level
-		if (rmHarvest != rmColony && threat_level != NONE) {						
+		if (rmHarvest != rmColony && threat_level != NONE && hasKeepers == false) {						
 			if (threat_level == LOW || threat_level == null) {
 				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
 				if (is_safe)

@@ -150,14 +150,17 @@ R2: {
 	6: { },
 	7: {	burrower:  {level: 7, amount: 2, body: "burrower_at"},
 			carrier:   {level: 7, amount: 5, body: "carrier_at"},
-			extractor: {level: 7, amount: 2, body: "extractor_rem"} },
+			extractor: {level: 7, amount: 2, body: "extractor_rem"},
+			multirole: {level: 5, amount: 1, body: "worker_at"} },
 	8: {	burrower:  {level: 7, amount: 2, body: "burrower_at"},
 			carrier:   {level: 7, amount: 5, body: "carrier_at"},
-			extractor: {level: 7, amount: 2, body: "extractor_rem"} } },
+			extractor: {level: 7, amount: 2, body: "extractor_rem"},
+			multirole: {level: 5, amount: 1, body: "worker_at"} } },
 
 SK: {		paladin:   {level: 8, amount: 2, scale: false},
-			healer:	   {level: 4, amount: 1},
+			healer:	   {level: 4, amount: 1, scale: false},
 			burrower:  {level: 7, amount: 2, body: "burrower_at"},
 			carrier:   {level: 7, amount: 5, body: "carrier_at"},
-			extractor: {level: 7, amount: 2, body: "extractor_rem"} }
+			extractor: {level: 7, amount: 2, body: "extractor_rem"},
+			multirole: {level: 5, amount: 1, body: "worker_at"} }
 };

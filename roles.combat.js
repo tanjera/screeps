@@ -178,7 +178,7 @@ module.exports = {
 		}
 	},
 
-	setCamp: function(creep) {
+	acquireCamp: function(creep) {
 		if (creep.memory.camp != null || Game.time % 10 != 0)
 			return;
 
@@ -215,7 +215,7 @@ module.exports = {
 		}
 	},
 
-	moveToCamp: function(creep) {
+	travelCamp: function(creep) {
 		let camp = _.get(creep.memory, "camp");
 		if (camp != null) {
 			if (camp instanceof RoomPosition == true) {
@@ -233,5 +233,9 @@ module.exports = {
 		} else {
 			creep.travel(new RoomPosition(25, 25, creep.room.name));
 		}
+	},
+
+	clearCamp: function(creep) {
+		_.set(creep.memory, "camp", null);
 	}
 }

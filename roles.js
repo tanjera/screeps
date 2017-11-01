@@ -269,6 +269,7 @@ module.exports = {
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			_Combat.clearCamp(creep);
 			let target = Game.getObjectById(creep.memory.target.id);
 
 			creep.dismantle(target);
@@ -297,8 +298,8 @@ module.exports = {
 			}
 		} else {
 			creep.heal(creep);
-			_Combat.setCamp(creep);
-			_Combat.moveToCamp(creep);					
+			_Combat.acquireCamp(creep);
+			_Combat.travelCamp(creep);					
 			return;
 		}
 	},
@@ -320,6 +321,7 @@ module.exports = {
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			_Combat.clearCamp(creep);
 			let target = Game.getObjectById(creep.memory.target.id);
 						
 			creep.attack(target);
@@ -351,8 +353,8 @@ module.exports = {
 			}
 		} else {
 			creep.heal(creep);
-			_Combat.setCamp(creep);
-			_Combat.moveToCamp(creep);
+			_Combat.acquireCamp(creep);
+			_Combat.travelCamp(creep);
 			return;
 		}
 	},
@@ -408,6 +410,7 @@ module.exports = {
 		_Combat.acquireTarget_Heal(creep);
 		
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
+			_Combat.clearCamp(creep);
 			let target = Game.getObjectById(creep.memory.target.id);
 			let result = creep.heal(target);
 			if (target == null || target.hits == target.hitsMax) {
@@ -424,23 +427,24 @@ module.exports = {
 		
 		if (to_partner) {
 			_Combat.checkPartner_Existing(creep);
-			_Combat.acquirePartner(creep);
+			_Combat.acquireTarget_Partner(creep);
 
 			if (_.get(creep, ["memory", "partner", "id"]) != null) {
+				_Combat.clearCamp(creep);
 				let target = Game.getObjectById(creep.memory.partner.id);
 			
 				if (target == null) {
 					_.set(creep, ["memory", "target", "id"], null);
-					_Combat.setCamp(creep);
-					_Combat.moveToCamp(creep);
+					_Combat.acquireCamp(creep);
+					_Combat.travelCamp(creep);
 				} else if (creep.pos.getRangeTo(p) > 1) {
 					creep.moveTo(p, { reusePath: 0 });
 					return;
 				}
 			}
 		} else {
-			_Combat.setCamp(creep);
-			_Combat.moveToCamp(creep);
+			_Combat.acquireCamp(creep);
+			_Combat.travelCamp(creep);
 		}
 	},
 };
