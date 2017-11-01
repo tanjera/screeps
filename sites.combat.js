@@ -40,6 +40,7 @@ module.exports = {
 			case "waves":			army = _.cloneDeep(Population_Combat__Waves);			break;
 			case "trickle":			army = _.cloneDeep(Population_Combat__Trickle);			break;
 			case "occupy":			army = _.cloneDeep(Population_Combat__Occupy);			break;
+			case "dismantle":		army = _.cloneDeep(Population_Combat__Dismantle);		break;
 			case "tower_drain":		army = _.cloneDeep(Population_Combat__Tower_Drain);		break;
 			case "controller":		army = _.cloneDeep(Population_Combat__Controller);		break;
 		}
@@ -100,6 +101,8 @@ module.exports = {
 			case "trickle":			this.runTactic_Trickle(combat_id, combat);				break;
 			// Occupy tactic same as Trickle tactic using different army population.
 			case "occupy":			this.runTactic_Trickle(combat_id, combat);				break;
+			// Dismantle tactic same as Trickle tactic using different army population.
+			case "dismantle":		this.runTactic_Trickle(combat_id, combat);				break;
 			case "tower_drain":		this.runTactic_Tower_Drain(combat_id, combat);			break;
 			case "controller":		this.runTactic_Controller(combat_id, combat);			break;
 		}
@@ -167,7 +170,14 @@ module.exports = {
 		let tactic = _.get(combat, "tactic");
 		let state_combat = _.get(combat, "state_combat");
 		let listCreeps = _.filter(Game.creeps, c => { return _.get(c, ["memory", "combat_id"]) == combat_id; });
-		
+
+		// Dismantle is a Trickle tactic with dismantler population targeting structures.
+		if (_.get(tactic, "type") == "dismantle") {
+			_.set(tactic, "target_creeps", false); 
+			_.set(tactic, "target_structures", true);
+			_.set(tactic, "to_occupy", false);
+		}
+
 		switch (state_combat) {	
 			// Trickle tactic is a constant state of spawning and moving to trickle into destination room
 			case "spawning":
@@ -193,7 +203,7 @@ module.exports = {
 				return;
 				
 			case "complete":
-				if (_.get(combat, ["tactic", "to_occupy"]))
+				if (_.get(combat, ["tactic", "to_occupy"], false))
 					this.setOccupation(combat_id, combat, tactic);
 				delete Memory["sites"]["combat"][combat_id];	
 				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);

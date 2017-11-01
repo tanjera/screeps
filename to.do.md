@@ -1,19 +1,15 @@
 # Implemented, Needs Debugging/Testing	
-
+- guardian room healers roles working as intended?
+- source keeper mining working properly?
+- sites.combat tactic "dismantle"
 
 # Implementing...
-... fixed miner overpop d/t stall bounceback?
-*** guardian room soldiers/healers- only check for targets isPulse_Defense()
+
 
 # To Implement
-** Task.compile(): ensure each room's tasks are compiled q 50 ticks; if more than 50 rooms, run 2-3 rooms/tick
 * log.boosts: list all active boosts
 
 - Observer -> adjust threat_level
-
-- Center sector mining
-	- Create Roles.Dredger: each one claim a source in the room (by memory, in sites.mining)
-	- Copy o4kapuk's behavior; burrow, if a source keeper, keep at distance, attack ranged, heal through
 
 - Industry
 	- Set of 6 labs (RCL 7) not defining supply1 and supply2 accessible to all labs

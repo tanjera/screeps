@@ -19,6 +19,10 @@ Population_Combat__Occupy = {
     healer:     {amount: 1}
 };
 
+Population_Combat__Dismantle = {
+    dismantler:    {amount: 3}
+};
+
 Population_Combat__Tower_Drain = {
     tank:       {amount: 3},
     healer:     {amount: 3}

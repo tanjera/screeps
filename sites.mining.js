@@ -111,10 +111,10 @@ module.exports = {
 		_.each(listCreeps, c => {
 			switch(_.get(c, ["memory", "role"])) {
 				default: break;
-				case "paladin": popActual["paladin"] = _.get(popActual, "paladin", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 200) ? 1 : 0); break;
+				case "paladin": popActual["paladin"] = _.get(popActual, "paladin", 0) + 1; break;
 				case "soldier": popActual["soldier"] = _.get(popActual, "soldier", 0) + 1; break;
 				case "healer": popActual["healer"] = _.get(popActual, "healer", 0) + 1; break;
-				case "dredger": popActual["dredger"] = _.get(popActual, "dredger", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 100) ? 1 : 0); break;
+				case "dredger": popActual["dredger"] = _.get(popActual, "dredger", 0) + 1; break;
 				case "burrower": popActual["burrower"] = _.get(popActual, "burrower", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 100) ? 1 : 0); break;
 				case "carrier": popActual["carrier"] = _.get(popActual, "carrier", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 50) ? 1 : 0); break;
 				case "miner": popActual["miner"] = _.get(popActual, "miner", 0) + 1; break;
