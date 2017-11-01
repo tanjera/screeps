@@ -16,8 +16,15 @@ module.exports = {
 				creep.travelToRoom(creep.memory.room, true);
 			} else {
 				let controller = _.get(Game, ["rooms", creep.memory.room, "controller"]);
-				if (controller != null && !creep.pos.inRangeTo(controller, 3))
+				if (controller != null && !creep.pos.inRangeTo(controller, 3)) {
 					creep.travel(controller);
+					return;
+				}
+
+				if (controller == null && creep.pos.isEdge()) {
+					creep.travel(new RoomPosition(25, 25, creep.room.name));
+					return;
+				}
 			}
 		}
 	},
