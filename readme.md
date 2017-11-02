@@ -163,3 +163,31 @@ Rarely used but useful when needed, you can keep a continuous occupation of a ro
 There are a number of commands that can be run from the console that are part of the codebase and assist in managing your Screeps empire. These range from logs to show your resource amounts, to using a "blueprint" feature that saves your room layout (using flags) and will automatically rebuild after an attack, along with a CPU profiler that can show you which functions are using the most CPU. For a full list of console commands, simply go to the console and type:
 
 `help()`
+
+### Advanced Topics
+
+#### Ratio of Colonies to Remote Mining, Source Keeper Mining
+
+CPU optimization and spawn burden (spawn time, spawn amounts, and energy requirements) are a constant focus for the development of this code base. With that said, a lot of focus goes into population balancing to ensure colonies and mining rooms are fully functional but that colonies and creeps are maximizing their potential. Although the code base takes measures to save CPU when running on a low CPU bucket, it is best to keep the CPU bucket full by not over-reaching your colonies' abilities for spawning and CPU usage. The easiest way to balance CPU and spawn burden is to only set up a certain amount of remote mining rooms per colony based on RCL. The following ratios are shown to work best:
+
+- Per RCL 3-6 colony (1 spawn): 2 (2 source) - 3 (1 source) remote mining
+- Per RCL 7 colony (2 spawns): 3 (2 source) - 4 (1 source) remote mining
+- Per RCL 3-6 colony (3 spawns): 4 (2 source) - 5 (1 source) remote mining; or 2 souce keeper mining with 1 remote mining
+
+#### Custom Populations
+
+When implementing a specific room population, it is best to use the original population object from populations.js or populations.combat.js as a template to modify. Body types and classes can be modified, but *not all classes are implemented for all sites*. For example, mining rooms may not know what to do with a dismantler or a bulldozer creep. This is because different types of rooms use different body types for different functions and implement them differently. If you have trouble with a creep's behavior in a custom set population, feel free to ask the developers for possible updates or implementations.
+
+The following are classes and body types. Note: you can specify any body in the population object for any class without worrying about implementation, so long as they have the proper body parts (you cannot use a healer body to carry energy, but you can use an all-terrain carrier body for a regular carrier class/role). The default matches between class/role and body type is designed to be most effective without needing to be otherwise specified.
+
+- "scout" class; body: "scout", "tank"
+- "worker" class; body: "worker", "worker\_at", "multirole"
+- "mining" class (includes burrowing, carrying, or combination miner);     body: "burrower", "burrower\_at", "worker", "worker\_at", "carrier", "carrier\_at"
+- "courier" class; body: "carrier", "carrier\_at"
+- "extracter" class; body: "extractor", "extractor\_rem", "worker", "worker\at"
+- "reserver" class; body: "reserver", "reserver\_at"
+- "colonizer" class; body: "reserver", "reserver\_at"
+- "soldier" class; body: "soldier", "brawler", "paladin", "tank", "multirole"
+- "archer" class; body: "archer", "ranger"
+- "dismantler" class; body: "dismantler", "bulldozer", "worker", "worker\_at"
+- "healer" class; body: "healer"

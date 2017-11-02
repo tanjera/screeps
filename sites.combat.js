@@ -77,7 +77,7 @@ module.exports = {
 				Memory["hive"]["spawn_requests"].push({ 
 					room: rmColony, 
 					listRooms: listSpawnRooms, 
-					priority: 0, 
+					priority: 20, 
 					level: _.get(listArmy, [role, "level"], rmLevel),
 					scale: false,
 					body: _.get(listArmy, [role, "body"], role), 

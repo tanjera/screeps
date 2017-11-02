@@ -112,33 +112,36 @@ let Hive = {
 		let _Compile = require("tasks.compile");
 
 		// Initiates cycle structure if non-existant (between last finish and new start)
+		// Runs through all tasks within 50 ticks; if finished before 50 ticks, "holdover" to refill bucket for remainder
 		if (!_.get(Memory, ["hive", "pulses", "tasks", "cycle"])
 				|| !_.get(Memory, ["hive", "pulses", "tasks", "cycle", "list"]))
 			_.set(Memory, ["hive", "pulses", "tasks", "cycle"], {
 				iterate: 0, 
 				batch: Math.max(1, Math.round(_.keys(Game.rooms).length / 50)),
-				list: _.keys(Game.rooms)
+				list: _.keys(Game.rooms),
+				holdover: (50 - Math.ceil(_.keys(Game.rooms).length / Math.max(1, Math.round(_.keys(Game.rooms).length / 50))))
 		});
 
 		let list = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "list"]);
 		let batch = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "batch"], 1);
 		let iterate = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "iterate"], 0);
+		let holdover = _.get(Memory, ["hive", "pulses", "tasks", "cycle", "holdover"], 0);
 		
-		for (let i = 0; i < batch && (iterate + i) < list.length; i++) {
-			let room = _.get(list, iterate + i);
-			if (room != null && _.get(Game, ["rooms", room]) != null) {
-				_.set(Memory, ["rooms", room, "tasks", "list"], new Object());
-				_.set(Memory, ["rooms", room, "tasks", "running"], new Object());
-				_Compile.compileTasks(room);
-			}
-		}
-		
-		// Iterate, then check if iteration is complete (and reset cycles)
-		iterate += batch;
-		if (iterate >= list.length)
+		if (iterate < list.length) {
+			for (let i = 0; i < batch && (iterate + i) < list.length; i++) {
+				let room = _.get(list, iterate + i);
+				if (room != null && _.get(Game, ["rooms", room]) != null) {
+					_.set(Memory, ["rooms", room, "tasks", "list"], new Object());
+					_.set(Memory, ["rooms", room, "tasks", "running"], new Object());
+					_Compile.compileTasks(room);
+				}
+			}		
+			_.set(Memory, ["hive", "pulses", "tasks", "cycle", "iterate"], iterate + batch);
+		} else if (iterate >= list.length && holdover > 0) {
+			_.set(Memory, ["hive", "pulses", "tasks", "cycle", "holdover"], holdover - 1);
+		} else if (iterate >= list.length && holdover <= 0) {
 			delete Memory["hive"]["pulses"]["tasks"]["cycle"];
-		else
-			_.set(Memory, ["hive", "pulses", "tasks", "cycle", "iterate"], iterate);
+		}
 
 		_CPU.End("Hive", "initTasks");
 	},

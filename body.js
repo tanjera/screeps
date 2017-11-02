@@ -30,6 +30,7 @@ module.exports = {
             case "paladin": return this.getBody_Paladin(level);
             case "tank": return this.getBody_Tank(level);
             case "archer": return this.getBody_Archer(level);
+            case "ranger": return this.getBody_Ranger(level);
             case "healer": return this.getBody_Healer(level);            
             case "dismantler": return this.getBody_Dismantler(level);
             case "bulldozer": return this.getBody_Bulldozer(level);
@@ -46,7 +47,7 @@ module.exports = {
 
             case "worker": return this.getBody_Worker(level);
 			case "worker_at": return this.getBody_Worker_AT(level);            
-            case "courier": return this.getBody_Carrier(level);            
+            case "courier": return this.getBody_Carrier(level);
         }
     },
     
@@ -131,7 +132,7 @@ module.exports = {
         switch (level) {
             default:
 				return this.getBody_Soldier(level);
-            case 7: case 8:
+            case 8:
                 return [ // 4450 energy, 25x MOVE, 5x RANGED_ATTACK, 15x ATTACK, 5x HEAL
                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
 						MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
@@ -258,6 +259,23 @@ module.exports = {
                         RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
                         RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
                         RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
+        }
+    },
+    
+    getBody_Ranger: function(level) {
+        switch (level) {
+            default:
+                return this.getBody_Archer(level);    
+            case 8:
+                return [ // 4800 energy, 5x TOUGH, 25x MOVE, 15x RANGED_ATTACK, 5x HEAL, 
+                        TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, 
+                        MOVE, MOVE, MOVE, MOVE, MOVE,
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
+                        RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, 
+                        HEAL, HEAL, HEAL, HEAL, HEAL];
         }
 	},
 

@@ -1,9 +1,10 @@
 # Implemented, Needs Debugging/Testing	
 - guardian room healers roles working as intended?
-- source keeper mining working properly?
 - sites.combat tactic "dismantle"
+- ranger role?
 
 # Implementing...
+- After task compiling cycle complete, if completed in < 50 ticks, pause/countdown remaining ticks to 50 without compiling (refill bucket)
 
 
 # To Implement

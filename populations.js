@@ -104,7 +104,7 @@ R1: {
 			multirole: {level: 4, amount: 1, body: "worker_at"},
 			reserver:  {level: 4, amount: 2, body: "reserver_at"} },
 	7: {	burrower:  {level: 6, amount: 1, body: "burrower_at"},
-			carrier:   {level: 7, amount: 2, body: "carrier_at"},
+			carrier:   {level: 6, amount: 2, body: "carrier_at"},
 			multirole: {level: 5, amount: 1, body: "worker_at"},
 			reserver:  {level: 7, amount: 1, body: "reserver_at"} },
 	8: {    burrower:  {level: 6, amount: 1, body: "burrower_at"},
@@ -133,7 +133,7 @@ R2: {
 			multirole: {level: 4, amount: 1, body: "worker_at"},
 			reserver:  {level: 4, amount: 2, body: "reserver_at"} },
 	7: {	burrower:  {level: 7, amount: 1, body: "burrower_at"},
-			carrier:   {level: 7, amount: 3, body: "carrier_at"},
+			carrier:   {level: 6, amount: 3, body: "carrier_at"},
 			multirole: {level: 5, amount: 1, body: "worker_at"},
 			reserver:  {level: 7, amount: 1, body: "reserver_at"} },
 	8: {    burrower:  {level: 7, amount: 1, body: "burrower_at"},
@@ -141,13 +141,8 @@ R2: {
 			multirole: {level: 5, amount: 1, body: "worker_at"},
 			reserver:  {level: 8, amount: 1, body: "reserver_at"} } },
 			
-R2: {
-	1: { },
-	2: { },
-	3: { },
-	4: { },
-	5: { },
-	6: { },
+R3: {	// Sector center mining rooms
+	1: { }, 2: { }, 3: { }, 4: { }, 5: { }, 6: { },
 	7: {	burrower:  {level: 7, amount: 2, body: "burrower_at"},
 			carrier:   {level: 7, amount: 5, body: "carrier_at"},
 			extractor: {level: 7, amount: 2, body: "extractor_rem"},
@@ -161,6 +156,11 @@ SK: {		paladin:   {level: 8, amount: 2, scale: false},
 			healer:	   {level: 4, amount: 1, scale: false},
 			burrower:  {level: 7, amount: 2, body: "burrower_at"},
 			carrier:   {level: 7, amount: 5, body: "carrier_at"},
-			extractor: {level: 7, amount: 2, body: "extractor_rem"},
-			multirole: {level: 5, amount: 1, body: "worker_at"} }
+			extractor: {level: 7, amount: 2, body: "extractor_rem"} },
+
+SK_Alt: {	ranger:    {level: 8, amount: 2, scale: false},
+			healer:	   {level: 4, amount: 1, scale: false},
+			burrower:  {level: 7, amount: 2, body: "burrower_at"},
+			carrier:   {level: 7, amount: 5, body: "carrier_at"},
+			extractor: {level: 7, amount: 2, body: "extractor_rem"} }
 };
