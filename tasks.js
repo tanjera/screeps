@@ -116,11 +116,19 @@ module.exports = {
 		if (isRefueling) {
 			if (this.goToRoom(creep, creep.memory.room, isRefueling))
 				return;
-
-			task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+			
+			if (_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false)) {
+				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
+					t => { return (t.type == "energy" || t.type == "energy-critical") && t.resource == "energy"						
+						&& _.get(t, "creeps") > 0; }),
+					t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }));
+			} else {
+				task = _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
 					t => { return t.type == "energy" && t.resource == "energy"						
 						&& _.get(t, "creeps") > 0; }),
 					t => { return creep.pos.getRangeTo(_.get(t, ["pos", "x"]), _.get(t, ["pos", "y"])); }));
+			}
+
 			if (task != null) {
 				this.giveTask(creep, task);
 				return;

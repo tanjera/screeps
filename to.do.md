@@ -4,7 +4,7 @@
 - ranger role?
 
 # Implementing...
-- After task compiling cycle complete, if completed in < 50 ticks, pause/countdown remaining ticks to 50 without compiling (refill bucket)
+- on critical downgrade, allow workers to pull energy from storage
 
 
 # To Implement
