@@ -464,7 +464,10 @@ module.exports = {
 									key: `industry:withdraw-${mineral}-${lab.id}`, room: rmColony,
 									type: "industry", subtype: "withdraw", resource: mineral,
 									id: lab.id, pos: lab.pos, timer: 60, creeps: 10, priority: 2 });
-
+								Tasks.addTask(rmColony, {
+									key: `industry:deposit-${mineral}-${lab.id}`, room: rmColony,
+									type: "industry", subtype: "deposit", resource: mineral,
+									id: storage.id, pos: storage.pos, timer: 60, creeps: 10, priority: 2 });
 							}
 					});
 
