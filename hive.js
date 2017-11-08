@@ -67,10 +67,17 @@ let Hive = {
 			if (!_.has(Game, ["creeps", c])) {
 				if (Memory.creeps[c]["task"] != null) {
 					let task = Memory.creeps[c]["task"];
-					if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
-						delete Memory["rooms"][task.room]["tasks"]["running"][task.key][c];
-				}
-				delete Memory.creeps[c];
+					if (_.get(task, "type") == "industry") {
+						if (_.has(Memory, ["rooms", task.room, "industry", "tasks", "running", task.key]))
+							delete Memory["rooms"][task.room]["industry"]["tasks"]["running"][task.key][c];
+
+					} else {
+						if (_.has(Memory, ["rooms", task.room, "tasks", "running", task.key]))
+							delete Memory["rooms"][task.room]["tasks"]["running"][task.key][c];
+					}
+				task.creeps += 1;
+                }
+		delete Memory.creeps[c];
 		}});
 
 		_.each(Object.keys(Memory.rooms), r => { 

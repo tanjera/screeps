@@ -370,6 +370,8 @@ module.exports = {
 					break;
 
 				case "empty":
+				    storage = Game.rooms[rmColony].storage;
+				    if (storage == null) break;
 					_.forEach(listing["labs"], l => {
 						lab = Game.getObjectById(l);
 						if (lab.mineralAmount > 0) {
@@ -377,6 +379,10 @@ module.exports = {
 								key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
 								type: "industry", subtype: "withdraw", resource: lab.mineralType,
 								id: lab.id, pos: lab.pos, timer: 60, creeps: 10, priority: 2 });
+							Tasks.addTask(rmColony, {
+								key: `industry:deposit-${lab.mineralType}-${lab.id}`, room: rmColony,
+								type: "industry", subtype: "deposit", resource: lab.mineralType,
+								id: storage.id, pos:storage.pos, timer: 60, creeps: 10, priority: 2 });
 						}
 					});
 					break;
@@ -453,12 +459,16 @@ module.exports = {
 								key: `industry:withdraw-${lab.mineralType}-${lab.id}`, room: rmColony,
 								type: "industry", subtype: "withdraw", resource: lab.mineralType,
 								id: lab.id, pos: lab.pos, timer: 60, creeps: 10, priority: 2 });
-						} else if (lab.mineralAmount > lab.mineralCapacity * 0.2) {
-							Tasks.addTask(rmColony, {
-								key: `industry:withdraw-${mineral}-${lab.id}`, room: rmColony,
-								type: "industry", subtype: "withdraw", resource: mineral,
-								id: lab.id, pos: lab.pos, timer: 60, creeps: 10, priority: 2 });
-						}
+							} else if (lab.mineralAmount > lab.mineralCapacity * 0.2) {
+								Tasks.addTask(rmColony, {
+									key: `industry:withdraw-${mineral}-${lab.id}`, room: rmColony,
+									type: "industry", subtype: "withdraw", resource: mineral,
+									id: lab.id, pos: lab.pos, timer: 60, creeps: 10, priority: 2 });
+								Tasks.addTask(rmColony, {
+									key: `industry:deposit-${mineral}-${lab.id}`, room: rmColony,
+									type: "industry", subtype: "deposit", resource: mineral,
+									id: storage.id, pos: storage.pos, timer: 60, creeps: 10, priority: 2 });
+							}
 					});
 
 					break;
