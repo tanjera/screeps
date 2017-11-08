@@ -21,7 +21,6 @@ module.exports.loop = function () {
 
 	Hive.clearDeadMemory();
 	Hive.initMemory();
-	Hive.initTasks();
 	Hive.initLabs();
 	Hive.initVisuals();
 
