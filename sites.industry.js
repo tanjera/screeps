@@ -43,6 +43,8 @@ module.exports = {
 			_CPU.End(rmColony, "Industry-loadNukers");
 
 			_CPU.Start(rmColony, "Industry-createLabTasks");
+			_.set(Memory, ["rooms", rmColony, "industry", "tasks", "list"], new Object());
+			_.set(Memory, ["rooms", rmColony, "industry", "tasks", "running"], new Object());
 			this.createLabTasks(rmColony);
 			_CPU.End(rmColony, "Industry-createLabTasks");
 
