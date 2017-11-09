@@ -47,7 +47,7 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, isRefueling))
+				if (this.goToRoom(creep, creep.memory.room, true))
 					return;
 
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
@@ -68,7 +68,7 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, isRefueling))
+				if (this.goToRoom(creep, creep.memory.room, false))
 					return;
 
 				creep.memory.task = creep.memory.task || creep.getTask_Upgrade(true);
@@ -105,7 +105,7 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, isRefueling))
+				if (this.goToRoom(creep, creep.memory.room, true))
 					return;
 
 				
@@ -132,10 +132,10 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, isRefueling))
+				if (this.goToRoom(creep, creep.memory.room, false))
 					return;
 
-				if (room.energyAvailable < room.energyCapacityAvailable * 0.75) {
+				if (creep.room.energyAvailable < creep.room.energyCapacityAvailable * 0.75) {
 					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Spawns();
 					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Towers();
 				} else {
@@ -189,7 +189,7 @@ module.exports = {
 		} 
 	},
 
-    Extracter: function(creep, isSafe) {
+    Extractor: function(creep, isSafe) {
 		let hostile = isSafe ? null
 			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
 				c => { return c.isHostile(); }}));
@@ -205,7 +205,7 @@ module.exports = {
 					}
 					
 
-					if (this.goToRoom(creep, creep.memory.room, isRefueling))
+					if (this.goToRoom(creep, creep.memory.room, true))
 						return;
 
 					creep.memory.task = creep.memory.task || creep.getTask_Extract();
@@ -221,7 +221,7 @@ module.exports = {
 						return;
 					}
 
-					if (this.goToRoom(creep, creep.memory.room, isRefueling))
+					if (this.goToRoom(creep, creep.memory.room, false))
 						return;
 
 					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");

@@ -281,7 +281,7 @@ module.exports = {
 
 			switch (_.get(creep, ["memory", "role"])) {
 				case "scout": 		Roles.Scout(creep);					break;
-				case "extractor": 	Roles.Extracter(creep, is_safe);	break;
+				case "extractor": 	Roles.Extractor(creep, is_safe);	break;
 				case "reserver": 	Roles.Reserver(creep);				break;
 				case "healer": 		Roles.Healer(creep, true);			break;
 				

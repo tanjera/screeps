@@ -4,8 +4,10 @@ Creep.prototype.runTask = function runTask() {
 	} else if (this.memory.task["timer"] != null) {
 		let task = this.memory.task;
 		task["timer"] = task["timer"] - 1;
-		if (task["timer"] <= 0)
+		if (task["timer"] <= 0) {
+			delete this.memory.task;
 			return;
+		}
 	}
 
 	switch (this.memory.task["subtype"]) {
@@ -29,7 +31,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(obj);
 				return;
 			} else {    // Action takes one tick... task complete... delete task...
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			}
 		}
@@ -42,7 +44,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(obj);
 				return;
 			} else {    // Action takes one tick... task complete... delete task...
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			}
 		}
@@ -99,7 +101,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(obj);
 				return;			
 			} else {
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			}
 		}
@@ -115,7 +117,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(controller);
 				return;
 			} else if (result != OK) {
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			} else { return; }
 		}
@@ -128,7 +130,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(controller);
 				return;
 			} else if (result != OK) {
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			} else { return; }
 		}
@@ -140,7 +142,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(structure);
 				return;
 			} else if (result != OK || structure.hits == structure.hitsMax) {
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			} else { return; }
 		}
@@ -152,7 +154,7 @@ Creep.prototype.runTask = function runTask() {
 				this.travelTask(structure);
 				return;
 			} else if (result != OK) {
-				this.finishedTask();
+				delete this.memory.task;
 				return;
 			} else { return; }
 		}
@@ -167,7 +169,7 @@ Creep.prototype.runTask = function runTask() {
 						this.travelTask(target);
 						return;
 					} else {
-						this.finishedTask();
+						delete this.memory.task;
 						return;
 					}
 					return;
@@ -181,7 +183,7 @@ Creep.prototype.runTask = function runTask() {
 							this.travelTask(target);
 							return;
 						} else {
-							this.finishedTask();
+							delete this.memory.task;
 							return;
 						}
 					}
@@ -193,7 +195,7 @@ Creep.prototype.runTask = function runTask() {
 
 
 Creep.prototype.getTask_Boost = function getTask_Boost () {
-	if (creep.ticksToLive < 1250)
+	if (this.ticksToLive < 1250)
 		return null;
 // TO DO FROM INDUSTRY
 };
@@ -402,8 +404,8 @@ Creep.prototype.getTask_Deposit_Spawns = function getTask_Deposit_Spawns () {
 					type: "carry",
 					subtype: "deposit",
 					resource: "energy",
-					id: spawns_ext.id,
-					pos: spawns_ext.pos,
+					id: spawn_ext.id,
+					pos: spawn_ext.pos,
 					timer: 60	
 		};
 	}
