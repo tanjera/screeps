@@ -4,7 +4,8 @@
 - ranger role?
 
 # Implementing...
-- on critical downgrade, allow workers to pull energy from storage
+... task system revamp ...
+	- need boost tasks
 
 
 # To Implement

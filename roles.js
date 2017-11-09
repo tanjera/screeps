@@ -135,8 +135,17 @@ module.exports = {
 				if (this.goToRoom(creep, creep.memory.room, isRefueling))
 					return;
 
-				creep.memory.task = creep.memory.task || creep.getTask_Deposit("mineral");
-				creep.memory.task = creep.memory.task || creep.getTask_Deposit("energy");
+				if (room.energyAvailable < room.energyCapacityAvailable * 0.75) {
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Spawns();
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Towers();
+				} else {
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Towers();
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Spawns();
+				}
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Link();
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("energy");
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Container("energy");
 				creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
 				creep.runTask(creep);
@@ -215,7 +224,7 @@ module.exports = {
 					if (this.goToRoom(creep, creep.memory.room, isRefueling))
 						return;
 
-					creep.memory.task = creep.memory.task || creep.getTask_Deposit("mineral");
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");
 					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
 					creep.runTask(creep);

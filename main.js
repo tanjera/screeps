@@ -1,5 +1,7 @@
 require("overload");
 require("overload.creep");
+require("overload.creep.tasks");
+require("overload.creep.travel");
 require("overload.room");
 require("overload.roomposition");
 
