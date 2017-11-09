@@ -43,7 +43,7 @@ module.exports = {
 						key: `work:upgrade-${room.controller.id}`,
 						timer: 60,
 						creeps: 60,
-						priority: 9
+						priority: 10
 					});
 			}
 
@@ -94,7 +94,7 @@ module.exports = {
 							key: `work:repair-${repair_maintenance[i].id}`,
 							timer: 60,
 							creeps: 2,
-							priority: 8
+							priority: 7
 						});
 			} else if (is_safe && (am_owner || repair_maintenance[i].structureType == "road" || repair_maintenance[i].structureType == "container")) {
 				_Tasks.addTask(rmName,
@@ -106,7 +106,7 @@ module.exports = {
 						key: `work:repair-${repair_maintenance[i].id}`,
 						timer: 60,
 						creeps: 2,
-						priority: 10
+						priority: 8
 					});
 			}
 		}
