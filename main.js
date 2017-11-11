@@ -1,5 +1,7 @@
 require("overload");
 require("overload.creep");
+require("overload.creep.tasks");
+require("overload.creep.travel");
 require("overload.room");
 require("overload.roomposition");
 
@@ -21,7 +23,6 @@ module.exports.loop = function () {
 
 	Hive.clearDeadMemory();
 	Hive.initMemory();
-	Hive.initTasks();
 	Hive.initLabs();
 	Hive.initVisuals();
 

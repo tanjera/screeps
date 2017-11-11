@@ -193,35 +193,50 @@ let Blueprint = {
 		*/
 
 		if (level >= 5) {
-			// Only build roads at level 5 to allow extensions, tower, and walls to be built
-			sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "road");
-		
-			// Iterate sources, create one link within 2 tiles of each source and room controller
+			/* Building links... order to build:
+			 * RCL 5 (x2): 1 @ source; 1 @ storage
+			 * RCL 6 (x3): 2 @ sources; 1 @ storage
+			 * RCL 7 (x4): 2 @ sources; 1 @ storage; 1 @ controller
+			 * RCL 8 (x6): 2 @ sources; 2 @ storage; 2 @ controller
+			 * In 1 source rooms, start at controller at 1 RCL lower
+			 */
+
+			let links = _.filter(structures, s => { return s.structureType == "link"; });
 			if (sites < sites_per_room) {
-				let links = _.filter(structures, s => { return s.structureType == "link"; });
-				
-				for (let i = 0; i < sources.length && i < (CONTROLLER_STRUCTURES["link"][room.controller.level] - 1); i++) {
+				// Build links near sources
+				for (let i = 0; i < (level == 5 ? 1 : sources.length); i++) {
 					let source = sources[i];
 					if (sites < sites_per_room && source.pos.findInRange(links, 2).length == 0) {
 						let adj = source.pos.getOpenTile_Path(2);
 						if (adj != null && adj.createConstructionSite("link") == OK) {							
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
-							links.push(new Object());
 							sites += 1;
 						}
 					}
 				};
 
-				if (sites < sites_per_room && links.length < CONTROLLER_STRUCTURES["link"][room.controller.level]
-						&& room.controller.pos.findInRange(links, 2).length < 2) {
+				let cont_links;
+				switch (level) {
+					default: cont_links = 0; break;
+					case 6: cont_links = (sources.length == 1 ? 1 : 0); break;
+					case 7: cont_links = (sources.length == 1 ? 2 : 1); break;
+					case 8: cont_links = 2; break;
+				}
+
+				// Build links near room controller
+				if (sites < sites_per_room && room.controller.pos.findInRange(links, 2).length < cont_links) {
 					let adj = room.controller.pos.getOpenTile_Path(2);
 					if (adj != null && adj.createConstructionSite("link") == OK) {							
 						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
-						links.push(new Object());
 						sites += 1;
 					}
 				}
 			}
+			
+			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "link");
+
+			// Only build roads at level 5 to allow extensions, tower, and walls to be built
+			sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "road");
 		}
 
 		if (level >= 6) {
@@ -247,11 +262,6 @@ let Blueprint = {
 				}
 			}
 			*/
-		}
-
-		if (level >= 7) {
-			// Builds links near storage last (facilitate upgrading controller before filling storage...)
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "link");
 		}
 
 		if (level == 8) {

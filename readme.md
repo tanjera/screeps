@@ -184,7 +184,7 @@ The following are classes and body types. Note: you can specify any body in the 
 - "worker" class; body: "worker", "worker\_at", "multirole"
 - "mining" class (includes burrowing, carrying, or combination miner);     body: "burrower", "burrower\_at", "worker", "worker\_at", "carrier", "carrier\_at"
 - "courier" class; body: "carrier", "carrier\_at"
-- "extracter" class; body: "extractor", "extractor\_rem", "worker", "worker\at"
+- "extractor" class; body: "extractor", "extractor\_rem", "worker", "worker\at"
 - "reserver" class; body: "reserver", "reserver\_at"
 - "colonizer" class; body: "reserver", "reserver\_at"
 - "soldier" class; body: "soldier", "brawler", "paladin", "tank", "multirole"

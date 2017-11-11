@@ -1,5 +1,3 @@
-let Tasks = require("tasks");
-
 module.exports = {
 
 	moveToDestination: function(creep) {
@@ -8,6 +6,14 @@ module.exports = {
 			return true;
 		} else
 			return false;
+	},
+
+	goToRoom: function(creep, room_name, is_refueling) {
+		if (creep.room.name != room_name) {
+			creep.travelToRoom(room_name, is_refueling);
+			return true;
+		}
+		return false;
 	},
 
 	Scout: function(creep) {
@@ -30,36 +36,51 @@ module.exports = {
 	},
 
     Worker: function(creep, isSafe) {
-        let hostile = (isSafe == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return c.isHostile(); }}))
-			: null;
+        let hostile = isSafe ? null
+			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
+				c => { return c.isHostile(); }}));
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
 				if (_.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "working";
-					Tasks.returnTask(creep);
 					return;
 				}
 
-				Tasks.assignTask(creep, true);
-				if (creep.runTaskTimer(creep)) {
-					creep.runTask(creep);
-				}
+				if (this.goToRoom(creep, creep.memory.room, true))
+					return;
+
+				creep.memory.task = creep.memory.task || creep.getTask_Boost();
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", 
+				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", 
+				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
+				creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
+				creep.memory.task = creep.memory.task || creep.getTask_Mine();
+				creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
+				creep.runTask(creep);
 				return;
 
 			} else if (creep.memory.state == "working") {
-				if (creep.carry[RESOURCE_ENERGY] == 0) {
-						creep.memory.state = "refueling";
-						Tasks.returnTask(creep);
-						return;
-					}
-
-				Tasks.assignTask(creep, false);
-				if (creep.runTaskTimer(creep)) {
-					creep.runTask(creep);
+				if (creep.carry["energy"] == 0) {
+					creep.memory.state = "refueling";
+					return;
 				}
+
+				if (this.goToRoom(creep, creep.memory.room, false))
+					return;
+
+				creep.memory.task = creep.memory.task || creep.getTask_Upgrade(true);
+				creep.memory.task = creep.memory.task || creep.getTask_Sign();
+				creep.memory.task = creep.memory.task || creep.getTask_Repair(true);
+				creep.memory.task = creep.memory.task || creep.getTask_Build();
+				creep.memory.task = creep.memory.task || creep.getTask_Repair(false);
+				creep.memory.task = creep.memory.task || creep.getTask_Upgrade(false);
+				creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
+				creep.runTask(creep);
 				return;
 
 			} else {
@@ -73,37 +94,63 @@ module.exports = {
 	},
 
     Mining: function(creep, isSafe) {
-		let hostile = (isSafe == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return c.isHostile(); }}))
-			: null;
+		let hostile = isSafe ? null
+			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
+				c => { return c.isHostile(); }}));
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
-				if (creep.memory.role != "burrower" 
-						&& creep.carryCapacity > 0 && _.sum(creep.carry) == creep.carryCapacity) {
+				if (creep.memory.role != "burrower" && creep.carryCapacity > 0 
+						&& _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
-					Tasks.returnTask(creep);
 					return;
 				}
 
-				Tasks.assignTask(creep, true);
-				if (creep.runTaskTimer(creep)) {
-					creep.runTask(creep);
+				if (this.goToRoom(creep, creep.memory.room, true))
+					return;
+
+				
+				if (creep.memory.role == "burrower") {
+					creep.memory.task = creep.memory.task || creep.getTask_Mine();
+					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+				
+				} else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
+					creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
+					if (creep.hasPart("work") > 0)
+						creep.memory.task = creep.memory.task || creep.getTask_Mine();
+					creep.memory.task = creep.memory.task || creep.getTask_Pickup("mineral");
+					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 				}
+
+				creep.runTask(creep);
 				return;
 
 			} else if (creep.memory.state == "delivering") {
 				if (creep.carryCapacity == 0 || _.sum(creep.carry) == 0) {
 					creep.memory.state = "refueling";
-					Tasks.returnTask(creep);
 					return;
 				}
 
-				Tasks.assignTask(creep, false);
-				if (creep.runTaskTimer(creep)) {
-					creep.runTask(creep);
+				if (this.goToRoom(creep, creep.memory.colony, false))
+					return;
+
+				if (creep.room.energyAvailable < creep.room.energyCapacityAvailable * 0.75) {
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Spawns();
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Towers();
+				} else {
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Towers();
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Spawns();
 				}
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Link();
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("energy");
+				creep.memory.task = creep.memory.task || creep.getTask_Deposit_Container("energy");
+				creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
+				creep.runTask(creep);
 				return;
 
 			} else {
@@ -123,27 +170,27 @@ module.exports = {
 		if (creep.memory.state == "loading") {
             if (_.sum(creep.carry) > 0) {
                 creep.memory.state = "delivering";
-                Tasks.returnTask(creep);
                 return;
             }
+			
+			creep.memory.task = creep.memory.task || creep.getTask_Industry_Withdraw();
+			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
-            Tasks.assignTask(creep, true);
-            if (creep.runTaskTimer(creep)) {
-                creep.runTask(creep);
-            }
+            creep.runTask(creep);
             return;
 
         } else if (creep.memory.state == "delivering") {
             if (_.sum(creep.carry) == 0) {
                     creep.memory.state = "loading";
-                    Tasks.returnTask(creep);
                     return;
                 }
 
-            Tasks.assignTask(creep, false);
-            if (creep.runTaskTimer(creep)) {
-                creep.runTask(creep);
-            }
+			creep.memory.task = creep.memory.task || creep.getTask_Industry_Deposit();
+			creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");
+			creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("energy");
+			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
+            creep.runTask(creep);
             return;
 
         } else {
@@ -152,11 +199,10 @@ module.exports = {
 		} 
 	},
 
-    Extracter: function(creep, isSafe) {
-		let hostile = (isSafe == true)
-			? _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
-				c => { return c.isHostile(); }}))
-			: null;
+    Extractor: function(creep, isSafe) {
+		let hostile = isSafe ? null
+			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, { filter:
+				c => { return c.isHostile(); }}));
 
 		if (hostile == null) {
 			switch (creep.memory.state) {
@@ -165,29 +211,34 @@ module.exports = {
 					if (_.sum(creep.carry) == creep.carryCapacity
 							|| _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true) == false) {
 						creep.memory.state = "deliver";
-						Tasks.returnTask(creep);
 						return;
 					}
+					
 
-					Tasks.assignTask(creep, true);
-					if (creep.runTaskTimer(creep)) {
-						creep.runTask(creep);
-					}
-				return;
+					if (this.goToRoom(creep, creep.memory.room, true))
+						return;
+
+					creep.memory.task = creep.memory.task || creep.getTask_Extract();
+					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
+					creep.runTask(creep);
+					return;
 
 				case "deliver":
 					if (_.sum(creep.carry) == 0 
 							&& _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true)) {
 						creep.memory.state = "get_minerals";
-						Tasks.returnTask(creep);
 						return;
 					}
 
-					Tasks.assignTask(creep, false);
-					if (creep.runTaskTimer(creep)) {
-						creep.runTask(creep);
-					}
-				return;
+					if (this.goToRoom(creep, creep.memory.colony, false))
+						return;
+
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");
+					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
+					creep.runTask(creep);
+					return;
 			}
 		} else if (hostile != null) {
 			creep.moveFrom(creep, hostile);

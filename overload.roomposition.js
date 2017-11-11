@@ -77,17 +77,17 @@ RoomPosition.prototype.inRangeToListTargets = function inRangeToListTargets(list
 	return false;
 };
 
-RoomPosition.prototype.getAccessAmount = function getAccessAmount() {
+RoomPosition.prototype.getAccessAmount = function getAccessAmount(creeps_block) {
 	let access = 0;
 	
-	access += new RoomPosition(this.x - 1, 	this.y - 1, 	this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x, 		this.y - 1, 	this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x + 1, 	this.y - 1, 	this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x - 1, 	this.y, 		this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x + 1, 	this.y, 		this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x - 1, 	this.y + 1, 	this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x, 		this.y + 1, 	this.roomName).isWalkable() ? 1 : 0;
-	access += new RoomPosition(this.x + 1, 	this.y + 1, 	this.roomName).isWalkable() ? 1 : 0;
+	access += new RoomPosition(this.x - 1, 	this.y - 1, 	this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x, 		this.y - 1, 	this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x + 1, 	this.y - 1, 	this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x - 1, 	this.y, 		this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x + 1, 	this.y, 		this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x - 1, 	this.y + 1, 	this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x, 		this.y + 1, 	this.roomName).isWalkable(creeps_block) ? 1 : 0;
+	access += new RoomPosition(this.x + 1, 	this.y + 1, 	this.roomName).isWalkable(creeps_block) ? 1 : 0;
 
 	return access;
 };

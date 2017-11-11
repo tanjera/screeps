@@ -352,7 +352,7 @@ module.exports = {
 						case "container":			return 1; 
 						case "road":				return 2;
 						case "rampart": 
-						case "constructedWall":		return 3;						
+						case "constructedWall":		return 3;
 					}}));
 					
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], _.get(repair, "id"));
