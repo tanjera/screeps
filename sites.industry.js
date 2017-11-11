@@ -606,7 +606,7 @@ module.exports = {
 							+ `${amount} of ${res} ${rmColony} -> ${order["room"]} (code: ${result})`);
 					}
 				} else {
-					if (storage != null && storage.store["energy"] > 0) {
+					if (storage != null && storage.store["energy"] > room.getCriticalEnergy()) {
 						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: "energy", id: storage.id, timer: 60, priority: 5 },
 							{ type: "deposit", resource: "energy", id: terminal.id, timer: 60, priority: 5 });
@@ -636,6 +636,7 @@ module.exports = {
 
 		let o = order["name"];
 		let res = order["resource"];
+		let room = Game.rooms[rmColony];
 		let amount = Math.max(100, Math.min(_.get(Memory, ["resources", "terminal_orders", o, "amount"]), 2000));
 		let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 
@@ -661,7 +662,7 @@ module.exports = {
 					+ ` ${amount} of ${res} ${order["room"]} -> ${rmColony} (code: ${result})`);
 			}
 		} else {
-			if (storage != null && storage.store["energy"] > 0) {
+			if (storage != null && storage.store["energy"] > room.getCriticalEnergy()) {
 				filling.push("energy");
 
 				Memory.rooms[rmColony].industry.tasks.push(

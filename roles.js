@@ -100,8 +100,8 @@ module.exports = {
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
-				if (creep.memory.role != "burrower" 
-						&& creep.carryCapacity > 0 && _.sum(creep.carry) == creep.carryCapacity) {
+				if (creep.memory.role != "burrower" && creep.carryCapacity > 0 
+						&& _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
 					return;
 				}
@@ -116,6 +116,7 @@ module.exports = {
 				
 				} else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
 					if (creep.hasPart("work") > 0)
@@ -133,7 +134,7 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, false))
+				if (this.goToRoom(creep, creep.memory.colony, false))
 					return;
 
 				if (creep.room.energyAvailable < creep.room.energyCapacityAvailable * 0.75) {
@@ -230,7 +231,7 @@ module.exports = {
 						return;
 					}
 
-					if (this.goToRoom(creep, creep.memory.room, false))
+					if (this.goToRoom(creep, creep.memory.colony, false))
 						return;
 
 					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");

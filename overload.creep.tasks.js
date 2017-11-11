@@ -93,7 +93,8 @@ Creep.prototype.runTask = function runTask() {
 			} else if (result == ERR_NOT_IN_RANGE) {
 				if (this.memory.role == "burrower" && this.carry["energy"] > 0)
 					this.drop("energy");
-				this.travelTask(obj);
+				if (this.travelTask(obj) == ERR_NO_PATH)
+					delete this.memory.task;	
 				return;			
 			} else {
 				delete this.memory.task;
@@ -201,7 +202,7 @@ Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link () {
 		return;
 
 	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => { 
-		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) < 6
+		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) < 10
 			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]), 
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "receive"; }); }));
 
@@ -288,7 +289,7 @@ Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link () {
 		return;
 
 	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => { 
-		return s.structureType == "link" && s.energy < (s.energyCapacity * 0.8) && this.pos.getRangeTo(s.pos) < 6
+		return s.structureType == "link" && s.energy < (s.energyCapacity * 0.8) && this.pos.getRangeTo(s.pos) < 3
 			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]), 
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "send"; }); }));
 
@@ -456,13 +457,13 @@ Creep.prototype.getTask_Sign = function getTask_Sign () {
 	if (is_safe && sign_room != null && _.get(this.room, ["controller", "sign", "text"]) != sign_room) {
 		return {	type: "sign",
 					message: sign_room,
-					id: room.controller.id,
+					id: this.room.controller.id,
 					timer: 60
 				};
-	} else if (is_safe && sign_room == null && sign_default != null && _.get(room, ["controller", "sign", "text"]) != sign_default) {
+	} else if (is_safe && sign_room == null && sign_default != null && _.get(this.room, ["controller", "sign", "text"]) != sign_default) {
 		return {	type: "sign",
 					message: sign_default,
-					id: room.controller.id,
+					id: this.room.controller.id,
 					timer: 60
 				};
 	}

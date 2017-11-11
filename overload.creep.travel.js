@@ -213,20 +213,26 @@ Creep.prototype.travelTask = function travelTask (dest) {
 };
 
 Creep.prototype.travelTask_Burrower = function travelTask_Burrower () {
+	let result;
+
 	if (_.get(this.memory.task, "container") != null) {
 		let container = Game.getObjectById(this.memory.task["container"]);
 		if (container != null) {
 			let cont_cr = _.head(container.pos.lookFor(LOOK_CREEPS));
 			if (_.get(cont_cr, ["memory", "role"]) != "burrower")
-				return this.travel(container.pos);
+				result = this.travel(container.pos);
+			if (result == OK)
+				return result;
 		}
-	} else {
-		let position = new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);
-		let pos_cr = _.head(position.lookFor(LOOK_CREEPS));
-		if (_.get(pos_cr, ["memory", "role"]) != "burrower")
-			return this.travel(position);		
 	}
 
+	let position = new RoomPosition(this.memory.task["pos"].x, this.memory.task["pos"].y, this.memory.task["pos"].roomName);
+	let pos_cr = _.head(position.lookFor(LOOK_CREEPS));
+	if (_.get(pos_cr, ["memory", "role"]) != "burrower")
+		result = this.travel(position);
+	if (result == OK)
+		return OK;
+	
 	let source = Game.getObjectById(this.memory.task["id"]);
 	return this.travel(source.pos);
 };

@@ -77,13 +77,14 @@ let Hive = {
 	initMemory: function() {
 		_CPU.Start("Hive", "initMemory");
 
+		// Use odd intervals or odd numbers to prevent stacking multiple pulses on one tick
 		this.setPulse("defense", 4, 8);
-		this.setPulse("short", 10, 60);
-		this.setPulse("mid", 20, 90);
-		this.setPulse("long", 50, 200);
-		this.setPulse("spawn", 15, 30);
-		this.setPulse("lab", 2000, 2000);
-		this.setPulse("blueprint", 100, 500);
+		this.setPulse("short", 9, 60);
+		this.setPulse("mid", 19, 90);
+		this.setPulse("long", 49, 200);
+		this.setPulse("spawn", 14, 30);
+		this.setPulse("lab", 1999, 2000);
+		this.setPulse("blueprint", 99, 500);
 			
 		if (_.get(Memory, ["rooms"]) == null) _.set(Memory, ["rooms"], new Object());
 		if (_.get(Memory, ["hive", "allies"]) == null) _.set(Memory, ["hive", "allies"], new Array());
