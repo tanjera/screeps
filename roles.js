@@ -170,7 +170,10 @@ module.exports = {
                 creep.memory.state = "delivering";
                 return;
             }
-// TO DO
+			
+			creep.memory.task = creep.memory.task || creep.getTask_Industry_Withdraw();
+			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
             creep.runTask(creep);
             return;
 
@@ -179,7 +182,12 @@ module.exports = {
                     creep.memory.state = "loading";
                     return;
                 }
-// TO DO
+
+			creep.memory.task = creep.memory.task || creep.getTask_Industry_Deposit();
+			creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("mineral");
+			creep.memory.task = creep.memory.task || creep.getTask_Deposit_Storage("energy");
+			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
+
             creep.runTask(creep);
             return;
 

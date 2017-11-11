@@ -10,7 +10,7 @@ Creep.prototype.runTask = function runTask() {
 		}
 	}
 
-	switch (this.memory.task["subtype"]) {
+	switch (this.memory.task["type"]) {
 		case "wait":
 			this.travelTask(null);
 			return;
@@ -211,13 +211,10 @@ Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link () {
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "receive"; }); }));
 
 	if (link != null) {
-		return {	room: this.room.name,
-					type: "energy",
-					subtype: "withdraw",
+		return {	type: "withdraw",
 					structure: "link",
 					resource: "energy",
 					id: link.id,
-					pos: link.pos,
 					timer: 60
 		};
 	}
@@ -236,12 +233,9 @@ Creep.prototype.getTask_Withdraw_Storage = function getTask_Withdraw_Storage (re
 	else
 		return;
 
-	return {	room: this.room.name,
-				type: "energy",
-				subtype: "withdraw",
+	return {	type: "withdraw",
 				resource: resource,
 				id: this.room.storage.id,
-				pos: this.room.storage.pos,
 				timer: 60
 	};
 };
@@ -257,12 +251,9 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 			s => { return _.get(s, ["store", resource], 0) > 0; }));
 
 		if (cont != null) {
-			return {	room: this.room.name,
-						type: "energy",
-						subtype: "withdraw",
+			return {	type: "withdraw",
 						resource: resource,
 						id: cont.id,
-						pos: cont.pos,
 						timer: 60
 			};
 		}
@@ -285,12 +276,9 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 			s => { return this.pos.getRangeTo(s.pos); }));
 
 		if (cont != null) {
-			return {	room: this.room.name,
-						type: "energy",
-						subtype: "withdraw",
+			return {	type: "withdraw",
 						resource: "energy",
 						id: cont.id,
-						pos: cont.pos,
 						timer: 60
 			};
 		}
@@ -310,12 +298,9 @@ Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link () {
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "send"; }); }));
 
 	if (link != null) {
-		return {	room: this.room.name,
-					type: "carry",
-					subtype: "deposit",
+		return {	type: "deposit",
 					resource: "energy",
 					id: link.id,
-					pos: link.pos,
 					timer: 60,
 		};
 	}
@@ -335,12 +320,9 @@ Creep.prototype.getTask_Deposit_Storage = function getTask_Deposit_Storage (reso
 	else
 		return;
 
-	return {	room: this.room.name,
-				type: "carry",
-				subtype: "deposit",
+	return {	type: "deposit",
 				resource: resource,
 				id: this.room.storage.id,
-				pos: this.room.storage.pos,
 				timer: 60,
 	};
 };
@@ -358,12 +340,9 @@ Creep.prototype.getTask_Deposit_Container = function getTask_Deposit_Container (
 		return;
 
 	if (cont != null) {
-		return {	room: this.room.name,
-					type: "carry",
-					subtype: "deposit",
+		return {	type: "deposit",
 					resource: resource,
 					id: cont.id,
-					pos: cont.pos,
 					timer: 60,
 		};
 	}
@@ -378,13 +357,10 @@ Creep.prototype.getTask_Deposit_Towers = function getTask_Deposit_Towers () {
 		s => { return s.energy; }));
 
 	if (tower != null) {
-		return {	room: this.room.name,
-					type: "carry",
-					subtype: "deposit",
+		return {	type: "deposit",
 					structure: "tower",
 					resource: "energy",
 					id: tower.id,
-					pos: tower.pos,
 					timer: 60
 		};
 	}
@@ -400,12 +376,9 @@ Creep.prototype.getTask_Deposit_Spawns = function getTask_Deposit_Spawns () {
 			|| (s.structureType == "extension" && s.energy < s.energyCapacity); }));
 
 	if (spawn_ext != null) {
-		return {	room: this.room.name,
-					type: "carry",
-					subtype: "deposit",
+		return {	type: "deposit",
 					resource: "energy",
 					id: spawn_ext.id,
-					pos: spawn_ext.pos,
 					timer: 60	
 		};
 	}
@@ -423,12 +396,9 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup (resource) {
 			r => { return -r.amount; }));
 
 		if (pile != null) {
-			return {	room: this.room.name,
-						type: "carry",
-						subtype: "pickup",
+			return {	type: "pickup",
 						resource: "mineral",
 						id: pile.id,
-						pos: pile.pos,
 						timer: 30,
 			};
 		}
@@ -449,12 +419,9 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup (resource) {
 			r => { return -r.amount; }));
 
 		if (pile != null) {
-			return {	room: this.room.name,
-						type: "carry",
-						subtype: "pickup",
+			return {	type: "pickup",
 						resource: "energy",
 						id: pile.id,
-						pos: pile.pos,
 						timer: 30,
 			};
 		}
@@ -466,9 +433,7 @@ Creep.prototype.getTask_Upgrade = function getTask_Upgrade (only_critical) {
 		return;
 
 	if ((only_critical || only_critical == null) && _.get(this.room, ["controller", "ticksToDowngrade"]) <= 3500) {
-		return  {   room: this.room.name,
-					type: "work",
-					subtype: "upgrade",
+		return  {   type: "upgrade",
 					id: this.room.controller.id,
 					pos: this.room.controller.pos.getOpenTile_Range(2, true),
 					timer: 60
@@ -476,9 +441,7 @@ Creep.prototype.getTask_Upgrade = function getTask_Upgrade (only_critical) {
 	}
 	
 	if ((!only_critical || only_critical == null) && _.get(this.room, ["controller", "ticksToDowngrade"]) > 3500) {
-		return  {   room: this.room.name,
-					type: "work",
-					subtype: "upgrade",
+		return  {   type: "upgrade",
 					id: this.room.controller.id,
 					pos: this.room.controller.pos.getOpenTile_Range(2, true),
 					timer: 60
@@ -495,21 +458,15 @@ Creep.prototype.getTask_Sign = function getTask_Sign () {
 	let is_safe = _.get(Memory, ["rooms", this.room.name, "defense", "is_safe"]);
 
 	if (is_safe && sign_room != null && _.get(this.room, ["controller", "sign", "text"]) != sign_room) {
-		return {	room: this.room.name,
-					type: "work",
-					subtype: "sign",
+		return {	type: "sign",
 					message: sign_room,
 					id: room.controller.id,
-					pos: room.controller.pos,
 					timer: 60
 				};
 	} else if (is_safe && sign_room == null && sign_default != null && _.get(room, ["controller", "sign", "text"]) != sign_default) {
-		return {	room: this.room.name,
-					type: "work",
-					subtype: "sign",
+		return {	type: "sign",
 					message: sign_default,
 					id: room.controller.id,
-					pos: room.controller.pos,
 					timer: 60
 				};
 	}
@@ -519,11 +476,8 @@ Creep.prototype.getTask_Repair = function getTask_Repair (only_critical) {
 	if (only_critical == null || only_critical == true) {
 		let repair_critical = _.get(this.room.findRepair_Critical());
 		if (repair_critical != null)
-			return {	room: this.room.name,
-						type: "work",
-						subtype: "repair",
+			return {	type: "repair",
 						id: repair_critical.id,
-						pos: repair_critical.pos,
 						timer: 60
 					};
 	}
@@ -531,11 +485,8 @@ Creep.prototype.getTask_Repair = function getTask_Repair (only_critical) {
 	if (only_critical == null || only_critical == false) {
 		let repair_maintenance = _.head(this.room.findRepair_Maintenance());
 		if (repair_maintenance != null)
-			return {	room: this.room.name,
-						type: "work",
-						subtype: "repair",
+			return {	type: "repair",
 						id: repair_maintenance.id,
-						pos: repair_maintenance.pos,
 						timer: 60,
 					};
 	}
@@ -562,11 +513,8 @@ Creep.prototype.getTask_Build = function getTask_Build () {
 		}));
 
 	if (site != null)
-		return {	room: this.room.name,
-					type: "work",
-					subtype: "build",
+		return {	type: "build",
 					id: site.id,
-					pos: site.pos,
 					timer: 60
 				};
 };
@@ -597,9 +545,7 @@ Creep.prototype.getTask_Mine = function getTask_Mine () {
 	position = position || source.pos.getOpenTile_Adjacent(false);
 	position = position || source.pos;
 	
-	return {	room: this.room.name,
-				type: "mine",
-				subtype: "harvest",
+	return {	type: "harvest",
 				resource: "energy",
 				id: source.id,
 				pos: position,
@@ -618,21 +564,30 @@ Creep.prototype.getTask_Extract = function getTask_Extract () {
 	}));
 
 	if (mineral != null) {
-		return {	room: this.room.name,
-					type: "mine",
-					subtype: "harvest",
+		return {	type: "harvest",
 					resource: "mineral",
 					id: mineral.id,
-					pos: mineral.pos,
 					timer: 100
 		};
 	}
 };
 
+Creep.prototype.getTask_Industry_Withdraw = function getTask_Industry_Withdraw () {
+	return _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", this.room.name, "industry", "tasks"]),
+		t => { return t.type == "withdraw"; }),
+		t => { return t.priority; }));
+};
+
+Creep.prototype.getTask_Industry_Deposit = function getTask_Industry_Deposit () {
+	let res = _.head(_.sortBy(Object.keys(this.carry), (c) => { return -this.carry[c]; }));
+	return _.head(_.sortBy(_.filter(_.get(Memory, ["rooms", this.room.name, "industry", "tasks"]),
+			t => { return t.type == "deposit" && t.resource == res; }),
+			t => { return t.priority; }));
+
+};
+
 Creep.prototype.getTask_Wait = function getTask_Wait (ticks) {
-	return {	room: this.room.name,
-				type: "wait",
-				subtype: "wait",
+	return {	type: "wait",
 				timer: ticks || 10
 	};
 };

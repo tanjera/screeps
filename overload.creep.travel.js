@@ -203,13 +203,13 @@ Creep.prototype.travelTask = function travelTask (dest) {
 		return this.travel(pos);
 	else if (dest != null)
 		return this.travel(dest);
-	else if (_.get(this, ["memory", "task", "area", "pos"]) != null) {
-		let area = new RoomPosition(this.memory.task.area["pos"].x, this.memory.task.area["pos"].y, this.memory.task.area["pos"].roomName);	
-		if (!this.pos.inRangeTo(area, _.get(this, ["memory", "task", "area", "range"], 1)))
-			return this.travel(area);
-		else
-			return OK;
+	else if (_.get(this, ["memory", "task", "id"]) != null) {
+		let obj = Game.getObjectById(_.get(this, ["memory", "task", "id"]));
+		if (obj != null)
+			return this.travel(obj);
 	}
+
+	return ERR_NO_PATH;
 };
 
 Creep.prototype.travelTask_Burrower = function travelTask_Burrower () {
