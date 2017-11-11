@@ -2,7 +2,6 @@ require("populations");
 
 let Roles = require("roles");
 let Hive = require("hive");
-let Tasks = require("tasks");
 
 let _CPU = require("util.cpu");
 

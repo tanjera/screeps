@@ -1,5 +1,3 @@
-let Tasks = require("tasks");
-
 module.exports = {
 	
 	acquireBoost: function(creep) {
