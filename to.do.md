@@ -3,16 +3,13 @@
 - sites.combat tactic "dismantle"
 - ranger role?
 
+
+
 # Implementing...
-... task system revamp ...
-- fix link build locations
-	- energy pulling? should carriers pull from containers (filter: distance?) or storage first...
-		** have burrowers pull energy from container and dump into link...!!
-		** create link in base sooner, before creating link @ controller?
-	- searching for boosts to pull from industry boost list
-	- test:
-		- industry task completion (terminal orders, lab tasks)
-		- critical downgrade condition
+** test critical downgrade condition
+- have burrowers pull energy from container and dump into link...!!
+- searching for boosts to pull from industry boost list
+
 
 
 # To Implement

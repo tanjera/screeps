@@ -109,16 +109,23 @@ module.exports = {
 				if (this.goToRoom(creep, creep.memory.room, true))
 					return;
 
-				
 				if (creep.memory.role == "burrower") {
 					creep.memory.task = creep.memory.task || creep.getTask_Mine();
 					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
-				
+
 				} else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
-					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
-					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
+
+					let energy_level = _.get(Memory, ["rooms", creep.room.name, "survey", "energy_level"]);
+					if (energy_level == CRITICAL || energy_level == LOW) {	
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);						
+					} else {						
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
+					}
+					
 					if (creep.hasPart("work") > 0)
 						creep.memory.task = creep.memory.task || creep.getTask_Mine();
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("mineral");
