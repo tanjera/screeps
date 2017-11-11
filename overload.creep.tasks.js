@@ -162,6 +162,11 @@ Creep.prototype.runTask = function runTask() {
 				default:
 				case "energy":
 					if (target != null && this.transfer(target, this.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
+						if (_.get(target, "energy") != null && _.get(target, "energy") == _.get(target, "energyCapacity")) {
+							delete this.memory.task;
+							return;
+						}
+
 						this.travelTask(target);
 						return;
 					} else {
@@ -202,7 +207,7 @@ Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link () {
 		return;
 
 	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => { 
-		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) < 10
+		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) <= 12
 			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]), 
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "receive"; }); }));
 
