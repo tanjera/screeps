@@ -53,11 +53,7 @@ Creep.prototype.runTask = function runTask() {
 			let obj = Game.getObjectById(this.memory.task["id"]);			
 			
 			let result = this.harvest(obj);
-			if (result == OK || result == ERR_TIRED) {
-				if (Game.time % 10 == 0) {
-					this.travelTask(obj);
-				}
-
+			if (result == OK) {
 				let interval = 3;
 				if (Game.time % interval == 0) {
 					// Burrower fill adjacent link if possible; also fill adjacent container
@@ -93,7 +89,6 @@ Creep.prototype.runTask = function runTask() {
 						
 					}
 				}
-				
 				return;
 			} else if (result == ERR_NOT_IN_RANGE) {
 				if (this.memory.role == "burrower" && this.carry["energy"] > 0)
@@ -265,7 +260,7 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 		let am_owner = _.get(this.room, ["controller", "my"], false);
 		let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);
 		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
-			? (am_owner ? this.room.controller.getLevel() : 0)
+			? (am_owner ? this.room.getLevel() : 0)
 			: Game.rooms[mining_colony].getLevel();
 		let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
 			? [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ]
@@ -371,9 +366,10 @@ Creep.prototype.getTask_Deposit_Spawns = function getTask_Deposit_Spawns () {
 		return;
 
 
-	let spawn_ext = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => {
+	let spawn_ext = _.head(_.sortBy(_.filter(this.room.find(FIND_MY_STRUCTURES), s => {
 		return (s.structureType == "spawn" && s.energy < s.energyCapacity * 0.85)
-			|| (s.structureType == "extension" && s.energy < s.energyCapacity); }));
+			|| (s.structureType == "extension" && s.energy < s.energyCapacity); }),
+		s => { return this.pos.getRangeTo(s.pos); }));
 
 	if (spawn_ext != null) {
 		return {	type: "deposit",
@@ -408,7 +404,7 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup (resource) {
 		let am_owner = _.get(this.room, ["controller", "my"], false);
 		let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);
 		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
-			? (am_owner ? this.room.controller.getLevel() : 0)
+			? (am_owner ? this.room.getLevel() : 0)
 			: Game.rooms[mining_colony].getLevel();
 		let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
 			? [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ]
@@ -474,7 +470,7 @@ Creep.prototype.getTask_Sign = function getTask_Sign () {
 
 Creep.prototype.getTask_Repair = function getTask_Repair (only_critical) {
 	if (only_critical == null || only_critical == true) {
-		let repair_critical = _.get(this.room.findRepair_Critical());
+		let repair_critical = _.head(this.room.findRepair_Critical());
 		if (repair_critical != null)
 			return {	type: "repair",
 						id: repair_critical.id,
@@ -526,8 +522,11 @@ Creep.prototype.getTask_Mine = function getTask_Mine () {
 	let source = _.head(_.sortBy(_.filter(this.room.find(FIND_SOURCES), 
 		s => { return s.energy > 0; }),
 		s => {
-			return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1), 
-				c => { return c.memory.role == "burrower"; }).length;
+			if (this.memory.role == "burrower") {
+				return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1), 
+					c => { return c.memory.role == "burrower"; }).length;
+			} else
+				return;
 		}));
 
 	if (source == null)

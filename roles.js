@@ -52,11 +52,12 @@ module.exports = {
 
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", 
+				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", 
 				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
-				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", 
-					_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
 				creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
+				creep.memory.task = creep.memory.task || creep.getTask_Mine();
 				creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
 				creep.runTask(creep);
@@ -115,8 +116,8 @@ module.exports = {
 				
 				} else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
-					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
 					if (creep.hasPart("work") > 0)
 						creep.memory.task = creep.memory.task || creep.getTask_Mine();
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("mineral");

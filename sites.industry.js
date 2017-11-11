@@ -93,7 +93,7 @@ module.exports = {
 			return;
 
 		if (nuker.energy < nuker.energyCapacity && _.get(storage, ["store", "energy"], 0) > 0) {
-			Memory.rooms["rmColony"].industry.tasks.push(
+			Memory.rooms[rmColony].industry.tasks.push(
 				{ type: "withdraw", resource: "energy", id: storage.id, timer: 60, priority: 5 },
 				{ type: "deposit", resource: "energy", id: nuker.id, timer: 60, priority: 5 });
 		}
@@ -103,7 +103,7 @@ module.exports = {
 				_.set(Memory, ["rooms", rmColony, "stockpile", "G"], 500)
 
 			if (_.get(storage, ["store", "G"], 0) > 0) {
-				Memory.rooms["rmColony"].industry.tasks.push(
+				Memory.rooms[rmColony].industry.tasks.push(
 					{ type: "withdraw", resource: "G", id: storage.id, timer: 60, priority: 5 },
 					{ type: "deposit", resource: "G", id: nuker.id, timer: 60, priority: 5 });
 			}
@@ -327,7 +327,7 @@ module.exports = {
 
 					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
 					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
-						Memory.rooms["rmColony"].industry.boosts.push(
+						Memory.rooms[rmColony].industry.boosts.push(
 							{ role: listing["role"], subrole: listing["subrole"], resource: listing["mineral"], id: lab.id, timer: 60 });
 					}
 
@@ -335,14 +335,14 @@ module.exports = {
 					if (storage == null) break;
 
 					if (lab.mineralType != null && lab.mineralType != listing["mineral"]) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: lab.mineralType, id: lab.id, timer: 60, priority: 2 });
 					} else if (lab.energy < lab.energyCapacity * 0.75 && storage.store["energy"] > 0) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: "energy", id: storage.id, timer: 60, priority: 3 },
 							{ type: "deposit", resource: "energy", id: lab.id, timer: 60, priority: 3 });
 					} else if (lab.mineralAmount < lab.mineralCapacity * 0.75 && Object.keys(storage.store).includes(listing["mineral"])) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: listing["mineral"], id: storage.id, timer: 60, priority: 3 },
 							{ type: "deposit", resource: listing["mineral"], id: lab.id, timer: 60, priority: 3 });
 					}
@@ -352,7 +352,7 @@ module.exports = {
 					_.forEach(listing["labs"], l => {
 						lab = Game.getObjectById(l);
 						if (lab.mineralAmount > 0) {
-							Memory.rooms["rmColony"].industry.tasks.push(
+							Memory.rooms[rmColony].industry.tasks.push(
 								{ type: "withdraw", resource: lab.mineralType, id: lab.id, timer: 60, priority: 2 });
 						}
 					});
@@ -379,12 +379,12 @@ module.exports = {
 						return;
 					}
 					else if (lab.mineralType != null && lab.mineralType != supply1_mineral) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: lab.mineralType, id: lab.id, timer: 60, priority: 2 });
 					}
 					else if (Object.keys(storage.store).includes(supply1_mineral)
 							&& lab.mineralAmount < lab.mineralCapacity * 0.25) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: supply1_mineral, id: storage.id, timer: 60, priority: 3 },
 							{ type: "deposit", resource: supply1_mineral, id: lab.id, timer: 60, priority: 3 });
 					}
@@ -395,12 +395,12 @@ module.exports = {
 						return;
 					}
 					else if (lab.mineralType != null && lab.mineralType != supply2_mineral) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: lab.mineralType, id: lab.id, timer: 60, priority: 2 });
 					}
 					else if (Object.keys(storage.store).includes(supply2_mineral)
 							&& lab.mineralAmount < lab.mineralCapacity * 0.25) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: supply2_mineral, id: storage.id, timer: 60, priority: 3 },
 							{ type: "deposit", resource: supply2_mineral, id: lab.id, timer: 60, priority: 3 });
 					}
@@ -412,10 +412,10 @@ module.exports = {
 							return;
 						}
 						else if (lab.mineralType != null && lab.mineralType != mineral) {
-							Memory.rooms["rmColony"].industry.tasks.push(
+							Memory.rooms[rmColony].industry.tasks.push(
 								{ type: "withdraw", resource: lab.mineralType, id: lab.id, timer: 60, priority: 2 });
 						} else if (lab.mineralAmount > lab.mineralCapacity * 0.2) {
-							Memory.rooms["rmColony"].industry.tasks.push(
+							Memory.rooms[rmColony].industry.tasks.push(
 								{ type: "withdraw", resource: mineral, id: lab.id, timer: 60, priority: 2 });
 						}
 					});
@@ -607,7 +607,7 @@ module.exports = {
 					}
 				} else {
 					if (storage != null && storage.store["energy"] > 0) {
-						Memory.rooms["rmColony"].industry.tasks.push(
+						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: "energy", id: storage.id, timer: 60, priority: 5 },
 							{ type: "deposit", resource: "energy", id: terminal.id, timer: 60, priority: 5 });
 					} else if (res != "energy") {
@@ -619,7 +619,7 @@ module.exports = {
 			} else if (storage != null && storage.store[res] != null) {
 				filling.push(res);
 
-				Memory.rooms["rmColony"].industry.tasks.push(
+				Memory.rooms[rmColony].industry.tasks.push(
 					{ type: "withdraw", resource: res, id: storage.id, timer: 60, priority: 5,
 					amount: Object.keys(shortage).includes(res) ? Math.abs(shortage[res] + 100) : null },
 					{ type: "deposit", resource: res, id: terminal.id, timer: 60, priority: 5 });
@@ -664,7 +664,7 @@ module.exports = {
 			if (storage != null && storage.store["energy"] > 0) {
 				filling.push("energy");
 
-				Memory.rooms["rmColony"].industry.tasks.push(
+				Memory.rooms[rmColony].industry.tasks.push(
 					{ type: "withdraw", resource: "energy", id: storage.id, timer: 60, priority: 5 },				
 					{ type: "deposit", resource: "energy", id: terminal.id, timer: 60, priority: 5 });
 			} else if (res != "energy") {
@@ -693,7 +693,7 @@ module.exports = {
 				|| ((res != "energy" && terminal.store[res] == null) || (res == "energy" && terminal.store[res] == 0)))
 				continue;
 
-			Memory.rooms["rmColony"].industry.tasks.push(
+			Memory.rooms[rmColony].industry.tasks.push(
 				{ type: "withdraw", resource: res, id: terminal.id, timer: 60, priority: 6 },
 				{ type: "deposit", resource: res, id: storage.id, timer: 60, priority: 6 });
 		}

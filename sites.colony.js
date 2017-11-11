@@ -335,7 +335,7 @@ module.exports = {
 
 	towerAcquireRepair: function (rmColony) {
 		let energy_level = _.get(Memory, ["rooms", rmColony, "survey", "energy_level"]);
-		if (energy_level == LOW || energy_level == CRITICAL) {
+		if (energy_level == CRITICAL) {
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], null);
 			return;
 		}
@@ -350,9 +350,9 @@ module.exports = {
 				r => { 
 					switch (r.structureType) {
 						case "container":			return 1; 
+						case "road":				return 2;
 						case "rampart": 
-						case "constructedWall":		return 2;
-						case "road":				return 3;
+						case "constructedWall":		return 3;
 					}}));
 					
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], _.get(repair, "id"));
@@ -367,7 +367,7 @@ module.exports = {
 				_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], null);
 			} else {
 				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => {
-					return s.structureType == "tower" && s.energy > s.energyCapacity * 0.75; }}),
+					return s.structureType == "tower" && s.energy > s.energyCapacity * 0.8; }}),
 					t => { t.repair(repair) });				
 			}
 		}

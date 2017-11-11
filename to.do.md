@@ -5,7 +5,11 @@
 
 # Implementing...
 ... task system revamp ...
-	- need boost tasks
+	- energy pulling? should carriers pull from containers (filter: distance?) or storage first...
+	- searching for boosts to pull from industry boost list
+	- test:
+		- industry task completion (terminal orders, lab tasks)
+		- critical downgrade condition
 
 
 # To Implement
