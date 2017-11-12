@@ -634,21 +634,19 @@ module.exports = {
 
 	runOrder_Receive: function (rmColony, order, storage, terminal, filling) {
 	/* Notes: Minimum transfer amount is 100
-	 * And always buy in small amounts! ~500-2000
+	 * And always buy in small amounts! ~500-5000
 	 */
+
+		if (terminal.cooldown > 0)
+			return false;
 
 		let o = order["name"];
 		let res = order["resource"];
 		let room = Game.rooms[rmColony];
-		let amount = Math.max(100, Math.min(_.get(Memory, ["resources", "terminal_orders", o, "amount"]), 2000));
+		let amount = Math.max(100, Math.min(_.get(Memory, ["resources", "terminal_orders", o, "amount"]), 5000));
 		let cost = Game.market.calcTransactionCost(amount, rmColony, order["room"]);
 
-		if (terminal.store["energy"] != null && terminal.store["energy"] > cost) {
-			filling.push("energy");
-
-			if (terminal.cooldown > 0)
-				return false;
-
+		if (_.get(terminal, ["store", "energy"]) > cost) {
 			let result = Game.market.deal(order["market_id"], amount, rmColony);
 
 			if (result == OK) {
@@ -665,7 +663,7 @@ module.exports = {
 					+ ` ${amount} of ${res} ${order["room"]} -> ${rmColony} (code: ${result})`);
 			}
 		} else {
-			if (storage != null && storage.store["energy"] > room.getCriticalEnergy()) {
+			if (_.get(storage, ["store", "energy"]) > room.getCriticalEnergy()) {
 				filling.push("energy");
 
 				Memory.rooms[rmColony].industry.tasks.push(
