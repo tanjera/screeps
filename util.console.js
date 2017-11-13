@@ -304,9 +304,9 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> ${mineral} reaction target set to ${amount} (priority ${priority}).`;
 		};
 
-		help_labs.push("labs.set_boost(labID, mineral, role, subrole, ticks)");	
+		help_labs.push("labs.set_boost(labID, mineral, role, destination, ticks)");	
 	
-		labs.set_boost = function(labID, mineral, role, subrole, ticks) {
+		labs.set_boost = function(labID, mineral, role, dest, ticks) {
 			let lab = Game.getObjectById(labID);
 			let rmName = lab.pos.roomName;
 			let labDefinitions = _.get(Memory, ["rooms", rmName, "labs", "definitions"]);
@@ -316,12 +316,12 @@ module.exports = {
 				labDefinitions = [];
 
 			labDefinitions.push(
-				{ action: "boost", mineral: mineral, lab: labID, role: role, subrole: subrole, 
+				{ action: "boost", mineral: mineral, lab: labID, role: role, dest: dest,
 					expire: (ticks == null ? null : Game.time + ticks) });
 				
 			_.set(Memory, ["rooms", rmName, "labs", "definitions"], labDefinitions);
 			delete Memory["hive"]["pulses"]["lab"];	
-			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role}, ${subrole} from ${labID}`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Boost added for ${mineral} to ${role} from ${labID}`;
 		};
 
 		help_labs.push("labs.clear_reactions()");

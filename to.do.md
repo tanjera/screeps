@@ -6,9 +6,6 @@
 
 
 # Implementing...
-** test critical downgrade condition
-- have burrowers pull energy from container and dump into link...!!
-- searching for boosts to pull from industry boost list
 
 
 

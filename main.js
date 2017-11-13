@@ -2,6 +2,7 @@ require("overload");
 require("overload.creep");
 require("overload.creep.tasks");
 require("overload.creep.travel");
+require("overload.lab");
 require("overload.room");
 require("overload.roomposition");
 

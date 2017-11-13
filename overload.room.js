@@ -52,8 +52,8 @@ Room.prototype.getWallTarget = function getWallTarget() {
 				100000,
 				500000,
 				1000000,
-				5000000,
-				30000000 ];
+				2500000,
+				10000000 ];
 	return t[level];
 },
 	

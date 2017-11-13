@@ -109,6 +109,8 @@ module.exports = {
 				if (this.goToRoom(creep, creep.memory.room, true))
 					return;
 
+				creep.memory.task = creep.memory.task || creep.getTask_Boost();
+
 				if (creep.memory.role == "burrower") {
 					creep.memory.task = creep.memory.task || creep.getTask_Mine();
 					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
@@ -178,8 +180,9 @@ module.exports = {
             if (_.sum(creep.carry) > 0) {
                 creep.memory.state = "delivering";
                 return;
-            }
+			}
 			
+			creep.memory.task = creep.memory.task || creep.getTask_Boost();
 			creep.memory.task = creep.memory.task || creep.getTask_Industry_Withdraw();
 			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
@@ -220,11 +223,11 @@ module.exports = {
 						creep.memory.state = "deliver";
 						return;
 					}
-					
 
 					if (this.goToRoom(creep, creep.memory.room, true))
 						return;
 
+					creep.memory.task = creep.memory.task || creep.getTask_Boost();
 					creep.memory.task = creep.memory.task || creep.getTask_Extract();
 					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 

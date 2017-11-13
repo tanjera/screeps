@@ -158,8 +158,6 @@ Creep.prototype.runTask = function runTask() {
 		case "deposit": {
 			let target = Game.getObjectById(this.memory.task["id"]);
 			switch (this.memory.task["resource"]) {
-
-				default:
 				case "energy":
 					if (target != null && this.transfer(target, this.memory.task["resource"]) == ERR_NOT_IN_RANGE) {
 						if (_.get(target, "energy") != null && _.get(target, "energy") == _.get(target, "energyCapacity")) {
@@ -175,6 +173,7 @@ Creep.prototype.runTask = function runTask() {
 					}
 					return;
 
+				default:
 				case "mineral":		// All except energy
 					for (let r = Object.keys(this.carry).length; r > 0; r--) {
 						let resourceType = Object.keys(this.carry)[r - 1];
@@ -196,9 +195,14 @@ Creep.prototype.runTask = function runTask() {
 
 
 Creep.prototype.getTask_Boost = function getTask_Boost () {
-	if (this.ticksToLive < 1250)
+	if (this.ticksToLive < 1350 || this.spawning)
 		return null;
-// TO DO FROM INDUSTRY
+
+	let boosted = this.getBoosts();
+	return _.head(_.filter(_.get(Memory, ["rooms", this.room.name, "industry", "boosts"]),
+		t => { return t.active && t.role == this.memory.role 
+				&& (t.room == null ? true : t.room == this.memory.room) 
+				&& !boosted.includes(t.resource); }));
 };
 
 Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link () {

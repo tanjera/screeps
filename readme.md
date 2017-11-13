@@ -36,11 +36,11 @@ If you must manually build structures, you can run the following command to see 
 
 When you are ready to expand to a new room (create a new "colony"), you can use a console command to commit a colonization request to Memory, which will automatically spawn a colonizer (as long as the sending colony has enough energy and extensions, at least RCL 4), and the colonizer will move to the room and claim the controller. If your colonizer will need to travel through 3+ rooms to get there, you may want to include a list\_route to make sure the colonizer takes the quickest route and to avoid pathfinding problems (list_route is a list of rooms in order that you want the creep to travel through, including the room\_from, room\_to, and everything in-between, e.g. ["W1N1", "W1N2", "W2N2", "W3N2"] ... but list\_route is optional). To place a colonization request:
 
-`colonize("room_from", "room_target", {origin: {x: base_origin_x, y: base_origin_y}, name: "default_horizontal"}, [list_route]);`
+`empire.colonize("room_from", "room_target", {origin: {x: base_origin_x, y: base_origin_y}, name: "default_horizontal"}, [list_route]);`
 
 Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. You can either set a specific room layout via layout_name, or leave it as null to use the default horizontal layout. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_assist.rooms field for a colony like this:
 
-`spawn_assist(rmToAssist, [listRooms], [listRoute])`
+`empire.spawn_assist(rmToAssist, [listRooms], [listRoute])`
 
 #### Set Custom Room Functions
 
@@ -52,11 +52,11 @@ Note: If you set a custom room population (as shown in main.js' comments), you _
 
 Although local mining is run automatically in any room you own a controller, remote mining still needs to be defined via a console command. You can do that like so:
 
-`remote_mining(colony_room, room_to_harvest);`
+`empire.remote_mining(colony_room, room_to_harvest);`
 
 and it's pretty much that simple. The creep population for the remote mining is automatically chosen, but more complex operations are definitely possible and a few fields are read from Memory, including adjacent room assistance with spawning, spawning of soldiers to accompany miners in rooms that have source keepers, and custom populations for the mining operation, all set through Memory. For example, if you will be mining a room with source keepers and assist in spawning the creeps from an adjacent room, your command would look like this:
 
-`remote_mining(rmHarvest, rmColony, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation]);`
+`empire.remote_mining(rmHarvest, rmColony, hasKeepers, [listRoute], [listSpawnAssistRooms], [listPopulation]);`
 
 ### Spawning and Creep "Levels"
 
@@ -67,10 +67,6 @@ For resource management- to save energy and spawn time- I equated a room's contr
 ### Population Demand
 
 If a colony isn't doing so well- maybe its remote mine was attacked, its colony ran out of energy, or a server restart wiped out the population. Each time the codebase goes to spawn a creep, it tallies up the ideal requested population (a total of listPopulation for all Sites based in that room) and sees how much of the goal population even exists. If main.js defines that W18S43 should have 20 creeps between its colony, mining, and remote mining... but only 10 exist... which means it is at 50% of its goal, then it will spawn the next creep at 50% of its target level. So if the next creep was to have 30 body parts, then it will only spawn with 15. As a colony fills its population to 100%, the spawns will spawn at 100% of the target creep level. For this reason, without needing any adjustments to the code in main.js, a colony can die off (due to attack, lack of energy, server restart) and still revive itself. Miners and burrowers are one of the first to spawn, and they will spawn at low levels with few body parts, and work to renew the colony to its full operations.
-
-### Task System
-
-To save CPU and prevent 3 creeps from trying to do a job that only takes 1 creep, I implemented a task system. Every pulse cycle (see "Pulsing"- but at a full CPU bucket, this is roughly every 8 ticks), the codebase scans all active rooms and compiles a task list to memory. Every creep without a task will search through the task list and pick up a task. Some tasks have a creep limit of 1 or 2 creeps, to limit 2 creeps from picking up the same small pile of energy. Creeps will continue to run the task until it is complete or until a specified timer runs out. Tasks are also automatically sorted by priority, for example, carriers will deposit energy into the spawn before depositing excess into storage. The Sites.Industry() system also creates tasks of an "industry" type for couriers (mineral carriers) to load and unload labs, terminals, and storage.
 
 ### Pulsing
 
@@ -144,19 +140,16 @@ _.each(_.filter(Game.rooms.*room_name*.find(FIND_STRUCTURES)
     s => { _.set(Memory, ["rooms", s.pos.roomName, "structures", `${s.structureType}-${s.id}`, "targetHits"], *hitpoint_amount*); });
 ```
 
-#### Invading a Room
+#### Combat
 
-Invading another room is now possibly by setting an invasion request into Memory using a console command like so:
+There is a pipeline in place for entering specific instructions for creeps to initiate combat against targets, creeps, or structures in other rooms utilizing various tactics similar to a playbook. The full list of commands and options can be found under `help("empire")`. Some tactics that are included are:
 
-`invade("room_from", "room_to_invade", occupy?_true_false, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], new RoomPosition(rally_point_x, rally_point_y, "rally_point_room_name"), ["list_route"])`
-
-After all invading creeps are killed- either by defenses or by destroying the room then timing out, the invasion will be deemed over (in the near future, I will be working on victory conditions and repeated assaults...). If "occupy" is set to true, then an occupation request will be placed using the same army as the invading force. See "Occupying a Room" for more details.
-
-#### Occupying a Room
-
-Rarely used but useful when needed, you can keep a continuous occupation of a room by adding an occupation\_request to Memory. This is useful if you destroy a player's base and want to keep them from rebuilding, clearing out structures in a room from a previous player, or disrupting an enemy's supply route or remote mining operations, sieging their room in preperation for an attack! Occupation requests can be placed in memory with the following command:
-
-`occupy("room_from", "room_to_occupy, ["list_spawn_assist_rooms"], [{list_army_population}], ["list_target_gameIDs"], ["list_route"])"`
+- "Waves": Spawn a full set of creeps that rally at a specific rally point. Once every creep is at the rally point, they push towards the objective.
+- "Trickle": As creeps spawn, they trickle one by one into the objective room as a steady stream.
+- "Occupy": Based on "trickle", but utilizing a different army population specifically for maintaining the room under an occupation.
+- "Dismantle": Based on "trickle", but utilizing only dismantlers to remove an old set of structures.
+- "Tower Drain": Several tanks and healers rally outside an enemy's room. The tanks cross into the room, absorb fire from the towers, then switch out and get healed, draining the towers' energy.
+- "Controller": Attack a controller to downgrade it faster.
 
 ### Console Commands
 

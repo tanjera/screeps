@@ -1,33 +1,43 @@
 module.exports = {
 	
 	acquireBoost: function(creep) {
-		if (creep.room.name == creep.memory.colony) {
-			if (creep.memory.boost == null && !creep.isBoosted()) {
-				return this.seekBoost(creep);
-			} else if (creep.memory.boost != null && !creep.isBoosted()) {
-				creep.travel(new RoomPosition(creep.memory.boost.pos.x, creep.memory.boost.pos.y, creep.memory.boost.pos.roomName));
-				return true;
+		if (creep.room.name == creep.memory.colony && creep.memory.boost != "complete") {
+			if (creep.memory.boost == null) {
+				if (this.seekBoost(creep)) {
+					return true;
+				} else {
+					creep.memory.boost = "complete";
+					return false;
+				}
+			} else if (creep.memory.boost != null) {
+				let boost_pos = new RoomPosition(creep.memory.boost.pos.x, creep.memory.boost.pos.y, creep.memory.boost.pos.roomName);
+				if (creep.pos.getRangeTo(boost_pos) > 1) {
+					creep.travel(boost_pos);
+					return true;
+				} else {
+					let boosted = creep.getBoosts();
+					if (boosted.includes(creep.memory.boost.resource)) {
+						delete creep.memory.boost;
+						return true;	// True to re-run cycle, seek new boost next tick if available
+					}
+				}
 			}
-		}
+		} else 
+			return false;
 	},
 
 	seekBoost: function(creep) {
-		if (creep.isBoosted())
+		let boosted = creep.getBoosts();
+		let boost = _.head(_.filter(_.get(Memory, ["rooms", creep.room.name, "industry", "boosts"]),
+			t => { return t.active && t.role == creep.memory.role 
+					&& (t.room == null ? true : t.room == creep.memory.room) 
+					&& !boosted.includes(t.resource); }));
+
+		if (boost != null) {
+			creep.memory.boost = boost;
+			return true;
+		} else
 			return false;
-		else {
-			let task = _.head(_.filter(_.get(Memory, ["rooms", creep.room.name, "tasks", "list"]),
-				t => { 
-				return t.type == "boost" 
-					&& t.role == creep.memory.role 
-					&& t.subrole == creep.memory.subrole
-					&& (t.dest == null ? true : t.dest == creep.memory.room); }));
-				
-			if (task != null) {
-				creep.memory.boost = task;
-				return true;
-			} else
-				return false;
-		}
 	},
 
 	moveToDestination: function(creep, recheck_targets) {

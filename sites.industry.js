@@ -250,19 +250,21 @@ module.exports = {
                     break;
 
 				case "boost":
-					let lab = Game.getObjectById(listing["lab"]);
-					
+					let lab = Game.getObjectById(listing["lab"]);					
 					if (lab == null || (_.get(listing, "expire") != null && _.get(listing, "expire") < Game.time))
 						break;
 
-					let creeps = lab.pos.findInRange(FIND_MY_CREEPS, 1, { filter: (c) => { 
-						return c.memory.role == listing["role"]
-							&& c.memory.subrole == listing["subrole"]
-							&& c.ticksToLive > 1100 && !c.isBoosted() }});
-
-					if (creeps.length > 0) {
-						lab.boostCreep(creeps[0]);
+					if (!lab.canBoost(_.get(listing, "mineral"))) {
+						_.each(_.filter(_.get(Memory, ["rooms", rmColony, "industry", "boosts"]),
+							b => { return b.active && b.id == listing["lab"] && b.resource == listing["mineral"]; }),
+							b => { b.active = false; });
 					}
+
+					let creep = _.head(lab.pos.findInRange(FIND_MY_CREEPS, 1, { filter: (c) => { 
+						return c.ticksToLive > 1250 && c.memory.role == listing["role"] 
+								&& (!listing["room"] || c.memory.room == listing["room"]) }}));
+					if (creep)
+						lab.boostCreep(creep);
 
 					break;
 
@@ -329,7 +331,7 @@ module.exports = {
 					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
 					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
 						Memory.rooms[rmColony].industry.boosts.push(
-							{ role: listing["role"], subrole: listing["subrole"], resource: listing["mineral"], id: lab.id, timer: 60 });
+							{ type: "boost", role: listing["role"], resource: listing["mineral"], room: listing["dest"], id: lab.id, timer: 30, active: true });
 					}
 
 					storage = Game.rooms[rmColony].storage;

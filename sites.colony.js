@@ -344,7 +344,7 @@ module.exports = {
 			let room = Game["rooms"][rmColony];
 
 			let repair = _.head(_.sortBy(_.filter(room.findRepair_Maintenance(), 
-				r => { return (r.hits / room.getWallTarget() < 0.8
+				r => { return (r.hits / room.getWallTarget() < 1.05
 					&& (r.structureType == "rampart" || r.structureType == "constructedWall"
 						|| r.structureType == "container" || r.structureType == "road")); }),					
 				r => { 
