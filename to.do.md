@@ -6,6 +6,8 @@
 
 
 # Implementing...
+- custom wall hit point target *per room* 
+	- and fix readme re: passive defenses!!!
 
 
 

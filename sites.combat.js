@@ -378,7 +378,10 @@ module.exports = {
 			if (creep.memory.boost == null && !creep.isBoosted()) {
 				if (_Combat.seekBoost(creep))
 					return true;
-			} else if (creep.memory.boost != null && !creep.isBoosted()) {
+			} else if (creep.memory.boost != null && !creep.isBoosted()
+					&& _.get(creep.memory, ["boost", "pos", "x"]) 
+					&& _.get(creep.memory, ["boost", "pos", "y"])
+					&& _.get(creep.memory, ["boost", "pos", "roomName"])) {
 				creep.travel(new RoomPosition(creep.memory.boost.pos.x, creep.memory.boost.pos.y, creep.memory.boost.pos.roomName));
 				return true;
 			}

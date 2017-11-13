@@ -10,6 +10,13 @@ module.exports = {
 					return false;
 				}
 			} else if (creep.memory.boost != null) {
+				if (!_.get(creep.memory, ["boost", "pos", "x"]) 
+						|| !_.get(creep.memory, ["boost", "pos", "y"])
+						|| !_.get(creep.memory, ["boost", "pos", "roomName"])) {
+					delete creep.memory.boost;	
+					return false;
+				}
+
 				let boost_pos = new RoomPosition(creep.memory.boost.pos.x, creep.memory.boost.pos.y, creep.memory.boost.pos.roomName);
 				if (creep.pos.getRangeTo(boost_pos) > 1) {
 					creep.travel(boost_pos);

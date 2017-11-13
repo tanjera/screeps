@@ -331,7 +331,8 @@ module.exports = {
 					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
 					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
 						Memory.rooms[rmColony].industry.boosts.push(
-							{ type: "boost", role: listing["role"], resource: listing["mineral"], room: listing["dest"], id: lab.id, timer: 30, active: true });
+							{ type: "boost", role: listing["role"], resource: listing["mineral"], room: listing["dest"], 
+								id: lab.id, pos: lab.pos, timer: 30, active: true });
 					}
 
 					storage = Game.rooms[rmColony].storage;
