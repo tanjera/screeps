@@ -262,7 +262,7 @@ module.exports = {
 
 					let creep = _.head(lab.pos.findInRange(FIND_MY_CREEPS, 1, { filter: (c) => { 
 						return c.ticksToLive > 1250 && c.memory.role == listing["role"] 
-								&& (!listing["room"] || c.memory.room == listing["room"]) }}));
+								&& (!listing["dest"] || c.memory.room == listing["dest"]) }}));
 					if (creep)
 						lab.boostCreep(creep);
 
@@ -331,7 +331,7 @@ module.exports = {
 					// Minimum amount necessary to boost 1x body part: 30 mineral & 20 energy
 					if (lab.mineralType == listing["mineral"] && lab.mineralAmount > 30 && lab.energy > 20) {
 						Memory.rooms[rmColony].industry.boosts.push(
-							{ type: "boost", role: listing["role"], resource: listing["mineral"], room: listing["dest"], 
+							{ type: "boost", role: listing["role"], resource: listing["mineral"], dest: listing["dest"], 
 								id: lab.id, pos: lab.pos, timer: 30, active: true });
 					}
 

@@ -309,7 +309,7 @@ module.exports = {
 
 		help_labs.push("labs.set_boost(labID, mineral, role, destination, ticks)");	
 	
-		labs.set_boost = function(labID, mineral, role, dest, ticks) {
+		labs.set_boost = function(labID, mineral, role, destination, ticks) {
 			let lab = Game.getObjectById(labID);
 			let rmName = lab.pos.roomName;
 			let labDefinitions = _.get(Memory, ["rooms", rmName, "labs", "definitions"]);
@@ -319,7 +319,7 @@ module.exports = {
 				labDefinitions = [];
 
 			labDefinitions.push(
-				{ action: "boost", mineral: mineral, lab: labID, role: role, dest: dest,
+				{ action: "boost", mineral: mineral, lab: labID, role: role, dest: destination,
 					expire: (ticks == null ? null : Game.time + ticks) });
 				
 			_.set(Memory, ["rooms", rmName, "labs", "definitions"], labDefinitions);
@@ -440,7 +440,7 @@ module.exports = {
 				return `<font color=\"#D3FFA3\">[Console]</font> Unable to set hitpoint target; invalid entry.`;
 
 			for (let i in Memory.rooms)
-				_.set(Memory, ["rooms", this.name, "defense", "wall_hp_target"], hitpoints); 
+				_.set(Memory, ["rooms", i, "defense", "wall_hp_target"], hitpoints); 
 			return `<font color=\"#D3FFA3\">[Console]</font> Wall/rampart hitpoint target set for all rooms.`;
 		};
 
