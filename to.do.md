@@ -1,6 +1,5 @@
 # Implemented, Needs Debugging/Testing	
 - guardian room healers roles working as intended?
-- sites.combat tactic "dismantle"
 - ranger role?
 
 
@@ -28,7 +27,6 @@
 
 	- Log to show all boosts in action... or add to log.labs()
 
-
 - Roads
 	- Roads in colonies- from sources, extractor, and controller to ... ramparts?
 	- Roads in remote_mining rooms- from sources to exit tiles
@@ -37,8 +35,6 @@
 	- Sites.Support, help an ally build
 
 - CPU Optimization
-	- Replace _.filter(room.find(list)) with room.find(list, {filter: ()}) 
-		- Prevents extra step of API cloning array
 	- When sequentially calling _.sortBy ... figure out how to combine sorting conditions into 1 statement
 		- More _sortBy's * longer arrays to sort == CPU hog.
 

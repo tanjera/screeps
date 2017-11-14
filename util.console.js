@@ -1,15 +1,17 @@
 module.exports = {
 	Init: function() {
 		let help_main = new Array();
-		let help_profiler = new Array();
 		let help_allies = new Array();
 		let help_blueprint = new Array();
 		let help_empire = new Array();
 		let help_labs = new Array();
 		let help_logs = new Array();
-		let help_resources = new Array();
 		let help_path = new Array();
+		let help_pause = new Array();
+		let help_profiler = new Array();
+		let help_resources = new Array();
 		let help_visuals = new Array();
+		
 		
 
 		/* Main help() list */
@@ -20,6 +22,7 @@ module.exports = {
 		help_main.push(`- "labs" \t Management of lab functions/reactions`);
 		help_main.push(`- "logs" \t Logs for statistical output`);
 		help_main.push(`- "path" \t Utilities for enhancing creep pathfinding abilities`);
+		help_main.push(`- "pause" \t Utilities for pausing specific creep or colony functions`);
 		help_main.push(`- "profiler" \t Built-in CPU profiler`);
 		help_main.push(`- "resources" \t Management of resources, empire-wide sharing and/or selling to market`);
 		help_main.push(`- "visuals" \t Manage visual objects (RoomVisual class)`);
@@ -495,12 +498,6 @@ module.exports = {
 		}
 
 		help_empire.push("");
-		help_empire.push("empire.refill_bucket()")		
-		empire.refill_bucket = function() {
-			_.set(Memory, ["hive", "pulses", "bucket"], true);
-			return `<font color=\"#D3FFA3\">[Console]</font> Pausing main.js to refill bucket.`;
-		};
-
 		help_empire.push("empire.clear_deprecated_memory()")		
 		empire.clear_deprecated_memory = function() {
 			
@@ -614,6 +611,21 @@ module.exports = {
 		};
 
 
+		pause = new Object();
+		
+		help_pause.push("pause.mineral_extraction()")		
+		pause.mineral_extraction = function() {
+			_.set(Memory, ["hive", "pause", "extracting"], true);
+			return `<font color=\"#D3FFA3\">[Console]</font> Pausing mineral extraction- delete Memory.hive.pause.extracting to resume.`;
+		};
+		
+		help_pause.push("pause.refill_bucket()")		
+		pause.refill_bucket = function() {
+			_.set(Memory, ["hive", "pause", "bucket"], true);
+			return `<font color=\"#D3FFA3\">[Console]</font> Pausing main.js to refill bucket.`;
+		};
+
+
 
 		help = function(submenu) {			
 			let menu = new Array()			
@@ -625,6 +637,7 @@ module.exports = {
 				case "labs":		menu = help_labs;			break;
 				case "logs":		menu = help_logs;			break;
 				case "path":		menu = help_path;			break;
+				case "pause":		menu = help_pause;			break;
 				case "profiler":	menu = help_profiler;		break;
 				case "resources":	menu = help_resources;		break;
 				case "visuals":		menu = help_visuals;		break;

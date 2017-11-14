@@ -4,12 +4,12 @@ let _CPU = require("util.cpu");
 let Hive = {
 
 	refillBucket: function() {
-		if (Game.cpu.bucket >= 10000 && _.get(Memory, ["hive", "pulses", "bucket"], false)) {
-			_.set(Memory, ["hive", "pulses", "bucket"], false);
+		if (Game.cpu.bucket >= 10000 && _.get(Memory, ["hive", "pause", "bucket"], false)) {
+			_.set(Memory, ["hive", "pause", "bucket"], false);
 			console.log(`<font color=\"#D3FFA3\">[Console]</font> Bucket full, resuming main.js.`);
 		}
 
-		return _.get(Memory, ["hive", "pulses", "bucket"], false);
+		return _.get(Memory, ["hive", "pause", "bucket"], false);
 	},
 
 	setPulse: function(key, minTicks, maxTicks) {
