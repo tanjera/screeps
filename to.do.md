@@ -6,8 +6,8 @@
 
 
 # Implementing...
-- custom wall hit point target *per room* 
-	- and fix readme re: passive defenses!!!
+- combat boosts... 
+	- Add `use_boosts` to combat objects (from util_console and from toColonize)
 
 
 

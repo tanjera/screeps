@@ -501,7 +501,7 @@ module.exports = {
 		console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> ` 
 			+ `Setting occupation request in Memory; combat_id ${combat_id}-occupy.`);
 		_.set(Memory, ["sites", "combat", `${combat_id}-occupy`], 
-			{ colony: combat.colony, target_room: combat.target_room, use_boosts: combat.use_boosts, 
+			{ colony: combat.colony, target_room: combat.target_room, 
 				list_spawns: combat.list_spawns, list_route: combat.list_route, 
 				tactic: { type: "occupy", target_creeps: tactic.target_creeps, target_structures: tactic.target_structures, 
 					target_list: tactic.target_list } });

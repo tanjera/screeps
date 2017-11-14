@@ -53,7 +53,7 @@ Room.prototype.getWallTarget = function getWallTarget() {
 				500000,
 				1000000,
 				2500000,
-				10000000 ];
+				5000000 ];
 	return t[level];
 },
 	
@@ -83,9 +83,9 @@ Room.prototype.findRepair_Critical = function findRepair_Critical() {
 	return this.find(FIND_STRUCTURES, {
 		filter: (s) => {
 			return (s.structureType == "rampart"
-					&& s.hits < _.get(Memory, ["rooms", this.name, "structures", `${s.structureType}-${s.id}`, "targetHits"], this.getWallTarget()) * 0.1)
+					&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()) * 0.1)
 				|| (s.structureType == "constructedWall"
-					&& s.hits < _.get(Memory, ["rooms", this.name, "structures", `${s.structureType}-${s.id}`, "targetHits"], this.getWallTarget()) * 0.1)
+					&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()) * 0.1)
 				|| (s.structureType == "container" && s.hits < s.hitsMax * 0.1)
 				|| (s.structureType == "road" && s.hits < s.hitsMax * 0.1);
 		}}).sort((a, b) => {return a.hits - b.hits});
@@ -95,9 +95,9 @@ Room.prototype.findRepair_Maintenance = function findRepair_Maintenance() {
 	return this.find(FIND_STRUCTURES, {
 		filter: (s) => {
 			return (s.structureType == "rampart"
-					&& s.hits < _.get(Memory, ["rooms", this.name, "structures", `${s.structureType}-${s.id}`, "targetHits"], this.getWallTarget()))
+					&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()))
 				|| (s.structureType == "constructedWall"
-					&& s.hits < _.get(Memory, ["rooms", this.name, "structures", `${s.structureType}-${s.id}`, "targetHits"], this.getWallTarget()))
+					&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()))
 				|| (s.structureType == "container" && s.hits < s.hitsMax * 0.8)
 				|| (s.structureType == "road" && s.hits < s.hitsMax * 0.8)
 				|| ((s.structureType == "spawn" || s.structureType == "extension" || s.structureType == "link" || s.structureType == "storage"

@@ -130,15 +130,13 @@ There are several basic automatic defenses built into the code. Towers will choo
 
 #### Passive Defenses
 
-Passive defenses (walls and ramparts) are also an integral part of your room's defenses. When you construct a wall or rampart and have a worker or repairer available with energy, it is automatically set to build and repair your walls to a minimum "critical" hitpoint level, and then- as available- repair them to a target "maintenance" hitpoint level. The amount of hitpoints that the code will automatically aim for scales depending on your room's controller level (RCL), from 10K hitpoints at RCL1 to 1M hitpoints at RCL8. 
+Passive defenses (walls and ramparts) are also an integral part of your room's defenses. When you construct a wall or rampart and have a worker or repairer available with energy, it is automatically set to build and repair your walls to a minimum "critical" hitpoint level, and then- as available- repair them to a target "maintenance" hitpoint level. The amount of hitpoints that the code will automatically aim for scales depending on your room's controller level (RCL), from 10K hitpoints at RCL1 to 5M hitpoints at RCL8. 
 
-You can also specify the target hitpoint goal for a specific tile or wall or rampart by adding a value to its memory setting. Since this operation can get complex, there is no simple console command for it, but an example of a quick way to set a room's walls (all walls and ramparts along x == ?) to a custom target hitpoint goal- all via the console- would be by modifying Memory directly, with the fields surrounded by asterisks (*) needing to be set by you... and you can change this around to suit your needs!:
+You can change the target hitpoint goal to keep your walls and ramparts at by using the following command: 
 
-```
-_.each(_.filter(Game.rooms.*room_name*.find(FIND_STRUCTURES)
-    s => { return s.pos.x == *x_coordinate* && (s.structureType == "*structure_type*"; })), 
-    s => { _.set(Memory, ["rooms", s.pos.roomName, "structures", `${s.structureType}-${s.id}`, "targetHits"], *hitpoint_amount*); });
-```
+`empire.wall_target(hitpoints)`
+
+This changes the target hitpoint goal for all rooms. Rooms you colonize afterwards will revert to default target goal. By modifying the Memory object referenced in the console command, you can set the target goal for rooms individually as well.
 
 #### Combat
 

@@ -408,7 +408,7 @@ module.exports = {
 		
 		empire = new Object();
 
-		help_empire.push("empire.combat(combatID, rmColony, rmTarget, useBoosts, listSpawnRooms, listRoute, tactic)");
+		help_empire.push("empire.combat(combatID, rmColony, rmTarget, listSpawnRooms, listRoute, tactic)");
 		help_empire.push(" - tactic 'waves': { type: 'waves', spawn_repeat: t/f, rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
 		help_empire.push(" - tactic 'trickle': { type: 'trickle', target_creeps: t/f, target_structures: t/f, target_list: [], to_occupy: t/f }");
 		help_empire.push(" - tactic 'occupy': { type: 'occupy', target_creeps: t/f, target_structures: t/f, target_list: [] }");
@@ -416,9 +416,9 @@ module.exports = {
 		help_empire.push(" - tactic 'tower_drain': { type: 'tower_drain', rally_pos: new RoomPosition(rallyX, rallyY, rallyRoom), drain_pos: new RoomPosition(drainX, drainY, drainRoom) }");
 		help_empire.push(" - tactic 'controller': { type: 'controller', to_occupy: t/f }");
 		
-		empire.combat = function(combat_id, colony, target_room, use_boosts, list_spawns, list_route, tactic) {
+		empire.combat = function(combat_id, colony, target_room, list_spawns, list_route, tactic) {
 			_.set(Memory, ["sites", "combat", combat_id], 
-				{ colony: colony, target_room: target_room, use_boosts: use_boosts, list_spawns: list_spawns, 
+				{ colony: colony, target_room: target_room, list_spawns: list_spawns, 
 					list_route: list_route, tactic: tactic });
 			return `<font color=\"#D3FFA3\">[Console]</font> Combat request added to Memory.sites.combat.${combat_id} ... to cancel, delete the entry.`;
 		};
@@ -426,12 +426,21 @@ module.exports = {
 		help_empire.push("");
 		help_empire.push("empire.threat_level(level)  ... NONE, LOW, MEDIUM, HIGH")
 		empire.threat_level = function(level) {
-			for (let i in Memory.rooms) { 
+			for (let i in Memory.rooms) 
 				_.set(Memory, ["rooms", i, "defense", "threat_level"], level); 
-			}
 			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for all rooms set.`;
 		};
 		
+		help_empire.push("empire.wall_target(hitpoints)")
+		empire.wall_target = function(hitpoints) {
+			if (hitpoints == null)
+				return `<font color=\"#D3FFA3\">[Console]</font> Unable to set hitpoint target; invalid entry.`;
+
+			for (let i in Memory.rooms)
+				_.set(Memory, ["rooms", this.name, "defense", "wall_hp_target"], hitpoints); 
+			return `<font color=\"#D3FFA3\">[Console]</font> Wall/rampart hitpoint target set for all rooms.`;
+		};
+
 		help_empire.push("empire.set_camp(room_pos)")
 		empire.set_camp = function(room_pos) {
 			_.set(Memory, ["rooms", room_pos.roomName, "camp"], room_pos);
@@ -461,13 +470,6 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 		
-		help_empire.push("");
-		help_empire.push("empire.refill_bucket()")		
-		empire.refill_bucket = function() {
-			_.set(Memory, ["hive", "pulses", "bucket"], true);
-			return `<font color=\"#D3FFA3\">[Console]</font> Pausing main.js to refill bucket.`;
-		};
-
 		help_empire.push("empire.set_sign(message, rmName)")
 		empire.set_sign = function(message, rmName) {
 			/* Sorting algorithm for left -> right, top -> bottom (in SW sector!! Reverse sortBy() for other sectors...
@@ -491,7 +493,24 @@ module.exports = {
 				return `<font color=\"#D3FFA3\">[Console]</font> Default message set.`;
 			}
 		}
-		
+
+		help_empire.push("");
+		help_empire.push("empire.refill_bucket()")		
+		empire.refill_bucket = function() {
+			_.set(Memory, ["hive", "pulses", "bucket"], true);
+			return `<font color=\"#D3FFA3\">[Console]</font> Pausing main.js to refill bucket.`;
+		};
+
+		help_empire.push("empire.clear_deprecated_memory()")		
+		empire.clear_deprecated_memory = function() {
+			
+			_.each(Memory.rooms, r => {
+				delete r.tasks;
+				delete r.structures;
+			});
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Deleted deprecated Memory objects.`;
+		};
 
 		path = new Object();
 		help_path.push("path.road(rmName, startX, startY, endX, endY)");

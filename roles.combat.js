@@ -121,7 +121,7 @@ module.exports = {
 		&& _.get(creep, ["memory", "target", "notarget_structure"], 0) < Game.time - 10) {
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_STRUCTURES, { filter:
 				s => { return s.hits != null && s.hits > 0
-					&& (s.owner == null
+					&& ((s.owner == null && s.structureType != "container")
 					|| (s.owner != null && !s.my && s.owner != "Source Keeper" && s.structureType != "controller"
 						&& _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0)); }}),
 				s => { return creep.pos.getRangeTo(s.pos); } ),
