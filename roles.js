@@ -47,10 +47,11 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, true))
-					return;
-
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
+
+				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
+					return;
+				
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", 
 				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
@@ -106,10 +107,10 @@ module.exports = {
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.room, true))
-					return;
-
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
+
+				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
+					return;				
 
 				if (creep.memory.role == "burrower") {
 					creep.memory.task = creep.memory.task || creep.getTask_Mine();
@@ -183,6 +184,10 @@ module.exports = {
 			}
 			
 			creep.memory.task = creep.memory.task || creep.getTask_Boost();
+
+			if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
+				return;
+
 			creep.memory.task = creep.memory.task || creep.getTask_Industry_Withdraw();
 			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
@@ -224,10 +229,11 @@ module.exports = {
 						return;
 					}
 
-					if (this.goToRoom(creep, creep.memory.room, true))
+					creep.memory.task = creep.memory.task || creep.getTask_Boost();
+
+					if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
 						return;
 
-					creep.memory.task = creep.memory.task || creep.getTask_Boost();
 					creep.memory.task = creep.memory.task || creep.getTask_Extract();
 					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
