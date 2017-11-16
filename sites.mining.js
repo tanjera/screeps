@@ -30,11 +30,9 @@ module.exports = {
 			return;
 		}
 		
-		listSpawnRooms = _.get(Memory, ["sites", "mining", rmHarvest, "spawn_assist", "rooms"]);
-		listRoute = _.get(Memory, ["sites", "mining", rmHarvest, "list_route"]);
-		popTarget = _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
-		hasKeepers = _.get(Memory, ["sites", "mining", rmHarvest, "has_keepers"], false);
-
+		let listSpawnRooms = _.get(Memory, ["sites", "mining", rmHarvest, "spawn_assist", "rooms"]);
+		let listRoute = _.get(Memory, ["sites", "mining", rmHarvest, "list_route"]);
+		let hasKeepers = _.get(Memory, ["sites", "mining", rmHarvest, "has_keepers"], false);
 		if (rmColony == rmHarvest 
 				&& _.filter(_.get(Game, ["spawns"]), s => { return s.room.name == rmColony; }).length < 1) {
 			listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
@@ -52,7 +50,7 @@ module.exports = {
 
 		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, `Mining-${rmHarvest}-runPopulation`);
-			this.runPopulation(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, popTarget);
+			this.runPopulation(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers);
 			_CPU.End(rmColony, `Mining-${rmHarvest}-runPopulation`);
 		}
 
@@ -82,7 +80,7 @@ module.exports = {
 		_.set(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], hostiles);
 	},
 
-	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers, populationTarget) {
+	runPopulation: function(rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers) {
 		let room_level = Game["rooms"][rmColony].getLevel();
 		let has_minerals = _.get(Memory, ["sites", "mining", rmHarvest, "survey", "has_minerals"]);
 		let threat_level = _.get(Memory, ["rooms", rmColony, "defense", "threat_level"]);
@@ -124,7 +122,11 @@ module.exports = {
 			}
 		});
 
-		if (popTarget == null) {
+		let popTarget = new Object();
+		let custom_population = _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
+		if (custom_population)
+			popTarget = _.cloneDeep(custom_population);
+		else {
 			if (rmColony == rmHarvest)
 				popTarget = _.cloneDeep(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)]);
 			else if (hasKeepers != true) {
@@ -133,9 +135,8 @@ module.exports = {
 					: _.cloneDeep(Population_Mining["R1"][Math.max(1, room_level)]);
 			} else if (hasKeepers == true)
 				popTarget = _.cloneDeep(Population_Mining["SK"]);
-		} else
-			popTarget = _.cloneDeep(populationTarget);
-
+		}
+		
 		// Remote mining: adjust soldier levels based on threat level
 		if (rmHarvest != rmColony && threat_level != NONE && hasKeepers == false) {						
 			if (threat_level == LOW || threat_level == null) {
@@ -159,6 +160,10 @@ module.exports = {
 		Hive.populationTally(rmColony, 
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
 			_.sum(popActual));
+
+		// Grafana population stats
+		let Grafana = require("util.grafana");
+		Grafana.populationTally(rmColony, popTarget, popActual);
 
 		if (_.get(popActual, "paladin", 0) < _.get(popTarget, ["paladin", "amount"], 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 

@@ -10,8 +10,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-init");
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
 		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
-		popTarget = _.get(Memory, ["rooms", rmColony, "custom_population"]);
-
+		
 		if (_.get(Memory, ["rooms", rmColony, "defense", "threat_level"]) == null)
 			_.set(Memory, ["rooms", rmColony, "defense", "threat_level"], MEDIUM);
 
@@ -28,7 +27,7 @@ module.exports = {
 
 		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Colony-runPopulation");
-			this.runPopulation(rmColony, listCreeps, listSpawnRooms, popTarget);
+			this.runPopulation(rmColony, listCreeps, listSpawnRooms);
 			_CPU.End(rmColony, "Colony-runPopulation");
 		}
 
@@ -117,7 +116,7 @@ module.exports = {
 		}
 	},
 
-	runPopulation: function(rmColony, listCreeps, listSpawnRooms, populationTarget) {
+	runPopulation: function(rmColony, listCreeps, listSpawnRooms) {
 		let room_level = Game["rooms"][rmColony].getLevel();
 		let is_safe = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"]);		
 		let hostiles = _.get(Memory, ["rooms", rmColony, "defense", "hostiles"], new Array());
@@ -135,10 +134,12 @@ module.exports = {
 			}
 		});
 		
-		if (popTarget == null)
-			popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]); 
+		let popTarget = new Object();
+		let custom_population = _.get(Memory, ["rooms", rmColony, "custom_population"]);
+		if (custom_population)
+			popTarget = _.cloneDeep(custom_population);
 		else
-			popTarget = _.cloneDeep(populationTarget);
+			popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]); 
 			
 		// Adjust soldier amounts & levels based on threat level
 		if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {						
@@ -181,6 +182,10 @@ module.exports = {
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
 			_.sum(popActual));
 		
+		// Grafana population stats
+		let Grafana = require("util.grafana");
+		Grafana.populationTally(rmColony, popTarget, popActual);
+
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
 			&& ((_.get(popActual, "soldier", 0) < _.get(popTarget, ["soldier", "amount"], 0))
 			|| (_.get(popActual, "soldier", 0) < hostiles.length))) {

@@ -5,6 +5,8 @@
 
 
 # Implementing...
+- add (but comment) spawn population metrics -> grafana
+
 - combat boosts... 
 	- Add `use_boosts` to combat objects (from util_console and from toColonize)
 
