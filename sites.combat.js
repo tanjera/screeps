@@ -458,10 +458,9 @@ module.exports = {
 		if (_.get(Game, ["rooms", _.get(combat, "target_room")]) != null) {
 			let attack_structures = _.filter(room_structures,
 				s => { return s.hits != null && s.hits > 0
-					&& (s.owner == null
+					&& ((s.owner == null && s.structureType != "container")
 					|| (s.owner != null && !s.my && s.owner != "Source Keeper" && s.structureType != "controller"
 						&& _.get(Memory, ["hive", "allies"]).indexOf(s.owner.username) < 0)); });
-
 			if (_.get(combat, ["tactic", "target_structures"]) == true && attack_structures.length == 0) {
 				_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
 				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Victory detected by destroying all structures! Stopping attack.`);
