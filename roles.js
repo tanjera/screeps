@@ -44,6 +44,7 @@ module.exports = {
 			if (creep.memory.state == "refueling") {
 				if (_.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "working";
+					delete creep.memory.task;
 					return;
 				}
 
@@ -67,6 +68,7 @@ module.exports = {
 			} else if (creep.memory.state == "working") {
 				if (creep.carry["energy"] == 0) {
 					creep.memory.state = "refueling";
+					delete creep.memory.task;
 					return;
 				}
 
@@ -104,6 +106,7 @@ module.exports = {
 				if (creep.memory.role != "burrower" && creep.carryCapacity > 0 
 						&& _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
+					delete creep.memory.task;
 					return;
 				}
 
@@ -141,6 +144,7 @@ module.exports = {
 			} else if (creep.memory.state == "delivering") {
 				if (creep.carryCapacity == 0 || _.sum(creep.carry) == 0) {
 					creep.memory.state = "refueling";
+					delete creep.memory.task;
 					return;
 				}
 
@@ -179,7 +183,8 @@ module.exports = {
 		
 		if (creep.memory.state == "loading") {
             if (_.sum(creep.carry) > 0) {
-                creep.memory.state = "delivering";
+				creep.memory.state = "delivering";
+				delete creep.memory.task;
                 return;
 			}
 			
@@ -196,7 +201,8 @@ module.exports = {
 
         } else if (creep.memory.state == "delivering") {
             if (_.sum(creep.carry) == 0) {
-                    creep.memory.state = "loading";
+					creep.memory.state = "loading";
+					delete creep.memory.task;
                     return;
                 }
 
@@ -226,6 +232,7 @@ module.exports = {
 					if (_.sum(creep.carry) == creep.carryCapacity
 							|| _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true) == false) {
 						creep.memory.state = "deliver";
+						delete creep.memory.task;
 						return;
 					}
 
@@ -244,6 +251,7 @@ module.exports = {
 					if (_.sum(creep.carry) == 0 
 							&& _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true)) {
 						creep.memory.state = "get_minerals";
+						delete creep.memory.task;
 						return;
 					}
 
