@@ -41,6 +41,8 @@ module.exports = {
                     _.set(Memory, ["stats", "colonies", room.name, "rcl", "progress_total"], room.controller.progressTotal);
                     _.set(Memory, ["stats", "colonies", room.name, "rcl", "progress_percent"], (room.controller.progress / room.controller.progressTotal * 100));
                     
+                    _.set(Memory, ["stats", "colonies", room.name, "population"], new Object());
+
                     let storage = _.get(Game, ["rooms", room.name, "storage"]);
                     let terminal = _.get(Game, ["rooms", room.name, "terminal"]);
                     _.set(Memory, ["stats", "colonies", room.name, "storage", "store"], _.get(storage, "store"));
@@ -52,6 +54,22 @@ module.exports = {
                             + _.get(terminal, ["store", res], 0));
                 }
             });
+        }
+    },
+
+    populationTally: function(room_name, pop_target, pop_actual) {
+        // Deprecated function!! Comment 'return;' if you would still like to use.
+        return;
+
+        for (let i in pop_target) {
+            _.set(Memory, ["stats", "colonies", room_name, "population", "target", i], 
+                _.get(pop_target, [i, "amount"]) + _.get(Memory, ["stats", "colonies", room_name, "population", "target", i], 0));
+            _.set(Memory, ["stats", "colonies", room_name, "population", "actual", i], 
+                _.get(pop_actual, [i]) + _.get(Memory, ["stats", "colonies", room_name, "population", "actual", i], 0));
+
+            _.set(Memory, ["stats", "colonies", room_name, "population", "percent", i],
+                _.get(Memory, ["stats", "colonies", room_name, "population", "actual", i], 0)
+                / _.get(Memory, ["stats", "colonies", room_name, "population", "target", i], 1))
         }
     }
 };

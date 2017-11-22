@@ -10,19 +10,16 @@ let labDefinitions;
 module.exports = {
 
 	Run: function(rmColony) {
-		_CPU.Start(rmColony, "Industry-init");
+		// Expanded scope variables:
 		labDefinitions = _.get(Memory, ["rooms", rmColony, "labs", "definitions"]);
-		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);		
-		popTarget = _.get(Memory, ["rooms", rmColony, "custom_population"]);		
-		_CPU.End(rmColony, "Industry-init");
-
+		
 		_CPU.Start(rmColony, "Industry-listCreeps");
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Industry-listCreeps");
 
 		if (isPulse_Spawn()) {
 			_CPU.Start(rmColony, "Industry-runPopulation");
-			this.runPopulation(rmColony, listCreeps, listSpawnRooms, popTarget);
+			this.runPopulation(rmColony, listCreeps);
 			_CPU.End(rmColony, "Industry-runPopulation");
 		}
 
@@ -62,20 +59,28 @@ module.exports = {
 	},
 
 
-	runPopulation: function(rmColony, listCreeps, listSpawnRooms, populationTarget) {
+	runPopulation: function(rmColony, listCreeps) {
+		let listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);	
+
 		let popActual = new Object();
 		_.set(popActual, "courier", _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80)).length);
 
-		if (popTarget == null)
-			popTarget = _.cloneDeep(Population_Industry);
+		let popTarget = new Object();
+		let custom_population = _.get(Memory, ["rooms", rmColony, "custom_population"]);	
+		if (custom_population)
+			popTarget = _.cloneDeep(custom_population)
 		else
-			popTarget = _.cloneDeep(populationTarget)
-
+			popTarget = _.cloneDeep(Population_Industry);
+			
 		// Tally population levels for level scaling and statistics
 		Hive.populationTally(rmColony, 
 			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
 			_.sum(popActual));
 
+		// Grafana population stats
+		let Grafana = require("util.grafana");
+		Grafana.populationTally(rmColony, popTarget, popActual);
+		
 		if (_.get(Game, ["rooms", rmColony, "terminal"])
 			&& _.get(popActual, "courier", 0) < _.get(popTarget, ["courier", "amount"], 0)) {
 			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
