@@ -267,8 +267,7 @@ module.exports = {
 			
 			let pause_extraction = _.get(Memory, ["hive", "pause", "extracting"], false);
 			if (has_minerals && !pause_extraction 
-					&& _.get(popActual, "extractor", 0) < _.get(popTarget, ["extractor", "amount"], 0)
-					&& _.get(popActual, "extractor", 0) < _.sum(_.get(Memory, ["rooms", rmHarvest, "minerals"]), p => { return _.get(p, "access_tiles", 2); })) {
+					&& _.get(popActual, "extractor", 0) < _.get(popTarget, ["extractor", "amount"], 0)) {
 				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
 					priority: 18, 
 					level: _.get(popTarget, ["extractor", "level"], 1),
