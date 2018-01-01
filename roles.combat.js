@@ -215,7 +215,9 @@ module.exports = {
 		
 			let structures = creep.room.find(FIND_MY_STRUCTURES);
 			let ramparts = _.filter(structures, 
-				s => { return s.structureType == "rampart" && s.pos.lookFor(LOOK_CREEPS).length == 0; });					
+				s => { return s.structureType == "rampart" 
+						&& s.pos.lookFor(LOOK_CREEPS).length == 0
+						&& s.pos.lookFor(LOOK_STRUCTURES).length == 1; });					
 			let rampart = creep.pos.findClosestByPath(ramparts);
 			if (rampart != null) {
 				_.set(creep.memory, "camp", rampart.id);
