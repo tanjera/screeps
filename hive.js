@@ -63,15 +63,17 @@ let Hive = {
 		if (!isPulse_Short())
 			return;
 
-		_.each(Object.keys(Memory.creeps), c => {
-			if (!_.has(Game, ["creeps", c])) {
-				delete Memory.creeps[c];
-		}});
+		if (_.has(Memory, "creeps"))
+			_.each(Object.keys(Memory.creeps), c => {
+				if (!_.has(Game, ["creeps", c])) {
+					delete Memory.creeps[c];
+			}});
 
-		_.each(Object.keys(Memory.rooms), r => { 
-			if (!_.has(Game, ["rooms", r]))
-				delete Memory.rooms[r]; 
-		});
+		if (_.has(Memory, "rooms"))
+			_.each(Object.keys(Memory.rooms), r => { 
+				if (!_.has(Game, ["rooms", r]))
+					delete Memory.rooms[r]; 
+			});	
 	},
 
 	initMemory: function() {
