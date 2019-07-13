@@ -459,6 +459,10 @@ Creep.prototype.getTask_Sign = function getTask_Sign () {
 	if (!_.get(this.room, "controller", false))
 		return;
 
+	// Signs set by Screeps devs can't be changed- will report OK (0) but will fail to change
+	if (_.get(this.room, ["controller", "sign", "username"]) == "Screeps")
+		return;
+
 	let sign_room = _.get(Memory, ["hive", "signs", this.room.name]);
 	let sign_default = _.get(Memory, ["hive", "signs", "default"]);
 	let is_safe = _.get(Memory, ["rooms", this.room.name, "defense", "is_safe"]);
@@ -532,11 +536,11 @@ Creep.prototype.getTask_Mine = function getTask_Mine () {
 	let source = _.head(_.sortBy(_.filter(this.room.find(FIND_SOURCES), 
 		s => { return s.energy > 0; }),
 		s => {
-			if (this.memory.role == "burrower") {
+			if (this.memory.role == "burrower")
 				return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1), 
 					c => { return c.memory.role == "burrower"; }).length;
-			} else
-				return;
+			else // Sort by least crowded...
+				return s.pos.findInRange(FIND_MY_CREEPS, 1).length > s.pos.getOpenTile_Adjacent(true);			
 		}));
 
 	if (source == null)
