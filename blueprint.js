@@ -5,31 +5,31 @@ let _Hive = require("hive");
 
 let Blueprint = {
 
-	Init: function() {		
+	Init: function() {
 		// Process special blueprint requests (from console) immediately, effectively pausing cycles/pulses by 1 tick.
-		if (_.get(Memory, ["hive", "pulses", "blueprint", "request"]) != null) {			
+		if (_.get(Memory, ["hive", "pulses", "blueprint", "request"]) != null) {
 			let room = Game.rooms[_.get(Memory, ["hive", "pulses", "blueprint", "request"])];
-			
+
 			if (room == null) {
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blueprint() request for ${_.get(Memory, ["hive", "pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
 			} else {
 				_CPU.Start("Hive", "Blueprint-Run");
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Processing requested Blueprint() for ${room.name}`);
-				this.Run(room);				
+				this.Run(room);
 				_CPU.End("Hive", "Blueprint-Run");
 			}
 
 			delete Memory["hive"]["pulses"]["blueprint"]["request"];
-			return;			
+			return;
 		}
-		
+
 		// Only proceed if it's a pulse tick
 		if (!isPulse_Blueprint())
 			return;
-		
+
 		// Initiates cycle structure if non-existant (between last finish and new start)
 		if (_.get(Memory, ["hive", "pulses", "blueprint", "cycle"]) == null) {
-			let rooms = _.filter(Object.keys(Game.rooms), 
+			let rooms = _.filter(Object.keys(Game.rooms),
 				n => { return Game.rooms[n].controller != null && Game.rooms[n].controller.my; });
 			_.set(Memory, ["hive", "pulses", "blueprint", "cycle"], {room_iter: 0, room_list: rooms });
 		}
@@ -37,7 +37,7 @@ let Blueprint = {
 		let room_list = _.get(Memory, ["hive", "pulses", "blueprint", "cycle", "room_list"]);
 		let room_iter = _.get(Memory, ["hive", "pulses", "blueprint", "cycle", "room_iter"]);
 
-		_CPU.Start("Hive", "Blueprint-Run");		
+		_CPU.Start("Hive", "Blueprint-Run");
 		let room = (room_iter < room_list.length ? Game.rooms[room_list[room_iter]] : null);
 		if (room != null) {
 			console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room_iter + 1}/${room_list.length}: Running Blueprint() for ${room.name}`);
@@ -45,9 +45,9 @@ let Blueprint = {
 		}
 
 		// Iterate, then check if iteration is complete (and reset cycles)
-		room_iter += 1;		
+		room_iter += 1;
 		if (room_iter == room_list.length)
-			delete Memory["hive"]["pulses"]["blueprint"]["cycle"];			
+			delete Memory["hive"]["pulses"]["blueprint"]["cycle"];
 		else
 			_.set(Memory, ["hive", "pulses", "blueprint", "cycle", "room_iter"], room_iter);
 
@@ -73,7 +73,7 @@ let Blueprint = {
 
 		if (origin == null || sites >= sites_per_room)
 			return;
-		
+
 		switch (layout) {
 			default:
 			case "default_horizontal":
@@ -90,11 +90,11 @@ let Blueprint = {
 				break;
 		}
 
-		// Block areas around sources, minerals, and the room controller; prevents cycle of building and destroying.		
+		// Block areas around sources, minerals, and the room controller; prevents cycle of building and destroying.
 		if (blocked_areas == null) Memory["rooms"][room.name]["layout"]["blocked_areas"] = [];
 
 		_.each(sources, s => {
-			if (_.filter(blocked_areas, a => { 
+			if (_.filter(blocked_areas, a => {
 					return _.get(a, ["start", "x"]) == s.pos.x -1 && _.get(a, ["start", "y"]) == s.pos.y - 1
 					&& _.get(a, ["end", "x"]) == s.pos.x + 1 && _.get(a, ["end", "y"]) == s.pos.y + 1; }).length == 0) {
 				Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
@@ -103,7 +103,7 @@ let Blueprint = {
 			}
 		});
 
-		if (mineral != null && _.filter(blocked_areas, a => { 
+		if (mineral != null && _.filter(blocked_areas, a => {
 				return _.get(a, ["start", "x"]) == mineral.pos.x - 1 && _.get(a, ["start", "y"]) == mineral.pos.y - 1
 				&& _.get(a, ["end", "x"]) == mineral.pos.x + 1 && _.get(a, ["end", "y"]) == mineral.pos.y + 1; }).length == 0) {
 			Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
@@ -111,7 +111,7 @@ let Blueprint = {
 			console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for mineral around (${mineral.pos.x}, ${mineral.pos.y}).`);
 		}
 
-		if (_.filter(blocked_areas, a => { 
+		if (_.filter(blocked_areas, a => {
 				return _.get(a, ["start", "x"]) == room.controller.pos.x - 1 && _.get(a, ["start", "y"]) == room.controller.pos.y - 1
 				&& _.get(a, ["end", "x"]) == room.controller.pos.x + 1 && _.get(a, ["end", "y"]) == room.controller.pos.y + 1; }).length == 0) {
 			Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
@@ -132,63 +132,44 @@ let Blueprint = {
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "spawn");
 		if (_.filter(structures, s => { return s.structureType == "spawn"; }).length == 0)
 			return;
-				
+
 		// Order by priority; defense, then increased creep capacity
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "tower");
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "extension");
-		
+
 		if (level >= 3) {
 			// Iterate sources, create two containers adjacent to each source
 			if (sites < sites_per_room) {
-				let containers = _.filter(all_structures, s => { return s.structureType == "container"; });				
+				let containers = _.filter(all_structures, s => { return s.structureType == "container"; });
 				_.each(sources, source => {
 					if (sites < sites_per_room && source.pos.findInRange(containers, 1).length < 2) {
 						let adj = source.pos.getBuildableTile_Adjacent();
-						if (adj != null && adj.createConstructionSite("container") == OK) {							
+						if (adj != null && adj.createConstructionSite("container") == OK) {
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);
 							sites += 1;
 						}
 					}
 				});
 			}
-			
+
 			// Only build walls and ramparts after tower, containers
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "rampart");
-			sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "constructedWall");				
+			sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "constructedWall");
 		}
 
 		// Ordered by priority; lower priority than defensive structures (in case high RCL rebuilding after attack)
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "storage");
 		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "extractor"))
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "terminal");
-		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "terminal") 
+		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "terminal")
 				&& this.atMaxStructureCount(room, structures, layout, "nuker"))
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "lab");
-		
+
 		sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "nuker");
 		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "nuker"))
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "observer");
 		if (sites < sites_per_room && this.atMaxStructureCount(room, structures, layout, "observer"))
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "powerSpawn");
-
-		/* TODO: Revisit this code... it builds too many redundant roads, and clogs bases if source/controller are within ramparts
-		if (level >= 4) {
-			// Create roads leading from the base to sources, room controller
-			if (sites < sites_per_room) {
-				let target = room.controller.pos.findClosestByPath(ramparts);
-				if (target != null)
-					sites = this.createRoad(room, sites, sites_per_room, room.controller.pos, target.pos)
-			}
-
-			_.each(sources, source => {
-				if (sites < sites_per_room) {
-					let target = source.pos.findClosestByPath(ramparts);
-					if (target != null)
-						sites = this.createRoad(room, sites, sites_per_room, source.pos, target.pos)
-				}
-			});
-		}
-		*/
 
 		if (level >= 5) {
 			/* Building links... order to build:
@@ -206,7 +187,7 @@ let Blueprint = {
 					let source = sources[i];
 					if (sites < sites_per_room && source.pos.findInRange(links, 2).length == 0) {
 						let adj = source.pos.getOpenTile_Path(2);
-						if (adj != null && adj.createConstructionSite("link") == OK) {							
+						if (adj != null && adj.createConstructionSite("link") == OK) {
 							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
 							sites += 1;
 						}
@@ -224,13 +205,13 @@ let Blueprint = {
 				// Build links near room controller
 				if (sites < sites_per_room && room.controller.pos.findInRange(links, 2).length < cont_links) {
 					let adj = room.controller.pos.getOpenTile_Path(2);
-					if (adj != null && adj.createConstructionSite("link") == OK) {							
+					if (adj != null && adj.createConstructionSite("link") == OK) {
 						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
 						sites += 1;
 					}
 				}
 			}
-			
+
 			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "link");
 
 			// Only build roads at level 5 to allow extensions, tower, and walls to be built
@@ -248,18 +229,6 @@ let Blueprint = {
 					}
 				}
 			}
-
-			/* TODO: Revisit this code... if extractor is within ramparts, clogs bases; also, finds circuitous paths
-			// Create roads leading from the base to extractor
-			if (sites < sites_per_room) {
-				let extractor = _.head(_.filter(structures, s => { return s.structureType == "extractor"; }));
-				if (extractor != null) {
-					let target = extractor.pos.findClosestByPath(ramparts);
-					if (target != null)
-						sites = this.createRoad(room, sites, sites_per_room, extractor.pos, target.pos)
-				}
-			}
-			*/
 		}
 
 		if (level == 8) {
@@ -282,16 +251,16 @@ let Blueprint = {
 
 	atMaxStructureCount: function(room, structures, layout, structureType) {
 		let count = _.filter(structures, s => { return s.structureType == structureType; }).length;
-		return count == CONTROLLER_STRUCTURES[structureType][room.controller.level] 
+		return count == CONTROLLER_STRUCTURES[structureType][room.controller.level]
 			|| (layout[structureType] == null ? false : count == layout[structureType].length);
 	},
 
 	iterateStructure: function(room, sites, structures, layout, origin, sites_per_room, blocked_areas, structureType) {
 		if (sites >= sites_per_room)
 			return sites;
-		
+
 		let iterate_error = 0;
-		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] + iterate_error 
+		for (let i = 0; sites < sites_per_room && i < CONTROLLER_STRUCTURES[structureType][room.controller.level] + iterate_error
 				&& layout[structureType] != null && i < layout[structureType].length; i++) {
 			let x = origin.x + layout[structureType][i].x;
 			let y = origin.y + layout[structureType][i].y;
@@ -310,8 +279,8 @@ let Blueprint = {
 				}
 			}
 			if (blocked)
-				continue;		
-			
+				continue;
+
 			let result = room.createConstructionSite(x, y, structureType);
 			if (result == OK) {
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing ${structureType} at `
@@ -344,13 +313,13 @@ let Blueprint = {
 		let from_pos = new RoomPosition(from.x, from.y, room.name);
 		let to_pos = new RoomPosition(to.x, to.y, room.name);
 		let path = room.findPath(from_pos, to_pos, {ignoreCreeps: true});
-		
+
 		for (let i = 0; i < path.length; i++)
-			road += (((sites + road) < sites_per_room && room.createConstructionSite(path[i].x, path[i].y, "road") == OK) ? 1 : 0);					
-		
+			road += (((sites + road) < sites_per_room && room.createConstructionSite(path[i].x, path[i].y, "road") == OK) ? 1 : 0);
+
 		if ((sites + road + 1) < sites_per_room) {
 			road += (room.createConstructionSite(from_pos.x, from_pos.y, "road") == OK ? 1 : 0);
-			road += (room.createConstructionSite(to_pos.x, to_pos.y, "road") == OK ? 1 : 0);			
+			road += (room.createConstructionSite(to_pos.x, to_pos.y, "road") == OK ? 1 : 0);
 		}
 
 		if (road > 0) {

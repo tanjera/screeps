@@ -10,17 +10,17 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-init");
 		listSpawnRooms = _.get(Memory, ["rooms", rmColony, "spawn_assist", "rooms"]);
 		listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
-		
+
 		if (_.get(Memory, ["rooms", rmColony, "defense", "threat_level"]) == null)
 			_.set(Memory, ["rooms", rmColony, "defense", "threat_level"], MEDIUM);
 
 		let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 		_CPU.End(rmColony, "Colony-init");
 
-		
+
 		_CPU.Start(rmColony, "Colony-surveyRoom");
 		if (isPulse_Defense()) {
-			this.surveyRoom(rmColony);		
+			this.surveyRoom(rmColony);
 			this.surveySafeMode(rmColony, listCreeps);
 		}
 		_CPU.End(rmColony, "Colony-surveyRoom");
@@ -38,7 +38,7 @@ module.exports = {
 		_CPU.Start(rmColony, "Colony-runTowers");
 		this.runTowers(rmColony);
         _CPU.End(rmColony, "Colony-runTowers");
-		
+
 		_CPU.Start(rmColony, "Colony-defineLinks");
 		if (isPulse_Long() || _.has(Memory, ["hive", "pulses", "reset_links"])) {
 			this.defineLinks(rmColony);
@@ -55,16 +55,16 @@ module.exports = {
 		_.set(Memory, ["rooms", rmColony, "survey", "has_minerals"],
 			visible ? Game.rooms[rmColony].find(FIND_MINERALS, {filter: (m) => { return m.mineralAmount > 0; }}).length > 0 : false);
 
-		let hostiles = visible 
+		let hostiles = visible
 			? _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); })
 			: new Array();
 		_.set(Memory, ["rooms", rmColony, "defense", "hostiles"], hostiles);
-			
+
 		let is_safe = !visible || hostiles.length == 0;
 		_.set(Memory, ["rooms", rmColony, "defense", "is_safe"], is_safe);
 
 		let storage = _.get(Game, ["rooms", rmColony, "storage"]);
-		
+
 		if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getCriticalEnergy()) {
 			_.set(Memory, ["rooms", rmColony, "survey", "energy_level"], CRITICAL);
 		} else if (visible && storage != null && storage.store["energy"] < Game["rooms"][rmColony].getLowEnergy()) {
@@ -84,13 +84,13 @@ module.exports = {
 		let controller = _.get(room, "controller");
 		let is_safe = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"]);
 
-		if (is_safe || room == null || controller == null || controller.safeMode > 0 
+		if (is_safe || room == null || controller == null || controller.safeMode > 0
 				|| controller.safeModeCooldown > 0 || controller.safeModeAvailable == 0)
 			return;
 
 		let hostiles = _.get(Memory, ["rooms", rmColony, "defense", "hostiles"]);
-		let threats = _.filter(hostiles, c => { 
-			return c.isHostile() && c.owner.username != "Invader" 
+		let threats = _.filter(hostiles, c => {
+			return c.isHostile() && c.owner.username != "Invader"
 				&& (c.hasPart("attack") || c.hasPart("ranged_attack") || c.hasPart("work")); });
 		let structures = _.filter(room.find(FIND_MY_STRUCTURES), s => {
 			return s.structureType == "spawn" || s.structureType == "extension"
@@ -118,12 +118,12 @@ module.exports = {
 
 	runPopulation: function(rmColony, listCreeps, listSpawnRooms) {
 		let room_level = Game["rooms"][rmColony].getLevel();
-		let is_safe = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"]);		
+		let is_safe = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"]);
 		let hostiles = _.get(Memory, ["rooms", rmColony, "defense", "hostiles"], new Array());
 		let threat_level = _.get(Memory, ["rooms", rmColony, "defense", "threat_level"]);
 		let energy_level = _.get(Memory, ["rooms", rmColony, "survey", "energy_level"]);
 		let downgrade_critical = _.get(Memory, ["rooms", rmColony, "survey", "downgrade_critical"]);
-		
+
 		let popActual = new Object();
 		_.each(listCreeps, c => {
 			switch(_.get(c, ["memory", "role"])) {
@@ -133,16 +133,16 @@ module.exports = {
 				case "worker": popActual["worker"] = _.get(popActual, "worker", 0) + 1; break;
 			}
 		});
-		
+
 		let popTarget = new Object();
 		let custom_population = _.get(Memory, ["rooms", rmColony, "custom_population"]);
 		if (custom_population)
 			popTarget = _.cloneDeep(custom_population);
 		else
-			popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]); 
-			
+			popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]);
+
 		// Adjust soldier amounts & levels based on threat level
-		if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {						
+		if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {
 			if (threat_level == LOW || threat_level == null) {
 				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 2);
 				if (is_safe)
@@ -157,7 +157,7 @@ module.exports = {
 			} else if (threat_level == HIGH) {
 				_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 6);
 				_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 2);
-			}				
+			}
 		}
 
 		// Adjust worker amounts based on is_safe, energy_level
@@ -172,16 +172,16 @@ module.exports = {
 				_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.5)))
 			} else if (energy_level == EXCESS && room_level < 8) {
 				let storage = _.get(Game, ["rooms", rmColony, "storage"]);
-				_.set(popTarget, ["worker", "amount"], Math.round(_.get(popTarget, ["worker", "amount"]) * 
+				_.set(popTarget, ["worker", "amount"], Math.round(_.get(popTarget, ["worker", "amount"]) *
 					(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
 			}
 		}
-		
+
 		// Tally population levels for level scaling and statistics
-		Hive.populationTally(rmColony, 
-			_.sum(popTarget, p => { return _.get(p, "amount", 0); }), 
+		Hive.populationTally(rmColony,
+			_.sum(popTarget, p => { return _.get(p, "amount", 0); }),
 			_.sum(popActual));
-		
+
 		// Grafana population stats
 		let Grafana = require("util.grafana");
 		Grafana.populationTally(rmColony, popTarget, popActual);
@@ -189,30 +189,30 @@ module.exports = {
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
 			&& ((_.get(popActual, "soldier", 0) < _.get(popTarget, ["soldier", "amount"], 0))
 			|| (_.get(popActual, "soldier", 0) < hostiles.length))) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms,
 					priority: (!is_safe ? 1 : 21),
 					level: _.get(popTarget, ["soldier", "level"], room_level),
 					scale: _.get(popTarget, ["soldier", "scale"], true),
 					body: "soldier", name: null, args: {role: "soldier", room: rmColony} });
-		} 
-		
+		}
+
 		if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
 			&& _.get(popActual, "healer", 0) < _.get(popTarget, ["healer", "amount"], 0)) {
-			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+			Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms,
 				priority: (!is_safe ? 2 : 22),
 				level: _.get(popTarget, ["healer", "level"], 1),
 				scale: _.get(popTarget, ["healer", "scale"], true),
 				body: "healer", name: null, args: {role: "healer", room: rmColony} });
-		} 
-		
+		}
+
 		if (_.get(popActual, "worker", 0) < _.get(popTarget, ["worker", "amount"], 0)) {
-				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms, 
+				Memory["hive"]["spawn_requests"].push({ room: rmColony, listRooms: listSpawnRooms,
 					priority: Math.lerpSpawnPriority(23, 25, _.get(popActual, "worker", 0), _.get(popTarget, ["worker", "amount"], 0)),
 					level: _.get(popTarget, ["worker", "level"], 1),
 					scale: _.get(popTarget, ["worker", "scale"], true),
 					body: _.get(popTarget, ["worker", "body"], "worker"),
 					name: null, args: {role: "worker", room: rmColony} });
-		} 
+		}
 	},
 
 
@@ -239,13 +239,13 @@ module.exports = {
 		if (!is_safe) {
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "heal"], null);
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], null);
-			
+
 			this.towerAcquireAttack(rmColony);
 			this.towerRunAttack(rmColony);
 			return;
 		} else {
 		    _.set(Memory, ["rooms", rmColony, "defense", "targets", "attack"], null);
-			
+
 			this.towerAcquireHeal(rmColony);
 			if (_.get(Memory, ["rooms", rmColony, "defense", "targets", "heal"]) != null) {
 				this.towerRunHeal(rmColony);
@@ -271,19 +271,19 @@ module.exports = {
 				_.set(Memory, ["rooms", rmColony, "defense", "targets", "attack"], null);
 			}
 		}
-		
+
 		// Acquire target if no target exists, or re-acquire target every 15 ticks
 		if (target == null || Game.time % 15 == 0) {
 			let base_structures = _.filter(Game.rooms[rmColony].find(FIND_STRUCTURES),
-				s => { return s.structureType != "link" && s.structureType != "container" 
+				s => { return s.structureType != "link" && s.structureType != "container"
 						&& s.structureType != "extractor" && s.structureType != "controller"
 						&& s.structureType != "road"; });
 			let spawns = _.filter(base_structures, s => { return s.structureType == "spawn"; });
-			
+
 			// Find the center of base by averaging position of all spawns
 			let originX = 0, originY = 0;
 			for (let i = 0; i < spawns.length; i++) {
-				originX += spawns[i].pos.x; 
+				originX += spawns[i].pos.x;
 				originY += spawns[i].pos.y;
 			}
 			originX /= spawns.length;
@@ -293,7 +293,7 @@ module.exports = {
 			// Only attack creeps that are 1) not allies and 2) within 10 sq of base structures (or Invader within 5 sq of creeps)
 			// Then sort by 1) if they have heal parts, and 2) sort by distance (attack closest)
 			target = _.head(_.sortBy(_.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS),
-				c => { return !c.isAlly() && (c.pos.inRangeToListTargets(base_structures, 10) 
+				c => { return !c.isAlly() && (c.pos.inRangeToListTargets(base_structures, 10)
 						|| (c.owner.username == "Invader" && c.pos.inRangeToListTargets(my_creeps, 3))); }),
 				c => { return (c.hasPart("heal") > 0
 					? -100 + new RoomPosition(originX, originY, rmColony).getRangeTo(c.pos.x, c.pos.y)
@@ -309,16 +309,16 @@ module.exports = {
 			if (hostile == null) {
 				_.set(Memory, ["rooms", rmColony, "defense", "targets", "attack"], null);
 			} else {
-				_.each(_.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), 
+				_.each(_.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES),
 					s => { return s.structureType == "tower"; }),
-					t => { t.attack(hostile); });				
+					t => { t.attack(hostile); });
 			}
 		}
 	},
 
 	towerAcquireHeal: function (rmColony) {
 		if (Game.time % 15 == 0 && _.get(Game, ["rooms", rmColony]) != null) {
-			let injured = _.head(_.filter(Game.rooms[rmColony].find(FIND_MY_CREEPS), 
+			let injured = _.head(_.filter(Game.rooms[rmColony].find(FIND_MY_CREEPS),
 				c => { return c.hits < c.hitsMax; }));
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "heal"], _.get(injured, "id"));
 		}
@@ -333,7 +333,7 @@ module.exports = {
 			} else {
 				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => {
 					return s.structureType == "tower" && s.energy > s.energyCapacity * 0.5; }}),
-					t => { t.heal(injured) });				
+					t => { t.heal(injured) });
 			}
 		}
 	},
@@ -344,22 +344,21 @@ module.exports = {
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], null);
 			return;
 		}
-		
+
 		if (Game.time % 15 == 0 && _.get(Game, ["rooms", rmColony]) != null) {
 			let room = Game["rooms"][rmColony];
 
-			let repair = _.head(_.sortBy(_.filter(room.findRepair_Maintenance(), 
-				r => { return (r.hits / room.getWallTarget() < 1.05
-					&& (r.structureType == "rampart" || r.structureType == "constructedWall"
-						|| r.structureType == "container" || r.structureType == "road")); }),					
-				r => { 
+			let repair = _.head(_.sortBy(_.filter(room.findRepair_Maintenance(),
+				r => { return ((r.structureType == "rampart" || r.structureType == "constructedWall") && r.hits / room.getWallTarget() < 1.05)
+						|| ((r.structureType == "container" || r.structureType == "road") && r.hits / r.hitsMax < 0.9); }),
+				r => {
 					switch (r.structureType) {
-						case "container":			return 1; 
+						case "container":			return 1;
 						case "road":				return 2;
-						case "rampart": 
+						case "rampart":
 						case "constructedWall":		return 3;
 					}}));
-					
+
 			_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], _.get(repair, "id"));
 		}
 	},
@@ -373,7 +372,7 @@ module.exports = {
 			} else {
 				_.each(Game.rooms[rmColony].find(FIND_MY_STRUCTURES, { filter: (s) => {
 					return s.structureType == "tower" && s.energy > s.energyCapacity * 0.8; }}),
-					t => { t.repair(repair) });				
+					t => { t.repair(repair) });
 			}
 		}
 	},
@@ -383,7 +382,7 @@ module.exports = {
 		let room = Game.rooms[rmColony];
 		let structures = room.find(FIND_MY_STRUCTURES);
 		let links = _.filter(structures, s => { return s.structureType == "link"; });
-		
+
 		// Check that link definitions are current with GameObject ID's
 		if (link_defs != null && Object.keys(link_defs).length == links.length) {
 			for (let i = 0; i < Object.keys(link_defs).length; i++) {
@@ -414,10 +413,10 @@ module.exports = {
 			Memory["rooms"][rmColony]["links"] = link_defs;
 			console.log(`<font color=\"#D3FFA3\">[Console]</font> Links defined for ${rmColony}.`);
 		}
-		
+
 	},
 
-	runLinks: function (rmColony) {		
+	runLinks: function (rmColony) {
 		let links = _.get(Memory, ["rooms", rmColony, "links"]);
 
 		if (links != null) {
