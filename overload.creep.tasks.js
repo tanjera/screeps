@@ -50,15 +50,15 @@ Creep.prototype.runTask = function runTask() {
 		}
 
 		case "harvest": {
-			let obj = Game.getObjectById(this.memory.task["id"]);			
-			
+			let obj = Game.getObjectById(this.memory.task["id"]);
+
 			let result = this.harvest(obj);
 			if (result == OK) {
 				let interval = 3;
 				if (Game.time % interval == 0) {
 					// Burrower fill adjacent link if possible; also fill adjacent container
 					if (this.memory.role == "burrower" && this.carry["energy"] > 0) {
-						
+
 						let link_id = _.get(this.memory, ["task", "dump_link"]);
 						if (link_id != "unavailable" || Game.time % (interval * 5) == 0) {
 							let link = Game.getObjectById(link_id);
@@ -72,7 +72,7 @@ Creep.prototype.runTask = function runTask() {
 								_.set(this.memory, ["task", "dump_link"], "unavailable");
 							}
 						}
-						
+
 						let container_id = _.get(this.memory, ["task", "dump_container"]);
 						if (container_id != "unavailable" || Game.time % (interval * 5) == 0) {
 							let container = Game.getObjectById(container_id);
@@ -86,7 +86,7 @@ Creep.prototype.runTask = function runTask() {
 								_.set(this.memory, ["task", "dump_container"], "unavailable");
 							}
 						}
-						
+
 					}
 				}
 				return;
@@ -94,8 +94,8 @@ Creep.prototype.runTask = function runTask() {
 				if (this.memory.role == "burrower" && this.carry["energy"] > 0)
 					this.drop("energy");
 				if (this.travelTask(obj) == ERR_NO_PATH)
-					delete this.memory.task;	
-				return;			
+					delete this.memory.task;
+				return;
 			} else {
 				delete this.memory.task;
 				return;
@@ -200,8 +200,8 @@ Creep.prototype.getTask_Boost = function getTask_Boost () {
 
 	let boosted = this.getBoosts();
 	return _.head(_.filter(_.get(Memory, ["rooms", this.room.name, "industry", "boosts"]),
-		t => { return t.active && t.role == this.memory.role 
-				&& (t.room == null ? true : t.room == this.memory.room) 
+		t => { return t.active && t.role == this.memory.role
+				&& (t.room == null ? true : t.room == this.memory.room)
 				&& !boosted.includes(t.resource); }));
 };
 
@@ -210,9 +210,9 @@ Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link () {
 		|| !_.get(Memory, ["rooms", this.room.name, "defense", "is_safe"]))
 		return;
 
-	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => { 
+	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => {
 		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) <= 12
-			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]), 
+			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]),
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "receive"; }); }));
 
 	if (link != null) {
@@ -228,10 +228,10 @@ Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link () {
 Creep.prototype.getTask_Withdraw_Storage = function getTask_Withdraw_Storage (resource, is_critical) {
 	if (!this.room.storage)
 		return;
-	
+
 	if (resource != null && resource != "energy" && _.get(this.room.storage, ["store", resource], 0) > 0)
 		resource = resource;
-	else if ((resource == null || resource == "energy") 
+	else if ((resource == null || resource == "energy")
 			&& (_.get(Memory, ["rooms", this.room.name, "survey", "energy_level"]) != CRITICAL
 			|| is_critical))
 		resource = "energy";
@@ -252,7 +252,7 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 	let containers = _.filter(this.room.find(FIND_STRUCTURES), s => { return s.structureType == STRUCTURE_CONTAINER; });
 
 	if (resource == null || resource != "energy") {
-		let cont = _.head(_.filter(containers, 
+		let cont = _.head(_.filter(containers,
 			s => { return _.get(s, ["store", resource], 0) > 0; }));
 
 		if (cont != null) {
@@ -264,7 +264,7 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 		}
 	}
 
-	if ((resource == null || resource == "energy") 
+	if ((resource == null || resource == "energy")
 		&& (_.get(Memory, ["rooms", this.room.name, "survey", "energy_level"]) != CRITICAL
 			|| is_critical)) {
 		let am_owner = _.get(this.room, ["controller", "my"], false);
@@ -276,7 +276,7 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 			? [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ]
 			: [ 1000, 150, 200, 300, 500, 700, 900, 1250, 1250 ];
 
-		let cont = _.head(_.sortBy(_.filter(containers, 
+		let cont = _.head(_.sortBy(_.filter(containers,
 			s => { return s.store["energy"] > (carry_capacity[room_level] / 5); }),
 			s => { return this.pos.getRangeTo(s.pos); }));
 
@@ -293,13 +293,13 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link () {
 	if (_.get(Memory, ["rooms", this.room.name, "survey", "energy_level"]) == CRITICAL)
 		return;
-	
+
 	if (this.carry["energy"] == 0)
 		return;
 
-	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => { 
+	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => {
 		return s.structureType == "link" && s.energy < (s.energyCapacity * 0.8) && this.pos.getRangeTo(s.pos) < 3
-			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]), 
+			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]),
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "send"; }); }));
 
 	if (link != null) {
@@ -333,7 +333,7 @@ Creep.prototype.getTask_Deposit_Storage = function getTask_Deposit_Storage (reso
 };
 
 Creep.prototype.getTask_Deposit_Container = function getTask_Deposit_Container (resource) {
-	let cont = _.head(_.sortBy(_.filter(this.room.find(FIND_STRUCTURES), 
+	let cont = _.head(_.sortBy(_.filter(this.room.find(FIND_STRUCTURES),
 		s => { return s.structureType == "container" && _.sum(s.store) < s.storeCapacity; }),
 		s => { return this.pos.getRangeTo(s.pos); }));
 
@@ -357,7 +357,7 @@ Creep.prototype.getTask_Deposit_Towers = function getTask_Deposit_Towers () {
 	if (!_.get(this.room, ["controller", "my"], false))
 		return;
 
-	let tower = _.head(_.sortBy(_.filter(this.room.find(FIND_MY_STRUCTURES), 
+	let tower = _.head(_.sortBy(_.filter(this.room.find(FIND_MY_STRUCTURES),
 		s => { return s.structureType == "tower" && s.energy < s.energyCapacity; }),
 		s => { return s.energy; }));
 
@@ -385,7 +385,7 @@ Creep.prototype.getTask_Deposit_Spawns = function getTask_Deposit_Spawns () {
 		return {	type: "deposit",
 					resource: "energy",
 					id: spawn_ext.id,
-					timer: 60	
+					timer: 60
 		};
 	}
 };
@@ -397,7 +397,7 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup (resource) {
 	let dropped_resources = this.room.find(FIND_DROPPED_RESOURCES);
 
 	if (resource == null || resource != "energy") {
-		let pile = _.head(_.sortBy(_.filter(dropped_resources, 
+		let pile = _.head(_.sortBy(_.filter(dropped_resources,
 			r => { return r.resourceType == "mineral"; }),
 			r => { return -r.amount; }));
 
@@ -420,7 +420,7 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup (resource) {
 			? [ 1000, 150, 200, 400, 650, 900, 1200, 1650, 1650 ]
 			: [ 1000, 150, 200, 300, 500, 700, 900, 1250, 1250 ];
 
-		let pile = _.head(_.sortBy(_.filter(dropped_resources, 
+		let pile = _.head(_.sortBy(_.filter(dropped_resources,
 			r => { return r.resourceType == "energy" && r.amount > (carry_capacity[room_level] / 5); }),
 			r => { return -r.amount; }));
 
@@ -445,7 +445,7 @@ Creep.prototype.getTask_Upgrade = function getTask_Upgrade (only_critical) {
 					timer: 60
 				};
 	}
-	
+
 	if ((!only_critical || only_critical == null) && _.get(this.room, ["controller", "ticksToDowngrade"]) > 3500) {
 		return  {   type: "upgrade",
 					id: this.room.controller.id,
@@ -466,14 +466,20 @@ Creep.prototype.getTask_Sign = function getTask_Sign () {
 	let sign_room = _.get(Memory, ["hive", "signs", this.room.name]);
 	let sign_default = _.get(Memory, ["hive", "signs", "default"]);
 	let is_safe = _.get(Memory, ["rooms", this.room.name, "defense", "is_safe"]);
+	let room_sign = _.get(this.room, ["controller", "sign", "text"]);
 
-	if (is_safe && sign_room != null && _.get(this.room, ["controller", "sign", "text"]) != sign_room) {
+	// Set for blank sign (empty string) and room sign is blank (undefined)
+	if ((sign_room == null && sign_default == "" && room_sign == undefined)
+		|| (sign_room == "" && room_sign == undefined))
+		return;
+
+	if (is_safe && sign_room != null && room_sign != sign_room) {
 		return {	type: "sign",
 					message: sign_room,
 					id: this.room.controller.id,
 					timer: 60
 				};
-	} else if (is_safe && sign_room == null && sign_default != null && _.get(this.room, ["controller", "sign", "text"]) != sign_default) {
+	} else if (is_safe && sign_room == null && sign_default != null && room_sign != sign_default) {
 		return {	type: "sign",
 					message: sign_default,
 					id: this.room.controller.id,
@@ -515,10 +521,10 @@ Creep.prototype.getTask_Build = function getTask_Build () {
 				default:  			p = 6;  	break;
 				case "road":		p = 7;	break;
 			}
-			
+
 			if (s.progress > 0)
 				p -= 1;
-			
+
 			return p;
 		}));
 
@@ -533,21 +539,21 @@ Creep.prototype.getTask_Mine = function getTask_Mine () {
 	if (!_.get(Memory, ["rooms", this.room.name, "defense", "is_safe"], true))
 		return;
 
-	let source = _.head(_.sortBy(_.filter(this.room.find(FIND_SOURCES), 
+	let source = _.head(_.sortBy(_.filter(this.room.find(FIND_SOURCES),
 		s => { return s.energy > 0; }),
 		s => {
 			if (this.memory.role == "burrower")
-				return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1), 
+				return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1),
 					c => { return c.memory.role == "burrower"; }).length;
 			else // Sort by least crowded...
-				return s.pos.findInRange(FIND_MY_CREEPS, 1).length > s.pos.getOpenTile_Adjacent(true);			
+				return s.pos.findInRange(FIND_MY_CREEPS, 1).length > s.pos.getOpenTile_Adjacent(true);
 		}));
 
 	if (source == null)
 		return;
 
 	let container = _.get(Memory, ["rooms", this.room.name, "sources", source.id, "container"]);
-	container = (container == null) ? null : Game.getObjectById(container);		
+	container = (container == null) ? null : Game.getObjectById(container);
 	if (container == null) {
 		container = _.head(source.pos.findInRange(FIND_STRUCTURES, 1, { filter:
 			s => { return s.structureType == "container"; } }));
@@ -557,7 +563,7 @@ Creep.prototype.getTask_Mine = function getTask_Mine () {
 	let position = source.pos.getOpenTile_Adjacent(true);
 	position = position || source.pos.getOpenTile_Adjacent(false);
 	position = position || source.pos;
-	
+
 	return {	type: "harvest",
 				resource: "energy",
 				id: source.id,
@@ -571,9 +577,9 @@ Creep.prototype.getTask_Extract = function getTask_Extract () {
 	if (!_.get(Memory, ["rooms", this.room.name, "defense", "is_safe"], true))
 		return;
 
-	let mineral = _.head(_.filter(this.room.find(FIND_MINERALS), m => { 
-		return m.mineralAmount > 0 
-			&& _.some(m.pos.lookFor("structure"), s => { return s.structureType == "extractor"; }); 
+	let mineral = _.head(_.filter(this.room.find(FIND_MINERALS), m => {
+		return m.mineralAmount > 0
+			&& _.some(m.pos.lookFor("structure"), s => { return s.structureType == "extractor"; });
 	}));
 
 	if (mineral != null) {
