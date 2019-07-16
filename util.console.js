@@ -599,15 +599,26 @@ module.exports = {
 		
 
 		visuals = new Object();
-		help_visuals.push("visuals.toggle()");
+		help_visuals.push("visuals.toggle_path()");
 
-		visuals.toggle = function() {
-			if (_.get(Memory, ["hive", "visuals", "show"], false) == true)
-				_.set(Memory, ["hive", "visuals", "show"], false)
+		visuals.toggle_path = function() {
+			if (_.get(Memory, ["hive", "visuals", "show_path"], false) == true)
+				_.set(Memory, ["hive", "visuals", "show_path"], false)
 			else
-				_.set(Memory, ["hive", "visuals", "show"], true)
+				_.set(Memory, ["hive", "visuals", "show_path"], true)
 			
-			return `<font color=\"#D3FFA3\">[Console]</font> Visuals toggled to be shown: ${_.get(Memory, ["hive", "visuals", "show"], false)}`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Visuals for paths toggled to be shown: ${_.get(Memory, ["hive", "visuals", "show_path"], false)}`;
+		};
+
+		help_visuals.push("visuals.toggle_repair()");
+
+		visuals.toggle_repair = function() {
+			if (_.get(Memory, ["hive", "visuals", "show_repair"], false) == true)
+				_.set(Memory, ["hive", "visuals", "show_repair"], false)
+			else
+				_.set(Memory, ["hive", "visuals", "show_repair"], true)
+			
+			return `<font color=\"#D3FFA3\">[Console]</font> Visuals for repairs toggled to be shown: ${_.get(Memory, ["hive", "visuals", "show_repair"], false)}`;
 		};
 
 

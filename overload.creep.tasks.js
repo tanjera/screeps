@@ -375,7 +375,6 @@ Creep.prototype.getTask_Deposit_Spawns = function getTask_Deposit_Spawns () {
 	if (!_.get(this.room, ["controller", "my"], false))
 		return;
 
-
 	let spawn_ext = _.head(_.sortBy(_.filter(this.room.find(FIND_MY_STRUCTURES), s => {
 		return (s.structureType == "spawn" && s.energy < s.energyCapacity * 0.85)
 			|| (s.structureType == "extension" && s.energy < s.energyCapacity); }),
