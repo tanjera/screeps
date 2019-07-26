@@ -5,7 +5,7 @@ module.exports = {
 		let help_blueprint = new Array();
 		let help_empire = new Array();
 		let help_labs = new Array();
-		let help_logs = new Array();
+		let help_log = new Array();
 		let help_path = new Array();
 		let help_pause = new Array();
 		let help_profiler = new Array();
@@ -20,7 +20,7 @@ module.exports = {
 		help_main.push(`- "blueprint" \t Settings for automatic base building`);
 		help_main.push(`- "empire" \t Miscellaneous empire and colony management`);
 		help_main.push(`- "labs" \t Management of lab functions/reactions`);
-		help_main.push(`- "logs" \t Logs for statistical output`);
+		help_main.push(`- "log" \t Logs for statistical output`);
 		help_main.push(`- "path" \t Utilities for enhancing creep pathfinding abilities`);
 		help_main.push(`- "pause" \t Utilities for pausing specific creep or colony functions`);
 		help_main.push(`- "profiler" \t Built-in CPU profiler`);
@@ -119,7 +119,7 @@ module.exports = {
 		
 		log = new Object();
 		
-		help_logs.push("log.all()");
+		help_log.push("log.all()");
 
 		log.all = function() {
 			this.nukers();
@@ -129,7 +129,7 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Main logs printed.`;
 		}
 
-		help_logs.push("log.can_build()");
+		help_log.push("log.can_build()");
 		
 		log.can_build = function() {
 			let rooms = _.filter(Game.rooms, n => { return n.controller != null && n.controller.my; });
@@ -151,7 +151,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		help_logs.push("log.controllers()");
+		help_log.push("log.controllers()");
 		
 		log.controllers = function() {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
@@ -168,7 +168,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		help_logs.push("log.labs()");
+		help_log.push("log.labs()");
 
 		log.labs = function() {
 			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
@@ -200,7 +200,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 		
-		help_logs.push("log.resources()");
+		help_log.push("log.resources()");
 		
 		log.resources = function(resource = null, limit = 1) {
 			let resource_list = resource != null ? [ resource ] : RESOURCES_ALL;
@@ -227,7 +227,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		help_logs.push("log.remote_mining()");
+		help_log.push("log.remote_mining()");
 		
 		log.remote_mining = function() {
 			let output = "";
@@ -243,7 +243,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		help_logs.push("log.storage()");
+		help_log.push("log.storage()");
 
 		log.storage = function() {
 			console.log(`<font color=\"#D3FFA3">log-storage</font>`);
@@ -279,7 +279,7 @@ module.exports = {
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
-		help_logs.push("log.nukers()");
+		help_log.push("log.nukers()");
 
 		log.nukers = function() {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Nukers:");
@@ -646,7 +646,7 @@ module.exports = {
 				case "blueprint":	menu = help_blueprint;		break;
 				case "empire":		menu = help_empire;			break;
 				case "labs":		menu = help_labs;			break;
-				case "logs":		menu = help_logs;			break;
+				case "log":			menu = help_log;			break;
 				case "path":		menu = help_path;			break;
 				case "pause":		menu = help_pause;			break;
 				case "profiler":	menu = help_profiler;		break;
