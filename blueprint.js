@@ -76,17 +76,29 @@ let Blueprint = {
 
 		switch (layout) {
 			default:
-			case "default_horizontal":
+			case "def_hor":
 				layout = Blueprint__Default_Horizontal;
 				break;
-			case "default_vertical":
+			case "def_hor_w":
+				layout = Blueprint__Default_Horizontal__Walled;
+				break;
+			case "def_vert":
 				layout = Blueprint__Default_Vertical;
 				break;
-			case "default_compact":
+			case "def_vert_w":
+				layout = Blueprint__Default_Vertical__Walled;
+				break;
+			case "def_comp":
 				layout = Blueprint__Default_Compact;
 				break;
-			case "compact_horizontal":
+			case "def_comp_w":
+				layout = Blueprint__Default_Compact__Walled;
+				break;
+			case "comp_hor":
 				layout = Blueprint__Compact_Horizontal;
+				break;
+			case "comp_hor_w":
+				layout = Blueprint__Compact_Horizontal__Walled;
 				break;
 		}
 
