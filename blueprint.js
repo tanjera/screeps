@@ -75,7 +75,6 @@ let Blueprint = {
 			return;
 
 		switch (layout) {
-			default:
 			case "def_hor":
 				layout = Blueprint__Default_Horizontal;
 				break;
