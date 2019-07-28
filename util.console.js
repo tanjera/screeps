@@ -77,7 +77,6 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint layout set for ${rmName}.`;
 		};
 
-
 		help_blueprint.push("blueprint.block(rmName, x, y)");
 
 		blueprint.block = function(rmName, x, y) {
@@ -86,7 +85,6 @@ module.exports = {
 			Memory["rooms"][rmName]["layout"]["blocked_areas"].push({start: {x: x, y: y}, end: {x: x, y: y}});
 			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint position blocked for ${rmName} at (${x}, ${y}).`;
 		};
-
 
 		help_blueprint.push("blueprint.block_area(rmName, startX, startY, endX, endY)");
 
@@ -101,7 +99,6 @@ module.exports = {
 			Memory["rooms"][rmName]["layout"]["blocked_areas"].push({start: {x: startX, y: startY}, end: {x: endX, y: endY}});
 			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint area blocked for ${rmName} from (${startX}, ${startY}) to (${endX}, ${endY}).`;
 		};
-
 
 		help_blueprint.push("blueprint.request(rmName)");
 
@@ -125,6 +122,18 @@ module.exports = {
 
 			_.set(Memory, ["hive", "pulses", "reset_links"], true);
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting all link definitions; will redefine next tick.`;
+		};
+
+		help_blueprint.push("blueprint.toggle_walls(rmName)");
+
+		blueprint.toggle_walls = function(rmName) {
+			// For manual disabling of whether passive defensive will be placed (useful in order to prioritize RCL)
+			if (_.get(Memory, ["rooms", rmName, "layout", "place_defenses"], false) == true)
+				_.set(Memory, ["rooms", rmName, "layout", "place_defenses"], false)
+			else
+				_.set(Memory, ["rooms", rmName, "layout", "place_defenses"], true)
+
+			return `<font color=\"#D3FFA3\">[Console]</font> Blueprint placing defensive walls and ramparts: ${_.get(Memory, ["rooms", rmName, "layout", "place_defenses"], true)}`;
 		};
 
 
@@ -445,14 +454,18 @@ module.exports = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for all rooms set.`;
 		};
 
-		help_empire.push("empire.wall_target(hitpoints)")
+		help_empire.push("empire.wall_target(hitpoints)  ... hitpoints can be null to reset")
 		empire.wall_target = function(hitpoints) {
-			if (hitpoints == null)
-				return `<font color=\"#D3FFA3\">[Console]</font> Unable to set hitpoint target; invalid entry.`;
-
-			for (let i in Memory.rooms)
-				_.set(Memory, ["rooms", i, "defense", "wall_hp_target"], hitpoints);
-			return `<font color=\"#D3FFA3\">[Console]</font> Wall/rampart hitpoint target set for all rooms.`;
+			if (hitpoints == null) {
+				for (let i in Memory.rooms)
+					if (_.has(Memory, ["rooms", i, "defense", "wall_hp_target"]))
+						delete Memory["rooms"][i]["defense"]["wall_hp_target"];
+				return `<font color=\"#D3FFA3\">[Console]</font> Wall/rampart hitpoint target reset to default for all rooms.`;
+			} else {
+				for (let i in Memory.rooms)
+					_.set(Memory, ["rooms", i, "defense", "wall_hp_target"], hitpoints);
+				return `<font color=\"#D3FFA3\">[Console]</font> Wall/rampart hitpoint target set for all rooms.`;
+			}
 		};
 
 		help_empire.push("empire.set_camp(room_pos)")
@@ -651,18 +664,21 @@ module.exports = {
 
 		help = function(submenu) {
 			let menu = new Array()
-			switch (submenu.toLowerCase()) {
-				default: 			menu = help_main;			break;
-				case "allies":		menu = help_allies;			break;
-				case "blueprint":	menu = help_blueprint;		break;
-				case "empire":		menu = help_empire;			break;
-				case "labs":		menu = help_labs;			break;
-				case "log":			menu = help_log;			break;
-				case "path":		menu = help_path;			break;
-				case "pause":		menu = help_pause;			break;
-				case "profiler":	menu = help_profiler;		break;
-				case "resources":	menu = help_resources;		break;
-				case "visuals":		menu = help_visuals;		break;
+			if (submenu == null)
+				menu = help_main;
+			else {
+				switch (submenu.toLowerCase()) {
+					case "allies":		menu = help_allies;			break;
+					case "blueprint":	menu = help_blueprint;		break;
+					case "empire":		menu = help_empire;			break;
+					case "labs":		menu = help_labs;			break;
+					case "log":			menu = help_log;			break;
+					case "path":		menu = help_path;			break;
+					case "pause":		menu = help_pause;			break;
+					case "profiler":	menu = help_profiler;		break;
+					case "resources":	menu = help_resources;		break;
+					case "visuals":		menu = help_visuals;		break;
+				}
 			}
 
 			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${menu.join("<br>")}<br><br>`);

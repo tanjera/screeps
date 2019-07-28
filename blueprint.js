@@ -164,8 +164,10 @@ let Blueprint = {
 			}
 
 			// Only build walls and ramparts after tower, containers
-			sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "rampart");
-			sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "constructedWall");
+			if (_.get(Memory, ["rooms", room.name, "layout", "place_defenses"], true) == true) {
+				sites = Blueprint.iterateStructure(room, sites, structures, layout, origin, sites_per_room, blocked_areas, "rampart");
+				sites = Blueprint.iterateStructure(room, sites, all_structures, layout, origin, sites_per_room, blocked_areas, "constructedWall");
+			}
 		}
 
 		// Ordered by priority; lower priority than defensive structures (in case high RCL rebuilding after attack)
