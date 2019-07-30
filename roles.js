@@ -52,11 +52,11 @@ module.exports = {
 
 				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
 					return;
-				
+
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
-				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", 
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy",
 				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
-				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", 
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy",
 				_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
 				creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
 				creep.memory.task = creep.memory.task || creep.getTask_Mine();
@@ -90,7 +90,7 @@ module.exports = {
 				creep.memory.state = "refueling";
 				return;
 			}
-		} else if (hostile != null) {			
+		} else if (hostile != null) {
 			creep.moveFrom(creep, hostile);
 			return;
 		}
@@ -103,7 +103,7 @@ module.exports = {
 
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
-				if (creep.memory.role != "burrower" && creep.carryCapacity > 0 
+				if (creep.memory.role != "burrower" && creep.carryCapacity > 0
 						&& _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
 					delete creep.memory.task;
@@ -113,7 +113,7 @@ module.exports = {
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
 
 				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
-					return;				
+					return;
 
 				if (creep.memory.role == "burrower") {
 					creep.memory.task = creep.memory.task || creep.getTask_Mine();
@@ -124,14 +124,14 @@ module.exports = {
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
 
 					let energy_level = _.get(Memory, ["rooms", creep.room.name, "survey", "energy_level"]);
-					if (energy_level == CRITICAL || energy_level == LOW) {	
+					if (energy_level == CRITICAL || energy_level == LOW) {
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
-						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);						
-					} else {						
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
+					} else {
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
 					}
-					
+
 					if (creep.hasPart("work") > 0)
 						creep.memory.task = creep.memory.task || creep.getTask_Mine();
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("mineral");
@@ -180,14 +180,14 @@ module.exports = {
     Courier: function(creep) {
 		if (this.moveToDestination(creep))
 			return;
-		
+
 		if (creep.memory.state == "loading") {
             if (_.sum(creep.carry) > 0) {
 				creep.memory.state = "delivering";
 				delete creep.memory.task;
                 return;
 			}
-			
+
 			creep.memory.task = creep.memory.task || creep.getTask_Boost();
 
 			if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
@@ -217,7 +217,7 @@ module.exports = {
         } else {
             creep.memory.state = "loading";
             return;
-		} 
+		}
 	},
 
     Extractor: function(creep, isSafe) {
@@ -248,7 +248,7 @@ module.exports = {
 					return;
 
 				case "deliver":
-					if (_.sum(creep.carry) == 0 
+					if (_.sum(creep.carry) == 0
 							&& _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true)) {
 						creep.memory.state = "get_minerals";
 						delete creep.memory.task;
@@ -311,7 +311,7 @@ module.exports = {
 		} else if (result == ERR_NO_BODYPART) {
 			return;		// Reservers and colonizers with no "claim" parts prevent null body spawn locking
 		} else {
-			let request = _.get(Memory, ["sites", "colonization", creep.memory.room]);			
+			let request = _.get(Memory, ["sites", "colonization", creep.memory.room]);
 			if (_.get(request, ["target"]) == creep.room.name && creep.room.controller.my) {
 				delete Memory["sites"]["colonization"][creep.room.name];
 				_.set(Memory, ["rooms", creep.room.name, "spawn_assist", "rooms"], [_.get(request, ["from"])]);
@@ -329,18 +329,18 @@ module.exports = {
 
     Soldier: function(creep, targetStructures, targetCreeps, listTargets) {
 		let _Combat = require("roles.combat");
-		
+
 		if (_Combat.acquireBoost(creep))
 			return;
 		if (_Combat.moveToDestination(creep, 10))
 			return;
-		
+
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);
-		
+
 		if (targetCreeps)
-			_Combat.acquireTarget_Creep(creep);		
-		if (targetStructures && creep.room.name == creep.memory.room) 
+			_Combat.acquireTarget_Creep(creep);
+		if (targetStructures && creep.room.name == creep.memory.room)
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
@@ -374,14 +374,14 @@ module.exports = {
 		} else {
 			creep.heal(creep);
 			_Combat.acquireCamp(creep);
-			_Combat.travelCamp(creep);					
+			_Combat.travelCamp(creep);
 			return;
 		}
 	},
 
 	Archer: function(creep, targetStructures, targetCreeps, listTargets) {
 		let _Combat = require("roles.combat");
-		
+
 		if (_Combat.acquireBoost(creep))
 			return;
 		if (_Combat.moveToDestination(creep, 10))
@@ -389,16 +389,16 @@ module.exports = {
 
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);
-		
+
 		if (targetCreeps)
-			_Combat.acquireTarget_Creep(creep);		
-		if (targetStructures && creep.room.name == creep.memory.room) 
+			_Combat.acquireTarget_Creep(creep);
+		if (targetStructures && creep.room.name == creep.memory.room)
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
 			_Combat.clearCamp(creep);
 			let target = Game.getObjectById(creep.memory.target.id);
-						
+
 			creep.attack(target);
 			creep.dismantle(target);
 			let result = creep.rangedAttack(target);
@@ -436,16 +436,16 @@ module.exports = {
 
 	Dismantler: function(creep, targetStructures, listTargets) {
 		let _Combat = require("roles.combat");
-		
+
 		if (_Combat.acquireBoost(creep))
 			return;
 		if (_Combat.moveToDestination(creep, null))
 			return;
-		
+
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_ListTarget(creep, listTargets);
-		
-		if (targetStructures && creep.room.name == creep.memory.room) 
+
+		if (targetStructures && creep.room.name == creep.memory.room)
 			_Combat.acquireTarget_Structure(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
@@ -483,7 +483,7 @@ module.exports = {
 
 		_Combat.checkTarget_Existing(creep);
 		_Combat.acquireTarget_Heal(creep);
-		
+
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
 			_Combat.clearCamp(creep);
 			let target = Game.getObjectById(creep.memory.target.id);
@@ -499,7 +499,7 @@ module.exports = {
 				return;
 			}
 		}
-		
+
 		if (to_partner) {
 			_Combat.checkPartner_Existing(creep);
 			_Combat.acquireTarget_Partner(creep);
@@ -507,19 +507,24 @@ module.exports = {
 			if (_.get(creep, ["memory", "partner", "id"]) != null) {
 				_Combat.clearCamp(creep);
 				let target = Game.getObjectById(creep.memory.partner.id);
-			
+
 				if (target == null) {
 					_.set(creep, ["memory", "target", "id"], null);
 					_Combat.acquireCamp(creep);
 					_Combat.travelCamp(creep);
-				} else if (creep.pos.getRangeTo(p) > 1) {
+				} else if (creep.pos.getRangeTo(target) > 1) {
 					creep.moveTo(p, { reusePath: 0 });
 					return;
 				}
+			} else {
+				_Combat.acquireCamp(creep);
+				_Combat.travelCamp(creep);
+				return;
 			}
 		} else {
 			_Combat.acquireCamp(creep);
 			_Combat.travelCamp(creep);
+			return;
 		}
 	},
 };
