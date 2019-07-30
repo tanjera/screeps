@@ -1,5 +1,41 @@
 /* ***********************************************************
- *	GENERAL OVERLOADS
+ *
+ * Table of Contents:
+ *
+ * : [sec01a] General Overloads
+ * : [sec01b] Overloads: Creep
+ * : [sec01c] Overloads: Creep Tasks
+ * : [sec01d] Overloads: Creep Travel
+ * : [sec01e] Overloads: Lab
+ * : [sec01f] Overloads: Room
+ * : [sec01g] Overloads: RoomPosition
+ *
+ * : [sec02a] Definitions: Populations
+ * : [sec02b] Definitions: Combat Populations
+ *
+ * : [sec03a] Creep Body
+ * : [sec03b] Creep Roles
+ * : [sec03c] Creep Combat Roles
+ *
+ * : [sec04a] Sites
+ * : [sec05a] Hive Control
+ *
+ * : [sec06a] Blueprint
+ * : [sec06b] Blueprint Layouts
+ *
+ * : [sec07a] Console Commands
+ * : [sec08a] Visual Elements
+ * : [sec09a] CPU Profiling
+ * : [sec10a] Grafana Statistics
+ *
+ * : [sec11a] Main Loop
+ *
+ * *********************************************************** */
+
+
+
+/* ***********************************************************
+ *	[sec01a] GENERAL OVERLOADS
  * *********************************************************** */
 
 {	/* Constants */
@@ -75,7 +111,7 @@ Math.lerpSpawnPriority = function (lowPriority, highPriority, popActual, popTarg
 
 
 /* ***********************************************************
- *	OVERLOADS: CREEP
+ *	[sec01b] OVERLOADS: CREEP
  * *********************************************************** */
 
 Creep.prototype.isBoosted = function isBoosted() {
@@ -114,7 +150,7 @@ Creep.prototype.hasPart = function hasPart(part) {
 
 
 /* ***********************************************************
- *	OVERLOADS: CREEP TASKS
+ *	[sec01c] OVERLOADS: CREEP TASKS
  * *********************************************************** */
 
 Creep.prototype.runTask = function runTask() {
@@ -759,7 +795,7 @@ Creep.prototype.getTask_Wait = function getTask_Wait(ticks) {
 
 
 /* ***********************************************************
- *	OVERLOADS: CREEP TRAVEL
+ *	[sec01d] OVERLOADS: CREEP TRAVEL
  * *********************************************************** */
 
 Creep.prototype.travel = function travel(dest, ignore_creeps) {
@@ -1033,7 +1069,7 @@ Creep.prototype.moveFromSource = function moveFromSource() {
 
 
 /* ***********************************************************
- *	OVERLOADS: LAB
+ *	[sec01e] OVERLOADS: LAB
  * *********************************************************** */
 
 StructureLab.prototype.canBoost = function canBoost(mineral) {
@@ -1044,7 +1080,7 @@ StructureLab.prototype.canBoost = function canBoost(mineral) {
 
 
 /* ***********************************************************
- *	OVERLOADS: ROOM
+ *	[sec01f] OVERLOADS: ROOM
  * *********************************************************** */
 
 Room.prototype.store = function store(resource) {
@@ -1161,7 +1197,7 @@ Room.prototype.getLevel = function getLevel() {
 
 
 /* ***********************************************************
- *	OVERLOADS: ROOMPOSITION
+ *	[sec01g] OVERLOADS: ROOMPOSITION
  * *********************************************************** */
 
 RoomPosition.prototype.isValid = function isValid() {
@@ -1320,7 +1356,7 @@ RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range, creep
 
 
 /* ***********************************************************
- *	DEFINITIONS: POPULATIONS
+ *	[sec02a] DEFINITIONS: POPULATIONS
  * *********************************************************** */
 
 Population_Industry =
@@ -1564,7 +1600,7 @@ Population_Mining = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: COMBAT POPULATIONS
+ *	[sec02b] DEFINITIONS: COMBAT POPULATIONS
  * *********************************************************** */
 
 Population_Combat__Waves = {
@@ -1598,7 +1634,7 @@ Population_Combat__Controller = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: CREEP BODY
+ *	[sec03a] DEFINITIONS: CREEP BODY
  * *********************************************************** */
 
 let Creep_Body = {
@@ -2398,7 +2434,7 @@ let Creep_Body = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: CREEP ROLES
+ *	[sec03b] DEFINITIONS: CREEP ROLES
  * *********************************************************** */
 
 let Creep_Roles = {
@@ -2933,7 +2969,7 @@ let Creep_Roles = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: CREEP COMBAT ROLES
+ *	[sec03c] DEFINITIONS: CREEP COMBAT ROLES
  * *********************************************************** */
 
 let Creep_Roles_Combat = {
@@ -3220,7 +3256,7 @@ let Creep_Roles_Combat = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: SITES
+ *	[sec04a] DEFINITIONS: SITES
  * *********************************************************** */
 
 let Sites = {
@@ -5368,7 +5404,7 @@ let Sites = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: HIVE CONTROL
+ *	[sec05a] DEFINITIONS: HIVE CONTROL
  * *********************************************************** */
 
 let Control = {
@@ -5764,7 +5800,7 @@ let Control = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: BLUEPRINT
+ *	[sec06a] DEFINITIONS: BLUEPRINT
  * *********************************************************** */
 
 let Blueprint = {
@@ -6114,7 +6150,7 @@ let Blueprint = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: BLUEPRINT LAYOUTS
+ *	[sec06b] DEFINITIONS: BLUEPRINT LAYOUTS
  * *********************************************************** */
 
 Blueprint__Default_Horizontal = { // Size (without walls) 13, 12 ; Defensive offset -3, -3, +3, +3
@@ -6519,7 +6555,7 @@ Blueprint__Compact_Horizontal__Walled = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: CONSOLE COMMANDS
+ *	[sec07a] DEFINITIONS: CONSOLE COMMANDS
  * *********************************************************** */
 
 let Console = {
@@ -7218,7 +7254,7 @@ let Console = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: VISUAL ELEMENTS
+ *	[sec08a] DEFINITIONS: VISUAL ELEMENTS
  * *********************************************************** */
 
 let Stats_Visual = {
@@ -7288,7 +7324,7 @@ let Stats_Visual = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: CPU PROFILING
+ *	[sec09a] DEFINITIONS: CPU PROFILING
  * *********************************************************** */
 
 let Stats_CPU = {
@@ -7404,7 +7440,7 @@ let Stats_CPU = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: GRAFANA STATISTICS
+ *	[sec10a] DEFINITIONS: GRAFANA STATISTICS
  * *********************************************************** */
 
 let Stats_Grafana = {
@@ -7487,7 +7523,7 @@ let Stats_Grafana = {
 
 
 /* ***********************************************************
- *	DEFINITIONS: MAIN LOOP
+ *	[sec11a] DEFINITIONS: MAIN LOOP
  * *********************************************************** */
 
 
