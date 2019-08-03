@@ -2764,7 +2764,7 @@ let Creep_Roles = {
 				_.set(Memory, ["rooms", creep.room.name, "layout"], _.get(request, "layout"));
 				_.set(Memory, ["rooms", creep.room.name, "focus_defense"], _.get(request, "focus_defense"));
 				_.set(Memory, ["hive", "pulses", "blueprint", "request"], creep.room.name);
-				creep.suicide();
+				creep.memory = {};
 			} else if (result != OK) {
 				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);
 			}
@@ -3432,8 +3432,7 @@ let Sites = {
 						_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.5)))
 					} else if (energy_level == EXCESS && room_level < 8) {
 						let storage = _.get(Game, ["rooms", rmColony, "storage"]);
-						_.set(popTarget, ["worker", "amount"], Math.round(_.get(popTarget, ["worker", "amount"]) *
-							(storage.store["energy"] / Math.max(1, Game["rooms"][rmColony].getLowEnergy())) * 0.75));
+						_.set(popTarget, ["worker", "amount"], Math.max(1, Math.round(_.get(popTarget, ["worker", "amount"]) * 1.5)))
 					}
 				}
 
