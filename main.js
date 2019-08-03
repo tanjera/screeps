@@ -6770,7 +6770,7 @@ let Console = {
 
 		log.controllers = function () {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
-			let output = "<table>"
+			let output = "<table>";
 			_.each(_.sortBy(_.sortBy(_.filter(Game.rooms,
 				r => { return r.controller != null && r.controller.my; }),
 				r => { return -r.controller.progress; }),
@@ -6782,6 +6782,29 @@ let Console = {
 			console.log(`${output}</table>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
+
+		help_log.push("log.populations()");
+
+		log.populations = function () {
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Custom Populations set in Memory:");
+			let rooms = _.keys(_.get(Memory, "rooms"));
+			let output = "<table>";
+
+			for (let i = 0; i < rooms.length; i++) {
+				if (_.has(Memory, ["rooms", rooms[i], "custom_population"])) {
+					output += `<tr><td><font color=\"#D3FFA3\">${(rooms[i])}</font>: \t</td>`;
+					let populations = _.keys(Memory["rooms"][rooms[i]]["custom_population"]);
+					for (let j = 0; j < populations.length; j++) {
+						output += `<td>${populations[j]} @ lvl </td> `
+						+ `<td>${_.get(Memory, ["rooms", rooms[i], "custom_population", populations[j], "level"])} x </td>`
+						+ `<td>${_.get(Memory, ["rooms", rooms[i], "custom_population", populations[j], "amount"])} \t</td>  `;
+					}
+					output += `</tr>`;
+				}
+			}
+			console.log(`${output}</table>`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		}
 
 		help_log.push("log.labs()");
 
