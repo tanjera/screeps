@@ -1251,19 +1251,55 @@ RoomPosition.prototype.isBuildable = function isBuildable() {
 };
 
 RoomPosition.prototype.getTileInDirection = function getTileInDirection(dir) {
+	let nX = this.x;
+	let nY = this.y;
+
 	switch (dir) {
-		case 0: case "0": return this;
-		case 1: case "1": return new RoomPosition(this.x, this.y - 1, this.roomName);
-		case 2: case "2": return new RoomPosition(this.x + 1, this.y - 1, this.roomName);
-		case 3: case "3": return new RoomPosition(this.x + 1, this.y, this.roomName);
-		case 4: case "4": return new RoomPosition(this.x + 1, this.y + 1, this.roomName);
-		case 5: case "5": return new RoomPosition(this.x, this.y + 1, this.roomName);
-		case 6: case "6": return new RoomPosition(this.x - 1, this.y + 1, this.roomName);
-		case 7: case "7": return new RoomPosition(this.x - 1, this.y, this.roomName);
-		case 8: case "8": return new RoomPosition(this.x - 1, this.y - 1, this.roomName);
+		case 0: case "0":
+			break;
+
+		case 1: case "1":
+			nY = nY - 1;
+			break;
+
+		case 2: case "2":
+			nX = nX + 1;
+			nY = nY - 1;
+			break;
+
+		case 3: case "3":
+			nX = nX + 1;
+			break;
+
+		case 4: case "4":
+			nX = nX + 1;
+			nY = nY + 1;
+			break;
+
+		case 5: case "5":
+			nY = nY + 1;
+			break;
+
+		case 6: case "6":
+			nX = nX - 1;
+			nY = nY + 1;
+			break;
+
+		case 7: case "7":
+			nX = nX - 1;
+			break;
+
+		case 8: case "8":
+			nX = nX - 1;
+			nY = nY - 1;
+			break;
 	}
 
-	return null;
+	if (nX < 0 || nX > 49 || nY < 0 || nY > 49)
+		return null;
+	else
+		return new RoomPosition (nX, nY, this.roomName);
+
 };
 
 RoomPosition.prototype.isEdge = function isEdge() {
