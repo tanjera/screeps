@@ -2,11 +2,15 @@
 
 My code for my Screeps account- feel free to use, copy, etc. No guarantee that the code won't drive your colony into the ground though ;)
 
+Note: This is not a fully automated codebase, and has no intention of being fully automated! It is just an interface for controlling your colonies, and manages much of the mundane creep tasks.
+
 ### main.js
 
-**The _goal_ of this code-base is that all interaction with the player will be via Memory, not hard-coded... this is a work in progress!** This is the next step for this codebase, since it originally pulled all definitions from a custom "main.js"... well, now things are a bit more automated... but some advanced functions still need to be hard-coded into main.js as I work on porting them to Memory...
+**The goal for this codebase is to supply a complete interface for players to control their colonies via console commands. This is not a fully automated codebase, and does not aim to be one!** Colony tasks (spawning, building), mining tasks (burrowing, carrying), and many industry functions are all automated. Directing which rooms are to be colonized, the shape and placement of the colonies, goal amount of minerals to stockpile, and all combat functionality all needs to be entered via console commands. For a full list of console commands, type:
 
-#### Colonies 
+`help();`
+
+#### Colonies
 Rooms that you own a controller in are automatically run with a preset population of creeps adjusted based on room controller level (RCL) and whether the colony is being assisted in spawning from another, adjacent room. Colony populations are automatically spawned (so long as there is a spawn present! or a room assisting in spawning!) and creeps get to work on construction sites and upgrading the room controller.
 
 #### In-Colony Mining (Local Mining)
@@ -18,15 +22,15 @@ Just like colonies are automatically run and populated with a preset population,
 
 **This codebase will automate the layout and construction of your base within your colony, based on different pre-fabricated base layouts that are programmed in blueprint.layouts.js and can be visualized in Excel format in base\_layouts/base\_layouts.xlsc!!! Layouts have origins of 0,0 being the top left spawn, not including the defensive walls/buffer space).** Every 200-500 ticks, up to 5 construction sites will be placed automatically. Since your first colony is started via the GUI, for automated base creation, you will need to set the origin point for the top left of your colony like so (and you can set the layout as well, as "default\_horizontal", "default\_vertical", or "default\_compact"):
 
-`blueprint.set_layout(rmName, originX, originY, layoutName)`
+`blueprint.set_layout(rmName, originX, originY, layoutName);`
 
-If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked (e.g. by terrain), placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base\_layouts/base\_layouts.xlsx** and try to find adequate space if possible. 
+If your colony cannot be automatically built in its entirety due to walls being in the way, you can still manually place construction sites for the structures that are blocked (e.g. by terrain), placing them elsewhere. However, if they are destroyed, they will not automatically be rebuilt. For this reason, **see the default base layout in base\_layouts/base\_layouts.xlsx** and try to find adequate space if possible.
 
 Links will automatically be built near sources and the room controller, and will facilitate feeding energy to upgraders.
 
 To manually block off areas from being constructed (such as if the code is trying to build a wall up against a terrain wall, which is a useless waste of energy), you can set off blocked areas defined by start and end (x, y) coordinates. The blocked areas are defined as objects in a list, so you can add multiple blocked areas per room by adding to the list array. You can set them like this:
 
-`blueprint.block_area(rmName, startX, startY, endX, endY)`
+`blueprint.block_area(rmName, startX, startY, endX, endY);`
 
 If you must manually build structures, you can run the following command to see what structures are available to be built in each colony:
 
@@ -40,7 +44,7 @@ When you are ready to expand to a new room (create a new "colony"), you can use 
 
 Once the colonizer claims the new controller, the code-base will remove the colonization request from Memory and start running the new room as a colony _assisted by the colony that sent the colonizer, using the same route as the colonizer_. It will utilize the layout origin for automatically setting construction sites for your base as the colony progresses. You can either set a specific room layout via layout_name, or leave it as null to use the default horizontal layout. If you want to modify or add rooms to assist in the spawning burden, you can modify the spawn\_assist.rooms field for a colony like this:
 
-`empire.spawn_assist(rmToAssist, [listRooms], [listRoute])`
+`empire.spawn_assist(rmToAssist, [listRooms], [listRoute]);`
 
 #### Set Custom Room Functions
 
@@ -82,7 +86,7 @@ Links are automatically built based on the defined room layout and their functio
 
 So you have some minerals and want your labs to process them? Or boost your creeps? ... well rooms of RCL 6 and above automatically will spawn a courier that will run minerals to labs and terminals for managing reactions. The codebase actually lets you specify in Memory what your goal minerals are, and it will automatically set up reactions in your labs. Note: this is an empire-wide process, _not_ specific to each room- couriers in all of your rooms will start shipping reagents via terminals to different rooms to fill labs to run reactions, automatically!! There is no need for you to manually move minerals except if you want to send them to your friends.
 
-To set reaction targets, "mineral" is the mineral's abbreviation, "amount" is the amount of this mineral that you'd like to generate, and "priority" is any number for you to order your reaction priorities, with 1 being highest priority and 100 being lowest priority: 
+To set reaction targets, "mineral" is the mineral's abbreviation, "amount" is the amount of this mineral that you'd like to generate, and "priority" is any number for you to order your reaction priorities, with 1 being highest priority and 100 being lowest priority:
 
 `resources.lab_target(mineral, amount, priority);`
 
@@ -90,24 +94,24 @@ To set reaction targets, "mineral" is the mineral's abbreviation, "amount" is th
 
 Once you have reach RCL 6 a courier will spawn and begin to automatically do a lot of functions for you. For example, if you set up mineral reactions, the code will automatically request other rooms with terminals to load any excess minerals used for the reaction, and send it over! Also, if any rooms have an excess of energy, you can set the "cap_amount" so that when a room reaches the energy cap, it will start to overflow energy into other rooms:
 
-`resources.overflow_cap(cap_amount)`
+`resources.overflow_cap(cap_amount);`
 
-and any rooms with more energy than the limit will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your empire. 
+and any rooms with more energy than the limit will start automatically loading and sending the energy to a terminal in a room with the least amount of energy, balancing out the amount of energy in your empire.
 
 The codebase also will automatically off-load excess minerals and energy, selling them to the market to the highest bidder, but only if you enter manually into Memory the limit at which you want excess minerals to be sold. This is great for selling excess basic minerals, and you can always manually enter market trades for minerals that you don't include in automatic sales. To set up automatic market selling, you can use the following command on the console, where "resource" is the mineral abbreviation (or "energy"!), and "cap_amount" is the amount at which it will start overflowing that resource onto the market:
 
-`resources.market_cap(resource, cap_amount)`
+`resources.market_cap(resource, cap_amount);`
 
 Terminals also process manually entered terminal orders, which you can use to send resources to friends, by using the following manual entries in the console:
 
 * For internal transfers (among your own rooms or to your friends or private trades):
 
-`resources.send(order_name, room_from, room_to, resource, amount)`
-	
-* For manual market trading (fulfilling existing buy/sell orders from other players), use the following commands. Note that if you want to buy a mineral, you are purchasing from another player's "sell" order, but since you are buying, you will use `market_buy()`, specifying your room *to* which you want the minerals sent during the purchase (and the 'from' room will be pulled automatically from the player's "sell" order on the market in the server's database). Similarly, if you are selling, you will use `market_sell()` to sell to another player's "buy" order. To do all this, use the following commands:
+`resources.send(order_name, room_from, room_to, resource, amount);`
 
-`resources.market_sell(order_name, market_order_id, room_from, amount)` << to sell your existing minerals/energy
-`resources.market_buy(order_name, market_order_id, room_to, amount)` << to buy new minerals/energy
+* For manual market trading (fulfilling existing buy/sell orders from other players), use the following commands. Note that if you want to buy a mineral, you are purchasing from another player's "sell" order, but since you are buying, you will use `market_buy();`, specifying your room *to* which you want the minerals sent during the purchase (and the 'from' room will be pulled automatically from the player's "sell" order on the market in the server's database). Similarly, if you are selling, you will use `market_sell();` to sell to another player's "buy" order. To do all this, use the following commands:
+
+`resources.market_sell(order_name, market_order_id, room_from, amount);` << to sell your existing minerals/energy
+`resources.market_buy(order_name, market_order_id, room_to, amount);` << to buy new minerals/energy
 
 and your courier will to load/unload the terminal, and send/receive minerals and energy to fulfill all terminal orders!
 
@@ -118,10 +122,10 @@ and your courier will to load/unload the terminal, and send/receive minerals and
 Don't forget to define your allies in Memory, but be careful who you add! Your list of allies is a group of players whose creeps will be able to move through your rooms and interact with your creeps and structures without setting off your defenses. Allies can be set with the following commands:
 
 ```
-allies.add(ally)
-allies.add_list([ally1, ally2, ...])
-allies.remove(ally)
-allies.clear()
+allies.add(ally);
+allies.add_list([ally1, ally2, ...]);
+allies.remove(ally);
+allies.clear();
 ```
 
 #### Active Defenses
@@ -130,17 +134,17 @@ There are several basic automatic defenses built into the code. Towers will choo
 
 #### Passive Defenses
 
-Passive defenses (walls and ramparts) are also an integral part of your room's defenses. When you construct a wall or rampart and have a worker or repairer available with energy, it is automatically set to build and repair your walls to a minimum "critical" hitpoint level, and then- as available- repair them to a target "maintenance" hitpoint level. The amount of hitpoints that the code will automatically aim for scales depending on your room's controller level (RCL), from 10K hitpoints at RCL1 to 5M hitpoints at RCL8. 
+Passive defenses (walls and ramparts) are also an integral part of your room's defenses. When you construct a wall or rampart and have a worker or repairer available with energy, it is automatically set to build and repair your walls to a minimum "critical" hitpoint level, and then- as available- repair them to a target "maintenance" hitpoint level. The amount of hitpoints that the code will automatically aim for scales depending on your room's controller level (RCL), from 10K hitpoints at RCL1 to 5M hitpoints at RCL8.
 
-You can change the target hitpoint goal to keep your walls and ramparts at by using the following command: 
+You can change the target hitpoint goal to keep your walls and ramparts at by using the following command:
 
-`empire.wall_target(hitpoints)`
+`empire.wall_target(hitpoints);`
 
 This changes the target hitpoint goal for all rooms. Rooms you colonize afterwards will revert to default target goal. By modifying the Memory object referenced in the console command, you can set the target goal for rooms individually as well.
 
 #### Combat
 
-There is a pipeline in place for entering specific instructions for creeps to initiate combat against targets, creeps, or structures in other rooms utilizing various tactics similar to a playbook. The full list of commands and options can be found under `help("empire")`. Some tactics that are included are:
+There is a pipeline in place for entering specific instructions for creeps to initiate combat against targets, creeps, or structures in other rooms utilizing various tactics similar to a playbook. The full list of commands and options can be found under `help("empire");`. Some tactics that are included are:
 
 - "Waves": Spawn a full set of creeps that rally at a specific rally point. Once every creep is at the rally point, they push towards the objective.
 - "Trickle": As creeps spawn, they trickle one by one into the objective room as a steady stream.
@@ -151,9 +155,13 @@ There is a pipeline in place for entering specific instructions for creeps to in
 
 ### Console Commands
 
-There are a number of commands that can be run from the console that are part of the codebase and assist in managing your Screeps empire. These range from logs to show your resource amounts, to using a "blueprint" feature that saves your room layout (using flags) and will automatically rebuild after an attack, along with a CPU profiler that can show you which functions are using the most CPU. For a full list of console commands, simply go to the console and type:
+There are a number of commands that can be run from the console that are part of the codebase and are essential in growing your Screeps empire. These range from logs to show your resource amounts, to using a "blueprint" feature that saves your room layout (using flags) and will automatically rebuild after an attack, along with a CPU profiler that can show you which functions are using the most CPU. For a full list of console commands, simply go to the console and type:
 
-`help()`
+`help();`
+
+There are also a number of helpful commands that output logs to help keep track of all your different colonies and their different conditions. You can find a list of logs by typing:
+
+`help("log");`
 
 ### Advanced Topics
 
