@@ -6787,10 +6787,9 @@ let Console = {
 
 		log.populations = function () {
 			console.log("<font color=\"#D3FFA3\">[Console]</font> Populations for Colonies and Mining Sites (default and custom_population):");
-			
+
 			let colonies = _.keys(_.filter(Game.rooms, room => { return (room.controller != null && room.controller.my); }));
 			let mining = _.keys(_.get(Memory, ["sites", "mining"]));
-
 			let rooms = _.keys(_.get(Memory, "rooms"));
 			let output = "<table>";
 
@@ -6889,6 +6888,29 @@ let Console = {
 			console.log(`<font color=\"#D3FFA3">log.mining</font><table>${output}</table>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
+
+		help_log.push("log.spawn_assist()");
+
+		log.spawn_assist = function () {
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Active Spawn Assists:");
+
+			let rooms = _.filter(Game.rooms, room => { return (room.controller != null && room.controller.my); });
+			let output = "<table><tr><th>Colony \t\t</th><th>Assisted By:</th></tr>";
+			for (let i = 0; i < rooms.length; i++) {
+				let room = rooms[i].name;
+				let spawn_rooms = _.get(Memory, ["rooms", room, "spawn_assist", "rooms"], null);
+				if (spawn_rooms != null) {
+					output += `<tr><td><font color=\"#D3FFA3\">${(room)}</font>: \t</td>`;
+					_.each(spawn_rooms, r => { output += `<td>${r} \t</td>`; });
+					output += `</tr>`;
+				} else {
+					output += `<tr><td><font color=\"#D3FFA3\">${(room)}</font>: \t</td>`
+						+`<td>inactive</td></tr>`;
+				}
+			}
+			console.log(`${output}</table>`);
+			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
+		}
 
 		help_log.push("log.storage()");
 
