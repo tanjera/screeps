@@ -1112,7 +1112,9 @@ StructureLab.prototype.canBoost = function canBoost(mineral) {
  * *********************************************************** */
 
 Room.prototype.store = function store(resource) {
-	return _.get(this, ["storage", "store", resource], 0) + _.get(this, ["terminal", "store", resource], 0);
+	let amount = (_.get(this, ["storage", "my"], false) ? _.get(this, ["storage", "store", resource], 0) : 0)
+		+ (_.get(this, ["terminal", "my"], false) ? _.get(this, ["terminal", "store", resource], 0) : 0);
+	return amount; 
 };
 
 
@@ -1195,9 +1197,9 @@ Room.prototype.getLevel = function getLevel() {
 	Room.prototype.findRepair_Critical = function findRepair_Critical() {
 		return this.find(FIND_STRUCTURES, {
 			filter: (s) => {
-				return (s.structureType == "rampart"
+				return (s.structureType == "rampart" && s.my
 					&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()) * 0.1)
-					|| (s.structureType == "constructedWall"
+					|| (s.structureType == "constructedWall" && s.hits < s.hitsMax
 						&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()) * 0.1)
 					|| (s.structureType == "container" && s.hits < s.hitsMax * 0.1)
 					|| (s.structureType == "road" && s.hits < s.hitsMax * 0.1);
@@ -1208,16 +1210,16 @@ Room.prototype.getLevel = function getLevel() {
 	Room.prototype.findRepair_Maintenance = function findRepair_Maintenance() {
 		return this.find(FIND_STRUCTURES, {
 			filter: (s) => {
-				return (s.structureType == "rampart"
+				return (s.structureType == "rampart" && s.my
 					&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()))
-					|| (s.structureType == "constructedWall"
+					|| (s.structureType == "constructedWall" && s.hits < s.hitsMax
 						&& s.hits < _.get(Memory, ["rooms", this.name, "defense", "wall_hp_target"], this.getWallTarget()))
 					|| (s.structureType == "container" && s.hits < s.hitsMax * 0.8)
 					|| (s.structureType == "road" && s.hits < s.hitsMax * 0.8)
 					|| ((s.structureType == "spawn" || s.structureType == "extension" || s.structureType == "link" || s.structureType == "storage"
 						|| s.structureType == "tower" || s.structureType == "observer" || s.structureType == "extractor" || s.structureType == "lab"
 						|| s.structureType == "terminal" || s.structureType == "nuker" || s.structureType == "powerSpawn")
-						&& s.hits < s.hitsMax);
+						&& s.hits < s.hitsMax && s.my);
 			}
 		}).sort((a, b) => { return a.hits - b.hits });
 	}
