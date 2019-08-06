@@ -825,18 +825,46 @@ Creep.prototype.travel = function travel(dest, ignore_creeps) {
 		|| _.get(this, ["memory", "path", "destination"]) != pos_dest) {
 		_.set(this, ["memory", "path", "destination"], pos_dest);
 
-		let path_array = this.pos.findPathTo(pos_dest, {
-			maxOps: Control.moveMaxOps(), reusePath: Control.moveReusePath(),
-			ignoreCreeps: ignore_creeps, costCallback: function (roomName, costMatrix) {
-				_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {
-					costMatrix.set(p.x, p.y, 1);
-				});
+		let path_array;
+		
+		if (_.get(pos_dest, "roomName") == this.room.name) {
+			// If the creep's destination is in the same room as the creep, prevent exiting the room to path
+			path_array = this.pos.findPathTo(pos_dest, {
+				maxOps: Control.moveMaxOps(), reusePath: Control.moveReusePath(),
+				ignoreCreeps: ignore_creeps, costCallback: function (roomName, costMatrix) {
+					_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {
+						costMatrix.set(p.x, p.y, 1);
+					});
+	
+					_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {
+						costMatrix.set(p.x, p.y, 255);
+					});
 
-				_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {
-					costMatrix.set(p.x, p.y, 255);
-				});
-			}
-		});
+					// Set all edge tiles as impassable...
+					for (let i = 0; i < 50; i++) {
+						costMatrix.set(0, i, 255);
+						costMatrix.set(i, 0, 255);
+						costMatrix.set(49, i, 255);
+						costMatrix.set(i, 49, 255);
+					}
+				}
+			});
+		} else {
+			path_array = this.pos.findPathTo(pos_dest, {
+				maxOps: Control.moveMaxOps(), reusePath: Control.moveReusePath(),
+				ignoreCreeps: ignore_creeps, costCallback: function (roomName, costMatrix) {
+					_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {
+						costMatrix.set(p.x, p.y, 1);
+					});
+	
+					_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {
+						costMatrix.set(p.x, p.y, 255);
+					});
+				}
+			});
+		}
+		
+		
 
 		let path_string = "";
 		_.each(path_array, dir => {
