@@ -2542,7 +2542,7 @@ let Creep_Roles = {
 
 	Worker: function (creep, isSafe) {
 		let hostile = isSafe ? null
-			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, {
+			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5, {
 				filter:
 					c => { return c.isHostile(); }
 			}));
@@ -7130,8 +7130,15 @@ let Console = {
 		};
 
 		help_empire.push("");
-		help_empire.push("empire.threat_level(level)  ... NONE, LOW, MEDIUM, HIGH")
-		empire.threat_level = function (level) {
+
+		help_empire.push("empire.set_threat(roomName, level)  ... NONE, LOW, MEDIUM, HIGH")
+		empire.set_threat = function (room_name, level) {
+			_.set(Memory, ["rooms", room_name, "defense", "threat_level"], level);
+			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for room ${room_name} set.`;
+		};
+
+		help_empire.push("empire.set_threat_all(level)  ... NONE, LOW, MEDIUM, HIGH")
+		empire.set_threat_all = function (level) {
 			for (let i in Memory.rooms)
 				_.set(Memory, ["rooms", i, "defense", "threat_level"], level);
 			return `<font color=\"#D3FFA3\">[Console]</font> Threat level for all rooms set.`;
