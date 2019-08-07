@@ -826,7 +826,7 @@ Creep.prototype.travel = function travel(dest, ignore_creeps) {
 		_.set(this, ["memory", "path", "destination"], pos_dest);
 
 		let path_array;
-		
+
 		if (_.get(pos_dest, "roomName") == this.room.name) {
 			// If the creep's destination is in the same room as the creep, prevent exiting the room to path
 			path_array = this.pos.findPathTo(pos_dest, {
@@ -835,7 +835,7 @@ Creep.prototype.travel = function travel(dest, ignore_creeps) {
 					_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {
 						costMatrix.set(p.x, p.y, 1);
 					});
-	
+
 					_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {
 						costMatrix.set(p.x, p.y, 255);
 					});
@@ -856,15 +856,15 @@ Creep.prototype.travel = function travel(dest, ignore_creeps) {
 					_.each(_.get(Memory, ["hive", "paths", "prefer", "rooms", roomName]), p => {
 						costMatrix.set(p.x, p.y, 1);
 					});
-	
+
 					_.each(_.get(Memory, ["hive", "paths", "avoid", "rooms", roomName]), p => {
 						costMatrix.set(p.x, p.y, 255);
 					});
 				}
 			});
 		}
-		
-		
+
+
 
 		let path_string = "";
 		_.each(path_array, dir => {
@@ -1114,7 +1114,7 @@ StructureLab.prototype.canBoost = function canBoost(mineral) {
 Room.prototype.store = function store(resource) {
 	let amount = (_.get(this, ["storage", "my"], false) ? _.get(this, ["storage", "store", resource], 0) : 0)
 		+ (_.get(this, ["terminal", "my"], false) ? _.get(this, ["terminal", "store", resource], 0) : 0);
-	return amount; 
+	return amount;
 };
 
 
@@ -7271,6 +7271,21 @@ let Console = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Preference position added to Memory.hive.paths.prefer.rooms.${prefer_pos.roomName}`;
 		};
 
+		help_path.push("path.prefer_area(roomName, startX, startY, endX, endY)");
+
+		path.prefer_area = function (room_name, start_x, start_y, end_x, end_y) {
+			if (_.get(Memory, ["hive", "paths", "prefer", "rooms", room_name]) == null)
+				_.set(Memory, ["hive", "paths", "prefer", "rooms", room_name], new Array());
+
+			for (let x = start_x; x <= end_x; x++) {
+				for (let y = start_y; y <= end_y; y++) {
+					Memory["hive"]["paths"]["prefer"]["rooms"][room_name].push(new RoomPosition(x, y, room_name));
+				}
+			}
+
+			return `<font color=\"#D3FFA3\">[Console]</font> Preference positions added to Memory.hive.paths.prefer.rooms.${room_name}`;
+		};
+
 		help_path.push("path.avoid(avoid_pos)");
 
 		path.avoid = function (avoid_pos) {
@@ -7288,6 +7303,21 @@ let Console = {
 
 			for (let x = start_x; x <= end_x; x++) {
 				for (let y = start_y; y <= end_y; y++) {
+					Memory["hive"]["paths"]["avoid"]["rooms"][room_name].push(new RoomPosition(x, y, room_name));
+				}
+			}
+
+			return `<font color=\"#D3FFA3\">[Console]</font> Avoid positions added to Memory.hive.paths.avoid.rooms.${room_name}`;
+		};
+
+		help_path.push("path.avoid_radius(roomName, centerX, centerY, radius)");
+
+		path.avoid_radius = function (room_name, center_x, center_y, radius) {
+			if (_.get(Memory, ["hive", "paths", "avoid", "rooms", room_name]) == null)
+				_.set(Memory, ["hive", "paths", "avoid", "rooms", room_name], new Array());
+
+			for (let x = Math.max(center_x - radius, 0); x <= Math.min(center_x + radius, 49); x++) {
+				for (let y = Math.max(center_y - radius, 0); y <= Math.min(center_y + radius, 49); y++) {
 					Memory["hive"]["paths"]["avoid"]["rooms"][room_name].push(new RoomPosition(x, y, room_name));
 				}
 			}
