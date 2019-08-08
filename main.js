@@ -6162,6 +6162,12 @@ let Blueprint = {
 			if (blocked)
 				continue;
 
+			if (structureType == STRUCTURE_ROAD) {
+				let lookTerrain = room.lookForAt("terrain", x, y);
+				if (lookTerrain == "wall")
+					continue;
+			}
+
 			let result = room.createConstructionSite(x, y, structureType);
 			if (result == OK) {
 				console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing ${structureType} at `
