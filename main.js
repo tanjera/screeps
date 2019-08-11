@@ -3899,7 +3899,7 @@ let Sites = {
 				_.each(listCreeps, c => {
 					switch (_.get(c, ["memory", "role"])) {
 						default: break;
-						case "paladin": popActual["paladin"] = _.get(popActual, "paladin", 0) + 1; break;
+						case "paladin": popActual["paladin"] = _.get(popActual, "paladin", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 200) ? 1 : 0); break;
 						case "soldier": popActual["soldier"] = _.get(popActual, "soldier", 0) + 1; break;
 						case "healer": popActual["healer"] = _.get(popActual, "healer", 0) + 1; break;
 						case "dredger": popActual["dredger"] = _.get(popActual, "dredger", 0) + 1; break;
@@ -4144,7 +4144,7 @@ let Sites = {
 				let sources = room.find(FIND_SOURCES);
 				let containers = _.filter(room.find(FIND_STRUCTURES), s => { return s.structureType == "container"; });
 				_.each(sources, source => {
-					if (source.pos.findInRange(containers, 1).length < 2) {
+					if (source.pos.findInRange(containers, 1).length < 1) {
 						let adj = source.pos.getBuildableTile_Adjacent();
 						if (adj != null && adj.createConstructionSite("container") == OK)
 							console.log(`<font color=\"#6065FF\">[Mining]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);
