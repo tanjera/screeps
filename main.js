@@ -1438,22 +1438,22 @@ Population_Colonization =
 
 Population_Colony = {
 	Standalone: {
-		1: { worker: { level: 1, amount: 5 } },
-		2: { worker: { level: 2, amount: 5 } },
-		3: { worker: { level: 3, amount: 6 } },
-		4: { worker: { level: 4, amount: 6 } },
-		5: { worker: { level: 4, amount: 6 } },
+		1: { worker: { level: 1, amount: 5, body: "worker_at" } },
+		2: { worker: { level: 2, amount: 5, body: "worker_at" } },
+		3: { worker: { level: 3, amount: 6, body: "worker_at" } },
+		4: { worker: { level: 4, amount: 6, body: "worker_at" } },
+		5: { worker: { level: 4, amount: 6, body: "worker_at" } },
 		6: { worker: { level: 4, amount: 6 } },
 		7: { worker: { level: 7, amount: 5 } },
 		8: { worker: { level: 7, amount: 4 } }
 	},
 
 	Assisted: {
-		1: { worker: { level: 3, amount: 4 } },
-		2: { worker: { level: 3, amount: 4 } },
-		3: { worker: { level: 4, amount: 6 } },
-		4: { worker: { level: 5, amount: 6 } },
-		5: { worker: { level: 6, amount: 6 } },
+		1: { worker: { level: 3, amount: 4, body: "worker_at" } },
+		2: { worker: { level: 3, amount: 4, body: "worker_at" } },
+		3: { worker: { level: 4, amount: 6, body: "worker_at" } },
+		4: { worker: { level: 5, amount: 6, body: "worker_at" } },
+		5: { worker: { level: 6, amount: 6, body: "worker_at" } },
 		6: { worker: { level: 6, amount: 6 } },
 		7: { worker: { level: 7, amount: 5 } },
 		8: { worker: { level: 7, amount: 4 } }
@@ -1463,24 +1463,24 @@ Population_Colony = {
 
 Population_Mining = {
 	S1: {
-		1: { miner: { level: 1, amount: 2 } },
+		1: { miner: { level: 1, amount: 2, body: "worker_at" } },
 		2: {
-			miner: { level: 2, amount: 2 },
-			burrower: { level: 2, amount: 1 },
-			carrier: { level: 2, amount: 2 }
+			miner: { level: 2, amount: 2, body: "worker_at" },
+			burrower: { level: 2, amount: 1, body: "burrower_at" },
+			carrier: { level: 2, amount: 2, body: "carrier_at"}
 		},
 		3: {
-			miner: { level: 2, amount: 2 },
-			burrower: { level: 2, amount: 1 },
-			carrier: { level: 2, amount: 2 }
+			miner: { level: 2, amount: 2, body: "worker_at" },
+			burrower: { level: 2, amount: 1, body: "burrower_at" },
+			carrier: { level: 2, amount: 2, body: "carrier_at" }
 		},
 		4: {
-			burrower: { level: 3, amount: 1 },
-			carrier: { level: 3, amount: 2 }
+			burrower: { level: 3, amount: 1, body: "burrower_at" },
+			carrier: { level: 3, amount: 2, body: "carrier_at" }
 		},
 		5: {
-			burrower: { level: 4, amount: 1 },
-			carrier: { level: 4, amount: 2 }
+			burrower: { level: 4, amount: 1, body: "burrower_at" },
+			carrier: { level: 4, amount: 2, body: "carrier_at" }
 		},
 		6: {
 			burrower: { level: 4, amount: 1 },
@@ -1500,24 +1500,24 @@ Population_Mining = {
 	},
 
 	S2: {
-		1: { miner: { level: 1, amount: 2 } },
+		1: { miner: { level: 1, amount: 2, body: "worker_at" } },
 		2: {
-			miner: { level: 2, amount: 2 },
-			burrower: { level: 2, amount: 2 },
-			carrier: { level: 2, amount: 2 }
+			miner: { level: 2, amount: 2, body: "worker_at" },
+			burrower: { level: 2, amount: 2, body: "burrower_at" },
+			carrier: { level: 2, amount: 2, body: "carrier_at" }
 		},
 		3: {
-			miner: { level: 2, amount: 2 },
-			burrower: { level: 2, amount: 2 },
-			carrier: { level: 2, amount: 3 }
+			miner: { level: 2, amount: 2, body: "worker_at" },
+			burrower: { level: 2, amount: 2, body: "burrower_at" },
+			carrier: { level: 2, amount: 3, body: "carrier_at" }
 		},
 		4: {
-			burrower: { level: 3, amount: 2 },
-			carrier: { level: 3, amount: 3 }
+			burrower: { level: 3, amount: 2, body: "burrower_at" },
+			carrier: { level: 3, amount: 3, body: "carrier_at" }
 		},
 		5: {
-			burrower: { level: 4, amount: 2 },
-			carrier: { level: 4, amount: 3 }
+			burrower: { level: 4, amount: 2, body: "burrower_at" },
+			carrier: { level: 4, amount: 3, body: "carrier_at" }
 		},
 		6: {
 			burrower: { level: 4, amount: 2 },
@@ -1547,7 +1547,7 @@ Population_Mining = {
 	},
 
 	R1: {
-		1: { miner: { level: 1, amount: 1 } },
+		1: { miner: { level: 1, amount: 1, body: "worker_at" } },
 		2: {
 			burrower: { level: 2, amount: 2, body: "burrower_at" },
 			carrier: { level: 2, amount: 2, body: "carrier_at" },
@@ -1591,7 +1591,7 @@ Population_Mining = {
 	},
 
 	R2: {
-		1: { miner: { level: 1, amount: 1 } },
+		1: { miner: { level: 1, amount: 1, body: "worker_at" } },
 		2: {
 			burrower: { level: 2, amount: 2, body: "burrower_at" },
 			carrier: { level: 2, amount: 4, body: "carrier_at" },
@@ -3340,7 +3340,7 @@ let Sites = {
 				listSpawnRoute = _.get(Memory, ["rooms", rmColony, "spawn_assist", "list_route"]);
 
 				if (_.get(Memory, ["rooms", rmColony, "defense", "threat_level"]) == null)
-					_.set(Memory, ["rooms", rmColony, "defense", "threat_level"], MEDIUM);
+					_.set(Memory, ["rooms", rmColony, "defense", "threat_level"], LOW);
 
 				let listCreeps = _.filter(Game.creeps, c => c.memory.room == rmColony);
 				Stats_CPU.End(rmColony, "Colony-init");
@@ -3465,9 +3465,9 @@ let Sites = {
 				});
 
 				let popTarget = new Object();
-				let custom_population = _.get(Memory, ["rooms", rmColony, "custom_population"]);
-				if (custom_population)
-					popTarget = _.cloneDeep(custom_population);
+				let popSetting = _.get(Memory, ["rooms", rmColony, "set_population"]);
+				if (popSetting)
+					popTarget = _.cloneDeep(popSetting);
 				else
 					popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]);
 
@@ -3913,9 +3913,12 @@ let Sites = {
 				});
 
 				let popTarget = new Object();
-				let custom_population = _.get(Memory, ["sites", "mining", rmHarvest, "custom_population"]);
-				if (custom_population)
-					popTarget = _.cloneDeep(custom_population);
+				let popSetting = (rmColony == rmHarvest
+					? _.get(Memory, ["rooms", rmHarvest, "set_population"])
+					: _.get(Memory, ["sites", "mining", rmHarvest, "set_population"]));
+
+				if (popSetting)
+					popTarget = _.cloneDeep(popSetting);
 				else {
 					if (rmColony == rmHarvest)
 						popTarget = _.cloneDeep(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)]);
@@ -4212,9 +4215,9 @@ let Sites = {
 				_.set(popActual, "courier", _.filter(listCreeps, (c) => c.memory.role == "courier" && (c.ticksToLive == undefined || c.ticksToLive > 80)).length);
 
 				let popTarget = new Object();
-				let custom_population = _.get(Memory, ["rooms", rmColony, "custom_population"]);
-				if (custom_population)
-					popTarget = _.cloneDeep(custom_population)
+				let popSetting = _.get(Memory, ["rooms", rmColony, "set_population"]);
+				if (popSetting)
+					popTarget = _.cloneDeep(popSetting)
 				else
 					popTarget = _.cloneDeep(Population_Industry);
 
@@ -6826,7 +6829,7 @@ let Console = {
 		help_log.push("log.populations()");
 
 		log.populations = function () {
-			console.log("<font color=\"#D3FFA3\">[Console]</font> Populations for Colonies and Mining Sites (default and custom_population):");
+			console.log("<font color=\"#D3FFA3\">[Console]</font> Populations for Colonies and Mining Sites (default and set_population):");
 
 			let colonies = _.keys(_.filter(Game.rooms, room => { return (room.controller != null && room.controller.my); }));
 			let mining = _.keys(_.get(Memory, ["sites", "mining"]));
@@ -6835,13 +6838,13 @@ let Console = {
 
 			for (let i = 0; i < rooms.length; i++) {
 				if (_.indexOf(colonies, rooms[i]) >= 0 || _.indexOf(mining, rooms[i]) >= 0) {
-					if (_.has(Memory, ["rooms", rooms[i], "custom_population"])) {
+					if (_.has(Memory, ["rooms", rooms[i], "set_population"])) {
 						output += `<tr><td><font color=\"#D3FFA3\">${(rooms[i])}</font>: \t</td>`;
-						let populations = _.keys(Memory["rooms"][rooms[i]]["custom_population"]);
+						let populations = _.keys(Memory["rooms"][rooms[i]]["set_population"]);
 						for (let j = 0; j < populations.length; j++) {
 							output += `<td>${populations[j]}: </td> `
-							+ `<td>lvl ${_.get(Memory, ["rooms", rooms[i], "custom_population", populations[j], "level"])}</td>`
-							+ `<td> x ${_.get(Memory, ["rooms", rooms[i], "custom_population", populations[j], "amount"])} \t</td>  `;
+							+ `<td>lvl ${_.get(Memory, ["rooms", rooms[i], "set_population", populations[j], "level"])}</td>`
+							+ `<td> x ${_.get(Memory, ["rooms", rooms[i], "set_population", populations[j], "amount"])} \t</td>  `;
 						}
 						output += `</tr>`;
 					} else {
