@@ -3866,6 +3866,10 @@ let Sites = {
 				_.set(Memory, ["rooms", rmHarvest, "defense", "is_safe"], is_safe);
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"], is_safe);
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], hostiles);
+
+				_.set(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"],
+					(!visible || _.get(Game, ["rooms", rmHarvest, "controller", "pos"], null) == null) ? 0
+						: Game.rooms[rmHarvest].controller.pos.getAccessAmount(false));
 			},
 
 			runPopulation: function (rmColony, rmHarvest, listCreeps, listSpawnRooms, hasKeepers) {
@@ -4068,7 +4072,10 @@ let Sites = {
 
 					if (_.get(popActual, "reserver", 0) < _.get(popTarget, ["reserver", "amount"], 0)
 						&& Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
-						&& (Game.rooms[rmHarvest].controller.reservation == null || Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)) {
+						&& (Game.rooms[rmHarvest].controller.reservation == null
+							|| Game.rooms[rmHarvest].controller.reservation.ticksToEnd < 2000)
+						&& (_.get(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"], null) == null
+							|| _.get(popActual, "reserver", 0) < _.get(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"], 0))) {
 						Memory["hive"]["spawn_requests"].push({
 							room: rmColony, listRooms: listSpawnRooms,
 							priority: 17,
