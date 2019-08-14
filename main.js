@@ -7758,7 +7758,6 @@ let Stats_Grafana = {
 			let remote_mining = _.get(Memory, ["sites", "mining"]);
 
 			_.set(Memory, ["stats", "resources"], new Object());
-			_.set(Memory, ["stats", "alerts"], new Object());
 
 			_.each(_.filter(Game.rooms,
 				room => {return room.controller != null && room.controller.my; }),
@@ -7796,7 +7795,7 @@ let Stats_Grafana = {
 
 					// Set alerts (e.g. spawn_assist active)
 					if (_.get(Memory, ["rooms", room.name, "spawn_assist", "rooms"], null) != null)
-						_.set(Memory, ["stats", "alerts", `${room.name}-spawn_assist`], `${room.name}: spawn_assist active!`);
+						_.set(Memory, ["stats", "colonies", room.name, "alerts"], "spawn_assist active!;");
 			});
 		}
 	},
