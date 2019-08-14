@@ -3383,6 +3383,10 @@ let Sites = {
 				_.set(Memory, ["rooms", rmColony, "survey", "has_minerals"],
 					visible ? Game.rooms[rmColony].find(FIND_MINERALS, { filter: (m) => { return m.mineralAmount > 0; } }).length > 0 : false);
 
+				if (_.get(Memory, ["rooms", rmColony, "survey", "source_amount"], 0) == 0)
+					_.set(Memory, ["rooms", rmColony, "survey", "source_amount"],
+						(visible ? Game.rooms[rmColony].find(FIND_SOURCES).length : 0));
+
 				let hostiles = visible
 					? _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); })
 					: new Array();
@@ -3855,7 +3859,10 @@ let Sites = {
 				let visible = _.keys(Game.rooms).includes(rmHarvest);
 				_.set(Memory, ["sites", "mining", rmHarvest, "survey", "visible"], visible);
 				_.set(Memory, ["sites", "mining", rmHarvest, "survey", "has_minerals"],
-					visible ? Game.rooms[rmHarvest].find(FIND_MINERALS, { filter: (m) => { return m.mineralAmount > 0; } }).length > 0 : false);
+					visible ? _.filter(Game.rooms[rmHarvest].find(FIND_MINERALS), m => { return m.mineralAmount > 0; }).length > 0 : false);
+				if (_.get(Memory, ["sites", "mining", rmHarvest, "survey", "source_amount"], 0) == 0)
+					_.set(Memory, ["sites", "mining", rmHarvest, "survey", "source_amount"],
+						(visible ? Game.rooms[rmHarvest].find(FIND_SOURCES).length : 0));
 
 				let hostiles = visible
 					? _.filter(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS),
@@ -7719,15 +7726,14 @@ let Stats_Grafana = {
 	Run: function () {
 		// Periodically reset to remove unused keys or interval data
 		if (Game.time % 100 == 0) {
-			_.each(Game.rooms, room => {
-				if (room.controller != null && room.controller.my)
-					_.set(Memory, ["stats", "colonies", room.name, "population"], new Object());
+			_.each(_.filter(Game.rooms,
+				room => { return room.controller != null && room.controller.my; }),
+				room => { _.set(Memory, ["stats", "colonies", room.name, "population"], new Object());
 			});
 		}
 
-		if (Game.time % 500 == 0) {
+		if (Game.time % 500 == 0)
 			_.set(Memory, "stats", new Object());
-		}
 
 
 		_.set(Memory, ["stats", "cpu", "tick"], Game.time);
@@ -7749,27 +7755,48 @@ let Stats_Grafana = {
 		}
 
 		if (Game.time % 50 == 0) {
-			let colonies = new Object;
+			let remote_mining = _.get(Memory, ["sites", "mining"]);
+
 			_.set(Memory, ["stats", "resources"], new Object());
-			_.each(Game.rooms, room => {
-				if (room.controller != null && room.controller.my) {
+			_.set(Memory, ["stats", "alerts"], new Object());
+
+			_.each(_.filter(Game.rooms,
+				room => {return room.controller != null && room.controller.my; }),
+				room => {
+					// Report colony levels
 					_.set(Memory, ["stats", "colonies", room.name, "rcl", "level"], room.controller.level);
 					_.set(Memory, ["stats", "colonies", room.name, "rcl", "progress"], room.controller.progress);
 					_.set(Memory, ["stats", "colonies", room.name, "rcl", "progress_total"], room.controller.progressTotal);
 					_.set(Memory, ["stats", "colonies", room.name, "rcl", "progress_percent"], (room.controller.progress / room.controller.progressTotal * 100));
 
+					// Report colony population stats
 					_.set(Memory, ["stats", "colonies", room.name, "population"], new Object());
 
+					// Tally resources for individual colony
 					let storage = _.get(Game, ["rooms", room.name, "storage"]);
 					let terminal = _.get(Game, ["rooms", room.name, "terminal"]);
 					_.set(Memory, ["stats", "colonies", room.name, "storage", "store"], _.get(storage, "store"));
 					_.set(Memory, ["stats", "colonies", room.name, "terminal", "store"], _.get(terminal, "store"));
+
+					// Tally resources for entire country
 					for (let res in _.get(storage, "store"))
 						_.set(Memory, ["stats", "resources", res],
 							_.get(Memory, ["stats", "resources", res], 0)
 							+ _.get(storage, ["store", res], 0)
 							+ _.get(terminal, ["store", res], 0));
-				}
+
+					// Tally remote mining sites active
+					let source_total = 0;
+					let remote_list = _.filter(Object.keys(remote_mining), rem => { return rem != room.name && _.get(remote_mining[rem], "colony") == room.name; });
+					_.set(Memory, ["stats", "colonies", room.name, "remote_mining", "rooms"], remote_list.length);
+
+					_.each(remote_list, rem => { source_total = source_total + _.get(Memory, ["sites", "mining", room.name, "survey", "source_amount"], 0); });
+					_.set(Memory, ["stats", "colonies", room.name, "remote_mining", "sources"], source_total);
+					_.set(Memory, ["stats", "colonies", room.name, "mining_sources"], source_total + _.get(Memory, ["rooms", room.name, "survey", "source_amount"], 0));
+
+					// Set alerts (e.g. spawn_assist active)
+					if (_.get(Memory, ["rooms", room.name, "spawn_assist", "rooms"], null) != null)
+						_.set(Memory, ["stats", "alerts", `${room.name}-spawn_assist`], `${room.name}: spawn_assist active!`);
 			});
 		}
 	},
