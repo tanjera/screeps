@@ -442,7 +442,7 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 			: [1000, 150, 200, 300, 500, 700, 900, 1250, 1250];
 
 		let cont = _.head(_.sortBy(_.filter(this.room.find(FIND_STRUCTURES),
-			s => { return s.structureType == STRUCTURE_CONTAINER && _.get(s, ["store", "energy"], 0) > (carry_capacity[room_level] / 5); }),
+			s => { return s.structureType == STRUCTURE_CONTAINER && _.get(s, ["store", "energy"], 0) > (carry_capacity[room_level] / 4); }),
 			s => { return this.pos.getRangeTo(s.pos); }));
 
 		if (cont != null) {
@@ -2637,9 +2637,10 @@ let Creep_Roles = {
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
 
 					let energy_level = _.get(Memory, ["rooms", creep.room.name, "survey", "energy_level"]);
-					if (energy_level == CRITICAL || energy_level == LOW) {
+					if (energy_level == CRITICAL || energy_level == LOW 
+						|| _.get(Memory, ["sites", "mining", creep.memory.room, "store_percent"], 0) > 0.25) {
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
-						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);					
 					} else {
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
@@ -3880,10 +3881,16 @@ let Sites = {
 					let containers = !visible ? null 
 						: _.filter(Game.rooms[rmHarvest].find(FIND_STRUCTURES), 
 							s => { return s.structureType == STRUCTURE_CONTAINER; });
-					let store_energy = _.sum(containers, c => { return c.store["energy"]; });
-					let store_capacity = containers.length * 2000;
-					_.set(Memory, ["sites", "mining", rmHarvest, "store_total"], store_energy);
-					_.set(Memory, ["sites", "mining", rmHarvest, "store_percent"], store_energy / store_capacity);
+					
+					if (containers == null) {
+						_.set(Memory, ["sites", "mining", rmHarvest, "store_total"], 0);
+						_.set(Memory, ["sites", "mining", rmHarvest, "store_percent"], 0);
+					} else {
+						let store_energy = _.sum(containers, c => { return c.store["energy"]; });					
+						let store_capacity = containers.length * 2000;
+						_.set(Memory, ["sites", "mining", rmHarvest, "store_total"], store_energy);
+						_.set(Memory, ["sites", "mining", rmHarvest, "store_percent"], store_energy / store_capacity);
+					}
 				}
 
 				_.set(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"],
