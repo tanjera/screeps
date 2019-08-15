@@ -7785,8 +7785,9 @@ let Stats_Grafana = {
 
 			_.set(Memory, ["stats", "resources"], new Object());
 
+			// Iterate all colonies for statistics
 			_.each(_.filter(Game.rooms,
-				room => {return room.controller != null && room.controller.my; }),
+				room => { return room.controller != null && room.controller.my; }),
 				room => {
 					// Report colony levels
 					_.set(Memory, ["stats", "colonies", room.name, "rcl", "level"], room.controller.level);
@@ -7823,6 +7824,14 @@ let Stats_Grafana = {
 					if (_.get(Memory, ["rooms", room.name, "spawn_assist", "rooms"], null) != null)
 						_.set(Memory, ["stats", "colonies", room.name, "alerts"], "spawn_assist active!;");
 			});
+
+			// Iterate mining sites for statistics
+			_.each(_.filter(_.keys(_.get(Memory, ["sites", "mining"])), 
+				rmName => { return _.get(Game, ["rooms", rmName], null) != null; }),
+				rmName => {
+					_.set(Memory, ["stats", "mining", rmName, "store_percent"], 
+						_.get(Memory, ["sites", "mining", rmName, "store_percent"], 0));
+			});			
 		}
 	},
 
