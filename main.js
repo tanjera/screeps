@@ -3381,15 +3381,16 @@ let Sites = {
 			surveyRoom: function (rmColony) {
 				let visible = _.keys(Game.rooms).includes(rmColony);
 				_.set(Memory, ["rooms", rmColony, "survey", "has_minerals"],
-					visible ? Game.rooms[rmColony].find(FIND_MINERALS, { filter: (m) => { return m.mineralAmount > 0; } }).length > 0 : false);
+					!visible ? false 
+						: _.filter(Game.rooms[rmColony].find(FIND_MINERALS), 
+							m => { return m.mineralAmount > 0; }).length > 0 );
 
 				if (_.get(Memory, ["rooms", rmColony, "survey", "source_amount"], 0) == 0)
 					_.set(Memory, ["rooms", rmColony, "survey", "source_amount"],
 						(visible ? Game.rooms[rmColony].find(FIND_SOURCES).length : 0));
 
-				let hostiles = visible
-					? _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); })
-					: new Array();
+				let hostiles = !visible ? new Array()
+					: _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); });
 				_.set(Memory, ["rooms", rmColony, "defense", "hostiles"], hostiles);
 
 				let is_safe = !visible || hostiles.length == 0;
@@ -3874,6 +3875,17 @@ let Sites = {
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"], is_safe);
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], hostiles);
 
+				// Tally energy sitting in containers awaiting carriers to take to storage...
+				if (_.get(Game, ["rooms", rmColony, "storage"], null) != null) {
+					let containers = !visible ? null 
+						: _.filter(Game.rooms[rmHarvest].find(FIND_STRUCTURES), 
+							s => { return s.structureType == STRUCTURE_CONTAINER; });
+					let store_energy = _.sum(containers, c => { return c.store["energy"]; });
+					let store_capacity = containers.length * 2000;
+					_.set(Memory, ["sites", "mining", rmHarvest, "store_total"], store_energy);
+					_.set(Memory, ["sites", "mining", rmHarvest, "store_percent"], store_energy / store_capacity);
+				}
+
 				_.set(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"],
 					(!visible || _.get(Game, ["rooms", rmHarvest, "controller", "pos"], null) == null) ? 0
 						: Game.rooms[rmHarvest].controller.pos.getAccessAmount(false));
@@ -3960,6 +3972,13 @@ let Sites = {
 					}
 				}
 
+				// Adjust carrier population amounts based on amount of energy sitting in storage
+				if (_.get(Memory, ["sites", "mining", rmHarvest, "store_percent"], 0) > 0.75) {
+					_.set(popTarget, ["carrier", "amount"], _.get(popTarget, ["carrier", "amount"], 0) + 2);
+				} else if (_.get(Memory, ["sites", "mining", rmHarvest, "store_percent"], 0) > 0.5) {
+					_.set(popTarget, ["carrier", "amount"], _.get(popTarget, ["carrier", "amount"], 0) + 1);
+				}
+					
 				// Tally population levels for level scaling
 				Control.populationTally(rmColony,
 					_.sum(popTarget, p => { return _.get(p, "amount", 0); }),
