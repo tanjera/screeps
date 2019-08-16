@@ -720,8 +720,8 @@ Creep.prototype.getTask_Mine = function getTask_Mine() {
 	if (!_.get(Memory, ["rooms", this.room.name, "defense", "is_safe"], true))
 		return;
 
-	let source = _.head(_.sortBy(_.filter(this.room.find(FIND_SOURCES),
-		s => { return s.energy > 0; }),
+	// Find sources with energy, and that aren't marked as being avoided via path console functions
+	let source = _.head(_.sortBy(this.room.findSources(true),
 		s => {
 			if (this.memory.role == "burrower")
 				return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1),
@@ -1228,11 +1228,45 @@ Room.prototype.getLevel = function getLevel() {
 		}).sort((a, b) => { return a.hits - b.hits });
 	}
 
+	Room.prototype.findSources = function findSources(checkEnergy = false) {
+		return _.filter(this.find(FIND_SOURCES),
+			s => { return !s.pos.isAvoided() && (checkEnergy == true ? s.energy > 0 : true) });
+	}
+
 
 
 /* ***********************************************************
  *	[sec01g] OVERLOADS: ROOMPOSITION
  * *********************************************************** */
+
+RoomPosition.prototype.isAvoided = function isAvoided() {
+	return _.findIndex(_.get(Memory, ["hive", "paths", "avoid", "rooms", this.roomName], null),
+		p => { return p.x == this.x && p.y == this.y && p.roomName == this.roomName; }) >= 0;
+}
+
+RoomPosition.prototype.isBuildable = function isBuildable() {
+	if (!this.isValid())
+		return false;
+
+	let look = this.look();
+
+	let terrain = _.head(_.filter(look, l => l.type == "terrain"))["terrain"];
+	if (terrain == "wall")
+		return false;
+
+	let structures = _.filter(look, l => l.type == "structure");
+	for (let s in structures) {
+		if (structures[s].structure.structureType != "road"
+			&& (structures[s].structure.structureType != "rampart" || !structures[s].structure.my))
+			return false;
+	}
+
+	return true;
+};
+
+RoomPosition.prototype.isEdge = function isEdge() {
+	return (this.x == 0 || this.x == 49 || this.y == 0 || this.y == 49);
+};
 
 RoomPosition.prototype.isValid = function isValid() {
 	return !(this.x < 0 || this.x > 49 || this.y < 0 || this.y > 49);
@@ -1258,26 +1292,6 @@ RoomPosition.prototype.isWalkable = function isWalkable(creeps_block) {
 	if (creeps_block) {
 		let creeps = _.filter(look, l => l.type == "creep");
 		if (creeps.length > 0)
-			return false;
-	}
-
-	return true;
-};
-
-RoomPosition.prototype.isBuildable = function isBuildable() {
-	if (!this.isValid())
-		return false;
-
-	let look = this.look();
-
-	let terrain = _.head(_.filter(look, l => l.type == "terrain"))["terrain"];
-	if (terrain == "wall")
-		return false;
-
-	let structures = _.filter(look, l => l.type == "structure");
-	for (let s in structures) {
-		if (structures[s].structure.structureType != "road"
-			&& (structures[s].structure.structureType != "rampart" || !structures[s].structure.my))
 			return false;
 	}
 
@@ -1334,10 +1348,6 @@ RoomPosition.prototype.getTileInDirection = function getTileInDirection(dir) {
 	else
 		return new RoomPosition (nX, nY, this.roomName);
 
-};
-
-RoomPosition.prototype.isEdge = function isEdge() {
-	return (this.x == 0 || this.x == 49 || this.y == 0 || this.y == 49);
 };
 
 RoomPosition.prototype.inRangeToListTargets = function inRangeToListTargets(listTargets, range) {
@@ -2637,10 +2647,10 @@ let Creep_Roles = {
 					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
 
 					let energy_level = _.get(Memory, ["rooms", creep.room.name, "survey", "energy_level"]);
-					if (energy_level == CRITICAL || energy_level == LOW 
+					if (energy_level == CRITICAL || energy_level == LOW
 						|| _.get(Memory, ["sites", "mining", creep.memory.room, "store_percent"], 0) > 0.25) {
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
-						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);					
+						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
 					} else {
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy", true);
 						creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy", true);
@@ -3382,13 +3392,13 @@ let Sites = {
 			surveyRoom: function (rmColony) {
 				let visible = _.keys(Game.rooms).includes(rmColony);
 				_.set(Memory, ["rooms", rmColony, "survey", "has_minerals"],
-					!visible ? false 
-						: _.filter(Game.rooms[rmColony].find(FIND_MINERALS), 
+					!visible ? false
+						: _.filter(Game.rooms[rmColony].find(FIND_MINERALS),
 							m => { return m.mineralAmount > 0; }).length > 0 );
 
 				if (_.get(Memory, ["rooms", rmColony, "survey", "source_amount"], 0) == 0)
 					_.set(Memory, ["rooms", rmColony, "survey", "source_amount"],
-						(visible ? Game.rooms[rmColony].find(FIND_SOURCES).length : 0));
+						(visible ? Game.rooms[rmColony].findSources().length : 0));
 
 				let hostiles = !visible ? new Array()
 					: _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); });
@@ -3748,7 +3758,7 @@ let Sites = {
 				// Define missing link definitions
 				if (link_defs == null || Object.keys(link_defs).length != links.length) {
 					link_defs = [];
-					let sources = room.find(FIND_SOURCES);
+					let sources = room.findSources();
 					_.each(sources, source => {
 						_.each(source.pos.findInRange(links, 2), link => {
 							link_defs.push({ id: link.id, dir: "send" });
@@ -3864,7 +3874,7 @@ let Sites = {
 					visible ? _.filter(Game.rooms[rmHarvest].find(FIND_MINERALS), m => { return m.mineralAmount > 0; }).length > 0 : false);
 				if (_.get(Memory, ["sites", "mining", rmHarvest, "survey", "source_amount"], 0) == 0)
 					_.set(Memory, ["sites", "mining", rmHarvest, "survey", "source_amount"],
-						(visible ? Game.rooms[rmHarvest].find(FIND_SOURCES).length : 0));
+						(visible ? Game.rooms[rmHarvest].findSources().length : 0));
 
 				let hostiles = visible
 					? _.filter(Game.rooms[rmHarvest].find(FIND_HOSTILE_CREEPS),
@@ -3878,15 +3888,15 @@ let Sites = {
 
 				// Tally energy sitting in containers awaiting carriers to take to storage...
 				if (_.get(Game, ["rooms", rmColony, "storage"], null) != null) {
-					let containers = !visible ? null 
-						: _.filter(Game.rooms[rmHarvest].find(FIND_STRUCTURES), 
+					let containers = !visible ? null
+						: _.filter(Game.rooms[rmHarvest].find(FIND_STRUCTURES),
 							s => { return s.structureType == STRUCTURE_CONTAINER; });
-					
+
 					if (containers == null) {
 						_.set(Memory, ["sites", "mining", rmHarvest, "store_total"], 0);
 						_.set(Memory, ["sites", "mining", rmHarvest, "store_percent"], 0);
 					} else {
-						let store_energy = _.sum(containers, c => { return c.store["energy"]; });					
+						let store_energy = _.sum(containers, c => { return c.store["energy"]; });
 						let store_capacity = containers.length * 2000;
 						_.set(Memory, ["sites", "mining", rmHarvest, "store_total"], store_energy);
 						_.set(Memory, ["sites", "mining", rmHarvest, "store_percent"], store_energy / store_capacity);
@@ -3951,10 +3961,10 @@ let Sites = {
 					popTarget = _.cloneDeep(popSetting);
 				else {
 					if (rmColony == rmHarvest)
-						popTarget = _.cloneDeep(Population_Mining[`S${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)]);
+						popTarget = _.cloneDeep(Population_Mining[`S${Game.rooms[rmHarvest].findSources().length}`][Math.max(1, room_level)]);
 					else if (hasKeepers != true) {
 						popTarget = (is_visible && _.get(Game, ["rooms", rmHarvest]) != null)
-							? _.cloneDeep(Population_Mining[`R${Game.rooms[rmHarvest].find(FIND_SOURCES).length}`][Math.max(1, room_level)])
+							? _.cloneDeep(Population_Mining[`R${Game.rooms[rmHarvest].findSources().length}`][Math.max(1, room_level)])
 							: _.cloneDeep(Population_Mining["R1"][Math.max(1, room_level)]);
 					} else if (hasKeepers == true)
 						popTarget = _.cloneDeep(Population_Mining["SK"]);
@@ -3985,7 +3995,7 @@ let Sites = {
 				} else if (_.get(Memory, ["sites", "mining", rmHarvest, "store_percent"], 0) > 0.5) {
 					_.set(popTarget, ["carrier", "amount"], _.get(popTarget, ["carrier", "amount"], 0) + 1);
 				}
-					
+
 				// Tally population levels for level scaling
 				Control.populationTally(rmColony,
 					_.sum(popTarget, p => { return _.get(p, "amount", 0); }),
@@ -4181,7 +4191,7 @@ let Sites = {
 				if (room == null)
 					return;
 
-				let sources = room.find(FIND_SOURCES);
+				let sources = room.findSources();
 				let containers = _.filter(room.find(FIND_STRUCTURES), s => { return s.structureType == "container"; });
 				_.each(sources, source => {
 					if (source.pos.findInRange(containers, 1).length < 1) {
@@ -5976,7 +5986,7 @@ let Blueprint = {
 		let layout = _.get(Memory, ["rooms", room.name, "layout", "name"]);
 		let blocked_areas = _.get(Memory, ["rooms", room.name, "layout", "blocked_areas"]);
 
-		let sources = room.find(FIND_SOURCES);
+		let sources = room.findSources();
 		let mineral = _.head(room.find(FIND_MINERALS));
 		let sites = room.find(FIND_MY_CONSTRUCTION_SITES).length;
 		let all_structures = room.find(FIND_STRUCTURES);
@@ -7826,12 +7836,12 @@ let Stats_Grafana = {
 			});
 
 			// Iterate mining sites for statistics
-			_.each(_.filter(_.keys(_.get(Memory, ["sites", "mining"])), 
+			_.each(_.filter(_.keys(_.get(Memory, ["sites", "mining"])),
 				rmName => { return _.get(Game, ["rooms", rmName], null) != null; }),
 				rmName => {
-					_.set(Memory, ["stats", "mining", rmName, "store_percent"], 
+					_.set(Memory, ["stats", "mining", rmName, "store_percent"],
 						_.get(Memory, ["sites", "mining", rmName, "store_percent"], 0));
-			});			
+			});
 		}
 	},
 
