@@ -752,7 +752,7 @@ Creep.prototype.getTask_Mine = function getTask_Mine() {
 		resource: "energy",
 		id: source.id,
 		pos: position,
-		timer: 100,
+		timer: 9999,
 		container: _.get(container, "id", null)
 	};
 };
@@ -771,7 +771,7 @@ Creep.prototype.getTask_Extract = function getTask_Extract() {
 			type: "harvest",
 			resource: "mineral",
 			id: mineral.id,
-			timer: 100
+			timer: 9999
 		};
 	}
 };
@@ -7764,8 +7764,7 @@ let Stats_Grafana = {
 		if (Game.time % 100 == 0) {
 			_.each(_.filter(Game.rooms,
 				room => { return room.controller != null && room.controller.my; }),
-				room => { _.set(Memory, ["stats", "colonies", room.name, "population"], new Object());
-			});
+				room => { _.set(Memory, ["stats", "colonies", room.name, "population"], new Object()); });
 		}
 
 		if (Game.time % 500 == 0)
@@ -7791,13 +7790,14 @@ let Stats_Grafana = {
 		}
 
 		if (Game.time % 50 == 0) {
+			let colonies = _.filter(Game.rooms, room => { return room.controller != null && room.controller.my; });
 			let remote_mining = _.get(Memory, ["sites", "mining"]);
 
 			_.set(Memory, ["stats", "resources"], new Object());
+			_.set(Memory, ["stats", "gcl", "colonies"], (colonies == null ? 0 : colonies.length));
 
 			// Iterate all colonies for statistics
-			_.each(_.filter(Game.rooms,
-				room => { return room.controller != null && room.controller.my; }),
+			_.each(colonies,
 				room => {
 					// Report colony levels
 					_.set(Memory, ["stats", "colonies", room.name, "rcl", "level"], room.controller.level);
