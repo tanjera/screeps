@@ -436,13 +436,11 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 		let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);
 		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
 			? (am_owner ? this.room.getLevel() : 0)
-			: Game.rooms[mining_colony].getLevel();
-		let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
-			? [1000, 150, 200, 400, 650, 900, 1200, 1650, 1650]
-			: [1000, 150, 200, 300, 500, 700, 900, 1250, 1250];
-
+			: Game.rooms[mining_colony].getLevel();			
+		let carry_amount = this.carryCapacity / 5;
+		
 		let cont = _.head(_.sortBy(_.filter(this.room.find(FIND_STRUCTURES),
-			s => { return s.structureType == STRUCTURE_CONTAINER && _.get(s, ["store", "energy"], 0) > (carry_capacity[room_level] / 4); }),
+			s => { return s.structureType == STRUCTURE_CONTAINER && _.get(s, ["store", "energy"], 0) > carry_amount; }),
 			s => { return this.pos.getRangeTo(s.pos); }));
 
 		if (cont != null) {
@@ -582,17 +580,13 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 			};
 		}
 	}
-
 	
 	let am_owner = _.get(this.room, ["controller", "my"], false);
 	let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);	
 	let room_level = mining_colony == null || Game.rooms[mining_colony] == null
 		? (am_owner ? this.room.getLevel() : 0)
 		: Game.rooms[mining_colony].getLevel();
-	let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
-		? [1000, 150, 200, 400, 650, 900, 1200, 1650, 1650]
-		: [1000, 150, 200, 300, 500, 700, 900, 1250, 1250];
-	let carry_amount = carry_capacity[room_level] / 5;
+	let carry_amount = this.carryCapacity / 5;
 
 	if (resource == null || resource == "energy") {	
 		let pile = _.head(_.sortBy(_.filter(dropped_resources,
@@ -611,7 +605,7 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 
 	let tombstone = _.head(_.sortBy(_.filter(this.room.find(FIND_TOMBSTONES),
 		t => { return _.some(_.get(t, "store", null), s => { return s > carry_amount; }); }),
-		t => { return -this.pos.getRangeTo(t); }));
+		t => { return -this.pos.getRangeTo(t.pos); }));
 
 	if (tombstone != null) {
 		return {
