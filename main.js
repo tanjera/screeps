@@ -583,18 +583,20 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 		}
 	}
 
-	if (resource == null || resource == "energy") {
-		let am_owner = _.get(this.room, ["controller", "my"], false);
-		let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);
-		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
-			? (am_owner ? this.room.getLevel() : 0)
-			: Game.rooms[mining_colony].getLevel();
-		let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
-			? [1000, 150, 200, 400, 650, 900, 1200, 1650, 1650]
-			: [1000, 150, 200, 300, 500, 700, 900, 1250, 1250];
+	
+	let am_owner = _.get(this.room, ["controller", "my"], false);
+	let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);	
+	let room_level = mining_colony == null || Game.rooms[mining_colony] == null
+		? (am_owner ? this.room.getLevel() : 0)
+		: Game.rooms[mining_colony].getLevel();
+	let carry_capacity = (mining_colony == null || Game.rooms[mining_colony] == null)
+		? [1000, 150, 200, 400, 650, 900, 1200, 1650, 1650]
+		: [1000, 150, 200, 300, 500, 700, 900, 1250, 1250];
+	let carry_amount = carry_capacity[room_level] / 5;
 
+	if (resource == null || resource == "energy") {	
 		let pile = _.head(_.sortBy(_.filter(dropped_resources,
-			r => { return r.resourceType == "energy" && r.amount > (carry_capacity[room_level] / 5); }),
+			r => { return r.resourceType == "energy" && r.amount > carry_amount; }),
 			r => { return -r.amount; }));
 
 		if (pile != null) {
@@ -605,6 +607,19 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 				timer: 30,
 			};
 		}
+	}
+
+	let tombstone = _.head(_.sortBy(_.filter(this.room.find(FIND_TOMBSTONES),
+		t => { return _.some(_.get(t, "store", null), s => { return s > carry_amount; }); }),
+		t => { return -this.pos.getRangeTo(t); }));
+
+	if (tombstone != null) {
+		return {
+			type: "withdraw",	// Tombstones require creep.withdraw() ... not creep.pickup()
+			resource: _.head(_.filter(_.keys(tombstone.store), s => { return tombstone.store[s] > carry_amount; })),			
+			id: tombstone.id,
+			timer: _.get(tombstone, "ticksToDecay", 50)
+		};
 	}
 };
 
