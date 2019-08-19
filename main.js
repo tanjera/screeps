@@ -436,9 +436,9 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 		let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);
 		let room_level = mining_colony == null || Game.rooms[mining_colony] == null
 			? (am_owner ? this.room.getLevel() : 0)
-			: Game.rooms[mining_colony].getLevel();			
+			: Game.rooms[mining_colony].getLevel();
 		let carry_amount = this.carryCapacity / 5;
-		
+
 		let cont = _.head(_.sortBy(_.filter(this.room.find(FIND_STRUCTURES),
 			s => { return s.structureType == STRUCTURE_CONTAINER && _.get(s, ["store", "energy"], 0) > carry_amount; }),
 			s => { return this.pos.getRangeTo(s.pos); }));
@@ -580,15 +580,15 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 			};
 		}
 	}
-	
+
 	let am_owner = _.get(this.room, ["controller", "my"], false);
-	let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);	
+	let mining_colony = _.get(Memory, ["sites", "mining", this.room.name, "colony"]);
 	let room_level = mining_colony == null || Game.rooms[mining_colony] == null
 		? (am_owner ? this.room.getLevel() : 0)
 		: Game.rooms[mining_colony].getLevel();
 	let carry_amount = this.carryCapacity / 5;
 
-	if (resource == null || resource == "energy") {	
+	if (resource == null || resource == "energy") {
 		let pile = _.head(_.sortBy(_.filter(dropped_resources,
 			r => { return r.resourceType == "energy" && r.amount > carry_amount; }),
 			r => { return -r.amount; }));
@@ -610,7 +610,7 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 	if (tombstone != null) {
 		return {
 			type: "withdraw",	// Tombstones require creep.withdraw() ... not creep.pickup()
-			resource: _.head(_.filter(_.keys(tombstone.store), s => { return tombstone.store[s] > carry_amount; })),			
+			resource: _.head(_.filter(_.keys(tombstone.store), s => { return tombstone.store[s] > carry_amount; })),
 			id: tombstone.id,
 			timer: _.get(tombstone, "ticksToDecay", 50)
 		};
@@ -1965,35 +1965,88 @@ let Creep_Body = {
 					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
 			case 4:
 				return [ // 1000 energy, 5x RANGED_ATTACK, 5x MOVE
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE];
 			case 5:
 				return [ // 1600 energy, 8x RANGED_ATTACK, 8x MOVE
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE];
 			case 6:
 				return [ // 2000 energy, 10x RANGED_ATTACK, 10x MOVE
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE];
 			case 7:
 				return [ // 4000 energy, 20x RANGED_ATTACK, 20x MOVE
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE];
 			case 8:
 				return [ // 5000 energy, 25x RANGED_ATTACK, 25x MOVE
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE,
-					RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE];
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE];
 		}
 	},
 
 	getBody_Ranger: function (level) {
 		switch (level) {
 			default:
-				return this.getBody_Archer(level);
+				console.log(`Error @ getBody_Ranger, ${level} is not a proper number!`);
+				return;
+			case 1:
+				return [ // 200 energy, 1x RANGED_ATTACK, 1x MOVE
+					RANGED_ATTACK, MOVE];
+			case 2:
+				return [ // 460 energy, 1x TOUGH, 2x RANGED_ATTACK, 3x MOVE
+					TOUGH,
+					RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE];
+			case 3:
+				return [ // 720 energy, 2x TOUGH, 3x RANGED_ATTACK, 5x MOVE
+					TOUGH, TOUGH,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE];
+			case 4:
+				return [ // 1100 energy, 4x RANGED_ATTACK, 5x MOVE, 1x HEAL
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE,
+					HEAL];
+			case 5:
+				return [ // 1500 energy, 6x RANGED_ATTACK, 7x MOVE, 1x HEAL
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+					HEAL];
+			case 6:
+				return [ // 1800 energy, 6x RANGED_ATTACK, 8x MOVE, 2x HEAL
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+					HEAL, HEAL];
+			case 7:
+				return [ // 3600 energy, 12x RANGED_ATTACK, 16x MOVE, 4x HEAL
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+					RANGED_ATTACK, RANGED_ATTACK,
+					MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+					MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+					HEAL, HEAL, HEAL, HEAL];
 			case 8:
 				return [ // 4800 energy, 5x TOUGH, 25x MOVE, 15x RANGED_ATTACK, 5x HEAL,
 					TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
@@ -2932,13 +2985,12 @@ let Creep_Roles = {
 
 			creep.attack(target);
 			creep.dismantle(target);
+			creep.heal(creep);
 			let result = creep.rangedAttack(target);
 
 			if (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true) {
 				creep.moveTo(target, { reusePath: 0 });
 			} else if (result == ERR_NOT_IN_RANGE) {
-				creep.heal(creep);
-
 				if (_.get(creep, ["memory", "target", "rampart"]) != null) {
 					let rampart = Game.getObjectById(creep.memory.target.rampart);
 					if (rampart != null)
@@ -2948,13 +3000,9 @@ let Creep_Roles = {
 				} else
 					creep.moveTo(target, { reusePath: 0 });
 				return;
-			} else if (result == OK && creep.pos.getRangeTo(target < 3)) {
-				creep.moveFrom(creep, target);
-				return;
 			} else if (result == OK) {
-				return;
-			} else {
-				creep.heal(creep);
+				if (creep.pos.getRangeTo(target < 3))
+					creep.moveFrom(creep, target);
 				return;
 			}
 		} else {
@@ -3482,10 +3530,10 @@ let Sites = {
 				let popActual = new Object();
 				_.each(listCreeps, c => {
 					switch (_.get(c, ["memory", "role"])) {
-						default: break;
-						case "soldier": popActual["soldier"] = _.get(popActual, "soldier", 0) + 1; break;
-						case "healer": popActual["healer"] = _.get(popActual, "healer", 0) + 1; break;
-						case "worker": popActual["worker"] = _.get(popActual, "worker", 0) + 1; break;
+						default:
+							let role = _.get(c, ["memory", "role"]);
+							popActual[role] = _.get(popActual, role, 0) + 1;
+							break;
 					}
 				});
 
@@ -3499,19 +3547,19 @@ let Sites = {
 				// Adjust soldier amounts & levels based on threat level
 				if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {
 					if (threat_level == LOW || threat_level == null) {
-						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 2);
+						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe)
-							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 2));
+							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
 					} else if (threat_level == MEDIUM) {
-						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 3);
-						_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 1);
+						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe) {
 							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 1));
-							_.set(popTarget, ["healer", "level"], Math.max(2, room_level - 1));
+							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
 						}
 					} else if (threat_level == HIGH) {
 						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 6);
-						_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 2);
+						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 2);
 					}
 				}
 
@@ -3579,12 +3627,17 @@ let Sites = {
 				_.each(listCreeps, creep => {
 					_.set(creep, ["memory", "list_route"], listSpawnRoute);
 
-					if (creep.memory.role == "worker") {
-						Creep_Roles.Worker(creep);
-					} else if (creep.memory.role == "soldier") {
-						Creep_Roles.Soldier(creep, false, true);
-					} else if (creep.memory.role == "healer") {
-						Creep_Roles.Healer(creep, false);
+					switch (_.get(creep, ["memory", "role"])) {
+						case "worker": Creep_Roles.Worker(creep); break;
+						case "healer": Creep_Roles.Healer(creep, true); break;
+
+						case "soldier": case "paladin":
+							Creep_Roles.Soldier(creep, false, true);
+							break;
+
+						case "ranger": case "archer":
+							Creep_Roles.Archer(creep, false, true);
+							break;
 					}
 				});
 			},
@@ -3947,17 +4000,14 @@ let Sites = {
 				let popActual = new Object();
 				_.each(listCreeps, c => {
 					switch (_.get(c, ["memory", "role"])) {
-						default: break;
+						default:
+							let role = _.get(c, ["memory", "role"]);
+							popActual[role] = _.get(popActual, role, 0) + 1;
+							break;
+
 						case "paladin": popActual["paladin"] = _.get(popActual, "paladin", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 200) ? 1 : 0); break;
-						case "soldier": popActual["soldier"] = _.get(popActual, "soldier", 0) + 1; break;
-						case "healer": popActual["healer"] = _.get(popActual, "healer", 0) + 1; break;
-						case "dredger": popActual["dredger"] = _.get(popActual, "dredger", 0) + 1; break;
 						case "burrower": popActual["burrower"] = _.get(popActual, "burrower", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 100) ? 1 : 0); break;
 						case "carrier": popActual["carrier"] = _.get(popActual, "carrier", 0) + ((c.ticksToLive == undefined || c.ticksToLive > 50) ? 1 : 0); break;
-						case "miner": popActual["miner"] = _.get(popActual, "miner", 0) + 1; break;
-						case "multirole": popActual["multirole"] = _.get(popActual, "multirole", 0) + 1; break;
-						case "reserver": popActual["reserver"] = _.get(popActual, "reserver", 0) + 1; break;
-						case "extractor": popActual["extractor"] = _.get(popActual, "extractor", 0) + 1; break;
 					}
 				});
 
@@ -3982,19 +4032,19 @@ let Sites = {
 				// Remote mining: adjust soldier levels based on threat level
 				if (rmHarvest != rmColony && threat_level != NONE && hasKeepers == false) {
 					if (threat_level == LOW || threat_level == null) {
-						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe)
-							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 2));
+							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
 					} else if (threat_level == MEDIUM) {
-						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 2);
-						_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 1);
+						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe) {
 							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 1));
-							_.set(popTarget, ["healer", "level"], Math.max(2, room_level - 1));
+							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
 						}
 					} else if (threat_level == HIGH) {
 						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 4);
-						_.set(popTarget, ["healer", "amount"], _.get(popTarget, ["healer", "amount"], 0) + 1);
+						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 					}
 				}
 
@@ -4177,7 +4227,7 @@ let Sites = {
 							Creep_Roles.Soldier(creep, false, true);
 							break;
 
-						case "ranger":
+						case "ranger": case "archer":
 							Creep_Roles.Archer(creep, false, true);
 							break;
 
