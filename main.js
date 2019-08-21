@@ -3574,8 +3574,7 @@ let Sites = {
 						_.set(popTarget, ["worker", "amount"], Math.max(1, Math.round(_.get(popTarget, ["worker", "amount"]) * 0.5)))
 						_.set(popTarget, ["worker", "level"], Math.max(1, Math.round(_.get(popTarget, ["worker", "level"]) * 0.5)))
 					} else if (energy_level == EXCESS && room_level < 8) {
-						let storage = _.get(Game, ["rooms", rmColony, "storage"]);
-						_.set(popTarget, ["worker", "amount"], Math.max(1, Math.round(_.get(popTarget, ["worker", "amount"]) * 1.5)))
+						_.set(popTarget, ["worker", "amount"], Math.max(1, Math.round(_.get(popTarget, ["worker", "amount"]) * 2)))
 					}
 				}
 
