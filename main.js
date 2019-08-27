@@ -1286,12 +1286,18 @@ RoomPosition.prototype.isWalkable = function isWalkable(creeps_block) {
 		return false;
 
 	let look = this.look();
-
 	let terrain = _.head(_.filter(look, l => l.type == "terrain"))["terrain"];
-	if (terrain == "wall")
-		return false;
-
 	let structures = _.filter(look, l => l.type == "structure");
+
+	if (terrain == "wall") {
+		for (let s in structures)
+			if (structures[s].structure.structureType == "road")
+				return true;
+
+		return false;
+	}
+
+
 	for (let s in structures) {
 		if (structures[s].structure.structureType != "container" && structures[s].structure.structureType != "road"
 			&& (structures[s].structure.structureType != "rampart" || !structures[s].structure.my))
