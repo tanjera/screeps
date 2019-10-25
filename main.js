@@ -7609,7 +7609,7 @@ let Console = {
 			if (submenu == null)
 				menu = help_main;
 			else {
-				switch (submenu.toLowerCase()) {
+				switch (submenu.toString().toLowerCase()) {
 					case "allies": menu = help_allies; break;
 					case "blueprint": menu = help_blueprint; break;
 					case "empire": menu = help_empire; break;
