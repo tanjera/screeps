@@ -615,6 +615,20 @@ Creep.prototype.getTask_Pickup = function getTask_Pickup(resource) {
 			timer: _.get(tombstone, "ticksToDecay", 50)
 		};
 	}
+
+	let ruin = _.head(_.sortBy(_.filter(this.room.find(FIND_RUINS),
+		p => { return _.some(_.get(p, "store", null), p => { return p > carry_amount; }); }),
+		p => { return -this.pos.getRangeTo(p.pos); }));
+
+	if(ruin != null) {
+		return {
+			type: "withdraw",
+			resource: _.head(_.filter(_.keys(ruin.store), q => { return ruin.store[q] > carry_amount; })),
+			id: ruin.id,
+			timer: 50	/*ruin sites from suicides seem to have long tick times,
+						 sometimes 30k+.. just set to maxRoomLength */
+		};
+	}
 };
 
 Creep.prototype.getTask_Upgrade = function getTask_Upgrade(only_critical) {
@@ -3706,6 +3720,14 @@ let Sites = {
 					originX /= spawns.length;
 					originY /= spawns.length;
 
+					//Ensure we have a spawn, otherwise return 25, 25
+					if(!originX || !originY)
+					{
+						console.log(`<font color=\"#FF0000\">[Invasion]</font> Could not detect any spawns in room ${rmColony}`);
+						originX = 25;
+						originY = 25;
+					}
+
 					let my_creeps = Game.rooms[rmColony].find(FIND_MY_CREEPS);
 					// Only attack creeps that are 1) not allies and 2) within 10 sq of base structures (or Invader within 5 sq of creeps)
 					// Then sort by 1) if they have heal parts, and 2) sort by distance (attack closest)
@@ -4077,12 +4099,11 @@ let Sites = {
 						body: "paladin", name: null, args: { role: "paladin", room: rmHarvest, colony: rmColony }
 					});
 				}
-
 				if (_.get(popActual, "ranger", 0) < _.get(popTarget, ["ranger", "amount"], 0)) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
 						priority: 14,
-						level: popTarget["ranger"]["level"],
+						level: _.get(popTarget, ["ranger", "level"], room_level),
 						scale: _.get(popTarget, ["ranger", "scale"], true),
 						body: "ranger", name: null, args: { role: "ranger", room: rmHarvest, colony: rmColony }
 					});
