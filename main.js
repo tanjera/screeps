@@ -4383,16 +4383,14 @@ let Sites = {
 				if (nuker == null || storage == null)
 					return;
 
-				if (nuker.energy < nuker.energyCapacity && _.get(storage, ["store", "energy"], 0) > 0) {
+				if (nuker.store[RESOURCE_ENERGY] < nuker.store.getCapacity(RESOURCE_ENERGY) && _.get(storage, ["store", "energy"], 0) > 0) {
 					Memory.rooms[rmColony].industry.tasks.push(
 						{ type: "withdraw", resource: "energy", id: storage.id, timer: 60, priority: 5 },
 						{ type: "deposit", resource: "energy", id: nuker.id, timer: 60, priority: 5 });
 				}
-
-				if (nuker.ghodium < nuker.ghodiumCapacity) {
+				if (nuker.store[RESOURCE_GHODIUM] < nuker.store.getCapacity(RESOURCE_GHODIUM)) {
 					if (_.get(Memory, ["rooms", rmColony, "stockpile", "G"]) == null)
 						_.set(Memory, ["rooms", rmColony, "stockpile", "G"], 500)
-
 					if (_.get(storage, ["store", "G"], 0) > 0) {
 						Memory.rooms[rmColony].industry.tasks.push(
 							{ type: "withdraw", resource: "G", id: storage.id, timer: 60, priority: 5 },
