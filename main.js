@@ -454,6 +454,32 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 	}
 };
 
+Creep.prototype.getTask_Withdraw_Source_Container = function getTask_Withdraw_Source_Container() {
+	if (this.memory.role == "burrower") {
+		if (this.store.getFreeCapacity() == 0)
+			return;
+
+		let source = _.head(_.filter(this.room.findSources(false), s => {
+			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
+		}));
+
+		if (source == null)
+			return;
+
+		let container = _.head(_.filter(source.pos.findInRange(FIND_STRUCTURES, 1),
+			s => { return s.structureType == "container" && s.store.energy > 0; } ));
+
+		if (container != null) {
+			return {
+				type: "withdraw",
+				resource: "energy",
+				id: container.id,
+				timer: 60
+			};
+		}
+	}
+};
+
 Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link() {
 	if (_.get(Memory, ["rooms", this.room.name, "survey", "energy_level"]) == CRITICAL)
 		return;
@@ -474,6 +500,32 @@ Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link() {
 			id: link.id,
 			timer: 60,
 		};
+	}
+};
+
+Creep.prototype.getTask_Deposit_Source_Link = function getTask_Deposit_Source_Link() {
+	if (this.memory.role == "burrower") {
+		let source = _.head(_.filter(this.room.findSources(false), s => {
+			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
+		}));
+
+		if (source == null)
+			return;
+
+		let link = _.head(_.filter(source.pos.findInRange(FIND_STRUCTURES, 2), s => { 
+			return s.structureType == "link" && s.energy < s.energyCapacity
+				&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]),
+					l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "send"; });				
+				 }));
+
+		if (link != null) {
+			return {
+				type: "deposit",
+				resource: "energy",
+				id: link.id,
+				timer: 60,
+			};
+		}
 	}
 };
 
@@ -743,8 +795,50 @@ Creep.prototype.getTask_Mine = function getTask_Mine() {
 	if (!_.get(Memory, ["rooms", this.room.name, "defense", "is_safe"], true))
 		return;
 
-	// Find sources with energy, and that aren't marked as being avoided via path console functions
-	let source = _.head(_.sortBy(this.room.findSources(true),
+	/* Expected behavior:
+	 * Burrowers: 1 burrower per source, stick to source, stand on container, mine; when source is empty, move
+	 *   energy to nearby link (as new task).
+	 * Miners: Move to any source that's not avoided and that has energy, harvest, then get new task
+	 */
+
+	let source = null;
+
+	if (this.memory.role == "burrower") {
+		let sources = this.room.findSources(false);
+
+		// Burrower already has an assignment? Follow the assignment.
+		source = _.head(_.filter(sources, s => {
+			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
+		}));
+
+		// No burrower assignment? Need to iterate sources and update assignments
+		if (source == null) {
+			// List of existing burrower creeps
+			let burrowers = _.filter(this.room.find(FIND_MY_CREEPS),
+				c => { return c.memory.role == "burrower"; });
+
+			_.forEach(sources, s => {
+				let burrower = _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]);
+				// If burrower is assigned but there is no existing creep by that id (creep died?)
+				if (burrower != null && _.filter(burrowers, b => { return b.id == burrower; }).length == 0)
+					_.set(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"], null);
+			});
+
+			// Assign this creep the 1st unassigned source
+			source = _.head(_.filter(sources,
+				s => { return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == null; }));
+
+			if (source != null) {
+				_.set(Memory, ["rooms", this.room.name, "sources", source.id, "burrower"], this.id);
+			}
+		}
+
+		if (source == null || source.energy == 0)
+			return;
+
+	} else {
+		// Find sources with energy, and that aren't marked as being avoided via path console functions
+		source = _.head(_.sortBy(this.room.findSources(true),
 		s => {
 			if (this.memory.role == "burrower")
 				return _.filter(s.pos.findInRange(FIND_MY_CREEPS, 1),
@@ -753,11 +847,13 @@ Creep.prototype.getTask_Mine = function getTask_Mine() {
 				return s.pos.findInRange(FIND_MY_CREEPS, 1).length > s.pos.getOpenTile_Adjacent(true);
 		}));
 
-	if (source == null)
-		return;
+		if (source == null)
+			return;
+	}
 
 	let container = _.get(Memory, ["rooms", this.room.name, "sources", source.id, "container"]);
 	container = (container == null) ? null : Game.getObjectById(container);
+
 	if (container == null) {
 		container = _.head(source.pos.findInRange(FIND_STRUCTURES, 1, {
 			filter:
@@ -1569,7 +1665,7 @@ Population_Mining = {
 			extractor: { level: 7, amount: 2 }
 		},
 		8: {
-			burrower: { level: 7, amount: 1 },
+			burrower: { level: 7, amount: 2 },
 			carrier: { level: 6, amount: 3 },
 			extractor: { level: 8, amount: 2 }
 		}
@@ -2722,6 +2818,8 @@ let Creep_Roles = {
 
 				if (creep.memory.role == "burrower") {
 					creep.memory.task = creep.memory.task || creep.getTask_Mine();
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Source_Container();
+					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Source_Link();
 					creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
 				} else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
