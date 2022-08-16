@@ -455,10 +455,10 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 };
 
 Creep.prototype.getTask_Withdraw_Source_Container = function getTask_Withdraw_Source_Container() {
+	if (this.store.getFreeCapacity() == 0)
+		return;
+	
 	if (this.memory.role == "burrower") {
-		if (this.store.getFreeCapacity() == 0)
-			return;
-
 		let source = _.head(_.filter(this.room.findSources(false), s => {
 			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
 		}));
@@ -504,6 +504,9 @@ Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link() {
 };
 
 Creep.prototype.getTask_Deposit_Source_Link = function getTask_Deposit_Source_Link() {
+	if (this.store["energy"] == 0)
+		return;
+	
 	if (this.memory.role == "burrower") {
 		let source = _.head(_.filter(this.room.findSources(false), s => {
 			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
