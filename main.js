@@ -458,7 +458,7 @@ Creep.prototype.getTask_Withdraw_Container = function getTask_Withdraw_Container
 Creep.prototype.getTask_Withdraw_Source_Container = function getTask_Withdraw_Source_Container() {
 	if (this.store.getFreeCapacity() == 0)
 		return;
-	
+
 	if (this.memory.role == "burrower") {
 		let source = _.head(_.filter(this.room.findSources(false), s => {
 			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
@@ -507,7 +507,7 @@ Creep.prototype.getTask_Deposit_Link = function getTask_Deposit_Link() {
 Creep.prototype.getTask_Deposit_Source_Link = function getTask_Deposit_Source_Link() {
 	if (this.store["energy"] == 0)
 		return;
-	
+
 	if (this.memory.role == "burrower") {
 		let source = _.head(_.filter(this.room.findSources(false), s => {
 			return _.get(Memory, ["rooms", this.room.name, "sources", s.id, "burrower"]) == this.id;
@@ -516,10 +516,10 @@ Creep.prototype.getTask_Deposit_Source_Link = function getTask_Deposit_Source_Li
 		if (source == null)
 			return;
 
-		let link = _.head(_.filter(source.pos.findInRange(FIND_STRUCTURES, 2), s => { 
+		let link = _.head(_.filter(source.pos.findInRange(FIND_STRUCTURES, 2), s => {
 			return s.structureType == "link" && s.energy < s.energyCapacity
 				&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]),
-					l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "send"; });				
+					l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "send"; });
 				 }));
 
 		if (link != null) {
@@ -3052,6 +3052,8 @@ let Creep_Roles = {
 		if (targetStructures && creep.room.name == creep.memory.room)
 			Creep_Roles_Combat.acquireTarget_Structure(creep);
 
+		Creep_Roles_Combat.acquireTarget_InvaderCore(creep);
+
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
 			Creep_Roles_Combat.clearCamp(creep);
 			let target = Game.getObjectById(creep.memory.target.id);
@@ -3101,6 +3103,8 @@ let Creep_Roles = {
 			Creep_Roles_Combat.acquireTarget_Creep(creep);
 		if (targetStructures && creep.room.name == creep.memory.room)
 			Creep_Roles_Combat.acquireTarget_Structure(creep);
+
+		Creep_Roles_Combat.acquireTarget_InvaderCore(creep);
 
 		if (_.get(creep, ["memory", "target", "id"]) != null) {
 			Creep_Roles_Combat.clearCamp(creep);
@@ -3354,6 +3358,23 @@ let Creep_Roles_Combat = {
 		}
 	},
 
+	acquireTarget_InvaderCore: function (creep) {
+		if (_.get(creep, ["memory", "target", "id"]) == null
+			&& _.get(creep, ["memory", "target", "notarget_invadercore"], 0) < Game.time - 10) {
+
+			let target = _.head(_.filter(creep.room.find(FIND_STRUCTURES),
+				s => s.structureType == "invaderCore"));
+
+			if (target != null) {
+				_.set(creep, ["memory", "target", "id"], target.id);
+				this.acquireRampart_Adjacent(creep);
+				return;
+			} else {
+				_.set(creep, ["memory", "target", "notarget_invadercore"], Game.time);
+			}
+		}
+	},
+
 	acquireTarget_Structure: function (creep) {
 		if (_.get(creep, ["memory", "target", "id"]) == null
 			&& _.get(creep, ["memory", "target", "notarget_structure"], 0) < Game.time - 10) {
@@ -3584,7 +3605,7 @@ let Sites = {
 					: _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); });
 				_.set(Memory, ["rooms", rmColony, "defense", "hostiles"], hostiles);
 
-				let is_safe = !visible || hostiles.length == 0;
+				let is_safe = visible && hostiles.length == 0;
 				_.set(Memory, ["rooms", rmColony, "defense", "is_safe"], is_safe);
 
 				let storage = _.get(Game, ["rooms", rmColony, "storage"]);
@@ -4073,7 +4094,12 @@ let Sites = {
 						c => { return c.isHostile() && c.owner.username != "Source Keeper"; })
 					: new Array();
 
-				let is_safe = !visible || rmColony == rmHarvest || hostiles.length == 0;
+				let invaderCore = visible
+					? _.head(_.filter(Game.rooms[rmHarvest].find(FIND_STRUCTURES),
+						s => s.structureType == "invaderCore"))
+					: null;
+
+				let is_safe = visible && hostiles.length == 0 && invaderCore == null;
 				_.set(Memory, ["rooms", rmHarvest, "defense", "is_safe"], is_safe);
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"], is_safe);
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], hostiles);
@@ -4163,8 +4189,11 @@ let Sites = {
 				if (rmHarvest != rmColony && threat_level != NONE && hasKeepers == false) {
 					if (threat_level == LOW || threat_level == null) {
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
-						if (is_safe)
-							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
+						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+						if (is_safe) {
+							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 2));
+							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 2));
+						}
 					} else if (threat_level == MEDIUM) {
 						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
@@ -5101,7 +5130,7 @@ let Sites = {
 					let res = resource_list[r];
 
 					if (filling.includes(res)
-						|| ((res != "energy" && (terminal.store[res] == null || terminal.store[res] == 0)) 
+						|| ((res != "energy" && (terminal.store[res] == null || terminal.store[res] == 0))
 							|| (res == "energy" && terminal.store[res] == 0)))
 						continue;
 
