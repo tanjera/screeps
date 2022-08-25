@@ -193,6 +193,7 @@ Creep.prototype.runTask = function runTask() {
 
 		case "withdraw": {
 			let obj = Game.getObjectById(this.memory.task["id"]);
+
 			if (this.withdraw(obj, this.memory.task["resource"],
 				(this.memory.task["amount"] > this.carryCapacity - _.sum(this.carry) ? null : this.memory.task["amount"]))
 				== ERR_NOT_IN_RANGE) {
@@ -362,13 +363,13 @@ Creep.prototype.getTask_Boost = function getTask_Boost() {
 		}));
 };
 
-Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link() {
+Creep.prototype.getTask_Withdraw_Link = function getTask_Withdraw_Link(distance) {
 	if (!_.get(this.room, ["controller", "my"], false)
 		|| !_.get(Memory, ["rooms", this.room.name, "defense", "is_safe"]))
 		return;
 
 	let link = _.head(_.filter(this.room.find(FIND_MY_STRUCTURES), s => {
-		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) <= 12
+		return s.structureType == "link" && s.energy > 0 && this.pos.getRangeTo(s.pos) <= distance
 			&& _.some(_.get(Memory, ["rooms", this.room.name, "links"]),
 				l => { return _.get(l, "id") == s.id && _.get(l, "dir") == "receive"; });
 	}));
@@ -2755,7 +2756,7 @@ let Creep_Roles = {
 				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
 					return;
 
-				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
+				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link(15);
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy",
 					_.get(Memory, ["rooms", creep.room.name, "survey", "downgrade_critical"], false));
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Container("energy",
@@ -2827,7 +2828,7 @@ let Creep_Roles = {
 
 				} else if (creep.memory.role == "miner" || creep.memory.role == "carrier") {
 					creep.memory.task = creep.memory.task || creep.getTask_Pickup("energy");
-					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
+					creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link(15);
 
 					let energy_level = _.get(Memory, ["rooms", creep.room.name, "survey", "energy_level"]);
 					if (energy_level == CRITICAL || energy_level == LOW
@@ -2901,7 +2902,7 @@ let Creep_Roles = {
 				return;
 
 			creep.memory.task = creep.memory.task || creep.getTask_Industry_Withdraw();
-			creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
+			creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link(50);
 			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
 			creep.runTask(creep);
@@ -5100,7 +5101,8 @@ let Sites = {
 					let res = resource_list[r];
 
 					if (filling.includes(res)
-						|| ((res != "energy" && terminal.store[res] == null) || (res == "energy" && terminal.store[res] == 0)))
+						|| ((res != "energy" && (terminal.store[res] == null || terminal.store[res] == 0)) 
+							|| (res == "energy" && terminal.store[res] == 0)))
 						continue;
 
 					Memory.rooms[rmColony].industry.tasks.push(
