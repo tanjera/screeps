@@ -40,7 +40,7 @@
 
 {	/* Constants */
 
-	// Defensive alert states
+// Defensive alert states
 	NONE = 10;
 	LOW = 11;
 	MEDIUM = 12;
@@ -51,6 +51,10 @@
 	LOW = 11;
 	NORMAL = 12;
 	EXCESS = 13;
+}
+
+getUsername = function () {
+	return _.find({...Game.structures, ...Game.creeps, ...Game.constructionSites}).owner.username;
 }
 
 hasCPU = function () {
@@ -2799,14 +2803,14 @@ let Creep_Roles = {
 		}
 	},
 
-	Mining: function (creep, isSafe) {
+	Mining: function (creep, isSafe, canMine) {
 		let hostile = isSafe ? null
 			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, {
 				filter:
 					c => { return c.isHostile(); }
 			}));
 
-		if (hostile == null) {
+		if (hostile == null && canMine) {
 			if (creep.memory.state == "refueling") {
 				if (creep.memory.role != "burrower" && creep.carryCapacity > 0
 					&& _.sum(creep.carry) == creep.carryCapacity) {
@@ -4104,6 +4108,11 @@ let Sites = {
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"], is_safe);
 				_.set(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], hostiles);
 
+				// Can only mine a site/room if it is not reserved, or is reserved by the player
+				let reservation = _.get(Game, ["rooms", rmHarvest, "controller", "reservation"], null);
+				let can_mine = visible && (reservation == null || _.get(reservation, "username", null) == getUsername())
+				_.set(Memory, ["sites", "mining", rmHarvest, "can_mine"], can_mine);
+
 				// Tally energy sitting in containers awaiting carriers to take to storage...
 				if (_.get(Game, ["rooms", rmColony, "storage"], null) != null) {
 					let containers = !visible ? null
@@ -4135,6 +4144,7 @@ let Sites = {
 
 				let is_safe_colony = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"], true);
 				let is_visible = _.get(Memory, ["sites", "mining", rmHarvest, "survey", "visible"], true);
+				let can_mine = _.get(Memory, ["sites", "mining", rmHarvest, "can_mine"]);
 
 				// If the colony is not safe (under siege?) pause spawning remote mining; frees colony spawns to make soldiers
 				if (rmColony != rmHarvest && !is_safe_colony)
@@ -4273,7 +4283,7 @@ let Sites = {
 					});
 				}
 
-				if (is_safe) {
+				if (is_safe && can_mine) {
 					if (_.get(popActual, "burrower", 0) < _.get(popTarget, ["burrower", "amount"], 0)) {
 						Memory["hive"]["spawn_requests"].push({
 							room: rmColony, listRooms: listSpawnRooms,
@@ -4363,6 +4373,7 @@ let Sites = {
 
 			runCreeps: function (rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {
 				let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"]);
+				let can_mine = _.get(Memory, ["sites", "mining", rmHarvest, "can_mine"]);
 
 				_.each(listCreeps, creep => {
 					_.set(creep, ["memory", "list_route"], listRoute);
@@ -4374,11 +4385,12 @@ let Sites = {
 						case "healer": Creep_Roles.Healer(creep, true); break;
 
 						case "miner": case "burrower": case "carrier":
-							Creep_Roles.Mining(creep, is_safe);
+							Creep_Roles.Mining(creep, is_safe, can_mine);
 							break;
 
 						case "dredger":
-							Creep_Roles.Dredger(creep);
+							// This role hasn't been implemented yet...
+							//Creep_Roles.Dredger(creep, can_mine);
 							break;
 
 						case "soldier": case "paladin":
@@ -4390,7 +4402,7 @@ let Sites = {
 							break;
 
 						case "multirole":
-							if (hasKeepers || is_safe)
+							if (hasKeepers || (is_safe && can_mine))
 								Creep_Roles.Worker(creep, is_safe);
 							else
 								Creep_Roles.Soldier(creep, false, true);
