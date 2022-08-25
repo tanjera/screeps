@@ -2989,11 +2989,22 @@ let Creep_Roles = {
 		if (this.moveToDestination(creep))
 			return;
 
+		let controller = _.get(creep.room, "controller", null);
+
+		if (creep.pos.getRangeTo(controller) > 1) {
+			creep.travel(creep.room.controller)
+			return;
+		}
+
 		let result;
-		if (_.get(creep.room, ["controller", "owner"]) != null && !creep.room.controller.my)
+		if (_.get(controller, "owner") != null && !creep.room.controller.my) {
 			result = creep.attackController(creep.room.controller);
-		else
+		} else if (_.get(controller, ["reservation", "username"], null) != null
+			&& _.get(controller, ["reservation", "username"], null) != getUsername()) {
+			result = creep.attackController(creep.room.controller);
+		} else {
 			result = creep.reserveController(creep.room.controller);
+		}
 
 		if (result == ERR_NOT_IN_RANGE) {
 			creep.travel(creep.room.controller)
@@ -4283,63 +4294,7 @@ let Sites = {
 					});
 				}
 
-				if (is_safe && can_mine) {
-					if (_.get(popActual, "burrower", 0) < _.get(popTarget, ["burrower", "amount"], 0)) {
-						Memory["hive"]["spawn_requests"].push({
-							room: rmColony, listRooms: listSpawnRooms,
-							priority: (rmColony == rmHarvest ? 12 : 15),
-							level: _.get(popTarget, ["burrower", "level"], 1),
-							scale: _.get(popTarget, ["burrower", "scale"], true),
-							body: _.get(popTarget, ["burrower", "body"], "burrower"),
-							name: null, args: { role: "burrower", room: rmHarvest, colony: rmColony }
-						});
-					}
-
-					if (_.get(popActual, "carrier", 0) < _.get(popTarget, ["carrier", "amount"], 0)) {
-						Memory["hive"]["spawn_requests"].push({
-							room: rmColony, listRooms: listSpawnRooms,
-							priority: (rmColony == rmHarvest ? 13 : 16),
-							level: _.get(popTarget, ["carrier", "level"], 1),
-							scale: _.get(popTarget, ["carrier", "scale"], true),
-							body: _.get(popTarget, ["carrier", "body"], "carrier"),
-							name: null, args: { role: "carrier", room: rmHarvest, colony: rmColony }
-						});
-					}
-
-					if (_.get(popActual, "miner", 0) < 2 // Population stalling? Energy defecit? Replenish with miner group
-						&& (_.get(popActual, "burrower", 0) < _.get(popTarget, ["burrower", "amount"], 0)
-							&& _.get(popActual, "carrier", 0) < _.get(popTarget, ["carrier", "amount"], 0))) {
-						Memory["hive"]["spawn_requests"].push({
-							room: rmColony, listRooms: listSpawnRooms,
-							priority: (rmColony == rmHarvest ? 11 : 14),
-							level: Math.max(1, Game["rooms"][rmColony].getLevel_Available()),
-							scale: true, body: "worker",
-							name: null, args: { role: "miner", room: rmHarvest, colony: rmColony, spawn_renew: false }
-						});
-					}
-
-					if (_.get(popActual, "miner", 0) < _.get(popTarget, ["miner", "amount"], 0)) {
-						Memory["hive"]["spawn_requests"].push({
-							room: rmColony, listRooms: listSpawnRooms,
-							priority: (rmColony == rmHarvest ? 12 : 15),
-							level: _.get(popTarget, ["miner", "level"], 1),
-							scale: _.get(popTarget, ["miner", "scale"], true),
-							body: _.get(popTarget, ["miner", "body"], "worker"),
-							name: null, args: { role: "miner", room: rmHarvest, colony: rmColony }
-						});
-					}
-
-					if (_.get(popActual, "dredger", 0) < _.get(popTarget, ["dredger", "amount"], 0)) {
-						Memory["hive"]["spawn_requests"].push({
-							room: rmColony, listRooms: listSpawnRooms,
-							priority: 19,
-							level: _.get(popTarget, ["dredger", "level"], 1),
-							scale: _.get(popTarget, ["dredger", "scale"], true),
-							body: _.get(popTarget, ["dredger", "body"], "dredger"),
-							name: null, args: { role: "dredger", room: rmHarvest, colony: rmColony }
-						});
-					}
-
+				if (is_safe) {
 					if (_.get(popActual, "reserver", 0) < _.get(popTarget, ["reserver", "amount"], 0)
 						&& Game.rooms[rmHarvest] != null && Game.rooms[rmHarvest].controller != null
 						&& (Game.rooms[rmHarvest].controller.reservation == null
@@ -4356,17 +4311,75 @@ let Sites = {
 						});
 					}
 
-					let pause_extraction = _.get(Memory, ["hive", "pause", "extracting"], false);
-					if (has_minerals && !pause_extraction
-						&& _.get(popActual, "extractor", 0) < _.get(popTarget, ["extractor", "amount"], 0)) {
-						Memory["hive"]["spawn_requests"].push({
-							room: rmColony, listRooms: listSpawnRooms,
-							priority: 18,
-							level: _.get(popTarget, ["extractor", "level"], 1),
-							scale: _.get(popTarget, ["extractor", "scale"], true),
-							body: _.get(popTarget, ["extractor", "body"], "extractor"),
-							name: null, args: { role: "extractor", room: rmHarvest, colony: rmColony }
-						});
+					if (can_mine) {
+						if (_.get(popActual, "burrower", 0) < _.get(popTarget, ["burrower", "amount"], 0)) {
+							Memory["hive"]["spawn_requests"].push({
+								room: rmColony, listRooms: listSpawnRooms,
+								priority: (rmColony == rmHarvest ? 12 : 15),
+								level: _.get(popTarget, ["burrower", "level"], 1),
+								scale: _.get(popTarget, ["burrower", "scale"], true),
+								body: _.get(popTarget, ["burrower", "body"], "burrower"),
+								name: null, args: { role: "burrower", room: rmHarvest, colony: rmColony }
+							});
+						}
+
+						if (_.get(popActual, "carrier", 0) < _.get(popTarget, ["carrier", "amount"], 0)) {
+							Memory["hive"]["spawn_requests"].push({
+								room: rmColony, listRooms: listSpawnRooms,
+								priority: (rmColony == rmHarvest ? 13 : 16),
+								level: _.get(popTarget, ["carrier", "level"], 1),
+								scale: _.get(popTarget, ["carrier", "scale"], true),
+								body: _.get(popTarget, ["carrier", "body"], "carrier"),
+								name: null, args: { role: "carrier", room: rmHarvest, colony: rmColony }
+							});
+						}
+
+						if (_.get(popActual, "miner", 0) < 2 // Population stalling? Energy defecit? Replenish with miner group
+							&& (_.get(popActual, "burrower", 0) < _.get(popTarget, ["burrower", "amount"], 0)
+								&& _.get(popActual, "carrier", 0) < _.get(popTarget, ["carrier", "amount"], 0))) {
+							Memory["hive"]["spawn_requests"].push({
+								room: rmColony, listRooms: listSpawnRooms,
+								priority: (rmColony == rmHarvest ? 11 : 14),
+								level: Math.max(1, Game["rooms"][rmColony].getLevel_Available()),
+								scale: true, body: "worker",
+								name: null, args: { role: "miner", room: rmHarvest, colony: rmColony, spawn_renew: false }
+							});
+						}
+
+						if (_.get(popActual, "miner", 0) < _.get(popTarget, ["miner", "amount"], 0)) {
+							Memory["hive"]["spawn_requests"].push({
+								room: rmColony, listRooms: listSpawnRooms,
+								priority: (rmColony == rmHarvest ? 12 : 15),
+								level: _.get(popTarget, ["miner", "level"], 1),
+								scale: _.get(popTarget, ["miner", "scale"], true),
+								body: _.get(popTarget, ["miner", "body"], "worker"),
+								name: null, args: { role: "miner", room: rmHarvest, colony: rmColony }
+							});
+						}
+
+						if (_.get(popActual, "dredger", 0) < _.get(popTarget, ["dredger", "amount"], 0)) {
+							Memory["hive"]["spawn_requests"].push({
+								room: rmColony, listRooms: listSpawnRooms,
+								priority: 19,
+								level: _.get(popTarget, ["dredger", "level"], 1),
+								scale: _.get(popTarget, ["dredger", "scale"], true),
+								body: _.get(popTarget, ["dredger", "body"], "dredger"),
+								name: null, args: { role: "dredger", room: rmHarvest, colony: rmColony }
+							});
+						}
+
+						let pause_extraction = _.get(Memory, ["hive", "pause", "extracting"], false);
+						if (has_minerals && !pause_extraction
+							&& _.get(popActual, "extractor", 0) < _.get(popTarget, ["extractor", "amount"], 0)) {
+							Memory["hive"]["spawn_requests"].push({
+								room: rmColony, listRooms: listSpawnRooms,
+								priority: 18,
+								level: _.get(popTarget, ["extractor", "level"], 1),
+								scale: _.get(popTarget, ["extractor", "scale"], true),
+								body: _.get(popTarget, ["extractor", "body"], "extractor"),
+								name: null, args: { role: "extractor", room: rmHarvest, colony: rmColony }
+							});
+						}
 					}
 				}
 			},
@@ -7573,6 +7586,7 @@ let Console = {
 			return `<font color=\"#D3FFA3\">[Console]</font> Remote mining added to Memory.sites.mining.${rmHarvest} ... to cancel, delete the entry.`;
 		};
 
+		help_empire.push("empire.set_sign(message)")
 		help_empire.push("empire.set_sign(message, rmName)")
 		empire.set_sign = function (message, rmName) {
 			/* Sorting algorithm for left -> right, top -> bottom (in SW sector!! Reverse sortBy() for other sectors...
