@@ -2901,6 +2901,7 @@ let Creep_Roles = {
 				return;
 
 			creep.memory.task = creep.memory.task || creep.getTask_Industry_Withdraw();
+			creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link();
 			creep.memory.task = creep.memory.task || creep.getTask_Wait(10);
 
 			creep.runTask(creep);
