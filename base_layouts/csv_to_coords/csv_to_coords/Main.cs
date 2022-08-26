@@ -10,31 +10,27 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
-namespace csv_to_coords
-{
-    public partial class Main : Form
-    {
-        public Main()
-        {
+namespace csv_to_coords {
+
+    public partial class Main : Form {
+
+        public Main() {
             InitializeComponent();
         }
 
-        private void btnBrowse_Click(object sender, EventArgs e)
-        {
+        private void btnBrowse_Click(object sender, EventArgs e) {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            
+
             openFileDialog1.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
             openFileDialog1.FilterIndex = 1;
             openFileDialog1.RestoreDirectory = true;
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK) {
                 txtFilePath.Text = openFileDialog1.FileName;
             }
         }
 
-        private void btnGenerate_Click(object sender, EventArgs e)
-        {
+        private void btnGenerate_Click(object sender, EventArgs e) {
             StreamReader inFile = new StreamReader(txtFilePath.Text);
 
             List<String> spawn = new List<String>(),
@@ -44,6 +40,7 @@ namespace csv_to_coords
                 tower = new List<String>(),
                 terminal = new List<String>(),
                 lab = new List<String>(),
+                factory = new List<String>(),
                 nuker = new List<String>(),
                 observer = new List<String>(),
                 powerSpawn = new List<String>(),
@@ -51,21 +48,19 @@ namespace csv_to_coords
                 rampart = new List<String>(),
                 constructedWall = new List<String>();
 
-            for (int y = 0; !inFile.EndOfStream; y++)
-            {
+            for (int y = 0; !inFile.EndOfStream; y++) {
                 string inRaw = inFile.ReadLine();
                 string[] inArray = inRaw.Split(',');
-                
-                for(int x = 0; x < inArray.Length; x++) {
-                    switch (inArray[x])
-                    {
+
+                for (int x = 0; x < inArray.Length; x++) {
+                    switch (inArray[x]) {
                         default:
                             break;
 
                         case "SP":
                             spawn.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
-                            
+
                         case "EX":
                             extension.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
@@ -73,7 +68,7 @@ namespace csv_to_coords
                         case "LI":
                             link.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
-                            
+
                         case "ST":
                             storage.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
@@ -102,6 +97,10 @@ namespace csv_to_coords
                             lab.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
 
+                        case "FA":
+                            factory.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
+                            break;
+
                         case "RD":
                             road.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
                             break;
@@ -112,11 +111,11 @@ namespace csv_to_coords
 
                         case "RM":
                             rampart.Add("{x: " + (x + numOffsetX.Value).ToString() + ", y: " + (y + numOffsetY.Value).ToString() + "}");
-                            break;                            
+                            break;
                     }
                 }
             }
-            
+
             StringBuilder output = new StringBuilder();
             formatListStrings(output, spawn, "spawn");
             formatListStrings(output, extension, "extension");
@@ -125,20 +124,19 @@ namespace csv_to_coords
             formatListStrings(output, tower, "tower");
             formatListStrings(output, terminal, "terminal");
             formatListStrings(output, lab, "lab");
+            formatListStrings(output, factory, "factory");
             formatListStrings(output, nuker, "nuker");
             formatListStrings(output, observer, "observer");
             formatListStrings(output, powerSpawn, "powerSpawn");
             formatListStrings(output, road, "road");
             formatListStrings(output, rampart, "rampart");
             formatListStrings(output, constructedWall, "constructedWall");
-            
+
             txtOutput.Text = output.ToString();
         }
 
-        private void formatListStrings(StringBuilder output, List<String> list, string name)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
+        private void formatListStrings(StringBuilder output, List<String> list, string name) {
+            for (int i = 0; i < list.Count; i++) {
                 if (i == 0)
                     output.Append(name + ": [ " + list[i]);
                 else
@@ -153,13 +151,11 @@ namespace csv_to_coords
             }
         }
 
-        private void btnClipboard_Click(object sender, EventArgs e)
-        {
+        private void btnClipboard_Click(object sender, EventArgs e) {
             Clipboard.SetText(txtOutput.Text);
         }
 
-        private void btnClear_Click(object sender, EventArgs e)
-        {
+        private void btnClear_Click(object sender, EventArgs e) {
             txtFilePath.Clear();
             numOffsetX.Value = 0;
             numOffsetY.Value = 0;
@@ -167,18 +163,15 @@ namespace csv_to_coords
             txtOutput.Clear();
         }
 
-        private void numOffsetX_Enter(object sender, EventArgs e)
-        {
+        private void numOffsetX_Enter(object sender, EventArgs e) {
             numOffsetX.Select(0, numOffsetX.Value.ToString().Length);
         }
 
-        private void numOffsetY_Enter(object sender, EventArgs e)
-        {
+        private void numOffsetY_Enter(object sender, EventArgs e) {
             numOffsetY.Select(0, numOffsetY.Value.ToString().Length);
         }
 
-        private void numLineBreak_Enter(object sender, EventArgs e)
-        {
+        private void numLineBreak_Enter(object sender, EventArgs e) {
             numLineBreak.Select(0, numLineBreak.Value.ToString().Length);
         }
     }
