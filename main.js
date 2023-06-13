@@ -7858,15 +7858,6 @@ let Stats_Visual = {
 				new RoomVisual(r).circle(_.get(Memory, ["rooms", r, "camp"]),
 					{ fill: "orange", stroke: "pink", radius: 0.3, opacity: 0.25 });
 		});
-		// Show all Screeps paths as a blue line
-		_.each(_.filter(Game.creeps, c => { return c.memory._move != null }), c => {
-			let path = c.memory._move.path;
-			for (let i = 0; i < path.length; i++) {
-				new RoomVisual(c.room.name).circle(path[i].x, path[i].y, { fill: "blue", radius: 0.15, opacity: 0.25 });
-				if (i > 0)
-					new RoomVisual(c.room.name).line(path[i - 1].x, path[i - 1].y, path[i].x, path[i].y, { color: "blue", opacity: 0.25 });
-			}
-		});
 	},
 
 	Show_Repair: function () {
