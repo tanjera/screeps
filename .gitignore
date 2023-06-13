@@ -188,6 +188,9 @@ $RECYCLE.BIN/
 # Visual Studio temp something
 .vs/
 
+# Visual Code
+.vscode/
+
 # VS 2015+
 *.vc.vc.opendb
 *.vc.db
