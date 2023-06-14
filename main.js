@@ -8024,6 +8024,7 @@ let Stats_Grafana = {
 		_.set(Memory, ["stats", "cpu", "tick"], Game.time);
 		_.set(Memory, ["stats", "cpu", "bucket"], Game.cpu.bucket);
 		_.set(Memory, ["stats", "cpu", "used"], Game.cpu.getUsed());
+		_.set(Memory, ["stats", "cpu", "limit"], Game.cpu.limit);
 
 		if (Game.time % 5 == 0) {
 			_.set(Memory, ["stats", "gcl", "level"], Game.gcl.level);
