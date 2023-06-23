@@ -1562,7 +1562,7 @@ RoomPosition.prototype.getOpenTile_Path = function getOpenTile_Path(range, creep
 			}
 		}
 	}
-sec02aworker
+	
 	return null;
 };
 
@@ -1581,10 +1581,10 @@ Population_Colonization =
 
 Population_Colony = {
 	Standalone: {
-		1: { worker: { level: 1, amount: 5, body: "worker_at" } },
-		2: { worker: { level: 2, amount: 5, body: "worker_at" } },
-		3: { worker: { level: 3, amount: 6, body: "worker_at" } },
-		4: { worker: { level: 4, amount: 6, body: "worker_at" } },
+		1: { worker: { level: 1, amount: 10, body: "worker_at" } }, // Was 5 : Double workers for faster expansion through level 4
+		2: { worker: { level: 2, amount: 10, body: "worker_at" } }, // Was 5
+		3: { worker: { level: 3, amount: 12, body: "worker_at" } },	// Was 6
+		4: { worker: { level: 4, amount: 12, body: "worker_at" } },	// Was 6
 		5: { worker: { level: 4, amount: 6, body: "worker_at" } },
 		6: { worker: { level: 4, amount: 6 } },
 		7: { worker: { level: 7, amount: 5 } },
