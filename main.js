@@ -3047,7 +3047,7 @@ let Creep_Roles = {
 				_.set(Memory, ["hive", "pulses", "blueprint", "request"], creep.room.name);
 				creep.memory = {};
 			} else if (result != OK) {
-				console.log(`<font color=\"#F0FF00\">[Colonization]</font> ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);
+				console.log(`[Colonization] ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);
 			}
 			return;
 		}
@@ -3662,7 +3662,7 @@ let Sites = {
 				for (let i = 0; i < structures.length; i++) {
 					if (structures[i].pos.findInRange(threats, 3).length > 0) {
 						if (room.controller.activateSafeMode() == OK)
-							console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; enemy detected at key base structure!`);
+							console.log(`[Invasion] Safe mode activated in ${rmColony}; enemy detected at key base structure!`);
 						return;
 					}
 				}
@@ -3671,7 +3671,7 @@ let Sites = {
 					for (let i = 0; i < listCreeps.length; i++) {
 						if (listCreeps[i].pos.findInRange(threats, 3).length > 0) {
 							if (room.controller.activateSafeMode() == OK)
-								console.log(`<font color=\"#FF0000\">[Invasion]</font> Safe mode activated in ${rmColony}; no structures; enemy detected at creeps!`);
+								console.log(`[Invasion] Safe mode activated in ${rmColony}; no structures; enemy detected at creeps!`);
 							return;
 						}
 					}
@@ -3862,7 +3862,7 @@ let Sites = {
 					//Ensure we have a spawn, otherwise return 25, 25
 					if(!originX || !originY)
 					{
-						console.log(`<font color=\"#FF0000\">[Invasion]</font> Could not detect any spawns in room ${rmColony}`);
+						console.log(`[Invasion] Could not detect any spawns in room ${rmColony}`);
 						originX = 25;
 						originY = 25;
 					}
@@ -3873,7 +3873,7 @@ let Sites = {
 					target = _.head(_.sortBy(_.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS),
 						c => {
 							return !c.isAlly() && (c.pos.inRangeToListTargets(base_structures, 10)
-								|| (c.owner.username == "Invader" && c.pos.inRangeToListTargets(my_creeps, 3)));
+								|| (c.owner.username === "Invader" && c.pos.inRangeToListTargets(my_creeps, 3)));
 						}),
 						c => {
 							return (c.hasPart("heal") > 0
@@ -4004,7 +4004,7 @@ let Sites = {
 					});
 
 					Memory["rooms"][rmColony]["links"] = link_defs;
-					console.log(`<font color=\"#D3FFA3\">[Console]</font> Links defined for ${rmColony}.`);
+					console.log(`[Console] Links defined for ${rmColony}.`);
 				}
 
 			},
@@ -4439,7 +4439,7 @@ let Sites = {
 					if (source.pos.findInRange(containers, 1).length < 1) {
 						let adj = source.pos.getBuildableTile_Adjacent();
 						if (adj != null && adj.createConstructionSite("container") == OK)
-							console.log(`<font color=\"#6065FF\">[Mining]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);
+							console.log(`[Mining] ${room.name} placing container at (${adj.x}, ${adj.y})`);
 					}
 				});
 			}
@@ -4561,7 +4561,7 @@ let Sites = {
 					return s.structureType == "lab"
 						&& _.filter(labDefinitions, def => { return _.get(def, "action") == "boost" && _.get(def, "lab") == s.id; }).length == 0
 				}).length < 3) {
-					console.log(`<font color=\"#A17BFF\">[Labs]</font> Unable to assign a reaction to ${rmColony}- not enough labs available for reactions (labs boosting?).`);
+					console.log(`[Labs]</font> Unable to assign a reaction to ${rmColony}- not enough labs available for reactions (labs boosting?).`);
 					return;
 				}
 
@@ -4584,10 +4584,10 @@ let Sites = {
 
 				if (target != null) {
 					_.set(Memory, ["resources", "labs", "reactions", rmColony], { mineral: target.mineral, amount: target.amount });
-					console.log(`<font color=\"#A17BFF\">[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
+					console.log(`[Labs]</font> Assigning ${rmColony} to create ${target.mineral}.`);
 				} else {
 					_.set(Memory, ["resources", "labs", "reactions", rmColony], { mineral: null, amount: null });
-					console.log(`<font color=\"#A17BFF\">[Labs]</font> No reaction to assign to ${rmColony}, idling.`);
+					console.log(`[Labs]</font> No reaction to assign to ${rmColony}, idling.`);
 				}
 
 			},
@@ -4671,7 +4671,7 @@ let Sites = {
 
 				labDefinitions.push({ action: "reaction", supply1: supply1, supply2: supply2, reactors: reactors });
 				_.set(Memory, ["rooms", rmColony, "labs", "definitions"], labDefinitions);
-				console.log(`<font color=\"#A17BFF\">[Labs]</font> Labs defined for ${rmColony}.`);
+				console.log(`[Labs]</font> Labs defined for ${rmColony}.`);
 			},
 
 			runLabs: function (rmColony) {
@@ -4741,7 +4741,7 @@ let Sites = {
 								if (_.get(Memory, ["resources", "labs", "targets", mineral, "is_reagent"]))
 									delete Memory["resources"]["labs"]["targets"][mineral];
 								delete Memory["resources"]["labs"]["reactions"][rmColony];
-								console.log(`<font color=\"#A17BFF\">[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
+								console.log(`[Labs]</font> ${rmColony} completed target for ${mineral}, re-assigning lab.`);
 								delete Memory["hive"]["pulses"]["lab"];
 								return;
 							}
@@ -4837,7 +4837,7 @@ let Sites = {
 
 							lab = Game.getObjectById(listing["supply1"]);
 							if (lab == null) {
-								console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${listing["supply1"]}) is null.`);
+								console.log(`[Error] Sites.Industry: Game.getObjectById(${listing["supply1"]}) is null.`);
 								return;
 							}
 							else if (lab.mineralType != null && lab.mineralType != supply1_mineral) {
@@ -4853,7 +4853,7 @@ let Sites = {
 
 							lab = Game.getObjectById(listing["supply2"]);
 							if (lab == null) {
-								console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${listing["supply2"]}) is null.`);
+								console.log(`[Error] Sites.Industry: Game.getObjectById(${listing["supply2"]}) is null.`);
 								return;
 							}
 							else if (lab.mineralType != null && lab.mineralType != supply2_mineral) {
@@ -4870,7 +4870,7 @@ let Sites = {
 							_.forEach(listing["reactors"], r => {
 								lab = Game.getObjectById(r);
 								if (lab == null) {
-									console.log(`<font color=\"#FF0000\">[Error]</font> Sites.Industry: Game.getObjectById(${r}) is null.`);
+									console.log(`[Error] Sites.Industry: Game.getObjectById(${r}) is null.`);
 									return;
 								}
 								else if (lab.mineralType != null && lab.mineralType != mineral) {
@@ -4922,7 +4922,7 @@ let Sites = {
 						if (amount > 0) {
 							// Prevent spamming "new energy order creted" if it's just modifying the amount on an existing order...
 							if (_.get(Memory, ["resources", "terminal_orders", `${rmColony}-energy_critical`]) == null)
-								console.log(`<font color=\"#DC00FF\">[Terminals]</font> Creating critical energy order for ${rmColony} for ${amount} energy.`);
+								console.log(`[Terminals] Creating critical energy order for ${rmColony} for ${amount} energy.`);
 							_.set(Memory, ["resources", "terminal_orders", `${rmColony}-energy_critical`],
 								{ room: rmColony, resource: "energy", amount: amount, automated: true, priority: 1 });
 
@@ -5004,10 +5004,10 @@ let Sites = {
 								order["room"] = replacement.roomName;
 								order["resource"] = replacement.resourceType;
 
-								console.log(`<font color=\"#00F0FF\">[Market]</font> Replacement market order found for ${o}!`);
+								console.log(`[Market] Replacement market order found for ${o}!`);
 								return true;
 							} else {
-								console.log(`<font color=\"#00F0FF\">[Market]</font> No replacement market order found for ${o}; order deleted!`);
+								console.log(`[Market] No replacement market order found for ${o}; order deleted!`);
 
 								delete Memory["resources"]["terminal_orders"][o];
 								return false;
@@ -5056,7 +5056,7 @@ let Sites = {
 								: Game.market.deal(order["market_id"], amount, rmColony);
 
 							if (result == OK) {
-								console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} sent, ${rmColony}`
+								console.log(`[Terminals] ${o}: ${amount} of ${res} sent, ${rmColony}`
 									+ ` -> ${order["room"]}`);
 
 								Memory["resources"]["terminal_orders"][o]["amount"] -= amount;
@@ -5066,7 +5066,7 @@ let Sites = {
 								return true;
 
 							} else {
-								console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: failed to send, `
+								console.log(`[Terminals] ${o}: failed to send, `
 									+ `${amount} of ${res} ${rmColony} -> ${order["room"]} (code: ${result})`);
 							}
 						} else {
@@ -5113,7 +5113,7 @@ let Sites = {
 					let result = Game.market.deal(order["market_id"], amount, rmColony);
 
 					if (result == OK) {
-						console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: ${amount} of ${res} received, ${order["room"]}`
+						console.log(`[Terminals] ${o}: ${amount} of ${res} received, ${order["room"]}`
 							+ ` -> ${rmColony} `);
 
 						Memory["resources"]["terminal_orders"][o]["amount"] -= amount;
@@ -5122,7 +5122,7 @@ let Sites = {
 
 						return true;
 					} else {
-						console.log(`<font color=\"#DC00FF\">[Terminals]</font> ${o}: failed to receive`
+						console.log(`[Terminals] ${o}: failed to receive`
 							+ ` ${amount} of ${res} ${order["room"]} -> ${rmColony} (code: ${result})`);
 					}
 				} else {
@@ -5405,7 +5405,7 @@ let Sites = {
 						if (_.get(combat, ["tactic", "to_occupy"]))
 							this.setOccupation(combat_id, combat, tactic);
 						delete Memory["sites"]["combat"][combat_id];
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
+						console.log(`[Combat: ${combat_id}] Combat completed, removing from memory.`);
 						return;
 				}
 			},
@@ -5450,7 +5450,7 @@ let Sites = {
 						if (_.get(combat, ["tactic", "to_occupy"], false))
 							this.setOccupation(combat_id, combat, tactic);
 						delete Memory["sites"]["combat"][combat_id];
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
+						console.log(`[Combat: ${combat_id}] Combat completed, removing from memory.`);
 						return;
 				}
 			},
@@ -5537,7 +5537,7 @@ let Sites = {
 							let target_room = Game["rooms"][_.get(combat, "target_room")];
 							if (target_room != null && _.filter(target_room.find(FIND_STRUCTURES), s => { return s.structureType == "tower"; }).length == 0) {
 								_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-								console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> No enemy towers detected! Completing tower drain combat.`);
+								console.log(`[Combat: ${combat_id}] No enemy towers detected! Completing tower drain combat.`);
 								return;
 							}
 						}
@@ -5545,7 +5545,7 @@ let Sites = {
 
 					case "complete":
 						delete Memory["sites"]["combat"][combat_id];
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
+						console.log(`[Combat: ${combat_id}] Combat completed, removing from memory.`);
 						return;
 				}
 			},
@@ -5587,7 +5587,7 @@ let Sites = {
 						if (_.get(combat, ["tactic", "to_occupy"]))
 							this.setOccupation(combat_id, combat, tactic);
 						delete Memory["sites"]["combat"][combat_id];
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Combat completed, removing from memory.`);
+						console.log(`[Combat: ${combat_id}] Combat completed, removing from memory.`);
 						return;
 				}
 			},
@@ -5607,11 +5607,11 @@ let Sites = {
 				if (state_combat == "rallying" && listCreeps.length > 0 && Game.time % 5 == 0) {
 					if (creeps_rallied.length == listCreeps.length) {
 						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "attacking");
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> All creeps at rally point. Launching attack!`);
+						console.log(`[Combat: ${combat_id}] All creeps at rally point. Launching attack!`);
 						return true;
 					}
 				} else if (Game.time % 50 == 0) {
-					console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Spawning and rallying troops, `
+					console.log(`[Combat: ${combat_id}] Spawning and rallying troops, `
 						+ `${creeps_rallied.length} of ${army_amount} at rally point.`);
 				}
 				return false;
@@ -5693,7 +5693,7 @@ let Sites = {
 			evaluateDefeat_CreepsWiped: function (combat_id, combat, listCreeps) {
 				if (listCreeps.length == 0 && _.get(combat, ["tactic", "spawn_repeat"]) != true) {
 					_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-					console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Defeat detected by all friendly creeps killed! Stopping attack.`);
+					console.log(`[Combat: ${combat_id}] Defeat detected by all friendly creeps killed! Stopping attack.`);
 					return true;
 				}
 				return false;
@@ -5710,7 +5710,7 @@ let Sites = {
 						});
 					if (_.get(combat, ["tactic", "target_structures"]) == true && attack_structures.length == 0) {
 						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Victory detected by destroying all structures! Stopping attack.`);
+						console.log(`[Combat: ${combat_id}] Victory detected by destroying all structures! Stopping attack.`);
 						return true;
 					}
 				}
@@ -5728,7 +5728,7 @@ let Sites = {
 
 					if (targets_remaining.length == 0) {
 						_.set(Memory, ["sites", "combat", combat_id, "state_combat"], "complete");
-						console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> Victory detected by destroying all targets on target list! Stopping attack.`);
+						console.log(`[Combat: ${combat_id}] Victory detected by destroying all targets on target list! Stopping attack.`);
 						return true;
 					}
 				}
@@ -5745,7 +5745,7 @@ let Sites = {
 			},
 
 			setOccupation: function (combat_id, combat, tactic) {
-				console.log(`<font color=\"#FFA100\">[Combat: ${combat_id}]</font> `
+				console.log(`[Combat: ${combat_id}] `
 					+ `Setting occupation request in Memory; combat_id ${combat_id}-occupy.`);
 				_.set(Memory, ["sites", "combat", `${combat_id}-occupy`],
 					{
@@ -5775,7 +5775,7 @@ let Control = {
 	refillBucket: function () {
 		if (Game.cpu.bucket >= 10000 && _.get(Memory, ["hive", "pause", "bucket"], false)) {
 			_.set(Memory, ["hive", "pause", "bucket"], false);
-			console.log(`<font color=\"#D3FFA3\">[Console]</font> Bucket full, resuming main.js.`);
+			console.log(`[Console] Bucket full, resuming main.js.`);
 		}
 
 		return _.get(Memory, ["hive", "pause", "bucket"], false);
@@ -5994,7 +5994,7 @@ let Control = {
 								: spawn.spawnCreep(body, name, { memory: request.args, energyStructures: energies });
 
 							if (result == OK) {
-								console.log(`<font color=\"#19C800\">[Spawns]</font> Spawning `
+								console.log(`[Spawns] Spawning `
 									+ (spawn.room.name == request.room ? `${request.room}  ` : `${spawn.room.name} -> ${request.room}  `)
 									+ `${level} / ${request.level}  ${name} : ${request.args["role"]}`
 									+ `${request.args["subrole"] == null ? "" : ", " + request.args["subrole"]} `
@@ -6062,7 +6062,7 @@ let Control = {
 
 				if (order != null) {
 					if (_.get(Memory, ["resources", "terminal_orders", `overflow_${res}`]) != null)
-						console.log(`<font color=\"#F7FF00\">[Hive]</font> Selling overflow resource to market: ${excess} of ${res} from ${room}`);
+						console.log(`[Hive] Selling overflow resource to market: ${excess} of ${res} from ${room}`);
 					_.set(Memory, ["resources", "terminal_orders", `overflow_${res}`], { market_id: order.id, amount: excess, from: room, priority: 4 });
 
 				}
@@ -6097,7 +6097,7 @@ let Control = {
 				r => { return !_.has(Memory, ["resources", "terminal_orders", `overflow_energy_${r}`]) && energy[r] - limit > 100; }),
 				r => {	// Terminal transfers: minimum quantity of 100.
 					_.set(Memory, ["resources", "terminal_orders", `overflow_energy_${r}`], { room: tgtRoom, resource: "energy", amount: energy[r] - limit, from: r, priority: 2 });
-					console.log(`<font color=\"#F7FF00\">[Hive]</font> Creating overflow energy transfer: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);
+					console.log(`[Hive] Creating overflow energy transfer: ${energy[r] - limit}, ${r} -> ${tgtRoom}`);
 				});
 		}
 
@@ -6152,7 +6152,7 @@ let Control = {
 					r => { return r.controller != null && r.controller.my && r.terminal; }),
 					r => { amount += r.store(reagent); });
 				if (amount <= 1000 && !_.has(Memory, ["resources", "labs", "targets", reagent]) && getReagents(reagent) != null) {
-					console.log(`<font color=\"#A17BFF\">[Labs]</font> reagent ${reagent} missing for ${target.mineral}, creating target goal.`);
+					console.log(`[Labs]</font> reagent ${reagent} missing for ${target.mineral}, creating target goal.`);
 					Memory["resources"]["labs"]["targets"][reagent] = { amount: target.amount, priority: target.priority, mineral: reagent, is_reagent: true };
 					this.createReagentTargets(Memory["resources"]["labs"]["targets"][reagent]);
 				}
@@ -6174,10 +6174,10 @@ let Blueprint = {
 			let room = Game.rooms[_.get(Memory, ["hive", "pulses", "blueprint", "request"])];
 
 			if (room == null) {
-				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blueprint() request for ${_.get(Memory, ["hive", "pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
+				console.log(`[Blueprint] Blueprint() request for ${_.get(Memory, ["hive", "pulses", "blueprint", "request"])} failed; unable to find in Game.rooms.`);
 			} else {
 				Stats_CPU.Start("Hive", "Blueprint-Run");
-				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Processing requested Blueprint() for ${room.name}`);
+				console.log(`[Blueprint] Processing requested Blueprint() for ${room.name}`);
 				this.Run(room);
 				Stats_CPU.End("Hive", "Blueprint-Run");
 			}
@@ -6203,7 +6203,7 @@ let Blueprint = {
 		Stats_CPU.Start("Hive", "Blueprint-Run");
 		let room = (room_iter < room_list.length ? Game.rooms[room_list[room_iter]] : null);
 		if (room != null) {
-			console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room_iter + 1}/${room_list.length}: Running Blueprint() for ${room.name}`);
+			console.log(`[Blueprint] ${room_iter + 1}/${room_list.length}: Running Blueprint() for ${room.name}`);
 			this.Run(room);			// Run blueprinting for this room
 		}
 
@@ -6280,7 +6280,7 @@ let Blueprint = {
 			}).length == 0) {
 				Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
 					{ start: { x: (s.pos.x - 1), y: (s.pos.y - 1) }, end: { x: (s.pos.x + 1), y: (s.pos.y + 1) } });
-				console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for source around (${s.pos.x}, ${s.pos.y}).`);
+				console.log(`[Blueprint] Blocking area in ${room.name} for source around (${s.pos.x}, ${s.pos.y}).`);
 			}
 		});
 
@@ -6290,7 +6290,7 @@ let Blueprint = {
 		}).length == 0) {
 			Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
 				{ start: { x: (mineral.pos.x - 1), y: (mineral.pos.y - 1) }, end: { x: (mineral.pos.x + 1), y: (mineral.pos.y + 1) } });
-			console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for mineral around (${mineral.pos.x}, ${mineral.pos.y}).`);
+			console.log(`[Blueprint] Blocking area in ${room.name} for mineral around (${mineral.pos.x}, ${mineral.pos.y}).`);
 		}
 
 		if (_.filter(blocked_areas, a => {
@@ -6299,7 +6299,7 @@ let Blueprint = {
 		}).length == 0) {
 			Memory["rooms"][room.name]["layout"]["blocked_areas"].push(
 				{ start: { x: (room.controller.pos.x - 1), y: (room.controller.pos.y - 1) }, end: { x: (room.controller.pos.x + 1), y: (room.controller.pos.y + 1) } });
-			console.log(`<font color=\"#6065FF\">[Blueprint]</font> Blocking area in ${room.name} for room controller around (${room.controller.pos.x}, ${room.controller.pos.y}).`);
+			console.log(`[Blueprint] Blocking area in ${room.name} for room controller around (${room.controller.pos.x}, ${room.controller.pos.y}).`);
 		}
 
 		// If colonization focused on rapidly building defenses (RCL 3), don't place anything until tower is built
@@ -6328,7 +6328,7 @@ let Blueprint = {
 					if (sites < sites_per_room && source.pos.findInRange(containers, 1).length < 2) {
 						let adj = source.pos.getBuildableTile_Adjacent();
 						if (adj != null && adj.createConstructionSite("container") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing container at (${adj.x}, ${adj.y})`);
+							console.log(`[Blueprint] ${room.name} placing container at (${adj.x}, ${adj.y})`);
 							sites += 1;
 						}
 					}
@@ -6375,7 +6375,7 @@ let Blueprint = {
 					if (sites < sites_per_room && source.pos.findInRange(links, 2).length == 0) {
 						let adj = source.pos.getOpenTile_Path(2);
 						if (adj != null && adj.createConstructionSite("link") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
+							console.log(`[Blueprint] ${room.name} placing link at (${adj.x}, ${adj.y})`);
 							sites += 1;
 						}
 					}
@@ -6393,7 +6393,7 @@ let Blueprint = {
 				if (sites < sites_per_room && room.controller.pos.findInRange(links, 2).length < cont_links) {
 					let adj = room.controller.pos.getOpenTile_Path(2);
 					if (adj != null && adj.createConstructionSite("link") == OK) {
-						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing link at (${adj.x}, ${adj.y})`);
+						console.log(`[Blueprint] ${room.name} placing link at (${adj.x}, ${adj.y})`);
 						sites += 1;
 					}
 				}
@@ -6410,7 +6410,7 @@ let Blueprint = {
 				let extractors = _.filter(structures, s => { return s.structureType == "extractor"; }).length;
 				if (extractors < CONTROLLER_STRUCTURES["extractor"][level]) {
 					if (room.createConstructionSite(mineral.pos.x, mineral.pos.y, "extractor") == OK) {
-						console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing extractor at `
+						console.log(`[Blueprint] ${room.name} placing extractor at `
 							+ `(${mineral.pos.x}, ${mineral.pos.y})`);
 						sites += 1;
 					}
@@ -6426,7 +6426,7 @@ let Blueprint = {
 						|| structure.structureType == "storage" || structure.structureType == "terminal"
 						|| structure.structureType == "nuker" || structure.structureType == "powerSpawn") {
 						if (room.createConstructionSite(structure.pos.x, structure.pos.y, "rampart") == OK) {
-							console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing rampart over `
+							console.log(`[Blueprint] ${room.name} placing rampart over `
 								+ `${structure.structureType} at (${structure.pos.x}, ${structure.pos.y})`);
 							sites += 1;
 						}
@@ -6476,7 +6476,7 @@ let Blueprint = {
 
 			let result = room.createConstructionSite(x, y, structureType);
 			if (result == OK) {
-				console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placing ${structureType} at `
+				console.log(`[Blueprint] ${room.name} placing ${structureType} at `
 					+ `(${origin.x + layout[structureType][i].x}, ${origin.y + layout[structureType][i].y})`);
 				sites += 1;
 			} else if (result == ERR_INVALID_TARGET) {
@@ -6516,7 +6516,7 @@ let Blueprint = {
 		}
 
 		if (road > 0) {
-			console.log(`<font color=\"#6065FF\">[Blueprint]</font> ${room.name} placed ${road} construction sites for a road `
+			console.log(`[Blueprint] ${room.name} placed ${road} construction sites for a road `
 				+ `from (${from_pos.x}, ${from_pos.y}) to (${to_pos.x}, ${to_pos.y})`);
 			sites += road;
 		}
@@ -7206,56 +7206,55 @@ let Console = {
 		help_log.push("log.controllers()");
 
 		log.controllers = function () {
-			console.log("<font color=\"#D3FFA3\">[Console]</font> Room Controllers:");
-			let output = "<table>";
+			console.log("[Console] Room Controllers:");
+			let output = "";
 			_.each(_.sortBy(_.sortBy(_.filter(Game.rooms,
 				r => { return r.controller != null && r.controller.my; }),
 				r => { return -r.controller.progress; }),
 				r => { return -r.controller.level; }), r => {
-					output += `<tr><td><font color=\"#D3FFA3\">${r.name}:</font>  (${r.controller.level})  </td> `
-						+ `<td>${r.controller.progress}  </td><td>  /  </td><td>${r.controller.progressTotal}    </td> `
-						+ `<td>(${(r.controller.progress / r.controller.progressTotal * 100).toFixed()} %)</td></tr>`;
+					output += `${r.name}: (${r.controller.level})\t `
+						+ `${r.controller.progress}  \t  /  \t${r.controller.progressTotal}    \t `
+						+ `(${(r.controller.progress / r.controller.progressTotal * 100).toFixed()} %)\t\n`;
 				});
-			console.log(`${output}</table>`);
+			console.log(`${output}`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
 		help_log.push("log.populations()");
 
 		log.populations = function () {
-			console.log("<font color=\"#D3FFA3\">[Console]</font> Populations for Colonies and Mining Sites (default and set_population):");
+			console.log("[Console] Populations for Colonies and Mining Sites (default and set_population):");
 
 			let colonies = _.keys(_.filter(Game.rooms, room => { return (room.controller != null && room.controller.my); }));
 			let mining = _.keys(_.get(Memory, ["sites", "mining"]));
 			let rooms = _.keys(_.get(Memory, "rooms"));
-			let output = "<table>";
+			let output = "";
 
 			for (let i = 0; i < rooms.length; i++) {
 				if (_.indexOf(colonies, rooms[i]) >= 0 || _.indexOf(mining, rooms[i]) >= 0) {
 					if (_.has(Memory, ["rooms", rooms[i], "set_population"])) {
-						output += `<tr><td><font color=\"#D3FFA3\">${(rooms[i])}</font>: \t</td>`;
+						output += `- ${(rooms[i])}: \t`;
 						let populations = _.keys(Memory["rooms"][rooms[i]]["set_population"]);
 						for (let j = 0; j < populations.length; j++) {
-							output += `<td>${populations[j]}: </td> `
-							+ `<td>lvl ${_.get(Memory, ["rooms", rooms[i], "set_population", populations[j], "level"])}</td>`
-							+ `<td> x ${_.get(Memory, ["rooms", rooms[i], "set_population", populations[j], "amount"])} \t</td>  `;
+							output += `${populations[j]}:  `
+							+ `lvl ${_.get(Memory, ["rooms", rooms[i], "set_population", populations[j], "level"])}\t`
+							+ `x ${_.get(Memory, ["rooms", rooms[i], "set_population", populations[j], "amount"])} \t  `;
 						}
-						output += `</tr>`;
+						output += `\n`;
 					} else {
-						output += `<tr><td><font color=\"#D3FFA3\">${(rooms[i])}</font>: \t</td>`
-							+`<td>default</td></tr>`;
+						output += `- ${(rooms[i])}: \t default \n`;
 					}
 				}
 			}
-			console.log(`${output}</table>`);
+			console.log(`${output}`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		}
 
 		help_log.push("log.labs()");
 
 		log.labs = function () {
-			let output = "<font color=\"#D3FFA3\">[Console]</font> Lab Report<br>"
-				+ "<table><tr><th>Room \t</th><th>Mineral \t</th><th>Amount \t</th><th>Target Amount \t</th><th>Reagent #1 \t</th><th>Reagent #2</th></tr>";
+			let output = "[Console] Lab Report \n"
+				+ "Room \tMineral \tAmount \tTarget Amount \tReagent #1 \tReagent #2\n";
 
 			_.each(_.keys(_.get(Memory, ["resources", "labs", "reactions"])), r => {
 				let rxn = Memory["resources"]["labs"]["reactions"][r];
@@ -7273,13 +7272,13 @@ let Console = {
 						_.each(_.filter(Game.rooms,
 							r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); }),
 							r => { r_amount += r.store(reagent); });
-						reagents += `<td>${reagent}: \t${r_amount}</td>`;
+						reagents += `${reagent}: \t${r_amount}\t`;
 					});
 
-				output += `<tr><td>${r}</td><td>${_.get(rxn, "mineral")}</td><td>${amount}</td><td>(${_.get(rxn, "amount")})${reagents}</tr>`
+				output += `${r} \t${_.get(rxn, "mineral")} \t${amount} \t(${_.get(rxn, "amount")})${reagents} \n`
 			});
 
-			console.log(`${output}</table>`);
+			console.log(`${output}`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
@@ -7289,8 +7288,8 @@ let Console = {
 			let resource_list = resource != null ? [resource] : RESOURCES_ALL;
 			let room_list = _.filter(Game.rooms, r => { return r.controller != null && r.controller.my && (r.storage || r.terminal); });
 
-			let output = `<font color=\"#FFF"><tr><th>Resource\t</th><th>Total \t\t</th>`;
-			_.each(room_list, r => { output += `<th><font color=\"#${r.terminal ? "5DB65B" : "B65B5B"}\">${r.name}</font> \t</th>`; });
+			let output = `Resource \tTotal`;
+			_.each(room_list, r => { output += `${r.terminal ? "*" : "-"} ${r.name} \t`; });
 
 			_.each(resource_list, res => {
 				let amount = 0;
@@ -7299,14 +7298,14 @@ let Console = {
 				_.each(room_list, r => {
 					let a = r.store(res);
 					amount += a;
-					output_rooms += `<td>${a}</td>`
+					output_rooms += `${a} \t`
 				});
 
 				if (amount >= limit)
-					output += `<tr><td>${res}</td><td>${amount}</td> ${output_rooms} </tr>`;
+					output += `${res} \t${amount} \t${output_rooms} \n`;
 			});
 
-			console.log(`<font color=\"#D3FFA3">log.resources</font> <table>${output}</table>`);
+			console.log(`log.resources ${output}`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
@@ -7322,7 +7321,7 @@ let Console = {
 				output += `</tr>`;
 			});
 
-			console.log(`<font color=\"#D3FFA3">log.mining</font><table>${output}</table>`);
+			console.log(`log.mining <table>${output}</table>`);
 			return "<font color=\"#D3FFA3\">[Console]</font> Report generated";
 		};
 
@@ -7809,8 +7808,7 @@ let Console = {
 				}
 			}
 
-			console.log(`<font color=\"#D3FFA3\">Command list:</font> <br>${menu.join("<br>")}<br><br>`);
-			return `<font color=\"#D3FFA3\">[Console]</font> Help("${submenu}") list complete`;
+			return `<font color=\"#D3FFA3\">[Console]</font> Command list: <br>${menu.join("<br>")}<br><br>`;
 		};
 	}
 };
@@ -7962,12 +7960,12 @@ let Stats_CPU = {
 		if (_.get(Memory, ["hive", "profiler", "cycles"]) <= 0) {
 			let total_cycles = _.get(Memory, ["hive", "profiler", "cycles_total"]);
 
-			console.log(`<font color=\"#D3FFA3">Pulses during profiling: \n`
+			console.log(`Pulses during profiling: \n`
 				+ `Short:\t ${_.get(Memory, ["hive", "profiler", "pulses", "short"], 0)} \n`
 				+ `Mid:\t ${_.get(Memory, ["hive", "profiler", "pulses", "mid"], 0)} \n`
 				+ `Long:\t ${_.get(Memory, ["hive", "profiler", "pulses", "long"], 0)} \n`
 				+ `Spawn:\t ${_.get(Memory, ["hive", "profiler", "pulses", "spawn"], 0)} \n`
-				+ `Lab:\t ${_.get(Memory, ["hive", "profiler", "pulses", "lab"], 0)} \n`);
+				+ `Lab:\t ${_.get(Memory, ["hive", "profiler", "pulses", "lab"], 0)} \n_`);
 
 			for (let r in _.get(Memory, ["hive", "profiler", "current"])) {
 				let output = "";
@@ -7978,7 +7976,7 @@ let Stats_CPU = {
 					let cycles = Object.keys(_.get(Memory, ["hive", "profiler", "current", r, n])).length;
 					_.forEach(_.get(Memory, ["hive", "profiler", "current", r, n]), c => { used += _.get(c, "used", 0); });
 					used = ((used > 0 == true) ? used : 0);
-					output += `<tr><td>(${parseFloat(used).toFixed(2)} / ${cycles})</td><td>${parseFloat(used / cycles).toFixed(2)}</td><td>${n}</td></tr>`;
+					output += `(${parseFloat(used).toFixed(2)} / ${cycles})\t${parseFloat(used / cycles).toFixed(2)}\t${n}\t\n`;
 
 					room_used += used;
 					if (typeof (room_cycles) != "number")
@@ -7986,17 +7984,17 @@ let Stats_CPU = {
 					room_cycles = Math.max(room_cycles, cycles);
 				}
 
-				console.log(`<font color=\"#D3FFA3">CPU report for ${r} \n`
+				console.log( `CPU report for ${r} \n`
 					+ `Room Total: ${parseFloat(room_used).toFixed(2)} : `
-					+ `Room Mean: ${parseFloat(room_used / total_cycles).toFixed(2)}</font> `
-					+ `<table><tr><th>Total / Cycles\t  </th><th>Mean\t  </th><th>Function</th></tr>`
-					+ `${output}</table>`);
+					+ `Room Mean: ${parseFloat(room_used / total_cycles).toFixed(2)} \n\n`
+					+ `Total / Cycles\t  Mean\t  Function`
+					+ `${output}`);
 			}
 
 			_.set(Memory, ["hive", "profiler", "status"], "off");
 			_.set(Memory, ["hive", "profiler", "current"], new Object());	// Wipe for the next use
 		} else if (_.get(Memory, ["hive", "profiler", "cycles"]) % 5 == 0) {
-			console.log(`<font color=\"#D3FFA3\">[CPU]</font> Profiler running, ${_.get(Memory, ["hive", "profiler", "cycles"])} ticks remaining.`);
+			console.log(`[CPU] Profiler running, ${_.get(Memory, ["hive", "profiler", "cycles"])} ticks remaining.`);
 		}
 	}
 };
