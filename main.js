@@ -165,8 +165,17 @@ Creep.prototype.runTask = function runTask() {
 		task["timer"] = task["timer"] - 1;
 		if (task["timer"] <= 0) {
 			delete this.memory.task;
+
+			if (_.get(Memory, ["hive", "visuals", "saying"]) == true) {
+				this.say("reset");
+			}
+
 			return;
 		}
+	}
+
+	if (_.get(Memory, ["hive", "visuals", "saying"]) == true) {
+		this.say(this.memory.task["type"]);
 	}
 
 	switch (this.memory.task["type"]) {
@@ -7179,6 +7188,14 @@ let Console = {
 			this.controllers();
 			this.resources();
 			return `<font color=\"#D3FFA3\">[Console]</font> Main logs printed.`;
+		}
+
+		help_log.push("log.say()");
+
+		log.say = function () {
+			_.set(Memory, ["hive", "visuals", "saying"], _.get(Memory, ["hive", "visuals", "saying"]) !== true);
+
+			return `Creep speech: ${_.get(Memory, ["hive", "visuals", "saying"]) ? "enabled" : "disabled"}`;
 		}
 
 		help_log.push("log.can_build()");
