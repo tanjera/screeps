@@ -6234,7 +6234,7 @@ let Blueprint = {
 
 		// Iterate, then check if iteration is complete (and reset cycles)
 		room_iter += 1;
-		if (room_iter == room_list.length)
+		if (room_iter >= room_list.length)
 			delete Memory["hive"]["pulses"]["blueprint"]["cycle"];
 		else
 			_.set(Memory, ["hive", "pulses", "blueprint", "cycle", "room_iter"], room_iter);
@@ -7166,7 +7166,7 @@ let Console = {
 		help_blueprint.push("blueprint.reset()");
 		blueprint.reset = function () {
 			if (_.get(Memory, ["hive", "pulses", "blueprint"], null) != null)
-				delete Memory.hive.pulses.blueprint;				
+				delete Memory.hive.pulses.blueprint;
 			return `<font color=\"#D3FFA3\">[Console]</font> Resetting Blueprint() cycles; Blueprint() will initiate next tick.`;
 		};
 
