@@ -142,10 +142,16 @@ Creep.prototype.isAlly = function isAlly() {
 	return this.my || (allyList != null && allyList.indexOf(this.owner.username) >= 0);
 };
 
+Creep.prototype.isForeign = function isHostile() {
+	let allyList = _.get(Memory, ["hive", "allies"]);
+	return !this.my && (allyList == null || allyList.indexOf(this.owner.username) < 0);
+};
 
 Creep.prototype.isHostile = function isHostile() {
 	let allyList = _.get(Memory, ["hive", "allies"]);
-	return !this.my && (allyList == null || allyList.indexOf(this.owner.username) < 0);
+
+	return !this.my && (allyList == null || allyList.indexOf(this.owner.username) < 0)
+		&& (this.hasPart("attack") || this.hasPart("ranged_attack"));
 };
 
 Creep.prototype.hasPart = function hasPart(part) {
@@ -3365,7 +3371,7 @@ let Creep_Roles_Combat = {
 			}
 
 			let target = _.head(_.sortBy(_.sortBy(_.sortBy(creep.room.find(FIND_HOSTILE_CREEPS,
-				{ filter: (c) => { return c.isHostile(); } }),
+				{ filter: (c) => { return c.isHostile() || c.isForeign(); } }),
 				c => {
 					return -(c.hasPart("attack") + c.hasPart("ranged_attack")
 						+ c.hasPart("heal")) + c.hasPart("work");
@@ -3625,9 +3631,16 @@ let Sites = {
 					_.set(Memory, ["rooms", rmColony, "survey", "source_amount"],
 						(visible ? Game.rooms[rmColony].findSources().length : 0));
 
+				let foreign = !visible ? new Array()
+					: _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isForeign(); });
+				_.set(Memory, ["rooms", rmColony, "defense", "foreign"], foreign);
+
 				let hostiles = !visible ? new Array()
 					: _.filter(Game.rooms[rmColony].find(FIND_HOSTILE_CREEPS), c => { return c.isHostile(); });
 				_.set(Memory, ["rooms", rmColony, "defense", "hostiles"], hostiles);
+
+				let has_foreign = visible && foreign.length > 0;
+				_.set(Memory, ["rooms", rmColony, "defense", "has_foreign"], has_foreign);
 
 				let is_safe = visible && hostiles.length == 0;
 				_.set(Memory, ["rooms", rmColony, "defense", "is_safe"], is_safe);
@@ -3812,8 +3825,9 @@ let Sites = {
 
 			runTowers: function (rmColony) {
 				let is_safe = (_.get(Memory, ["rooms", rmColony, "defense", "hostiles"], new Array()).length == 0);
+				let has_foreign = (_.get(Memory, ["rooms", rmColony, "defense", "foreign"], new Array()).length == 0);
 
-				if (!is_safe) {
+				if (!is_safe || has_foreign) {
 					_.set(Memory, ["rooms", rmColony, "defense", "targets", "heal"], null);
 					_.set(Memory, ["rooms", rmColony, "defense", "targets", "repair"], null);
 
@@ -4159,6 +4173,7 @@ let Sites = {
 				let room_level = Game["rooms"][rmColony].getLevel();
 				let has_minerals = _.get(Memory, ["sites", "mining", rmHarvest, "survey", "has_minerals"]);
 				let threat_level = _.get(Memory, ["rooms", rmColony, "defense", "threat_level"]);
+				let has_foreign = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "has_foreign"]);
 				let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"]);
 				let hostiles = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "hostiles"], new Array());
 
@@ -4220,14 +4235,14 @@ let Sites = {
 					if (threat_level == LOW || threat_level == null) {
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
-						if (is_safe) {
+						if (is_safe && !has_foreign) {
 							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 2));
 							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 2));
 						}
 					} else if (threat_level == MEDIUM) {
 						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
-						if (is_safe) {
+						if (is_safe && !has_foreign) {
 							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 1));
 							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
 						}
@@ -4394,6 +4409,7 @@ let Sites = {
 			},
 
 			runCreeps: function (rmColony, rmHarvest, listCreeps, hasKeepers, listRoute) {
+				let has_foreign = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "has_foreign"]);
 				let is_safe = _.get(Memory, ["sites", "mining", rmHarvest, "defense", "is_safe"]);
 				let can_mine = _.get(Memory, ["sites", "mining", rmHarvest, "can_mine"]);
 
