@@ -3703,6 +3703,8 @@ let Sites = {
 			runPopulation: function (rmColony, listCreeps, listSpawnRooms) {
 				let room_level = Game["rooms"][rmColony].getLevel();
 				let is_safe = _.get(Memory, ["rooms", rmColony, "defense", "is_safe"]);
+				let has_foreign = _.get(Memory, ["rooms", rmColony, "defense", "has_foreign"]);
+				let foreign = _.get(Memory, ["rooms", rmColony, "defense", "foreign"], new Array());
 				let hostiles = _.get(Memory, ["rooms", rmColony, "defense", "hostiles"], new Array());
 				let threat_level = _.get(Memory, ["rooms", rmColony, "defense", "threat_level"]);
 				let energy_level = _.get(Memory, ["rooms", rmColony, "survey", "energy_level"]);
@@ -3728,11 +3730,12 @@ let Sites = {
 				// Adjust soldier amounts & levels based on threat level
 				if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {
 					if (threat_level == LOW || threat_level == null) {
+						//_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe)
 							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
 					} else if (threat_level == MEDIUM) {
-						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 2);
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe) {
 							_.set(popTarget, ["soldier", "level"], Math.max(2, room_level - 1));
@@ -3767,12 +3770,15 @@ let Sites = {
 				// Grafana population stats
 				Stats_Grafana.populationTally(rmColony, popTarget, popActual);
 
+				let towers = _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType === "tower"; }).length;
+
 				if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
 					&& ((_.get(popActual, "soldier", 0) < _.get(popTarget, ["soldier", "amount"], 0))
-						|| (_.get(popActual, "soldier", 0) < hostiles.length))) {
+						|| (_.get(popActual, "soldier", 0) < hostiles.length)
+						|| (towers < 1 && _.get(popActual, "soldier", 0) < foreign.length))) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
-						priority: (!is_safe ? 1 : 21),
+						priority: (!is_safe || has_foreign ? 1 : 21),
 						level: _.get(popTarget, ["soldier", "level"], room_level),
 						scale: _.get(popTarget, ["soldier", "scale"], true),
 						body: "soldier", name: null, args: { role: "soldier", room: rmColony }
