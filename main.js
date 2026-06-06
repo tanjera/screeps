@@ -164,6 +164,8 @@ Creep.prototype.hasPart = function hasPart(part) {
  * *********************************************************** */
 
 Creep.prototype.runTask = function runTask() {
+	let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
 	if (this.memory.task == null) {
 		return;
 	} else if (this.memory.task["timer"] != null) {
@@ -172,7 +174,7 @@ Creep.prototype.runTask = function runTask() {
 		if (task["timer"] <= 0) {
 			delete this.memory.task;
 
-			if (_.get(Memory, ["hive", "visuals", "saying"]) == true) {
+			if (visuals) {
 				this.say("reset");
 			}
 
@@ -180,7 +182,7 @@ Creep.prototype.runTask = function runTask() {
 		}
 	}
 
-	if (_.get(Memory, ["hive", "visuals", "saying"]) == true) {
+	if (visuals) {
 		this.say(this.memory.task["type"]);
 	}
 
@@ -2762,18 +2764,31 @@ let Creep_Roles = {
 					c => { return c.isHostile(); }
 			}));
 
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
 		if (hostile == null) {
 			if (creep.memory.state == "refueling") {
 				if (_.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "working";
+
+					if (visuals) {
+						creep.say("work");
+					}
+
 					delete creep.memory.task;
 					return;
 				}
 
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
 
-				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
+				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true)) {
+
+					if (visuals) {
+						creep.say("travel");
+					}
+
 					return;
+				}
 
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Link(15);
 				creep.memory.task = creep.memory.task || creep.getTask_Withdraw_Storage("energy",
@@ -2790,6 +2805,11 @@ let Creep_Roles = {
 			} else if (creep.memory.state == "working") {
 				if (creep.carry["energy"] == 0) {
 					creep.memory.state = "refueling";
+
+					if (visuals) {
+						creep.say("refuel");
+					}
+
 					delete creep.memory.task;
 					return;
 				}
@@ -2810,10 +2830,20 @@ let Creep_Roles = {
 
 			} else {
 				creep.memory.state = "refueling";
+
+				if (visuals) {
+					creep.say("refuel");
+				}
+
 				return;
 			}
 		} else if (hostile != null) {
 			creep.moveFrom(creep, hostile);
+
+			if (visuals) {
+				creep.say("run");
+			}
+
 			return;
 		}
 	},
@@ -2825,19 +2855,32 @@ let Creep_Roles = {
 					c => { return c.isHostile(); }
 			}));
 
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
 		if (hostile == null && canMine) {
 			if (creep.memory.state == "refueling") {
 				if (creep.memory.role != "burrower" && creep.carryCapacity > 0
 					&& _.sum(creep.carry) == creep.carryCapacity) {
 					creep.memory.state = "delivering";
+
+					if (visuals) {
+						creep.say("deliver");
+					}
+
 					delete creep.memory.task;
 					return;
 				}
 
 				creep.memory.task = creep.memory.task || creep.getTask_Boost();
 
-				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true))
+				if (!creep.memory.task && this.goToRoom(creep, creep.memory.room, true)) {
+					if (visuals) {
+						creep.say("travel");
+					}
+
 					return;
+				}
+
 
 				if (creep.memory.role == "burrower") {
 					creep.memory.task = creep.memory.task || creep.getTask_Mine();
@@ -2872,11 +2915,21 @@ let Creep_Roles = {
 				if (creep.carryCapacity == 0 || _.sum(creep.carry) == 0) {
 					creep.memory.state = "refueling";
 					delete creep.memory.task;
+
+					if (visuals) {
+						creep.say("refuel");
+					}
+
 					return;
 				}
 
-				if (this.goToRoom(creep, creep.memory.colony, false))
+				if (this.goToRoom(creep, creep.memory.colony, false)) {
+					if (visuals) {
+						creep.say("travel");
+					}
+
 					return;
+				}
 
 				if (creep.room.energyAvailable < creep.room.energyCapacityAvailable * 0.75) {
 					creep.memory.task = creep.memory.task || creep.getTask_Deposit_Spawns();
@@ -2896,10 +2949,18 @@ let Creep_Roles = {
 
 			} else {
 				creep.memory.state = "refueling";
+
+				if (visuals) {
+					creep.say("refuel");
+				}
 				return;
 			}
 		} else if (hostile != null) {
 			creep.moveFrom(creep, hostile);
+
+			if (visuals) {
+				creep.say("run");
+			}
 			return;
 		}
 	},
@@ -3042,14 +3103,29 @@ let Creep_Roles = {
 	},
 
 	Colonizer: function (creep) {
-		if (this.moveToDestination(creep))
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
+		if (this.moveToDestination(creep)) {
+			if (visuals) {
+				creep.say("travel");
+			}
+
 			return;
+		}
 
 		let result = creep.claimController(creep.room.controller);
 		if (result == ERR_NOT_IN_RANGE) {
 			creep.moveTo(creep.room.controller)
+			if (visuals) {
+				creep.say("move");
+			}
+
 			return;
 		} else if (result == ERR_NO_BODYPART) {
+			if (visuals) {
+				creep.say("incapable");
+			}
+
 			return;		// Reservers and colonizers with no "claim" parts prevent null body spawn locking
 		} else {
 			let request = _.get(Memory, ["sites", "colonization", creep.memory.room]);
@@ -3061,7 +3137,15 @@ let Creep_Roles = {
 				_.set(Memory, ["rooms", creep.room.name, "focus_defense"], _.get(request, "focus_defense"));
 				_.set(Memory, ["hive", "pulses", "blueprint", "request"], creep.room.name);
 				creep.memory = {};
+
+				if (visuals) {
+					creep.say("claim!");
+				}
 			} else if (result != OK) {
+				if (visuals) {
+					creep.say("failure");
+				}
+
 				console.log(`[Colonization] ${creep.name} unable to colonize ${_.get(request, ["target"])}; error ${result}`);
 			}
 			return;
@@ -3069,10 +3153,23 @@ let Creep_Roles = {
 	},
 
 	Soldier: function (creep, targetStructures, targetCreeps, listTargets) {
-		if (Creep_Roles_Combat.acquireBoost(creep))
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
+		if (Creep_Roles_Combat.acquireBoost(creep)) {
+			if (visuals) {
+				creep.say("boost");
+			}
+
 			return;
-		if (Creep_Roles_Combat.moveToDestination(creep, 10))
+		}
+
+		if (Creep_Roles_Combat.moveToDestination(creep, 10)) {
+			if (visuals) {
+				creep.say("travel");
+			}
+
 			return;
+		}
 
 		Creep_Roles_Combat.checkTarget_Existing(creep);
 		Creep_Roles_Combat.acquireTarget_ListTarget(creep, listTargets);
@@ -3093,8 +3190,16 @@ let Creep_Roles = {
 			let result = creep.attack(target);
 
 			if (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true) {
+				if (visuals) {
+					creep.say("destroy");
+				}
+
 				creep.moveTo(target, { reusePath: 0 });
 			} else if (result == ERR_NOT_IN_RANGE) {
+				if (visuals) {
+					creep.say("chase");
+				}
+
 				creep.heal(creep);
 
 				if (_.get(creep, ["memory", "target", "rampart"]) != null) {
@@ -3107,8 +3212,16 @@ let Creep_Roles = {
 					creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK) {
+				if (visuals) {
+					creep.say("attack");
+				}
+
 				return;
 			} else {
+				if (visuals) {
+					creep.say("heal");
+				}
+
 				creep.heal(creep);
 				return;
 			}
@@ -3116,15 +3229,33 @@ let Creep_Roles = {
 			creep.heal(creep);
 			Creep_Roles_Combat.acquireCamp(creep);
 			Creep_Roles_Combat.travelCamp(creep);
+
+			if (visuals) {
+				creep.say("camp");
+			}
+
 			return;
 		}
 	},
 
 	Archer: function (creep, targetStructures, targetCreeps, listTargets) {
-		if (Creep_Roles_Combat.acquireBoost(creep))
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
+		if (Creep_Roles_Combat.acquireBoost(creep)) {
+			if (visuals) {
+				creep.say("boost");
+			}
+
 			return;
-		if (Creep_Roles_Combat.moveToDestination(creep, 10))
+		}
+
+		if (Creep_Roles_Combat.moveToDestination(creep, 10)) {
+			if (visuals) {
+				creep.say("travel");
+			}
+
 			return;
+		}
 
 		Creep_Roles_Combat.checkTarget_Existing(creep);
 		Creep_Roles_Combat.acquireTarget_ListTarget(creep, listTargets);
@@ -3146,8 +3277,16 @@ let Creep_Roles = {
 			let result = creep.rangedAttack(target);
 
 			if (result == ERR_INVALID_TARGET && target instanceof ConstructionSite == true) {
+				if (visuals) {
+					creep.say("destroy");
+				}
+
 				creep.moveTo(target, { reusePath: 0 });
 			} else if (result == ERR_NOT_IN_RANGE) {
+				if (visuals) {
+					creep.say("chase");
+				}
+
 				if (_.get(creep, ["memory", "target", "rampart"]) != null) {
 					let rampart = Game.getObjectById(creep.memory.target.rampart);
 					if (rampart != null)
@@ -3158,11 +3297,19 @@ let Creep_Roles = {
 					creep.moveTo(target, { reusePath: 0 });
 				return;
 			} else if (result == OK) {
+				if (visuals) {
+					creep.say("attack");
+				}
+
 				if (creep.pos.getRangeTo(target < 3))
 					creep.moveFrom(creep, target);
 				return;
 			}
 		} else {
+			if (visuals) {
+				creep.say("camp");
+			}
+
 			creep.heal(creep);
 			Creep_Roles_Combat.acquireCamp(creep);
 			Creep_Roles_Combat.travelCamp(creep);
