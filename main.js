@@ -3896,7 +3896,6 @@ let Sites = {
 					//Ensure we have a spawn, otherwise return 25, 25
 					if(!originX || !originY)
 					{
-						console.log(`[Invasion] Could not detect any spawns in room ${rmColony}`);
 						originX = 25;
 						originY = 25;
 					}
