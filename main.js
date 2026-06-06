@@ -3709,6 +3709,7 @@ let Sites = {
 				let threat_level = _.get(Memory, ["rooms", rmColony, "defense", "threat_level"]);
 				let energy_level = _.get(Memory, ["rooms", rmColony, "survey", "energy_level"]);
 				let downgrade_critical = _.get(Memory, ["rooms", rmColony, "survey", "downgrade_critical"]);
+				let towers = _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType === "tower"; }).length;
 
 				let popActual = new Object();
 				_.each(listCreeps, c => {
@@ -3727,10 +3728,16 @@ let Sites = {
 				else
 					popTarget = _.cloneDeep(Population_Colony[listSpawnRooms == null ? "Standalone" : "Assisted"][Math.max(1, room_level)]);
 
+				// Have a baseline presence of defenders until towers are built
+				if (towers < 1 && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {
+					_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+					_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
+				}
+
 				// Adjust soldier amounts & levels based on threat level
 				if (threat_level != NONE && _.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null) {
 					if (threat_level == LOW || threat_level == null) {
-						//_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
+						_.set(popTarget, ["soldier", "amount"], _.get(popTarget, ["soldier", "amount"], 0) + 1);
 						_.set(popTarget, ["ranger", "amount"], _.get(popTarget, ["ranger", "amount"], 0) + 1);
 						if (is_safe)
 							_.set(popTarget, ["ranger", "level"], Math.max(2, room_level - 1));
@@ -3770,12 +3777,10 @@ let Sites = {
 				// Grafana population stats
 				Stats_Grafana.populationTally(rmColony, popTarget, popActual);
 
-				let towers = _.filter(Game.rooms[rmColony].find(FIND_MY_STRUCTURES), s => { return s.structureType === "tower"; }).length;
-
 				if (_.get(Game, ["rooms", rmColony, "controller", "safeMode"]) == null
 					&& ((_.get(popActual, "soldier", 0) < _.get(popTarget, ["soldier", "amount"], 0))
-						|| (_.get(popActual, "soldier", 0) < hostiles.length)
-						|| (towers < 1 && _.get(popActual, "soldier", 0) < foreign.length))) {
+						|| (_.get(popActual, "soldier", 0) < hostiles.length)											// Spawn # of soldiers to match # of hostiles
+						|| (towers < 1 && _.get(popActual, "soldier", 0) < foreign.length))) {							// If no towers, also spawn # of soldiers to match # of foreign creeps
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
 						priority: (!is_safe || has_foreign ? 1 : 21),
