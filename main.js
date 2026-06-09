@@ -7901,8 +7901,6 @@ let Console = {
 			let path = room.findPath(from.pos, to.pos, { ignoreCreeps: true });
 			for (let i = 0; i < path.length; i++)
 				room.createConstructionSite(path[i].x, path[i].y, "road");
-			room.createConstructionSite(from.pos, "road");
-			room.createConstructionSite(to.pos, "road");
 
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in for road from ${from_objID} to ${to_objID}`;
 		};
