@@ -7861,9 +7861,9 @@ let Console = {
 		};
 
 		path = new Object();
-		help_path.push("path.road(rmName, startX, startY, endX, endY)");
+		help_path.push("path.road(rmName, startX, startY, endX, endY, include_ends = false)");
 
-		path.road = function (rmName, startX, startY, endX, endY) {
+		path.road = function (rmName, startX, startY, endX, endY, include_ends = false) {
 			let room = Game.rooms[rmName];
 			if (room == null)
 				return `<font color=\"#D3FFA3\">[Console]</font> Error, ${rmName} not found.`;
@@ -7871,17 +7871,22 @@ let Console = {
 			let from = new RoomPosition(startX, startY, rmName);
 			let to = new RoomPosition(endX, endY, rmName);
 			let path = room.findPath(from, to, { ignoreCreeps: true });
-			for (let i = 0; i < path.length; i++)
+			
+			// findpath() includes end point... path.length -1 prevents this
+			for (let i = 0; i < path.length -1; i++)
 				room.createConstructionSite(path[i].x, path[i].y, "road");
-			room.createConstructionSite(startX, startY, "road");
-			room.createConstructionSite(endX, endY, "road");
+
+			if (include_ends) {
+				room.createConstructionSite(startX, startY, "road");
+				room.createConstructionSite(endX, endY, "road");
+			}
 
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
 		};
 
-		help_path.push("path.road(from_objID, to_objID)");
+		help_path.push("path.road(from_objID, to_objID, include_ends = false)");
 
-		path.road = function (from_objID, to_objID) {
+		path.road = function (from_objID, to_objID, include_ends = false) {
 			let from = Game.getObjectById(from_objID);
 			let to = Game.getObjectById(to_objID);
 
@@ -7899,8 +7904,15 @@ let Console = {
 
 			let room = Game.rooms[from.pos.roomName];
 			let path = room.findPath(from.pos, to.pos, { ignoreCreeps: true });
-			for (let i = 0; i < path.length; i++)
+			
+			// findpath() includes end point... path.length -1 prevents this
+			for (let i = 0; i < path.length -1; i++)
 				room.createConstructionSite(path[i].x, path[i].y, "road");
+
+			if (include_ends) {
+				room.createConstructionSite(from.pos, "road");
+				room.createConstructionSite(to.pos, "road");
+			}
 
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in for road from ${from_objID} to ${to_objID}`;
 		};
