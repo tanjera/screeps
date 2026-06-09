@@ -3010,6 +3010,8 @@ let Creep_Roles = {
 	},
 
 	Extractor: function (creep, isSafe) {
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
 		let hostile = isSafe ? null
 			: _.head(creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6, {
 				filter:
@@ -3023,6 +3025,11 @@ let Creep_Roles = {
 					if (_.sum(creep.carry) == creep.carryCapacity
 						|| _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true) == false) {
 						creep.memory.state = "deliver";
+
+						if (visuals) {
+							creep.say("deliver");
+						}
+
 						delete creep.memory.task;
 						return;
 					}
@@ -3042,6 +3049,11 @@ let Creep_Roles = {
 					if (_.sum(creep.carry) == 0
 						&& _.get(Memory, ["rooms", creep.room.name, "survey", "has_minerals"], true)) {
 						creep.memory.state = "get_minerals";
+
+						if (visuals) {
+							creep.say("refuel");
+						}
+
 						delete creep.memory.task;
 						return;
 					}
@@ -3056,18 +3068,32 @@ let Creep_Roles = {
 					return;
 			}
 		} else if (hostile != null) {
+			if (visuals) {
+				creep.say("run");
+			}
+
 			creep.moveFrom(creep, hostile);
 			return;
 		}
 	},
 
 	Reserver: function (creep) {
-		if (this.moveToDestination(creep))
-			return;
+		let visuals = _.get(Memory, ["hive", "visuals", "saying"], false);
+
+		if (this.moveToDestination(creep)) {
+			if (visuals) {
+				creep.say("travel");
+			}
+
+			return;}
 
 		let controller = _.get(creep.room, "controller", null);
 
 		if (creep.pos.getRangeTo(controller) > 1) {
+			if (visuals) {
+				creep.say("move");
+			}
+
 			creep.travel(creep.room.controller)
 			return;
 		}
@@ -3083,11 +3109,25 @@ let Creep_Roles = {
 		}
 
 		if (result == ERR_NOT_IN_RANGE) {
+			if (visuals) {
+				creep.say("move");
+			}
+
 			creep.travel(creep.room.controller)
 			return;
+
 		} else if (result == ERR_NO_BODYPART) {
+			if (visuals) {
+				creep.say("no-claim");
+			}
+
 			return;		// Reservers and colonizers with no "claim" parts prevent null body spawn locking
+
 		} else if (result == OK) {
+			if (visuals) {
+				creep.say("claim");
+			}
+
 			if (Game.time % 50 == 0) {
 				let room_sign = _.get(Memory, ["hive", "signs", creep.room.name]);
 				let default_sign = _.get(Memory, ["hive", "signs", "default"]);
@@ -7837,6 +7877,34 @@ let Console = {
 			room.createConstructionSite(endX, endY, "road");
 
 			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in ${rmName} for road from (${startX}, ${startY}) to (${endX}, ${endY}).`;
+		};
+
+		help_path.push("path.road(from_objID, to_objID)");
+
+		path.road = function (from_objID, to_objID) {
+			let from = Game.getObjectById(from_objID);
+			let to = Game.getObjectById(to_objID);
+
+			if (from == null) {
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, unable to find ${from_objID}.`;
+			}
+
+			if (to == null) {
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, unable to find ${to_objID}.`;
+			}
+
+			if (from.pos.roomName !== to.pos.roomName) {
+				return `<font color=\"#D3FFA3\">[Console]</font> Error, objects not within same room. Function does not support crossing rooms`;
+			}
+
+			let room = Game.rooms[from.pos.roomName];
+			let path = room.findPath(from.pos, to.pos, { ignoreCreeps: true });
+			for (let i = 0; i < path.length; i++)
+				room.createConstructionSite(path[i].x, path[i].y, "road");
+			room.createConstructionSite(from.pos, "road");
+			room.createConstructionSite(to.pos, "road");
+
+			return `<font color=\"#D3FFA3\">[Console]</font> Construction sites placed in for road from ${from_objID} to ${to_objID}`;
 		};
 
 		help_path.push("path.exit_tile(exit_pos)");
