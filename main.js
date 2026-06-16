@@ -4361,6 +4361,14 @@ let Sites = {
 					}
 				}
 
+				// Tally energy resources in colony's storage... if more full, reduce spawn priority/burden
+				if (_.get(Game, ["rooms", rmColony, "storage"], null) != null) {
+					_.set(Memory, ["sites", "mining", rmHarvest, "colony_store_energy"], 
+						Game.rooms[rmColony].storage.store.getUsedCapacity(RESOURCE_ENERGY));
+					_.set(Memory, ["sites", "mining", rmHarvest, "colony_store_available"], 
+						Game.rooms[rmColony].storage.store.getFreeCapacity(RESOURCE_ENERGY));
+				}
+
 				_.set(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"],
 					(!visible || _.get(Game, ["rooms", rmHarvest, "controller", "pos"], null) == null) ? 0
 						: Game.rooms[rmHarvest].controller.pos.getAccessAmount(false));
@@ -4378,6 +4386,8 @@ let Sites = {
 				let is_visible = _.get(Memory, ["sites", "mining", rmHarvest, "survey", "visible"], true);
 				let can_mine = _.get(Memory, ["sites", "mining", rmHarvest, "can_mine"]);
 
+				let is_priority = true;
+
 				// If the colony is not safe (under siege?) pause spawning remote mining; frees colony spawns to make soldiers
 				if (rmColony != rmHarvest && !is_safe_colony)
 					return;
@@ -4394,6 +4404,21 @@ let Sites = {
 					}
 					return;
 				}
+
+				// Set mining priority; if colony is full of energy, mining is a low priority
+				if (_.get(Game, ["rooms", rmColony, "storage"], null) != null) {
+					let store_energy = _.get(Memory, ["sites", "mining", rmHarvest, "colony_store_energy"], 0);
+					let store_avail = _.get(Memory, ["sites", "mining", rmHarvest, "colony_store_available"], 0);
+					if (store_avail == 0) {
+						is_priority = false;
+					} else if (store_avail > 0 && store_energy > 0
+						&& store_energy / store_avail > 1) {
+							is_priority = false;
+					}
+				}
+
+				// Commit to Memory for debugging purposes
+				_.set(Memory, ["sites", "mining", rmHarvest, "is_priority"], is_priority);
 
 				let popActual = new Object();
 				_.each(listCreeps, c => {
@@ -4467,7 +4492,7 @@ let Sites = {
 				if (_.get(popActual, "paladin", 0) < _.get(popTarget, ["paladin", "amount"], 0)) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
-						priority: 14,
+						priority: is_priority ? 14 : 24,
 						level: popTarget["paladin"]["level"],
 						scale: _.get(popTarget, ["paladin", "scale"], true),
 						body: "paladin", name: null, args: { role: "paladin", room: rmHarvest, colony: rmColony }
@@ -4476,7 +4501,7 @@ let Sites = {
 				if (_.get(popActual, "ranger", 0) < _.get(popTarget, ["ranger", "amount"], 0)) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
-						priority: 14,
+						priority: is_priority ? 14 : 34,
 						level: _.get(popTarget, ["ranger", "level"], room_level),
 						scale: _.get(popTarget, ["ranger", "scale"], true),
 						body: "ranger", name: null, args: { role: "ranger", room: rmHarvest, colony: rmColony }
@@ -4487,7 +4512,7 @@ let Sites = {
 					|| (_.get(popActual, "soldier", 0) < _.get(popTarget, ["soldier", "amount"], 0))) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
-						priority: (!is_safe ? 3 : 14),
+						priority: !is_safe ? 3 : (is_priority ? 14 : 34),
 						level: _.get(popTarget, ["soldier", "level"], room_level),
 						scale: _.get(popTarget, ["soldier", "scale"], true),
 						body: "soldier", name: null, args: { role: "soldier", room: rmHarvest, colony: rmColony }
@@ -4497,7 +4522,7 @@ let Sites = {
 				if (_.get(popActual, "healer", 0) < _.get(popTarget, ["healer", "amount"], 0)) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
-						priority: (!is_safe ? 4 : 15),
+						priority: !is_safe ? 4 : (is_priority ? 15 : 35),
 						level: popTarget["healer"]["level"],
 						scale: _.get(popTarget, ["healer", "scale"], true),
 						body: "healer", name: null, args: { role: "healer", room: rmHarvest, colony: rmColony }
@@ -4507,7 +4532,7 @@ let Sites = {
 				if (_.get(popActual, "multirole", 0) < _.get(popTarget, ["multirole", "amount"], 0)) {
 					Memory["hive"]["spawn_requests"].push({
 						room: rmColony, listRooms: listSpawnRooms,
-						priority: 19,
+						priority: is_priority ? 19 : 39,
 						level: popTarget["multirole"]["level"],
 						scale: _.get(popTarget, ["multirole", "scale"], true),
 						body: _.get(popTarget, ["multirole", "body"], "worker"),
@@ -4524,7 +4549,7 @@ let Sites = {
 							|| _.get(popActual, "reserver", 0) < _.get(Memory, ["sites", "mining", rmHarvest, "survey", "reserve_access"], 0))) {
 						Memory["hive"]["spawn_requests"].push({
 							room: rmColony, listRooms: listSpawnRooms,
-							priority: 17,
+							priority: is_priority ? 17 : 37,
 							level: _.get(popTarget, ["reserver", "level"], 1),
 							scale: _.get(popTarget, ["reserver", "scale"], true),
 							body: _.get(popTarget, ["reserver", "body"], "reserver"),
@@ -4536,7 +4561,7 @@ let Sites = {
 						if (_.get(popActual, "burrower", 0) < _.get(popTarget, ["burrower", "amount"], 0)) {
 							Memory["hive"]["spawn_requests"].push({
 								room: rmColony, listRooms: listSpawnRooms,
-								priority: (rmColony == rmHarvest ? 12 : 15),
+								priority: (rmColony == rmHarvest ? 12 : (is_priority ? 15 : 35)),
 								level: _.get(popTarget, ["burrower", "level"], 1),
 								scale: _.get(popTarget, ["burrower", "scale"], true),
 								body: _.get(popTarget, ["burrower", "body"], "burrower"),
@@ -4547,7 +4572,7 @@ let Sites = {
 						if (_.get(popActual, "carrier", 0) < _.get(popTarget, ["carrier", "amount"], 0)) {
 							Memory["hive"]["spawn_requests"].push({
 								room: rmColony, listRooms: listSpawnRooms,
-								priority: (rmColony == rmHarvest ? 13 : 16),
+								priority: (rmColony == rmHarvest ? 13 : (is_priority ? 16 : 36)),
 								level: _.get(popTarget, ["carrier", "level"], 1),
 								scale: _.get(popTarget, ["carrier", "scale"], true),
 								body: _.get(popTarget, ["carrier", "body"], "carrier"),
@@ -4560,7 +4585,7 @@ let Sites = {
 								&& _.get(popActual, "carrier", 0) < _.get(popTarget, ["carrier", "amount"], 0))) {
 							Memory["hive"]["spawn_requests"].push({
 								room: rmColony, listRooms: listSpawnRooms,
-								priority: (rmColony == rmHarvest ? 11 : 14),
+								priority: (rmColony == rmHarvest ? 11 : (is_priority ? 14 : 34)),
 								level: Math.max(1, Game["rooms"][rmColony].getLevel_Available()),
 								scale: true, body: "worker",
 								name: null, args: { role: "miner", room: rmHarvest, colony: rmColony, spawn_renew: false }
@@ -4570,7 +4595,7 @@ let Sites = {
 						if (_.get(popActual, "miner", 0) < _.get(popTarget, ["miner", "amount"], 0)) {
 							Memory["hive"]["spawn_requests"].push({
 								room: rmColony, listRooms: listSpawnRooms,
-								priority: (rmColony == rmHarvest ? 12 : 15),
+								priority: (rmColony == rmHarvest ? 12 : (is_priority ? 15 : 35)),
 								level: _.get(popTarget, ["miner", "level"], 1),
 								scale: _.get(popTarget, ["miner", "scale"], true),
 								body: _.get(popTarget, ["miner", "body"], "worker"),
@@ -4581,7 +4606,7 @@ let Sites = {
 						if (_.get(popActual, "dredger", 0) < _.get(popTarget, ["dredger", "amount"], 0)) {
 							Memory["hive"]["spawn_requests"].push({
 								room: rmColony, listRooms: listSpawnRooms,
-								priority: 19,
+								priority: is_priority ? 19 : 39,
 								level: _.get(popTarget, ["dredger", "level"], 1),
 								scale: _.get(popTarget, ["dredger", "scale"], true),
 								body: _.get(popTarget, ["dredger", "body"], "dredger"),
@@ -4594,7 +4619,7 @@ let Sites = {
 							&& _.get(popActual, "extractor", 0) < _.get(popTarget, ["extractor", "amount"], 0)) {
 							Memory["hive"]["spawn_requests"].push({
 								room: rmColony, listRooms: listSpawnRooms,
-								priority: 18,
+								priority: is_priority ? 18 : 38,
 								level: _.get(popTarget, ["extractor", "level"], 1),
 								scale: _.get(popTarget, ["extractor", "scale"], true),
 								body: _.get(popTarget, ["extractor", "body"], "extractor"),
